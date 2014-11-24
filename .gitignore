@@ -1,0 +1,6 @@
+# Build
+bud.userprefs
+bin/
+
+# Editors
+*.swp
