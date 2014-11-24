@@ -2,5 +2,8 @@
 bud.userprefs
 bin/
 
+# MonoDevelop
+test-results/
+
 # Editors
 *.swp
