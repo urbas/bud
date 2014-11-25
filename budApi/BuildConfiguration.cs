@@ -4,10 +4,10 @@ namespace Bud
 {
 	public class BuildConfiguration
 	{
-    private readonly string path;
+    public string ProjectBaseDir { private set; get; }
 
-    public BuildConfiguration(string path) {
-      this.path = path;
+    public BuildConfiguration(string projectBaseDir) {
+      ProjectBaseDir = projectBaseDir;
     }
 	}
 }
