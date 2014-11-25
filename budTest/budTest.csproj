@@ -44,6 +44,7 @@
     <Compile Include="IntegrationTests\NoConfiguration.cs" />
     <Compile Include="Test\Util\TemporaryDirectoryCopy.cs" />
     <Compile Include="Test\Util\TestProjects.cs" />
+    <Compile Include="Test\TemporaryDirectoryAssertions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\bud\bud.csproj">
