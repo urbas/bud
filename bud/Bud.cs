@@ -2,13 +2,15 @@ using System;
 
 namespace Bud {
   public static class Bud {
+
     public static BuildConfiguration Load(string path) {
-      return new BuildConfiguration();
+      return new BuildConfiguration(path);
     }
 
-    public static void ExecuteTask(BuildConfiguration buildConfiguration, string taskName) {
+    public static void Execute(BuildConfiguration buildConfiguration, string taskName) {
 
     }
+
   }
 }
 
