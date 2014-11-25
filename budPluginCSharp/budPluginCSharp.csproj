@@ -9,6 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Bud.Plugin.CSharp</RootNamespace>
     <AssemblyName>Bud.Plugin.CSharp</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -35,4 +36,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\budApi\budApi.csproj">
+      <Project>{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}</Project>
+      <Name>budApi</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
