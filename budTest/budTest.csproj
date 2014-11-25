@@ -35,11 +35,20 @@
       <Private>False</Private>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="IntegrationTests\PlainProjectBuild.cs" />
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="IntegrationTests\" />
+    <Folder Include="Test\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IntegrationTests\NoConfiguration.cs" />
+    <Compile Include="Test\Util\TemporaryDirectoryCopy.cs" />
+    <Compile Include="Test\Util\TestProjects.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\bud\bud.csproj">
+      <Project>{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}</Project>
+      <Name>bud</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
