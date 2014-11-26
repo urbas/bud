@@ -1,4 +1,5 @@
 using System;
+using Bud.Plugin.CSharp;
 
 namespace Bud {
   public static class Bud {
@@ -7,8 +8,8 @@ namespace Bud {
       return new BuildConfiguration(path);
     }
 
-    public static void Execute(BuildConfiguration buildConfiguration, string taskName) {
-
+    public static void Evaluate(BuildConfiguration buildConfiguration, string key) {
+      CSharpPlugin.Compile(buildConfiguration);
     }
 
   }

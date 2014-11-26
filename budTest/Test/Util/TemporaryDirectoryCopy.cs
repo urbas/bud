@@ -12,7 +12,7 @@ namespace Bud.Test.Util {
       if (!Directory.Exists(directory)) {
         throw new ArgumentException(string.Format("The directory '{0}' does not exist.", directory));
       }
-      temporaryDirectory = Directories.CreateTemporary(System.IO.Path.GetFileName(directory), string.Empty);
+      temporaryDirectory = Directories.CreateTemporary(System.IO.Path.GetFileName(directory) + "-", string.Empty);
       Directories.Copy(directory, temporaryDirectory);
     }
 

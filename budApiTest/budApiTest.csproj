@@ -5,10 +5,10 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.0</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{4E20C380-468E-4363-82B2-B0DD2467047E}</ProjectGuid>
+    <ProjectGuid>{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Bud.Plugin.CSharp</RootNamespace>
-    <AssemblyName>Bud.Plugin.CSharp</AssemblyName>
+    <RootNamespace>Bud</RootNamespace>
+    <AssemblyName>BudApiTest</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -31,10 +31,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="CSharpPlugin.cs" />
+    <Reference Include="nunit.framework">
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -42,5 +41,8 @@
       <Project>{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}</Project>
       <Name>budApi</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Test.cs" />
   </ItemGroup>
 </Project>

@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "systemTests", "systemTests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budPluginCSharp", "budPluginCSharp\budPluginCSharp.csproj", "{4E20C380-468E-4363-82B2-B0DD2467047E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budApiTest", "budApiTest\budApiTest.csproj", "{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -21,6 +23,10 @@ Global
 		{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}.Debug|x86.Build.0 = Debug|Any CPU
 		{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}.Release|x86.ActiveCfg = Release|Any CPU
 		{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}.Release|x86.Build.0 = Release|Any CPU
+		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Debug|x86.Build.0 = Debug|Any CPU
+		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Release|x86.ActiveCfg = Release|Any CPU
+		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Release|x86.Build.0 = Release|Any CPU
 		{4E20C380-468E-4363-82B2-B0DD2467047E}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{4E20C380-468E-4363-82B2-B0DD2467047E}.Debug|x86.Build.0 = Debug|Any CPU
 		{4E20C380-468E-4363-82B2-B0DD2467047E}.Release|x86.ActiveCfg = Release|Any CPU
