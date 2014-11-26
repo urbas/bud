@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Diagnostics;
+using Bud.Cli;
 
 namespace Bud.Plugin.CSharp {
   public class CSharpPlugin {
@@ -11,17 +12,9 @@ namespace Bud.Plugin.CSharp {
       var outputFile = GetOutputFile(buildConfiguration.ProjectBaseDir);
       Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
       var cSharpCompiler = "/usr/bin/mcs";
-      using (var process = new Process()) {
-        var compilerArguments = CliUtils.Argument("-out:" + outputFile).Add(sourceFiles).ToString();
-        process.StartInfo.FileName = cSharpCompiler;
-        process.StartInfo.Arguments = compilerArguments;
-        process.StartInfo.UseShellExecute = false;
-        process.StartInfo.RedirectStandardOutput = true;
-        process.StartInfo.RedirectStandardError = true;
-        process.Start();
-        Console.WriteLine(process.StandardOutput.ReadToEnd());
-        Console.Error.WriteLine(process.StandardError.ReadToEnd());
-        process.WaitForExit();
+      var exitCode = Processes.Execute(cSharpCompiler).AddArgument("-out:" + outputFile).AddArguments(sourceFiles).Execute(Console.Out, Console.Error);
+      if (exitCode != 0) {
+        throw new Exception("Compilation failed.");
       }
     }
 
