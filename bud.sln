@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "systemTests", "systemTests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budPluginCSharp", "budPluginCSharp\budPluginCSharp.csproj", "{4E20C380-468E-4363-82B2-B0DD2467047E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budApiTest", "budApiTest\budApiTest.csproj", "{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budApiTests", "budApiTests\budApiTests.csproj", "{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,7 +63,6 @@ Global
 		$2.MethodBraceStyle = EndOfLine
 		$2.ConstructorBraceStyle = EndOfLine
 		$2.DestructorBraceStyle = EndOfLine
-		$2.ElseIfNewLinePlacement = SameLine
 		$2.BeforeMethodDeclarationParentheses = False
 		$2.BeforeMethodCallParentheses = False
 		$2.BeforeConstructorDeclarationParentheses = False

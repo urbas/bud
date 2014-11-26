@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>10.0.0</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -32,6 +32,9 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>..\packages\Microsoft.Bcl.Immutable.1.0.34\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -40,12 +43,24 @@
     <Compile Include="BudPaths.cs" />
     <Compile Include="Cli\Processes.cs" />
     <Compile Include="Cli\ProcessBuilder.cs" />
-    <Compile Include="Plugins\DefaultBuildPlugin.cs" />
     <Compile Include="IO\TemporaryDirectory.cs" />
+    <Compile Include="Setting.cs" />
+    <Compile Include="Build.cs" />
+    <Compile Include="SettingKey.cs" />
+    <Compile Include="SettingValue.cs" />
+    <Compile Include="Settings\SettingInitialization.cs" />
+    <Compile Include="Settings\SettingsUtils.cs" />
+    <Compile Include="Settings\SettingInitializationBuilder.cs" />
+    <Compile Include="Settings\SettingConstantValue.cs" />
+    <Compile Include="Plugins\BuildPlugin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Cli\" />
     <Folder Include="Plugins\" />
+    <Folder Include="Settings\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

@@ -1,9 +1,12 @@
 # Build
 bud.userprefs
 bin/
+obj/
 
 # MonoDevelop
 test-results/
+packages/
 
 # Editors
 *.swp
+*~

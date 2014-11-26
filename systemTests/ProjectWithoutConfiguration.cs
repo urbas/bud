@@ -7,7 +7,7 @@ using Bud.Plugin.CSharp;
 namespace Bud.SystemTests {
   public class ProjectWithoutConfiguration {
     [Test]
-    public void Executing_compile_MUST_produce_the_executable() {
+    public void compile_MUST_produce_the_executable() {
       using (var testProjectCopy = TestProjects.TemporaryCopy("ProjectWithoutConfiguration")) {
         BuildConfiguration buildConfiguration = Bud.Load(testProjectCopy.Path);
 
@@ -22,7 +22,7 @@ namespace Bud.SystemTests {
     }
 
     [Test]
-    public void Executing_compile_MUST_produce_no_executable_WHEN_the_project_folder_is_empty() {
+    public void compile_MUST_produce_no_executable_WHEN_the_project_folder_is_empty() {
       using (var emptyProject = TestProjects.EmptyProject()) {
         BuildConfiguration buildConfiguration = Bud.Load(emptyProject.Path);
         Bud.Evaluate(buildConfiguration, "compile");

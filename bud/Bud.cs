@@ -1,5 +1,6 @@
 using System;
 using Bud.Plugin.CSharp;
+using Bud.Plugins;
 
 namespace Bud {
   public static class Bud {
@@ -12,7 +13,7 @@ namespace Bud {
       if ("compile".Equals(key)) {
         CSharpPlugin.Compile(buildConfiguration);
       } else {
-        DefaultBuildPlugin.Clean(buildConfiguration);
+        BuildPlugin.Clean(buildConfiguration);
       }
     }
 
