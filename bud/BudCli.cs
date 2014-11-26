@@ -1,9 +1,12 @@
 using System;
+using System.IO;
 
 namespace Bud {
   class BudCli {
     public static void Main(string[] args) {
-      Console.WriteLine("Hello World!");
+      BuildConfiguration buildConfiguration = Bud.Load(Directory.GetCurrentDirectory());
+      Console.WriteLine(args[0]);
+      Bud.Evaluate(buildConfiguration, args[0]);
     }
   }
 }

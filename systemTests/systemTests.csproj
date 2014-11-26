@@ -52,5 +52,9 @@
       <Project>{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}</Project>
       <Name>budTest</Name>
     </ProjectReference>
+    <ProjectReference Include="..\budPluginCSharp\budPluginCSharp.csproj">
+      <Project>{4E20C380-468E-4363-82B2-B0DD2467047E}</Project>
+      <Name>budPluginCSharp</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

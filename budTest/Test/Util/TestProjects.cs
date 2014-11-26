@@ -4,8 +4,13 @@ using Bud.Test.Util;
 
 namespace Bud {
   public static class TestProjects {
-    public static TemporaryDirectoryCopy TemporaryCopy(string projectDirName) {
-      return new TemporaryDirectoryCopy(GetPathOfProject(projectDirName));
+
+    public static TemporaryDirectory TemporaryCopy(string projectDirName) {
+      return new TemporaryDirectory(GetPathOfProject(projectDirName));
+    }
+
+    public static TemporaryDirectory EmptyProject() {
+      return new TemporaryDirectory();
     }
 
     public static string GetPathOfProject(string projectDirName) {

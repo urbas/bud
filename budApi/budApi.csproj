@@ -31,6 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Data.Linq" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -40,6 +41,7 @@
     <Compile Include="Cli\Processes.cs" />
     <Compile Include="Cli\ProcessBuilder.cs" />
     <Compile Include="Plugins\DefaultBuildPlugin.cs" />
+    <Compile Include="IO\TemporaryDirectory.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
