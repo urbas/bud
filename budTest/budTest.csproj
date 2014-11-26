@@ -38,11 +38,13 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Test\" />
+    <Folder Include="Test\Assertions\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Test\Util\TemporaryDirectoryCopy.cs" />
     <Compile Include="Test\Util\TestProjects.cs" />
-    <Compile Include="Test\TemporaryDirectoryAssertions.cs" />
+    <Compile Include="Test\Assertions\TemporaryDirectoryAssertions.cs" />
+    <Compile Include="Test\Assertions\FileAssertions.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\bud\bud.csproj">

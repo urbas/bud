@@ -1,6 +1,6 @@
 using System;
 using Bud.Test;
-using Bud.Test.Util;
+using Bud.Test.Assertions;
 using NUnit.Framework;
 
 namespace Bud.SystemTests {
@@ -11,6 +11,8 @@ namespace Bud.SystemTests {
         BuildConfiguration buildConfiguration = Bud.Load(testProjectCopy.Path);
         Bud.Evaluate(buildConfiguration, "compile");
         testProjectCopy.AssertOutputFileExists(".net-4.5/main/debug/bin/program.exe");
+        Bud.Evaluate(buildConfiguration, "clean");
+        testProjectCopy.AssertOutputFileDoesNotExist(".net-4.5/main/debug/bin/program.exe");
       }
     }
   }
