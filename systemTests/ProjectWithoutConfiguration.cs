@@ -10,7 +10,7 @@ namespace Bud.SystemTests {
       using (var testProjectCopy = TestProjects.TemporaryCopy("ProjectWithoutConfiguration")) {
         BuildConfiguration buildConfiguration = Bud.Load(testProjectCopy.Path);
         Bud.Evaluate(buildConfiguration, "compile");
-        testProjectCopy.AssertFileExists(".bud/output/.net-4.5/main/debug/bin/program.exe");
+        testProjectCopy.AssertOutputFileExists(".net-4.5/main/debug/bin/program.exe");
       }
     }
   }
