@@ -37,12 +37,13 @@
     <Compile Include="BuildConfiguration.cs" />
     <Compile Include="IO\Directories.cs" />
     <Compile Include="BudPaths.cs" />
-    <Compile Include="Cli\CliUtils.cs" />
-    <Compile Include="Cli\CliArguments.cs" />
+    <Compile Include="Cli\Processes.cs" />
+    <Compile Include="Cli\ProcessBuilder.cs" />
+    <Compile Include="Plugins\DefaultBuildPlugin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <Folder Include="Graph\" />
     <Folder Include="Cli\" />
+    <Folder Include="Plugins\" />
   </ItemGroup>
 </Project>

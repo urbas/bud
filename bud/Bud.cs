@@ -9,7 +9,11 @@ namespace Bud {
     }
 
     public static void Evaluate(BuildConfiguration buildConfiguration, string key) {
-      CSharpPlugin.Compile(buildConfiguration);
+      if ("compile".Equals(key)) {
+        CSharpPlugin.Compile(buildConfiguration);
+      } else {
+        DefaultBuildPlugin.Clean(buildConfiguration);
+      }
     }
 
   }

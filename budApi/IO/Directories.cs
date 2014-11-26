@@ -22,11 +22,11 @@ namespace Bud.IO {
 
       Directory.CreateDirectory(destDir);
 
-      foreach (string file in Directory.GetFiles(sourceDir)) {
+      foreach (string file in Directory.EnumerateFiles(sourceDir)) {
         File.Copy(file, Path.Combine(destDir, Path.GetFileName(file)), true);
       }
 
-      foreach (string subdir in Directory.GetDirectories(sourceDir)) {
+      foreach (string subdir in Directory.EnumerateDirectories(sourceDir)) {
         Copy(subdir, Path.Combine(destDir, Path.GetFileName(subdir)));
       }
     }
