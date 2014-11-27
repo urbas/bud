@@ -25,12 +25,12 @@ namespace Bud.Plugins {
       }
     }
 
-    public static Settings AddProject(this Settings existingSettings, string id, string baseDir) {
-      return existingSettings.Modify(ListOfProjects).ByMapping(listOfProjects => listOfProjects.Add(new Project(id, baseDir)));
+    public static Settings Project(string id, string baseDir) {
+      return InitializePlugin().Modify(ListOfProjects).ByMapping(listOfProjects => listOfProjects.Add(new Project(id, baseDir)));
     }
 
-    public static Settings InitializePlugin(this Settings existingSettings) {
-      return existingSettings.EnsureInitialized(ListOfProjects).OrInitializeWith(ImmutableHashSet.Create<Project>());
+    public static Settings InitializePlugin() {
+      return Settings.Start.EnsureInitialized(ListOfProjects).OrInitializeWith(ImmutableHashSet.Create<Project>());
     }
   }
 
