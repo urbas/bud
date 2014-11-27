@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace Bud {
   public interface Build {
-    ImmutableList<Setting> Settings();
+    Settings GetSettings();
   }
 }
 

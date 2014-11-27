@@ -1,6 +1,6 @@
 using System.IO;
 using System.Collections.Immutable;
-using Bud.Settings;
+using Bud.SettingsConstruction;
 
 namespace Bud.Plugins {
 
@@ -19,14 +19,17 @@ namespace Bud.Plugins {
     public static readonly ConfigKey<ImmutableHashSet<Project>> ListOfProjects = new ConfigKey<ImmutableHashSet<Project>>();
 
     public static void Clean(BuildConfiguration buildConfiguration) {
-      Directory.Delete(BudPaths.GetOutputDirectory(buildConfiguration.ProjectBaseDir), true);
+      var listOfProjects = buildConfiguration.Evaluate(ListOfProjects);
+      foreach (var project in listOfProjects) {
+        Directory.Delete(BudPaths.GetOutputDirectory(project.BaseDir), true);
+      }
     }
 
-    public static ImmutableList<Setting> AddProject(this ImmutableList<Setting> existingSettings, string id, string baseDir) {
+    public static Settings AddProject(this Settings existingSettings, string id, string baseDir) {
       return existingSettings.Modify(ListOfProjects).ByMapping(listOfProjects => listOfProjects.Add(new Project(id, baseDir)));
     }
 
-    public static ImmutableList<Setting> InitializePlugin(this ImmutableList<Setting> existingSettings) {
+    public static Settings InitializePlugin(this Settings existingSettings) {
       return existingSettings.EnsureInitialized(ListOfProjects).OrInitializeWith(ImmutableHashSet.Create<Project>());
     }
   }

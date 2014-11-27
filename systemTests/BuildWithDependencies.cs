@@ -2,12 +2,11 @@ using Bud;
 using System.Collections.Generic;
 using Bud.Plugins;
 using System.Collections.Immutable;
-using Bud.Settings;
 
 public class BuildWithDependencies : Build {
 
-  public ImmutableList<Setting> Settings() {
-    return BuildConfiguration.Start
+  public Settings GetSettings() {
+    return Settings.Start
       .AddProject(id: "root", baseDir: ".");
   }
 

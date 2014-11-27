@@ -38,7 +38,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BuildConfiguration.cs" />
     <Compile Include="IO\Directories.cs" />
     <Compile Include="BudPaths.cs" />
     <Compile Include="Cli\Processes.cs" />
@@ -46,7 +45,6 @@
     <Compile Include="IO\TemporaryDirectory.cs" />
     <Compile Include="Setting.cs" />
     <Compile Include="Build.cs" />
-    <Compile Include="Settings\SettingsUtils.cs" />
     <Compile Include="SettingKey.cs" />
     <Compile Include="Plugins\ProjectPlugin.cs" />
     <Compile Include="SettingsConstruction\Builders\ConfigBuilder.cs" />
@@ -54,12 +52,14 @@
     <Compile Include="SettingsConstruction\Builders\ConfigModificationBuilder.cs" />
     <Compile Include="SettingsConstruction\Ops\ConfigModification.cs" />
     <Compile Include="SettingsConstruction\Ops\SettingEnsureInitialization.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="BuildConfiguration.cs" />
+    <Compile Include="SettingsConstruction\SettingsUtils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Cli\" />
     <Folder Include="Plugins\" />
-    <Folder Include="Settings\" />
     <Folder Include="SettingsConstruction\" />
     <Folder Include="SettingsConstruction\Builders\" />
     <Folder Include="SettingsConstruction\Ops\" />

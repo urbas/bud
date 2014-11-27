@@ -4,10 +4,10 @@ using Bud.SettingsConstruction.Ops;
 
 namespace Bud.SettingsConstruction.Builders {
   public class ConfigEnsureInitializedBuilder<T> : ConfigBuilder<T> {
-    public ConfigEnsureInitializedBuilder(ImmutableList<Setting> existingSettings, ConfigKey<T> key) : base(existingSettings, key) {
+    public ConfigEnsureInitializedBuilder(Settings existingSettings, ConfigKey<T> key) : base(existingSettings, key) {
     }
 
-    public ImmutableList<Setting> OrInitializeWith(T value) {
+    public Settings OrInitializeWith(T value) {
       return ExistingSettings.Add(new SettingEnsureInitialization<T>(Key, value));
     }
   }
