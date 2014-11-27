@@ -1,6 +1,7 @@
 using System;
 using Bud.Plugin.CSharp;
 using Bud.Plugins;
+using System.Collections.Immutable;
 
 namespace Bud {
   public static class Bud {

@@ -46,24 +46,23 @@
     <Compile Include="IO\TemporaryDirectory.cs" />
     <Compile Include="Setting.cs" />
     <Compile Include="Build.cs" />
-    <Compile Include="SettingValue.cs" />
     <Compile Include="Settings\SettingsUtils.cs" />
     <Compile Include="SettingKey.cs" />
     <Compile Include="Plugins\ProjectPlugin.cs" />
-    <Compile Include="Settings\Construction\ConfigBuilder.cs" />
-    <Compile Include="Settings\Construction\ConfigEnsureInitializedBuilder.cs" />
-    <Compile Include="Settings\Construction\ConfigModification.cs" />
-    <Compile Include="Settings\Construction\ConfigModificationBuilder.cs" />
-    <Compile Include="Settings\Construction\ConfigValueModification.cs" />
-    <Compile Include="Settings\Construction\SettingConstantValue.cs" />
-    <Compile Include="Settings\Construction\SettingEnsureInitialization.cs" />
+    <Compile Include="SettingsConstruction\Builders\ConfigBuilder.cs" />
+    <Compile Include="SettingsConstruction\Builders\ConfigEnsureInitializedBuilder.cs" />
+    <Compile Include="SettingsConstruction\Builders\ConfigModificationBuilder.cs" />
+    <Compile Include="SettingsConstruction\Ops\ConfigModification.cs" />
+    <Compile Include="SettingsConstruction\Ops\SettingEnsureInitialization.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Cli\" />
     <Folder Include="Plugins\" />
     <Folder Include="Settings\" />
-    <Folder Include="Settings\Construction\" />
+    <Folder Include="SettingsConstruction\" />
+    <Folder Include="SettingsConstruction\Builders\" />
+    <Folder Include="SettingsConstruction\Ops\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

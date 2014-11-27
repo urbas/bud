@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 
-namespace Bud.Settings.Construction {
+namespace Bud.SettingsConstruction.Builders {
   public class ConfigBuilder<T> {
     public readonly ImmutableList<Setting> ExistingSettings;
     public readonly ConfigKey<T> Key;

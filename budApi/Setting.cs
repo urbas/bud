@@ -3,11 +3,9 @@ using System.Collections.Generic;
 
 namespace Bud {
   public class Setting {
-    public readonly SettingValue Value;
     public readonly SettingKey Key;
 
-    public Setting(SettingKey key, SettingValue value) {
-      this.Value = value;
+    public Setting(SettingKey key) {
       this.Key = key;
     }
   }
