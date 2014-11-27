@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using Bud.Settings.Construction;
 
 namespace Bud.Settings {
   public static class SettingsUtils {

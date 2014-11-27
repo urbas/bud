@@ -48,21 +48,22 @@
     <Compile Include="Build.cs" />
     <Compile Include="SettingValue.cs" />
     <Compile Include="Settings\SettingsUtils.cs" />
-    <Compile Include="Settings\SettingConstantValue.cs" />
     <Compile Include="SettingKey.cs" />
-    <Compile Include="Settings\ConfigModificationBuilder.cs" />
-    <Compile Include="Settings\ConfigBuilder.cs" />
-    <Compile Include="Settings\ConfigModification.cs" />
-    <Compile Include="Settings\ConfigEnsureInitializedBuilder.cs" />
     <Compile Include="Plugins\ProjectPlugin.cs" />
-    <Compile Include="Settings\SettingEnsureInitialization.cs" />
-    <Compile Include="Settings\ConfigValueModification.cs" />
+    <Compile Include="Settings\Construction\ConfigBuilder.cs" />
+    <Compile Include="Settings\Construction\ConfigEnsureInitializedBuilder.cs" />
+    <Compile Include="Settings\Construction\ConfigModification.cs" />
+    <Compile Include="Settings\Construction\ConfigModificationBuilder.cs" />
+    <Compile Include="Settings\Construction\ConfigValueModification.cs" />
+    <Compile Include="Settings\Construction\SettingConstantValue.cs" />
+    <Compile Include="Settings\Construction\SettingEnsureInitialization.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Cli\" />
     <Folder Include="Plugins\" />
     <Folder Include="Settings\" />
+    <Folder Include="Settings\Construction\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

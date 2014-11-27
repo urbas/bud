@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Immutable;
 
-namespace Bud.Settings {
+namespace Bud.Settings.Construction {
 
   internal class SettingConstantValue<T> : SettingValue {
     public readonly T Value;
