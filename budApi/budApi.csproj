@@ -46,13 +46,17 @@
     <Compile Include="IO\TemporaryDirectory.cs" />
     <Compile Include="Setting.cs" />
     <Compile Include="Build.cs" />
-    <Compile Include="SettingKey.cs" />
     <Compile Include="SettingValue.cs" />
-    <Compile Include="Settings\SettingInitialization.cs" />
     <Compile Include="Settings\SettingsUtils.cs" />
-    <Compile Include="Settings\SettingInitializationBuilder.cs" />
     <Compile Include="Settings\SettingConstantValue.cs" />
-    <Compile Include="Plugins\BuildPlugin.cs" />
+    <Compile Include="SettingKey.cs" />
+    <Compile Include="Settings\ConfigModificationBuilder.cs" />
+    <Compile Include="Settings\ConfigBuilder.cs" />
+    <Compile Include="Settings\ConfigModification.cs" />
+    <Compile Include="Settings\ConfigEnsureInitializedBuilder.cs" />
+    <Compile Include="Plugins\ProjectPlugin.cs" />
+    <Compile Include="Settings\SettingEnsureInitialization.cs" />
+    <Compile Include="Settings\ConfigValueModification.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

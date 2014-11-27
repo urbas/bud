@@ -1,10 +1,8 @@
 using System;
 using System.IO;
 
-namespace Bud
-{
-	public static class BudPaths
-  {
+namespace Bud {
+  public static class BudPaths {
 
     public static string GetBuildDirectory(string projectBaseDir) {
       return Path.Combine(projectBaseDir, ".bud");
@@ -22,6 +20,6 @@ namespace Bud
       return Path.Combine(GetBuildDirectory(projectBaseDir), "buildConfigCache");
     }
 
-	}
+  }
 }
 

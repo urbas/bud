@@ -7,9 +7,7 @@ public class BuildWithDependencies : Build {
 
   public ImmutableList<Setting> Settings() {
 
-    var rootProject = BuildPlugin.AddProject(baseDir: ".");
-//      .Using<CSharpPlugin>()
-//      .WithDependency("Foo.Bar", "1.2.3");
+    var rootProject = ProjectPlugin.CreateProject(id: "root", baseDir: ".");
 
     return rootProject;
   }

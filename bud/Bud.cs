@@ -13,7 +13,7 @@ namespace Bud {
       if ("compile".Equals(key)) {
         CSharpPlugin.Compile(buildConfiguration);
       } else {
-        BuildPlugin.Clean(buildConfiguration);
+        ProjectPlugin.Clean(buildConfiguration);
       }
     }
 

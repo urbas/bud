@@ -1,17 +1,15 @@
 using System;
 using System.Collections.Immutable;
 
-namespace Bud.Settings
-{
+namespace Bud.Settings {
 
-  internal class SettingConstantValue : SettingValue
-  {
-    public readonly ImmutableHashSet<string> Value;
+  internal class SettingConstantValue<T> : SettingValue {
+    public readonly T Value;
 
-    public SettingConstantValue(ImmutableHashSet<string> value) {
+    public SettingConstantValue(T value) {
       this.Value = value;
     }
-	}
+  }
 
 
 }
