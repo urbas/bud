@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Immutable;
 
 namespace Bud {
@@ -20,7 +21,11 @@ namespace Bud {
     }
 
     public BuildConfiguration Compile() {
-      return new BuildConfiguration();
+      var buildConfigurationBuilder = ImmutableDictionary.CreateBuilder<SettingKey, object>();
+      foreach (var setting in SettingsList) {
+        setting.ApplyTo(buildConfigurationBuilder);
+      }
+      return new BuildConfiguration(buildConfigurationBuilder.ToImmutable());
     }
   }
 }

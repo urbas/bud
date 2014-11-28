@@ -47,6 +47,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Test.cs" />
+    <Compile Include="SettingsConstruction\SettingConstructionTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="SettingsConstruction\" />
   </ItemGroup>
 </Project>

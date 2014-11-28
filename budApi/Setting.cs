@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Bud {
-  public class Setting {
+  public abstract class Setting {
     public readonly SettingKey Key;
 
     public Setting(SettingKey key) {
       this.Key = key;
     }
+
+    public abstract void ApplyTo(ImmutableDictionary<SettingKey, object>.Builder buildConfigurationBuilder);
   }
 }
 
