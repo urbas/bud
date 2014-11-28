@@ -1,18 +1,9 @@
-using System.IO;
+﻿using System;
 using System.Collections.Immutable;
-using Bud.SettingsConstruction;
+using Bud.SettingsConstruction.Ops;
+using System.IO;
 
 namespace Bud.Plugins {
-
-  public class Project {
-    public readonly string Id;
-    public readonly string BaseDir;
-
-    public Project(string id, string baseDir) {
-      this.BaseDir = baseDir;
-      this.Id = id;
-    }
-  }
 
   public static class ProjectPlugin {
 
@@ -26,13 +17,12 @@ namespace Bud.Plugins {
     }
 
     public static Settings Project(string id, string baseDir) {
-      return InitializePlugin().Modify(ListOfProjects).ByMapping(listOfProjects => listOfProjects.Add(new Project(id, baseDir)));
+      return InitializePlugin().Add(ConfigModification.Create(ListOfProjects, listOfProjects => listOfProjects.Add(new Project(id, baseDir))));
     }
 
     public static Settings InitializePlugin() {
-      return Settings.Start.EnsureInitialized(ListOfProjects).OrInitializeWith(ImmutableHashSet.Create<Project>());
+      return Settings.Start.Add(SettingEnsureInitialization.Create(ListOfProjects, ImmutableHashSet.Create<Project>()));
     }
   }
-
 }
 

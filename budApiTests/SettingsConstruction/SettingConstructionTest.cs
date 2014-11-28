@@ -6,12 +6,12 @@ namespace Bud {
   public class SettingConstructionTest {
 
     private static readonly ConfigKey<string> TestKey = new ConfigKey<string>();
-    private Settings testSettingInitialized = Settings.Start.EnsureInitialized(TestKey).OrInitializeWith("foo");
+    private Settings testSettingInitialized = Settings.Start.EnsureInitialized(TestKey, "foo");
 
     [Test]
     [ExpectedException(typeof(InvalidOperationException))]
     public void Modifying_an_uninitialised_key_MUST_throw_an_exception() {
-      Settings.Start.Modify(TestKey).ByMapping(v => v).Compile();
+      Settings.Start.Modify(TestKey, v => v).Compile();
     }
 
     [Test]
@@ -22,7 +22,7 @@ namespace Bud {
 
     [Test]
     public void Modifying_an_initialized_key_MUST_return_the_modified_value() {
-      var buildConfiguration = testSettingInitialized.Modify(TestKey).ByMapping(v => v + "bar").Compile();
+      var buildConfiguration = testSettingInitialized.Modify(TestKey, v => v + "bar").Compile();
       Assert.AreEqual("foobar", buildConfiguration.Evaluate(TestKey));
     }
 

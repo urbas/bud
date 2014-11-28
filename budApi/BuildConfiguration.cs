@@ -7,8 +7,8 @@ namespace Bud
 	{
     public readonly ImmutableDictionary<SettingKey, object> SettingKeysToValues;
 
-    public BuildConfiguration(ImmutableDictionary<SettingKey, object> immutableDictionary) {
-      this.SettingKeysToValues = immutableDictionary;
+    public BuildConfiguration(ImmutableDictionary<SettingKey, object> settingKeysToValues) {
+      this.SettingKeysToValues = settingKeysToValues;
     }
 
     public T Evaluate<T>(ConfigKey<T> key) {
