@@ -18,8 +18,7 @@ namespace Bud {
 
     [Test]
     public void Create_MUST_not_insert_two_same_projects_to_the_list_of_projects() {
-      var buildConfiguration = ProjectPlugin.Project("foo", ".")
-        .Add(ProjectPlugin.Project("foo", ".")).End();
+      var buildConfiguration = ProjectPlugin.Project("foo", ".").Add(ProjectPlugin.Project("foo", ".")).End();
       var listOfProjects = buildConfiguration.Evaluate(ProjectPlugin.ListOfProjects);
       Assert.AreEqual(
         ImmutableHashSet.Create<Project>().Add(new Project("foo", ".")),

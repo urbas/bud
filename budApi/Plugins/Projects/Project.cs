@@ -21,6 +21,10 @@ namespace Bud.Plugins {
     public override bool Equals(object otherProject) {
       return otherProject.GetType().Equals(GetType()) && Id.Equals(((Project)otherProject).Id);
     }
+
+    public override string ToString() {
+      return string.Format("Project({0}, {1})", Id, BaseDir);
+    }
   }
 
 }
