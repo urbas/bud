@@ -34,6 +34,9 @@
     <Reference Include="nunit.framework">
       <Package>nunit</Package>
     </Reference>
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>..\packages\Microsoft.Bcl.Immutable.1.0.34\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -48,8 +51,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SettingsConstruction\SettingConstructionTest.cs" />
+    <Compile Include="Plugins\ProjectsPluginTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="SettingsConstruction\" />
+    <Folder Include="Plugins\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

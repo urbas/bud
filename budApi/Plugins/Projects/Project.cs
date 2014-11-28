@@ -13,6 +13,14 @@ namespace Bud.Plugins {
       this.BaseDir = baseDir;
       this.Id = id;
     }
+
+    public override int GetHashCode() {
+      return Id.GetHashCode();
+    }
+
+    public override bool Equals(object otherProject) {
+      return otherProject.GetType().Equals(GetType()) && Id.Equals(((Project)otherProject).Id);
+    }
   }
 
 }

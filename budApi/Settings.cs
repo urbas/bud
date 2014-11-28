@@ -20,7 +20,7 @@ namespace Bud {
       return new Settings(SettingsList.AddRange(settings.SettingsList));
     }
 
-    public BuildConfiguration Compile() {
+    public BuildConfiguration End() {
       var buildConfigurationBuilder = ImmutableDictionary.CreateBuilder<SettingKey, object>();
       foreach (var setting in SettingsList) {
         setting.ApplyTo(buildConfigurationBuilder);

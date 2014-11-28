@@ -48,11 +48,11 @@
     <Compile Include="SettingKey.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="BuildConfiguration.cs" />
-    <Compile Include="Plugins\Projects\ProjectPlugin.cs" />
     <Compile Include="Plugins\ProjectsPlugin.cs" />
     <Compile Include="SettingsConstruction\Ops\ConfigModification.cs" />
     <Compile Include="SettingsConstruction\Ops\SettingEnsureInitialization.cs" />
     <Compile Include="SettingsConstruction\SettingsConstructionExtensions.cs" />
+    <Compile Include="Plugins\Projects\Project.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
