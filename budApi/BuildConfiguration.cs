@@ -19,17 +19,23 @@ namespace Bud {
       return Evaluate((IValuedKey<object>)key);
     }
 
+    public static BuildConfiguration ToBuildConfiguration(Settings settings) {
+      var buildConfigurationBuilder = ImmutableDictionary.CreateBuilder<ISettingKey, IValueDefinition>();
+      foreach (var setting in settings.SettingsList) {
+        setting.ApplyTo(buildConfigurationBuilder);
+      }
+      return new BuildConfiguration(buildConfigurationBuilder.ToImmutable());
+    }
+
     public override string ToString() {
-      if (SettingKeysToValues.IsEmpty)
-        return "BuildConfiguration";
       StringBuilder sb = new StringBuilder("BuildConfiguration{");
       var enumerator = SettingKeysToValues.Keys.GetEnumerator();
-      enumerator.MoveNext();
-      AppendValueOf(sb, enumerator.Current);
-      while (enumerator.MoveNext()) {
-        var settingKey = enumerator.Current;
-        sb.Append(", ");
-        AppendValueOf(sb, settingKey);
+      if (enumerator.MoveNext()) {
+        AppendValueOf(sb, enumerator.Current);
+        while (enumerator.MoveNext()) {
+          sb.Append(", ");
+          AppendValueOf(sb, enumerator.Current);
+        }
       }
       return sb.Append('}').ToString();
     }
@@ -40,14 +46,6 @@ namespace Bud {
         sb.Append(" => ").Append(Evaluate((IValuedKey)settingKey));
       }
       return sb;
-    }
-
-    public static BuildConfiguration ToBuildConfiguration(Settings settings) {
-      var buildConfigurationBuilder = ImmutableDictionary.CreateBuilder<ISettingKey, IValueDefinition>();
-      foreach (var setting in settings.SettingsList) {
-        setting.ApplyTo(buildConfigurationBuilder);
-      }
-      return new BuildConfiguration(buildConfigurationBuilder.ToImmutable());
     }
   }
 
