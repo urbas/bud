@@ -10,7 +10,7 @@ namespace Bud {
       this.Key = key;
     }
 
-    public abstract void ApplyTo(ImmutableDictionary<SettingKey, object>.Builder buildConfigurationBuilder);
+    public abstract void ApplyTo(ImmutableDictionary<ISettingKey, object>.Builder buildConfigurationBuilder);
   }
 }
 

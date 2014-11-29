@@ -5,25 +5,11 @@ using Bud.SettingsConstruction.Ops;
 
 namespace Bud.Plugins {
 
-  public class Project {
-    public readonly string Id;
-    public readonly string BaseDir;
-
-    public Project(string id, string baseDir) {
-      this.BaseDir = baseDir;
-      this.Id = id;
-    }
-
-    public override int GetHashCode() {
-      return Id.GetHashCode();
-    }
-
-    public override bool Equals(object otherProject) {
-      return otherProject.GetType().Equals(GetType()) && Id.Equals(((Project)otherProject).Id);
-    }
+  public class Project : SettingKey {
+    public Project(string id) : base(id) {}
 
     public override string ToString() {
-      return string.Format("Project({0}, {1})", Id, BaseDir);
+      return string.Format("Project({0})", Id);
     }
   }
 

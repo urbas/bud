@@ -2,26 +2,39 @@
 using System.Collections.Immutable;
 using Bud.SettingsConstruction.Ops;
 using System.IO;
+using Bud.SettingsConstruction;
 
 namespace Bud.Plugins {
 
   public static class ProjectPlugin {
 
-    public static readonly ConfigKey<ImmutableHashSet<Project>> ListOfProjects = new ConfigKey<ImmutableHashSet<Project>>();
+    public static readonly ConfigKey<ImmutableHashSet<Project>> ListOfProjects = new ConfigKey<ImmutableHashSet<Project>>("ListOfProjects");
+    public static readonly ConfigKey<string> BaseDir = new ConfigKey<string>("BaseDir");
 
-    public static void Clean(BuildConfiguration buildConfiguration) {
+    public static ScopedSettings Project(string id, string baseDir) {
+      var project = new Project(id);
+      return Settings.Start
+        .AddProjectSupport()
+        .Add(ModifyConfig.Create(ListOfProjects, listOfProjects => listOfProjects.Add(project)))
+        .Add(InitializeConfig.Create(BaseDir.In(project), baseDir))
+        .Add(ModifyTask.Create(BuildPlugin.Clean, CleanTask))
+        .ScopedTo(project);
+    }
+
+    public static Settings AddProjectSupport(this Settings existingSettings) {
+      return existingSettings
+        .AddBuildSupport()
+        .Add(EnsureConfigInitialized.Create(ListOfProjects, ImmutableHashSet.Create<Project>()));
+    }
+
+    private static Unit CleanTask(Func<Unit> previousCleanTask, BuildConfiguration buildConfiguration) {
+      previousCleanTask();
       var listOfProjects = buildConfiguration.Evaluate(ListOfProjects);
       foreach (var project in listOfProjects) {
-        Directory.Delete(BudPaths.GetOutputDirectory(project.BaseDir), true);
+        var baseDir = buildConfiguration.Evaluate(BaseDir.In(project));
+        Directory.Delete(BudPaths.GetOutputDirectory(baseDir), true);
       }
-    }
-
-    public static Settings Project(string id, string baseDir) {
-      return InitializePlugin().Add(ConfigModification.Create(ListOfProjects, listOfProjects => listOfProjects.Add(new Project(id, baseDir))));
-    }
-
-    public static Settings InitializePlugin() {
-      return Settings.Start.Add(SettingEnsureInitialization.Create(ListOfProjects, ImmutableHashSet.Create<Project>()));
+      return Unit.Instance;
     }
   }
 }

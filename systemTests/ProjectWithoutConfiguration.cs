@@ -2,7 +2,7 @@ using System;
 using Bud.Test;
 using Bud.Test.Assertions;
 using NUnit.Framework;
-using Bud.Plugin.CSharp;
+using Bud.Plugins.CSharp;
 
 namespace Bud.SystemTests {
   public class ProjectWithoutConfiguration {
@@ -11,12 +11,12 @@ namespace Bud.SystemTests {
       using (var testProjectCopy = TestProjects.TemporaryCopy("ProjectWithoutConfiguration")) {
         var buildConfiguration = Bud.Load(testProjectCopy.Path);
 
-        var expectedCompiledFile = CSharpPlugin.GetDefaultOutputFile(testProjectCopy.Path);
+        var expectedCompiledFile = MonoCompiler.GetDefaultOutputFile(testProjectCopy.Path);
 
-        Bud.Evaluate(buildConfiguration, "compile");
+        buildConfiguration.Evaluate(CSharpPlugin.Build);
         FileAssertions.AssertFileExists(expectedCompiledFile);
 
-        Bud.Evaluate(buildConfiguration, "clean");
+        buildConfiguration.Evaluate(BuildPlugin.Clean);
         FileAssertions.AssertFileDoesNotExist(expectedCompiledFile);
       }
     }
@@ -25,9 +25,8 @@ namespace Bud.SystemTests {
     public void compile_MUST_produce_no_executable_WHEN_the_project_folder_is_empty() {
       using (var emptyProject = TestProjects.EmptyProject()) {
         var buildConfiguration = Bud.Load(emptyProject.Path);
-        Bud.Evaluate(buildConfiguration, "compile");
-
-        var compiledFile = CSharpPlugin.GetDefaultOutputFile(emptyProject.Path);
+        buildConfiguration.Evaluate(CSharpPlugin.Build);
+        var compiledFile = MonoCompiler.GetDefaultOutputFile(emptyProject.Path);
         FileAssertions.AssertFileDoesNotExist(compiledFile);
       }
     }

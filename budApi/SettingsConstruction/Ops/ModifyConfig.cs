@@ -2,20 +2,20 @@ using System;
 using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction.Ops {
-  public static class ConfigModification {
+  public static class ModifyConfig {
     public static Setting Create<T>(ConfigKey<T> key, Func<T, T> valueModifier) {
-      return new ConfigModification<T>(key, valueModifier);
+      return new ModifyConfig<T>(key, valueModifier);
     }
   }
 
-  public class ConfigModification<T> : Setting {
+  public class ModifyConfig<T> : Setting {
     Func<T, T> ValueModifier;
 
-    public ConfigModification(ConfigKey<T> key, Func<T, T> valueModifier) : base(key) {
+    public ModifyConfig(ConfigKey<T> key, Func<T, T> valueModifier) : base(key) {
       this.ValueModifier = valueModifier;
     }
 
-    public override void ApplyTo(ImmutableDictionary<SettingKey, object>.Builder buildConfigurationBuilder) {
+    public override void ApplyTo(ImmutableDictionary<ISettingKey, object>.Builder buildConfigurationBuilder) {
       object value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
         T existingValue = (T)value;

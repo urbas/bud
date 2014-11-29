@@ -20,8 +20,12 @@ namespace Bud {
       return new Settings(SettingsList.AddRange(settings.SettingsList));
     }
 
+    public ScopedSettings ScopedTo(ISettingKey settingKey) {
+      return new ScopedSettings(SettingsList, settingKey);
+    }
+
     public BuildConfiguration End() {
-      var buildConfigurationBuilder = ImmutableDictionary.CreateBuilder<SettingKey, object>();
+      var buildConfigurationBuilder = ImmutableDictionary.CreateBuilder<ISettingKey, object>();
       foreach (var setting in SettingsList) {
         setting.ApplyTo(buildConfigurationBuilder);
       }

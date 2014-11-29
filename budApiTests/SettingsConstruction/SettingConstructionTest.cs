@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace Bud {
   public class SettingConstructionTest {
 
-    private static readonly ConfigKey<string> TestKey = new ConfigKey<string>();
+    private static readonly ConfigKey<string> TestKey = new ConfigKey<string>("testKey");
     private Settings initializedTestKeySetting = Settings.Start.EnsureInitialized(TestKey, "foo");
 
     [Test]

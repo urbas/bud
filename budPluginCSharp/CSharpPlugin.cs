@@ -4,22 +4,47 @@ using System.IO;
 using System.Diagnostics;
 using Bud.Cli;
 using Bud.Plugins;
+using Bud.SettingsConstruction.Ops;
+using System.Collections.Immutable;
+using Bud.SettingsConstruction;
 
-namespace Bud.Plugin.CSharp {
-  public class CSharpPlugin {
+namespace Bud.Plugins.CSharp {
 
-    public static void Compile(BuildConfiguration buildConfiguration) {
-      var listOfProjects = buildConfiguration.Evaluate(ProjectPlugin.ListOfProjects);
-      foreach (var project in listOfProjects) {
-        Compile(project);
-      }
+  public static class CSharpPlugin {
+    public static readonly SettingKey CSharp = new SettingKey("CSharp");
+    public static readonly TaskKey<Unit> Build = BuildPlugin.Build.In(CSharp);
+
+    public static Settings AddCSharpSupport(this ScopedSettings scopedSettings) {
+      var configKey = ProjectPlugin.BaseDir.In(scopedSettings.Scope);
+      return Initialise(scopedSettings)
+        .Add(
+        EnsureTaskInitialized.Create(
+          Build.In(scopedSettings.Scope),
+          TaskDefinition.Create(configKey, baseDir => MonoCompiler.Compile(baseDir))
+        )
+      );
     }
 
-    public static void Compile(Project project) {
-      var sourceDirectory = GetSourceDirectory(project.BaseDir);
+    private static Settings Initialise(Settings existingSettings) {
+      return existingSettings.AddBuildSupport().Add(EnsureTaskInitialized.Create(Build, TaskDefinition.Create(MonoCompiler.Compile)));
+    }
+  }
+
+  public static class MonoCompiler {
+
+    public static Unit Compile(BuildConfiguration buildConfiguration) {
+      foreach (var project in buildConfiguration.Evaluate(ProjectPlugin.ListOfProjects)) {
+        var baseDir = buildConfiguration.Evaluate(ProjectPlugin.BaseDir.In(project));
+        Compile(baseDir);
+      }
+      return Unit.Instance;
+    }
+
+    public static Unit Compile(string baseDir) {
+      var sourceDirectory = GetSourceDirectory(baseDir);
       var sourceFiles = Directory.EnumerateFiles(sourceDirectory);
       if (Directory.Exists(sourceDirectory) && sourceFiles.Any()) {
-        var outputFile = GetDefaultOutputFile(project.BaseDir);
+        var outputFile = GetDefaultOutputFile(baseDir);
         Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
         var cSharpCompiler = "/usr/bin/mcs";
         var exitCode = Processes.Execute(cSharpCompiler).AddArgument("-out:" + outputFile).AddArguments(sourceFiles).Execute(Console.Out, Console.Error);
@@ -27,9 +52,10 @@ namespace Bud.Plugin.CSharp {
           throw new Exception("Compilation failed.");
         }
       }
+      return Unit.Instance;
     }
 
-    private static string GetSourceDirectory(string projectBaseDir) {
+    public static string GetSourceDirectory(string projectBaseDir) {
       return Path.Combine(projectBaseDir, "src", "main", "cs");
     }
 

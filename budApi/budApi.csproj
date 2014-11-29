@@ -49,10 +49,17 @@
     <Compile Include="Settings.cs" />
     <Compile Include="BuildConfiguration.cs" />
     <Compile Include="Plugins\ProjectsPlugin.cs" />
-    <Compile Include="SettingsConstruction\Ops\ConfigModification.cs" />
-    <Compile Include="SettingsConstruction\Ops\SettingEnsureInitialization.cs" />
     <Compile Include="SettingsConstruction\SettingsConstructionExtensions.cs" />
     <Compile Include="Plugins\Projects\Project.cs" />
+    <Compile Include="Unit.cs" />
+    <Compile Include="ScopedSettings.cs" />
+    <Compile Include="SettingsConstruction\Ops\ModifyConfig.cs" />
+    <Compile Include="SettingsConstruction\Ops\EnsureTaskInitialized.cs" />
+    <Compile Include="SettingsConstruction\Ops\InitializeConfig.cs" />
+    <Compile Include="SettingsConstruction\Ops\EnsureConfigInitialized.cs" />
+    <Compile Include="SettingsConstruction\TaskDefinition.cs" />
+    <Compile Include="Plugins\BuildPlugin.cs" />
+    <Compile Include="SettingsConstruction\Ops\ModifyTask.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -61,7 +68,6 @@
     <Folder Include="SettingsConstruction\" />
     <Folder Include="SettingsConstruction\Ops\" />
     <Folder Include="Plugins\Projects\" />
-    <Folder Include="SettingOps\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
