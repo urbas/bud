@@ -5,9 +5,9 @@ namespace Bud.SettingsConstruction.Ops {
   public class EnsureConfigInitialized<T> : Setting {
     public Func<BuildConfiguration, T> InitialValue;
 
-    public EnsureConfigInitialized(SettingKey key, T initialValue) : this(key, b => initialValue) {}
+    public EnsureConfigInitialized(ConfigKey<T> key, T initialValue) : this(key, b => initialValue) {}
 
-    public EnsureConfigInitialized(SettingKey key, Func<BuildConfiguration, T> initialValue) : base(key) {
+    public EnsureConfigInitialized(ConfigKey<T> key, Func<BuildConfiguration, T> initialValue) : base(key) {
       this.InitialValue = initialValue;
     }
 

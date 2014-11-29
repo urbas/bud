@@ -23,7 +23,8 @@ namespace Bud.Plugins {
         .Initialize(BudDir.In(project), b => GetBudDir(b, project))
         .Initialize(OutputDir.In(project), b => GetOutputDir(b, project))
         .Initialize(BuildConfigCacheDir.In(project), b => GetBuildConfigCacheDir(b, project))
-        .Modify(BuildPlugin.Clean, CleanTask)
+        .Initialize(BuildPlugin.Clean.In(project), b => CleanProjectTask(b, project))
+        .AddDependencies(BuildPlugin.Clean, BuildPlugin.Clean.In(project))
         .ScopedTo(project);
     }
 
@@ -33,13 +34,9 @@ namespace Bud.Plugins {
         .EnsureInitialized(ListOfProjects, ImmutableHashSet.Create<Project>());
     }
 
-    private static Unit CleanTask(BuildConfiguration buildConfiguration, Func<Unit> previousCleanTask) {
-      previousCleanTask();
-      var listOfProjects = buildConfiguration.Evaluate(ListOfProjects);
-      foreach (var project in listOfProjects) {
-        var outputDir = buildConfiguration.Evaluate(OutputDir.In(project));
-        Directory.Delete(outputDir, true);
-      }
+    private static Unit CleanProjectTask(BuildConfiguration buildConfiguration, ISettingKey project) {
+      var outputDir = buildConfiguration.GetOutputDir(project);
+      Directory.Delete(outputDir, true);
       return Unit.Instance;
     }
 

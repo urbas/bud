@@ -1,8 +1,7 @@
 ﻿using System;
 
 namespace Bud.SettingsConstruction {
-  public interface IConfigDefinition {}
-  public interface IConfigDefinition<out T> : IValueDefinition<T>, IConfigDefinition {}
+  public interface IConfigDefinition<out T> : IValueDefinition<T> {}
 
   public class ConfigDefinition<T> : IConfigDefinition<T> {
     public readonly Func<BuildConfiguration, T> ConfigValue;

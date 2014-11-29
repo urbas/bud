@@ -8,12 +8,6 @@ namespace Bud {
     private static readonly ConfigKey<string> TestKey = new ConfigKey<string>("testKey");
 
     [Test]
-    [ExpectedException(typeof(InvalidOperationException))]
-    public void Modifying_an_uninitialised_config_MUST_throw_an_exception() {
-      Settings.Start.Modify(TestKey, v => v).ToBuildConfiguration();
-    }
-
-    [Test]
     public void Evaluating_an_initialized_config_MUST_return_the_value_of_initialization() {
       var buildConfiguration = Settings.Start
         .Initialize(TestKey, "foo");
@@ -35,6 +29,12 @@ namespace Bud {
         .Initialize(TestKey, "bar")
         .EnsureInitialized(TestKey, "foo");
       Assert.AreEqual("bar", buildConfiguration.ToBuildConfiguration().Evaluate(TestKey));
+    }
+
+    [Test]
+    [ExpectedException(typeof(InvalidOperationException))]
+    public void Modifying_an_uninitialised_config_MUST_throw_an_exception() {
+      Settings.Start.Modify(TestKey, v => v).ToBuildConfiguration();
     }
 
     [Test]

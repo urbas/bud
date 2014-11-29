@@ -61,6 +61,7 @@
     <Compile Include="SettingsConstruction\ConfigDefinition.cs" />
     <Compile Include="SettingsConstruction\IValueDefinition.cs" />
     <Compile Include="SettingsConstruction\Ops\AddDependencies.cs" />
+    <Compile Include="SettingsConstruction\Ops\InitializeTask.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
