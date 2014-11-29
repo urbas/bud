@@ -9,7 +9,7 @@ namespace Bud.SystemTests {
     [Test]
     public void compile_MUST_produce_the_executable() {
       using (var testProjectCopy = TestProjects.TemporaryCopy("ProjectWithoutConfiguration")) {
-        var buildConfiguration = Bud.Load(testProjectCopy.Path);
+        var buildConfiguration = BuildConfigurationLoader.Load(testProjectCopy.Path);
 
         var expectedCompiledFile = MonoCompiler.GetDefaultOutputFile(testProjectCopy.Path);
 
@@ -24,7 +24,7 @@ namespace Bud.SystemTests {
     [Test]
     public void compile_MUST_produce_no_executable_WHEN_the_project_folder_is_empty() {
       using (var emptyProject = TestProjects.EmptyProject()) {
-        var buildConfiguration = Bud.Load(emptyProject.Path);
+        var buildConfiguration = BuildConfigurationLoader.Load(emptyProject.Path);
         buildConfiguration.Evaluate(CSharpPlugin.Build);
         var compiledFile = MonoCompiler.GetDefaultOutputFile(emptyProject.Path);
         FileAssertions.AssertFileDoesNotExist(compiledFile);

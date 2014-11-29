@@ -8,6 +8,10 @@ namespace Bud.Cli {
   public class ProcessBuilder {
     private readonly StringBuilder arguments = new StringBuilder();
 
+    public static ProcessBuilder Executable(string executablePath) {
+      return new ProcessBuilder(executablePath);
+    }
+
     public ProcessBuilder(string executablePath) {
       ExecutablePath = executablePath;
     }
@@ -16,7 +20,7 @@ namespace Bud.Cli {
 
     public string Arguments { get { return arguments.ToString(); } }
 
-    public ProcessBuilder AddArgument(string argument) {
+    public ProcessBuilder WithArgument(string argument) {
       if (arguments.Length > 0) {
         arguments.Append(' ');
       }
@@ -24,13 +28,13 @@ namespace Bud.Cli {
       return this;
     }
 
-    public ProcessBuilder AddArguments(params string[] arguments) {
-      return AddArguments((IEnumerable<string>)arguments);
+    public ProcessBuilder WithArguments(params string[] arguments) {
+      return WithArguments((IEnumerable<string>)arguments);
     }
 
-    public ProcessBuilder AddArguments(IEnumerable<string> arguments) {
+    public ProcessBuilder WithArguments(IEnumerable<string> arguments) {
       foreach (var argument in arguments) {
-        AddArgument(argument);
+        WithArgument(argument);
       }
       return this;
     }
@@ -45,7 +49,7 @@ namespace Bud.Cli {
       return process;
     }
 
-    public int Execute(TextWriter output, TextWriter errorOutput) {
+    public int Start(TextWriter output, TextWriter errorOutput) {
       using (var process = ToProcess()) {
         process.Start();
         // TODO(urbas): Pipe the outputs using async operations.

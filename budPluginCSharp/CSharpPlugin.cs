@@ -43,7 +43,7 @@ namespace Bud.Plugins.CSharp {
         var outputFile = GetDefaultOutputFile(baseDir);
         Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
         var cSharpCompiler = "/usr/bin/mcs";
-        var exitCode = Processes.Execute(cSharpCompiler).AddArgument("-out:" + outputFile).AddArguments(sourceFiles).Execute(Console.Out, Console.Error);
+        var exitCode = ProcessBuilder.Executable(cSharpCompiler).WithArgument("-out:" + outputFile).WithArguments(sourceFiles).Start(Console.Out, Console.Error);
         if (exitCode != 0) {
           throw new Exception("Compilation failed.");
         }
