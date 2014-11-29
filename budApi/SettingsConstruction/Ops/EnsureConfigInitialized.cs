@@ -3,15 +3,17 @@ using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction.Ops {
   public class EnsureConfigInitialized<T> : Setting {
-    public T InitialValue;
+    public Func<BuildConfiguration, T> InitialValue;
 
-    public EnsureConfigInitialized(ConfigKey<T> key, T initialValue) : base(key) {
+    public EnsureConfigInitialized(SettingKey key, T initialValue) : this(key, b => initialValue) {}
+
+    public EnsureConfigInitialized(SettingKey key, Func<BuildConfiguration, T> initialValue) : base(key) {
       this.InitialValue = initialValue;
     }
 
-    public override void ApplyTo(ImmutableDictionary<ISettingKey, object>.Builder buildConfigurationBuilder) {
+    public override void ApplyTo(ImmutableDictionary<ISettingKey, IValueDefinition>.Builder buildConfigurationBuilder) {
       if (!buildConfigurationBuilder.ContainsKey(Key)) {
-        buildConfigurationBuilder[Key] = InitialValue;
+        buildConfigurationBuilder[Key] = new ConfigDefinition<T>(InitialValue);
       }
     }
   }

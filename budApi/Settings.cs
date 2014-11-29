@@ -24,12 +24,8 @@ namespace Bud {
       return new ScopedSettings(SettingsList, settingKey);
     }
 
-    public BuildConfiguration End() {
-      var buildConfigurationBuilder = ImmutableDictionary.CreateBuilder<ISettingKey, object>();
-      foreach (var setting in SettingsList) {
-        setting.ApplyTo(buildConfigurationBuilder);
-      }
-      return new BuildConfiguration(buildConfigurationBuilder.ToImmutable());
+    public BuildConfiguration ToBuildConfiguration() {
+      return BuildConfiguration.ToBuildConfiguration(this);
     }
   }
 }

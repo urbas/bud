@@ -1,60 +1,57 @@
 ﻿using System;
+using System.Collections.Immutable;
+using System.Collections.Generic;
 
 namespace Bud.SettingsConstruction {
-  public static class TaskDefinition {
 
-    public static ITaskDefinition<TResult> Create<TResult>(Func<BuildConfiguration, TResult> taskFunction) {
-      return new GenericTaskDefinition<TResult>(taskFunction);
-    }
+  public interface ITaskDefinition<out T> : IValueDefinition<T> {
+    ImmutableHashSet<ITaskKey> Dependencies { get; }
+    ITaskDefinition<T> WithDependencies(IEnumerable<ITaskKey> newDependencies);
   }
 
-  public interface ITaskDefinition<out TResult> {
-    TResult Evaluate(BuildConfiguration buildConfiguration);
-  }
+  public class TaskDefinition<T> : ITaskDefinition<T> {
+    public readonly Func<BuildConfiguration, T> TaskFunction;
 
-  public class NoOpTask : ITaskDefinition<Unit> {
-    public static readonly NoOpTask Instance = new NoOpTask();
+    public TaskDefinition(Func<T> taskFunction) : this(b => taskFunction()) {}
 
-    public Unit Evaluate(BuildConfiguration buildConfiguration) {
-      return Unit.Instance;
-    }
-  }
+    public TaskDefinition(Func<BuildConfiguration, T> taskFunction) : this(taskFunction, ImmutableHashSet<ITaskKey>.Empty) {}
 
-  public class GenericTaskDefinition<TResult> : ITaskDefinition<TResult> {
-    public readonly Func<BuildConfiguration, TResult> TaskFunction;
-
-    public GenericTaskDefinition(Func<BuildConfiguration, TResult> taskFunction) {
-      this.TaskFunction = taskFunction;
+    public TaskDefinition(Func<BuildConfiguration, T> taskFunction, ImmutableHashSet<ITaskKey> dependencies) {
+      TaskFunction = taskFunction;
+      Dependencies = dependencies;
     }
 
-    public TResult Evaluate(BuildConfiguration buildConfiguration) {
+    public ImmutableHashSet<ITaskKey> Dependencies { get; private set; }
+
+    public ITaskDefinition<T> WithDependencies(IEnumerable<ITaskKey> newDependencies) {
+      return new TaskDefinition<T>(TaskFunction, Dependencies.Union(newDependencies));
+    }
+
+    public T Evaluate(BuildConfiguration buildConfiguration) {
       return TaskFunction(buildConfiguration);
     }
   }
 
-  public class TaskDefinition<TResult> : ITaskDefinition<TResult> {
-    public readonly Func<TResult> TaskFunction;
+  public class TaskModification<T> : ITaskDefinition<T> {
+    public readonly ITaskDefinition<T> ExistingValue;
+    public readonly Func<BuildConfiguration, Func<T>, T> ValueModifier;
 
-    public TaskDefinition(Func<TResult> taskFunction) {
-      this.TaskFunction = taskFunction;
+    public TaskModification(ITaskDefinition<T> existingValue, Func<BuildConfiguration, Func<T>, T> valueModifier) : this(existingValue, valueModifier, existingValue.Dependencies) {}
+
+    public TaskModification(ITaskDefinition<T> existingValue, Func<BuildConfiguration, Func<T>, T> valueModifier, ImmutableHashSet<ITaskKey> dependencies) {
+      ValueModifier = valueModifier;
+      ExistingValue = existingValue;
+      Dependencies = dependencies;
     }
 
-    public TResult Evaluate(BuildConfiguration buildConfiguration) {
-      return TaskFunction();
-    }
-  }
+    public ImmutableHashSet<ITaskKey> Dependencies { get; private set; }
 
-  public class TaskDefinition<TResult, TDependency1> : ITaskDefinition<TResult> {
-    public readonly IValuedKey<TDependency1> Dependency1;
-    public readonly Func<TDependency1, TResult> TaskFunction;
-
-    public TaskDefinition(IValuedKey<TDependency1> dependency1, Func<TDependency1, TResult> taskFunction) {
-      this.TaskFunction = taskFunction;
-      this.Dependency1 = dependency1;
+    public ITaskDefinition<T> WithDependencies(IEnumerable<ITaskKey> newDependencies) {
+      return new TaskModification<T>(ExistingValue, ValueModifier, Dependencies.Union(newDependencies));
     }
 
-    public TResult Evaluate(BuildConfiguration buildConfiguration) {
-      return TaskFunction(buildConfiguration.Evaluate(Dependency1));
+    public T Evaluate(BuildConfiguration buildConfiguration) {
+      return ValueModifier(buildConfiguration, () => ExistingValue.Evaluate(buildConfiguration));
     }
   }
 

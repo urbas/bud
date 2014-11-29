@@ -12,35 +12,43 @@ namespace Bud.Plugins.CSharp {
 
   public static class CSharpPlugin {
     public static readonly SettingKey CSharp = new SettingKey("CSharp");
-    public static readonly TaskKey<Unit> Build = BuildPlugin.Build.In(CSharp);
+    public static readonly TaskKey<Unit> CSharpBuild = BuildPlugin.Build.In(CSharp);
 
     public static Settings AddCSharpSupport(this ScopedSettings scopedSettings) {
-      var configKey = ProjectPlugin.BaseDir.In(scopedSettings.Scope);
       return Initialise(scopedSettings)
-        .EnsureInitialized(Build.In(scopedSettings.Scope), configKey, MonoCompiler.Compile);
+        .EnsureInitialized(CSharpBuild.In(scopedSettings.Scope), buildConfig => MonoCompiler.Compile(buildConfig, scopedSettings.Scope));
     }
 
     private static Settings Initialise(Settings existingSettings) {
       return existingSettings.AddBuildSupport()
-        .EnsureInitialized(Build, MonoCompiler.Compile);
+        .EnsureInitialized(CSharpBuild, MonoCompiler.Compile)
+        .AddDependencies(BuildPlugin.Build, CSharpBuild);
+    }
+
+    public static string GetCSharpSourceDir(this BuildConfiguration buildConfiguration, ISettingKey project) {
+      return Path.Combine(buildConfiguration.GetBaseDir(project), "src", "main", "cs");
+    }
+
+    public static string GetCSharpOutputAssemblyFile(this BuildConfiguration buildConfiguration, ISettingKey project) {
+      return Path.Combine(buildConfiguration.GetOutputDir(project), ".net-4.5", "main", "debug", "bin", "program.exe");
     }
   }
 
   public static class MonoCompiler {
 
     public static Unit Compile(BuildConfiguration buildConfiguration) {
+      // TODO: evaluate per-project builds in parallel.
       foreach (var project in buildConfiguration.Evaluate(ProjectPlugin.ListOfProjects)) {
-        var baseDir = buildConfiguration.Evaluate(ProjectPlugin.BaseDir.In(project));
-        Compile(baseDir);
+        buildConfiguration.Evaluate(CSharpPlugin.CSharpBuild.In(project));
       }
       return Unit.Instance;
     }
 
-    public static Unit Compile(string baseDir) {
-      var sourceDirectory = GetSourceDirectory(baseDir);
+    public static Unit Compile(BuildConfiguration buildConfiguration, ISettingKey project) {
+      var sourceDirectory = buildConfiguration.GetCSharpSourceDir(project);
+      var outputFile = buildConfiguration.GetCSharpOutputAssemblyFile(project);
       var sourceFiles = Directory.EnumerateFiles(sourceDirectory);
       if (Directory.Exists(sourceDirectory) && sourceFiles.Any()) {
-        var outputFile = GetDefaultOutputFile(baseDir);
         Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
         var cSharpCompiler = "/usr/bin/mcs";
         var exitCode = ProcessBuilder.Executable(cSharpCompiler).WithArgument("-out:" + outputFile).WithArguments(sourceFiles).Start(Console.Out, Console.Error);
@@ -49,15 +57,6 @@ namespace Bud.Plugins.CSharp {
         }
       }
       return Unit.Instance;
-    }
-
-    public static string GetSourceDirectory(string projectBaseDir) {
-      return Path.Combine(projectBaseDir, "src", "main", "cs");
-    }
-
-    public static string GetDefaultOutputFile(string projectBaseDir) {
-      var budOutputDirectory = BudPaths.GetOutputDirectory(projectBaseDir);
-      return Path.Combine(budOutputDirectory, ".net-4.5", "main", "debug", "bin", "program.exe");
     }
   }
 }

@@ -9,7 +9,8 @@ namespace Bud {
     public static BuildConfiguration Load(string path) {
       // Does the .bud/bakedBuild/Build.dll file exist?
       //  - load it and be done with it :)
-      return ProjectPlugin.Project(path, path).AddCSharpSupport().End();
+      var defaultProjectSettings = ProjectPlugin.Project(path, path).AddCSharpSupport();
+      return BuildConfiguration.ToBuildConfiguration(defaultProjectSettings);
     }
 
   }

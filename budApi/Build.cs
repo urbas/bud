@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 
 namespace Bud {
   public interface Build {
-    Settings GetSettings();
+    Settings GetSettings(string baseDir);
   }
 }
 

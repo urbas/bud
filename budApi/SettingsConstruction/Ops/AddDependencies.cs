@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Collections.Generic;
 
 namespace Bud.SettingsConstruction.Ops {
-  public class ModifyTask<T> : Setting {
-    public Func<BuildConfiguration, Func<T>, T> TaskModification;
+  public class AddDependencies<T> : Setting {
+    private IEnumerable<ITaskKey> extraDependencies;
 
-    public ModifyTask(TaskKey<T> key, Func<BuildConfiguration, Func<T>, T> taskModification) : base(key) {
-      this.TaskModification = taskModification;
+    public AddDependencies(TaskKey<T> key, IEnumerable<ITaskKey> extraDependencies) : base(key) {
+      this.extraDependencies = extraDependencies;
     }
 
     public override void ApplyTo(ImmutableDictionary<ISettingKey, IValueDefinition>.Builder buildConfigurationBuilder) {
       IValueDefinition value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
         ITaskDefinition<T> existingValue = (ITaskDefinition<T>)value;
-        buildConfigurationBuilder[Key] = new TaskModification<T>(existingValue, TaskModification);
+        buildConfigurationBuilder[Key] = existingValue.WithDependencies(extraDependencies);
       } else {
         throw new InvalidOperationException(string.Format("Cannot modify the task '{0}'. This task has not yet been defined.", Key.GetType().FullName));
       }

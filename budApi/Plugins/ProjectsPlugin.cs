@@ -10,6 +10,9 @@ namespace Bud.Plugins {
 
     public static readonly ConfigKey<ImmutableHashSet<Project>> ListOfProjects = new ConfigKey<ImmutableHashSet<Project>>("ListOfProjects");
     public static readonly ConfigKey<string> BaseDir = new ConfigKey<string>("BaseDir");
+    public static readonly ConfigKey<string> BudDir = new ConfigKey<string>("BudDir");
+    public static readonly ConfigKey<string> OutputDir = new ConfigKey<string>("OutputDir");
+    public static readonly ConfigKey<string> BuildConfigCacheDir = new ConfigKey<string>("BuildConfigCacheDir");
 
     public static ScopedSettings Project(string id, string baseDir) {
       var project = new Project(id);
@@ -17,6 +20,9 @@ namespace Bud.Plugins {
         .AddProjectSupport()
         .Modify(ListOfProjects, listOfProjects => listOfProjects.Add(project))
         .Initialize(BaseDir.In(project), baseDir)
+        .Initialize(BudDir.In(project), b => GetBudDir(b, project))
+        .Initialize(OutputDir.In(project), b => GetOutputDir(b, project))
+        .Initialize(BuildConfigCacheDir.In(project), b => GetBuildConfigCacheDir(b, project))
         .Modify(BuildPlugin.Clean, CleanTask)
         .ScopedTo(project);
     }
@@ -27,14 +33,34 @@ namespace Bud.Plugins {
         .EnsureInitialized(ListOfProjects, ImmutableHashSet.Create<Project>());
     }
 
-    private static Unit CleanTask(Func<Unit> previousCleanTask, BuildConfiguration buildConfiguration) {
+    private static Unit CleanTask(BuildConfiguration buildConfiguration, Func<Unit> previousCleanTask) {
       previousCleanTask();
       var listOfProjects = buildConfiguration.Evaluate(ListOfProjects);
       foreach (var project in listOfProjects) {
-        var baseDir = buildConfiguration.Evaluate(BaseDir.In(project));
-        Directory.Delete(BudPaths.GetOutputDirectory(baseDir), true);
+        var outputDir = buildConfiguration.Evaluate(OutputDir.In(project));
+        Directory.Delete(outputDir, true);
       }
       return Unit.Instance;
+    }
+
+    public static string GetBaseDir(this BuildConfiguration buildConfiguration, ISettingKey project) {
+      return buildConfiguration.Evaluate(BaseDir.In(project));
+    }
+
+    public static string GetBudDir(this BuildConfiguration buildConfiguration, ISettingKey project) {
+      return Path.Combine(GetBaseDir(buildConfiguration, project), ".bud");
+    }
+
+    /// <returns>The directory where build output (such as compiled assemblies) are stored.</returns>
+    /// <param name="projectBaseDir">The root directory of the project being built.</param>
+    public static string GetOutputDir(this BuildConfiguration buildConfiguration, ISettingKey project) {
+      return Path.Combine(GetBudDir(buildConfiguration, project), "output");
+    }
+
+    /// <returns>The directory where data gathered during build configuration is stored (e.g.: downloaded dependencies).</returns>
+    /// <param name="projectBaseDir">The root directory of the project being built.</param>
+    public static string GetBuildConfigCacheDir(this BuildConfiguration buildConfiguration, ISettingKey project) {
+      return Path.Combine(GetBudDir(buildConfiguration, project), "buildConfigCache");
     }
   }
 }

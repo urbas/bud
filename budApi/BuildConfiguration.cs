@@ -5,32 +5,18 @@ using Bud.SettingsConstruction;
 
 namespace Bud {
   public class BuildConfiguration {
-    public readonly ImmutableDictionary<ISettingKey, object> SettingKeysToValues;
+    public readonly ImmutableDictionary<ISettingKey, IValueDefinition> SettingKeysToValues;
 
-    public BuildConfiguration(ImmutableDictionary<ISettingKey, object> settingKeysToValues) {
+    private BuildConfiguration(ImmutableDictionary<ISettingKey, IValueDefinition> settingKeysToValues) {
       this.SettingKeysToValues = settingKeysToValues;
     }
 
-    public T Evaluate<T>(ConfigKey<T> key) {
-      return (T)SettingKeysToValues[key];
-    }
-
-    public T Evaluate<T>(TaskKey<T> key) {
-      return ((ITaskDefinition<T>)SettingKeysToValues[key]).Evaluate(this);
+    public T Evaluate<T>(IValuedKey<T> key) {
+      return ((IValueDefinition<T>)SettingKeysToValues[key]).Evaluate(this);
     }
 
     public object Evaluate(IValuedKey key) {
       return Evaluate((IValuedKey<object>)key);
-    }
-
-    public T Evaluate<T>(IValuedKey<T> key) {
-      if (key is IConfigKey) {
-        return (T)SettingKeysToValues[key];
-      } else if (key is ITaskKey) {
-        return ((ITaskDefinition<T>)SettingKeysToValues[key]).Evaluate(this);
-      } else {
-        throw new NotSupportedException("Could not evaluate a setting key of an unkown type.");
-      }
     }
 
     public override string ToString() {
@@ -54,6 +40,14 @@ namespace Bud {
         sb.Append(" => ").Append(Evaluate((IValuedKey)settingKey));
       }
       return sb;
+    }
+
+    public static BuildConfiguration ToBuildConfiguration(Settings settings) {
+      var buildConfigurationBuilder = ImmutableDictionary.CreateBuilder<ISettingKey, IValueDefinition>();
+      foreach (var setting in settings.SettingsList) {
+        setting.ApplyTo(buildConfigurationBuilder);
+      }
+      return new BuildConfiguration(buildConfigurationBuilder.ToImmutable());
     }
   }
 

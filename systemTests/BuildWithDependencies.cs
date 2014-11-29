@@ -5,8 +5,8 @@ using System.Collections.Immutable;
 
 public class BuildWithDependencies : Build {
 
-  public Settings GetSettings() {
-    return ProjectPlugin.Project(id: "root", baseDir: ".");
+  public Settings GetSettings(string baseDir) {
+    return ProjectPlugin.Project("root", baseDir);
   }
 
 }
