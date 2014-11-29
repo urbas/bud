@@ -2,12 +2,6 @@
 using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction.Ops {
-  public static class InitializeConfig {
-    public static InitializeConfig<T> Create<T>(SettingKey key, T initialValue) {
-      return new InitializeConfig<T>(key, initialValue);
-    }
-  }
-
   public class InitializeConfig<T> : Setting {
     public T InitialValue;
 

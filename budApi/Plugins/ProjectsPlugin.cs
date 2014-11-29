@@ -15,16 +15,16 @@ namespace Bud.Plugins {
       var project = new Project(id);
       return Settings.Start
         .AddProjectSupport()
-        .Add(ModifyConfig.Create(ListOfProjects, listOfProjects => listOfProjects.Add(project)))
-        .Add(InitializeConfig.Create(BaseDir.In(project), baseDir))
-        .Add(ModifyTask.Create(BuildPlugin.Clean, CleanTask))
+        .Modify(ListOfProjects, listOfProjects => listOfProjects.Add(project))
+        .Initialize(BaseDir.In(project), baseDir)
+        .Modify(BuildPlugin.Clean, CleanTask)
         .ScopedTo(project);
     }
 
     public static Settings AddProjectSupport(this Settings existingSettings) {
       return existingSettings
         .AddBuildSupport()
-        .Add(EnsureConfigInitialized.Create(ListOfProjects, ImmutableHashSet.Create<Project>()));
+        .EnsureInitialized(ListOfProjects, ImmutableHashSet.Create<Project>());
     }
 
     private static Unit CleanTask(Func<Unit> previousCleanTask, BuildConfiguration buildConfiguration) {

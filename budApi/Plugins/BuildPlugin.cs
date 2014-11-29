@@ -9,8 +9,8 @@ namespace Bud {
 
     public static Settings AddBuildSupport(this Settings existingSettings) {
       return existingSettings
-        .Add(EnsureTaskInitialized.Create(Clean, NoOpTask.Instance))
-        .Add(EnsureTaskInitialized.Create(Build, NoOpTask.Instance));
+        .EnsureInitialized(Clean, () => Unit.Instance)
+        .EnsureInitialized(Build, () => Unit.Instance);
     }
   }
 }

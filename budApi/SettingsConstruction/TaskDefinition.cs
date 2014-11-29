@@ -6,14 +6,6 @@ namespace Bud.SettingsConstruction {
     public static ITaskDefinition<TResult> Create<TResult>(Func<BuildConfiguration, TResult> taskFunction) {
       return new GenericTaskDefinition<TResult>(taskFunction);
     }
-
-    public static ITaskDefinition<TResult> Create<TResult>(Func<TResult> taskFunction) {
-      return new TaskDefinition<TResult>(taskFunction);
-    }
-
-    public static ITaskDefinition<TResult> Create<TDependency1, TResult>(ValuedKey<TDependency1> dependency1, Func<TDependency1, TResult> taskFunction) {
-      return new TaskDefinition<TResult, TDependency1>(dependency1, taskFunction);
-    }
   }
 
   public interface ITaskDefinition<out TResult> {

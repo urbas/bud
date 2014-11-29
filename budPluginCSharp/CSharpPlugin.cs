@@ -17,16 +17,12 @@ namespace Bud.Plugins.CSharp {
     public static Settings AddCSharpSupport(this ScopedSettings scopedSettings) {
       var configKey = ProjectPlugin.BaseDir.In(scopedSettings.Scope);
       return Initialise(scopedSettings)
-        .Add(
-        EnsureTaskInitialized.Create(
-          Build.In(scopedSettings.Scope),
-          TaskDefinition.Create(configKey, baseDir => MonoCompiler.Compile(baseDir))
-        )
-      );
+        .EnsureInitialized(Build.In(scopedSettings.Scope), configKey, MonoCompiler.Compile);
     }
 
     private static Settings Initialise(Settings existingSettings) {
-      return existingSettings.AddBuildSupport().Add(EnsureTaskInitialized.Create(Build, TaskDefinition.Create(MonoCompiler.Compile)));
+      return existingSettings.AddBuildSupport()
+        .EnsureInitialized(Build, MonoCompiler.Compile);
     }
   }
 

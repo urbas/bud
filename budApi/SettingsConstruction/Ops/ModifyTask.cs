@@ -2,12 +2,6 @@
 using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction.Ops {
-  public static class ModifyTask {
-    public static ModifyTask<T> Create<T>(TaskKey<T> key, Func<Func<T>, BuildConfiguration, T> taskModificationFunction) {
-      return new ModifyTask<T>(key, taskModificationFunction);
-    }
-  }
-
   public class ModifyTask<T> : Setting {
     public Func<Func<T>, BuildConfiguration, T> TaskModification;
 

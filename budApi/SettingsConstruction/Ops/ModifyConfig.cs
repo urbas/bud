@@ -2,12 +2,6 @@ using System;
 using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction.Ops {
-  public static class ModifyConfig {
-    public static Setting Create<T>(ConfigKey<T> key, Func<T, T> valueModifier) {
-      return new ModifyConfig<T>(key, valueModifier);
-    }
-  }
-
   public class ModifyConfig<T> : Setting {
     Func<T, T> ValueModifier;
 

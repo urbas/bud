@@ -61,15 +61,10 @@ namespace Bud {
     
   }
 
-  public abstract class ValuedKey<T> : SettingKey, IValuedKey<T> {
-    public ValuedKey(string id) : base(id) {}
-    public ValuedKey(string id, ImmutableHashSet<ISettingKey> scope) : base(id, scope) {}
-  }
-
   /// <summary>
   /// Values of this key are evaluated once only (during build loading).
   /// </summary>
-  public class ConfigKey<T> : ValuedKey<T>, IConfigKey<T> {
+  public class ConfigKey<T> : SettingKey, IValuedKey<T>, IConfigKey<T> {
     public ConfigKey(string id) : base(id) {}
     public ConfigKey(string id, ImmutableHashSet<ISettingKey> scope) : base(id, scope) {}
     public ConfigKey<T> In(ISettingKey scope) { return new ConfigKey<T>(Id, Scope.Add(scope)); }
@@ -79,7 +74,7 @@ namespace Bud {
   /// Values of this key are evaluated once on every build evaluation (if two task keys A and B
   /// depend on the same task key C then the value of task key C will be calculated only once).
   /// </summary>
-  public class TaskKey<T> : ValuedKey<T>, ITaskKey<T> {
+  public class TaskKey<T> : SettingKey, IValuedKey<T>, ITaskKey<T> {
     public TaskKey(string id) : base(id) {}
     public TaskKey(string id, ImmutableHashSet<ISettingKey> scope) : base(id, scope) {}
     public TaskKey<T> In(ISettingKey scope) { return new TaskKey<T>(Id, Scope.Add(scope)); }

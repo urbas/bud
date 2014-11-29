@@ -2,13 +2,6 @@ using System;
 using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction.Ops {
-
-  public static class EnsureConfigInitialized {
-    public static EnsureConfigInitialized<T> Create<T>(ConfigKey<T> key, T initialValue) {
-      return new EnsureConfigInitialized<T>(key, initialValue);
-    }
-  }
-
   public class EnsureConfigInitialized<T> : Setting {
     public T InitialValue;
 
