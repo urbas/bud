@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Bud.Cli;
 using Bud.Plugins;
 using System.Collections.Immutable;
+using Bud.SettingsConstruction;
 
 namespace Bud
 {

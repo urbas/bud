@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
-namespace Bud {
+namespace Bud.SettingsConstruction {
   public abstract class Setting {
     public readonly SettingKey Key;
 
