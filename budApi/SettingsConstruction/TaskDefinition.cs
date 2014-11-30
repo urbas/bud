@@ -22,7 +22,14 @@ namespace Bud.SettingsConstruction {
     }
 
     public T Evaluate(BuildConfiguration buildConfiguration) {
+      InvokeDependencies(buildConfiguration);
       return TaskFunction(buildConfiguration);
+    }
+
+    private void InvokeDependencies(BuildConfiguration buildConfiguration) {
+      foreach (var dependency in Dependencies) {
+        buildConfiguration.Evaluate(dependency);
+      }
     }
   }
 
