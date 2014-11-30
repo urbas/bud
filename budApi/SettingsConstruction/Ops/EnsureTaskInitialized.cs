@@ -3,9 +3,9 @@ using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction.Ops {
   public class EnsureTaskInitialized<T> : Setting {
-    public ITaskDefinition<T> InitialValue;
+    public TaskDefinition<T> InitialValue;
 
-    public EnsureTaskInitialized(TaskKey<T> key, ITaskDefinition<T> initialValue) : base(key) {
+    public EnsureTaskInitialized(TaskKey<T> key, TaskDefinition<T> initialValue) : base(key) {
       this.InitialValue = initialValue;
     }
 
