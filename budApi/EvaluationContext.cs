@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 namespace Bud {
   public class EvaluationContext {
     public readonly IDictionary<ISettingKey, IValueDefinition> SettingKeysToValues;
+    // TODO: Assign sequential indices to keys and use arrays to access evaluated values (instead of dictionaries).
     private readonly Dictionary<IValuedKey, object> configValues = new Dictionary<IValuedKey, object>();
-    private readonly Dictionary<ITaskKey, Task> evaluations = new Dictionary<ITaskKey, Task>();
+    private readonly Dictionary<ITaskKey, Task> taskValues = new Dictionary<ITaskKey, Task>();
 
     private EvaluationContext(IDictionary<ISettingKey, IValueDefinition> settingKeysToValues) {
       this.SettingKeysToValues = settingKeysToValues;
@@ -29,11 +30,11 @@ namespace Bud {
 
     public Task Evaluate(ITaskKey key) {
       Task value;
-      if (evaluations.TryGetValue(key, out value)) {
+      if (taskValues.TryGetValue(key, out value)) {
         return value;
       } else {
         var evaluatedValue = ((ITaskDefinition)SettingKeysToValues[key]).Evaluate(this);
-        evaluations.Add(key, evaluatedValue);
+        taskValues.Add(key, evaluatedValue);
         return evaluatedValue;
       }
     }
@@ -47,7 +48,7 @@ namespace Bud {
     }
 
     public override string ToString() {
-      StringBuilder sb = new StringBuilder("BuildConfiguration{");
+      StringBuilder sb = new StringBuilder("EvaluationContext{");
       var enumerator = SettingKeysToValues.Keys.GetEnumerator();
       if (enumerator.MoveNext()) {
         sb.Append(enumerator.Current);
