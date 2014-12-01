@@ -9,7 +9,7 @@ namespace Bud {
     public static EvaluationContext Load(string path) {
       // Does the .bud/bakedBuild/Build.dll file exist?
       //  - load it and be done with it :)
-      var defaultProjectSettings = ProjectPlugin.Project(path, path).AddCSharpSupport();
+      var defaultProjectSettings = Project.New("root", path).BuildsCSharp();
       return EvaluationContext.ToEvaluationContext(defaultProjectSettings);
     }
 

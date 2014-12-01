@@ -6,8 +6,12 @@ using Bud.SettingsConstruction.Ops;
 namespace Bud.Plugins {
 
   public static class Project {
-    public static SettingKey New(string id) {
-      return new SettingKey(id);
+    public static ScopedSettings New(string id, string baseDir) {
+      return Settings.Start.AddProject(id, baseDir);
+    }
+
+    public static SettingKey Key(string id) {
+      return new SettingKey(id).In(ProjectPlugin.Projects);
     }
   }
 

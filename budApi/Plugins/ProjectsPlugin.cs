@@ -7,15 +7,16 @@ namespace Bud.Plugins {
 
   public static class ProjectPlugin {
 
+    public static readonly SettingKey Projects = new SettingKey("Projects");
     public static readonly ConfigKey<ImmutableHashSet<SettingKey>> ListOfProjects = new ConfigKey<ImmutableHashSet<SettingKey>>("ListOfProjects");
     public static readonly ConfigKey<string> BaseDir = new ConfigKey<string>("BaseDir");
     public static readonly ConfigKey<string> BudDir = new ConfigKey<string>("BudDir");
     public static readonly ConfigKey<string> OutputDir = new ConfigKey<string>("OutputDir");
     public static readonly ConfigKey<string> BuildConfigCacheDir = new ConfigKey<string>("BuildConfigCacheDir");
 
-    public static ScopedSettings Project(string id, string baseDir) {
-      var project = Bud.Plugins.Project.New(id);
-      return Settings.Start
+    public static ScopedSettings AddProject(this Settings existingSettings, string id, string baseDir) {
+      var project = Bud.Plugins.Project.Key(id);
+      return existingSettings
         .AddProjectSupport()
         .Modify(ListOfProjects, listOfProjects => listOfProjects.Add(project))
         .Initialize(BaseDir.In(project), baseDir)

@@ -1,14 +1,13 @@
 using Bud;
-using System.Collections.Generic;
 using Bud.Plugins;
-using System.Collections.Immutable;
+using Bud.Plugins.CSharp;
 
 public class BuildWithDependencies : Build {
-
   public Settings GetSettings(string baseDir) {
-    return ProjectPlugin.Project("root", baseDir);
+    return Project.New("root", baseDir)
+      .BuildsCSharp()
+      .WithDependency("Foo.Bar", "0.1.3");
   }
-
 }
 
 

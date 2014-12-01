@@ -65,6 +65,7 @@
     <Compile Include="Util\SettingsUtils.cs" />
     <Compile Include="EvaluationContext.cs" />
     <Compile Include="Util\TaskUtils.cs" />
+    <Compile Include="Plugins\DependenciesPlugin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

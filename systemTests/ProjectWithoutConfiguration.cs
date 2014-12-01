@@ -12,7 +12,7 @@ namespace Bud.SystemTests {
       using (var testProjectCopy = TestProjects.TemporaryCopy("ProjectWithoutConfiguration")) {
         var buildConfiguration = BuildConfigurationLoader.Load(testProjectCopy.Path);
 
-        var expectedCompiledFile = buildConfiguration.GetCSharpOutputAssemblyFile(Project.New(testProjectCopy.Path));
+        var expectedCompiledFile = buildConfiguration.GetCSharpOutputAssemblyFile(Project.Key("root"));
 
         await buildConfiguration.Evaluate(BuildPlugin.Build);
         FileAssertions.AssertFileExists(expectedCompiledFile);
@@ -27,7 +27,7 @@ namespace Bud.SystemTests {
       using (var emptyProject = TestProjects.EmptyProject()) {
         var buildConfiguration = BuildConfigurationLoader.Load(emptyProject.Path);
         await buildConfiguration.Evaluate(BuildPlugin.Build);
-        var unexpectedCompiledFile = buildConfiguration.GetCSharpOutputAssemblyFile(Project.New(emptyProject.Path));
+        var unexpectedCompiledFile = buildConfiguration.GetCSharpOutputAssemblyFile(Project.Key("root"));
         FileAssertions.AssertFileDoesNotExist(unexpectedCompiledFile);
       }
     }
