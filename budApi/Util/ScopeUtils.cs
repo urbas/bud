@@ -7,6 +7,9 @@ namespace Bud.Util {
   public static class ScopeUtils {
 
     public static bool AreEqual(ImmutableList<ISettingKey> scopeA, ImmutableList<ISettingKey> scopeB) {
+      if (scopeA == scopeB) {
+        return true;
+      }
       if (scopeA.Count != scopeB.Count) {
         return false;
       }
