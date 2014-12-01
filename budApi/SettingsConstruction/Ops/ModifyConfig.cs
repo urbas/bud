@@ -4,11 +4,11 @@ using Bud;
 
 namespace Bud.SettingsConstruction.Ops {
   public class ModifyConfig<T> : Setting {
-    Func<BuildConfiguration, T, T> ValueModifier;
+    Func<EvaluationContext, T, T> ValueModifier;
 
     public ModifyConfig(ConfigKey<T> key, Func<T, T> valueModifier) : this(key, (buildConfig, previousValue) => valueModifier(previousValue)) {}
 
-    public ModifyConfig(ConfigKey<T> key, Func<BuildConfiguration, T, T> valueModifier) : base(key) {
+    public ModifyConfig(ConfigKey<T> key, Func<EvaluationContext, T, T> valueModifier) : base(key) {
       this.ValueModifier = valueModifier;
     }
 

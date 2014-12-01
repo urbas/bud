@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Bud.Plugins {
 
@@ -32,29 +33,29 @@ namespace Bud.Plugins {
         .EnsureInitialized(ListOfProjects, ImmutableHashSet.Create<SettingKey>());
     }
 
-    private static Unit CleanProjectTask(BuildConfiguration buildConfiguration, ISettingKey project) {
+    private async static Task<Unit> CleanProjectTask(EvaluationContext buildConfiguration, ISettingKey project) {
       var outputDir = buildConfiguration.GetOutputDir(project);
       Directory.Delete(outputDir, true);
       return Unit.Instance;
     }
 
-    public static string GetBaseDir(this BuildConfiguration buildConfiguration, ISettingKey project) {
+    public static string GetBaseDir(this EvaluationContext buildConfiguration, ISettingKey project) {
       return buildConfiguration.Evaluate(BaseDir.In(project));
     }
 
-    public static string GetBudDir(this BuildConfiguration buildConfiguration, ISettingKey project) {
+    public static string GetBudDir(this EvaluationContext buildConfiguration, ISettingKey project) {
       return Path.Combine(GetBaseDir(buildConfiguration, project), ".bud");
     }
 
     /// <returns>The directory where build output (such as compiled assemblies) are stored.</returns>
     /// <param name="projectBaseDir">The root directory of the project being built.</param>
-    public static string GetOutputDir(this BuildConfiguration buildConfiguration, ISettingKey project) {
+    public static string GetOutputDir(this EvaluationContext buildConfiguration, ISettingKey project) {
       return Path.Combine(GetBudDir(buildConfiguration, project), "output");
     }
 
     /// <returns>The directory where data gathered during build configuration is stored (e.g.: downloaded dependencies).</returns>
     /// <param name="projectBaseDir">The root directory of the project being built.</param>
-    public static string GetBuildConfigCacheDir(this BuildConfiguration buildConfiguration, ISettingKey project) {
+    public static string GetBuildConfigCacheDir(this EvaluationContext buildConfiguration, ISettingKey project) {
       return Path.Combine(GetBudDir(buildConfiguration, project), "buildConfigCache");
     }
   }

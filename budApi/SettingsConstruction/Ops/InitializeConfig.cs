@@ -3,11 +3,11 @@ using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction.Ops {
   public class InitializeConfig<T> : Setting {
-    public Func<BuildConfiguration, T> InitialValue;
+    public Func<EvaluationContext, T> InitialValue;
 
     public InitializeConfig(ConfigKey<T> key, T initialValue) : this(key, b => initialValue) {}
 
-    public InitializeConfig(ConfigKey<T> key, Func<BuildConfiguration, T> initialValue) : base(key) {
+    public InitializeConfig(ConfigKey<T> key, Func<EvaluationContext, T> initialValue) : base(key) {
       this.InitialValue = initialValue;
     }
 

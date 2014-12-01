@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Bud.Util;
 
 namespace Bud {
   public static class BuildPlugin {
@@ -11,8 +12,8 @@ namespace Bud {
 
     public static Settings AddBuildSupport(this Settings existingSettings) {
       return existingSettings
-        .EnsureInitialized(Clean, () => Unit.Instance)
-        .EnsureInitialized(Build, () => Unit.Instance);
+        .EnsureInitialized(Clean, TaskUtils.NoOpTask)
+        .EnsureInitialized(Build, TaskUtils.NoOpTask);
     }
   }
 }

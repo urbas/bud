@@ -1,14 +1,14 @@
 ﻿using System;
 
 namespace Bud.SettingsConstruction {
-  public class ConfigDefinition<T> : IValueDefinition<T> {
-    public readonly Func<BuildConfiguration, T> ConfigValue;
+  public class ConfigDefinition<T> : IValueDefinition {
+    public readonly Func<EvaluationContext, T> ConfigValue;
 
-    public ConfigDefinition(Func<BuildConfiguration, T> configValue) {
+    public ConfigDefinition(Func<EvaluationContext, T> configValue) {
       this.ConfigValue = configValue;
     }
 
-    public T Evaluate(BuildConfiguration buildConfiguration) {
+    public T Evaluate(EvaluationContext buildConfiguration) {
       return ConfigValue(buildConfiguration);
     }
   }

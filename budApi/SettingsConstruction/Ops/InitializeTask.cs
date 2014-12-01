@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 
 namespace Bud.SettingsConstruction.Ops {
   public class InitializeTask<T> : Setting {
-    public Func<BuildConfiguration, T> InitialValue;
+    public Func<EvaluationContext, Task<T>> InitialValue;
 
-    public InitializeTask(TaskKey<T> key, T initialValue) : this(key, b => initialValue) {}
+    public InitializeTask(TaskKey<T> key, T initialValue) : this(key, async b => initialValue) {}
 
-    public InitializeTask(TaskKey<T> key, Func<BuildConfiguration, T> initialValue) : base(key) {
+    public InitializeTask(TaskKey<T> key, Func<EvaluationContext, Task<T>> initialValue) : base(key) {
       this.InitialValue = initialValue;
     }
 

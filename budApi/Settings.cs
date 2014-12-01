@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Immutable;
 using Bud.SettingsConstruction;
 using Bud.SettingsConstruction.Ops;
+using System.Threading.Tasks;
 
 namespace Bud {
   public class Settings {
@@ -25,11 +26,15 @@ namespace Bud {
       return Add(new InitializeConfig<T>(key, initialValue));
     }
 
-    public Settings Initialize<T>(ConfigKey<T> key, Func<BuildConfiguration, T> initialValue) {
+    public Settings Initialize<T>(ConfigKey<T> key, Func<EvaluationContext, T> initialValue) {
       return Add(new InitializeConfig<T>(key, initialValue));
     }
 
-    public Settings Initialize<T>(TaskKey<T> key, Func<BuildConfiguration, T> task) {
+    public Settings Initialize<T>(TaskKey<T> key, Func<EvaluationContext, T> initialValue) {
+      return Add(new InitializeTask<T>(key, context => Task.FromResult(initialValue(context))));
+    }
+
+    public Settings Initialize<T>(TaskKey<T> key, Func<EvaluationContext, Task<T>> task) {
       return Add(new InitializeTask<T>(key, task));
     }
 
@@ -37,11 +42,11 @@ namespace Bud {
       return Add(new EnsureConfigInitialized<T>(key, initialValue));
     }
 
-    public Settings EnsureInitialized<T>(TaskKey<T> key, Func<BuildConfiguration, T> task) {
-      return Add(new EnsureTaskInitialized<T>(key, new TaskDefinition<T>(task)));
+    public Settings EnsureInitialized<T>(TaskKey<T> key, Func<EvaluationContext, T> task) {
+      return Add(new EnsureTaskInitialized<T>(key, new TaskDefinition<T>(context => Task.FromResult(task(context)))));
     }
 
-    public Settings EnsureInitialized<T>(TaskKey<T> key, Func<T> task) {
+    public Settings EnsureInitialized<T>(TaskKey<T> key, Func<EvaluationContext, Task<T>> task) {
       return Add(new EnsureTaskInitialized<T>(key, new TaskDefinition<T>(task)));
     }
 
@@ -49,7 +54,7 @@ namespace Bud {
       return Add(new ModifyConfig<T>(key, modifier));
     }
 
-    public Settings Modify<T>(TaskKey<T> key, Func<BuildConfiguration, Func<T>, T> modifier) {
+    public Settings Modify<T>(TaskKey<T> key, Func<EvaluationContext, Func<Task<T>>, Task<T>> modifier) {
       return Add(new ModifyTask<T>(key, modifier));
     }
 
@@ -61,8 +66,8 @@ namespace Bud {
       return new ScopedSettings(SettingsList, settingKey);
     }
 
-    public BuildConfiguration ToBuildConfiguration() {
-      return BuildConfiguration.ToBuildConfiguration(this);
+    public EvaluationContext ToEvaluationContext() {
+      return EvaluationContext.ToEvaluationContext(this);
     }
   }
 }

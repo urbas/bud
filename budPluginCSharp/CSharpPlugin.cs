@@ -7,6 +7,7 @@ using Bud.Plugins;
 using Bud.SettingsConstruction.Ops;
 using System.Collections.Immutable;
 using Bud.SettingsConstruction;
+using System.Threading.Tasks;
 
 namespace Bud.Plugins.CSharp {
 
@@ -16,7 +17,7 @@ namespace Bud.Plugins.CSharp {
 
     public static Settings AddCSharpSupport(this ScopedSettings scopedSettings) {
       return Initialise(scopedSettings)
-        .EnsureInitialized(CSharpBuild.In(scopedSettings.Scope), buildConfig => MonoCompiler.Compile(buildConfig, scopedSettings.Scope));
+        .EnsureInitialized(CSharpBuild.In(scopedSettings.Scope), async buildConfig => MonoCompiler.Compile(buildConfig, scopedSettings.Scope));
     }
 
     private static Settings Initialise(Settings existingSettings) {
@@ -25,18 +26,18 @@ namespace Bud.Plugins.CSharp {
         .AddDependencies(BuildPlugin.Build, CSharpBuild);
     }
 
-    public static string GetCSharpSourceDir(this BuildConfiguration buildConfiguration, ISettingKey project) {
+    public static string GetCSharpSourceDir(this EvaluationContext buildConfiguration, ISettingKey project) {
       return Path.Combine(buildConfiguration.GetBaseDir(project), "src", "main", "cs");
     }
 
-    public static string GetCSharpOutputAssemblyFile(this BuildConfiguration buildConfiguration, ISettingKey project) {
+    public static string GetCSharpOutputAssemblyFile(this EvaluationContext buildConfiguration, ISettingKey project) {
       return Path.Combine(buildConfiguration.GetOutputDir(project), ".net-4.5", "main", "debug", "bin", "program.exe");
     }
   }
 
   public static class MonoCompiler {
 
-    public static Unit Compile(BuildConfiguration buildConfiguration) {
+    public async static Task<Unit> Compile(EvaluationContext buildConfiguration) {
       // TODO: evaluate per-project builds in parallel.
       foreach (var project in buildConfiguration.Evaluate(ProjectPlugin.ListOfProjects)) {
         buildConfiguration.Evaluate(CSharpPlugin.CSharpBuild.In(project));
@@ -44,7 +45,7 @@ namespace Bud.Plugins.CSharp {
       return Unit.Instance;
     }
 
-    public static Unit Compile(BuildConfiguration buildConfiguration, ISettingKey project) {
+    public static Unit Compile(EvaluationContext buildConfiguration, ISettingKey project) {
       var sourceDirectory = buildConfiguration.GetCSharpSourceDir(project);
       var outputFile = buildConfiguration.GetCSharpOutputAssemblyFile(project);
       var sourceFiles = Directory.EnumerateFiles(sourceDirectory);
