@@ -26,12 +26,12 @@ namespace Bud.Plugins.CSharp {
         .AddDependencies(BuildPlugin.Build, CSharpBuild);
     }
 
-    public static string GetCSharpSourceDir(this EvaluationContext buildConfiguration, ISettingKey project) {
-      return Path.Combine(buildConfiguration.GetBaseDir(project), "src", "main", "cs");
+    public static string GetCSharpSourceDir(this EvaluationContext context, ISettingKey project) {
+      return Path.Combine(context.GetBaseDir(project), "src", "main", "cs");
     }
 
-    public static string GetCSharpOutputAssemblyFile(this EvaluationContext buildConfiguration, ISettingKey project) {
-      return Path.Combine(buildConfiguration.GetOutputDir(project), ".net-4.5", "main", "debug", "bin", "program.exe");
+    public static string GetCSharpOutputAssemblyFile(this EvaluationContext context, ISettingKey project) {
+      return Path.Combine(context.GetOutputDir(project), ".net-4.5", "main", "debug", "bin", "program.exe");
     }
   }
 
@@ -44,19 +44,21 @@ namespace Bud.Plugins.CSharp {
       return Unit.Instance;
     }
 
-    public static Unit Compile(EvaluationContext buildConfiguration, ISettingKey project) {
-      var sourceDirectory = buildConfiguration.GetCSharpSourceDir(project);
-      var outputFile = buildConfiguration.GetCSharpOutputAssemblyFile(project);
-      var sourceFiles = Directory.EnumerateFiles(sourceDirectory);
-      if (Directory.Exists(sourceDirectory) && sourceFiles.Any()) {
-        Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
-        var cSharpCompiler = "/usr/bin/mcs";
-        var exitCode = ProcessBuilder.Executable(cSharpCompiler).WithArgument("-out:" + outputFile).WithArguments(sourceFiles).Start(Console.Out, Console.Error);
-        if (exitCode != 0) {
-          throw new Exception("Compilation failed.");
+    public static Task<Unit> Compile(EvaluationContext context, ISettingKey project) {
+      var sourceDirectory = context.GetCSharpSourceDir(project);
+      var outputFile = context.GetCSharpOutputAssemblyFile(project);
+      return Task.Run(() => {
+        var sourceFiles = Directory.EnumerateFiles(sourceDirectory);
+        if (Directory.Exists(sourceDirectory) && sourceFiles.Any()) {
+          Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
+          var cSharpCompiler = "/usr/bin/mcs";
+          var exitCode = ProcessBuilder.Executable(cSharpCompiler).WithArgument("-out:" + outputFile).WithArguments(sourceFiles).Start(Console.Out, Console.Error);
+          if (exitCode != 0) {
+            throw new Exception("Compilation failed.");
+          }
         }
-      }
-      return Unit.Instance;
+        return Unit.Instance;
+      });
     }
   }
 }
