@@ -15,18 +15,6 @@ namespace Bud {
     SettingKey In(ISettingKey subScope);
   }
 
-  public interface IValuedKey : ISettingKey {
-
-  }
-
-  public interface IValuedKey<out T> : IValuedKey {
-
-  }
-
-  public interface ITaskKey : IValuedKey {
-
-  }
-
   public class SettingKey : ISettingKey {
 
     protected readonly int hash;
@@ -71,10 +59,13 @@ namespace Bud {
     
   }
 
+  public interface ConfigKey : ISettingKey {
+  }
+
   /// <summary>
   /// Values of this key are evaluated once only (during build loading).
   /// </summary>
-  public class ConfigKey<T> : SettingKey, IValuedKey<T> {
+  public class ConfigKey<T> : SettingKey, ConfigKey {
     public ConfigKey(string id) : base(id) {
     }
 
@@ -92,11 +83,14 @@ namespace Bud {
     }
   }
 
+  public interface TaskKey : ISettingKey {
+  }
+
   /// <summary>
   /// Values of this key are evaluated once on every build evaluation (if two task keys A and B
   /// depend on the same task key C then the value of task key C will be calculated only once).
   /// </summary>
-  public class TaskKey<T> : SettingKey, IValuedKey<T>, ITaskKey {
+  public class TaskKey<T> : SettingKey, TaskKey {
     public TaskKey(string id) : base(id) {
     }
 

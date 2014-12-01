@@ -6,7 +6,7 @@ namespace Bud.SettingsConstruction.Ops {
   public class InitializeTask<T> : Setting {
     public Func<EvaluationContext, Task<T>> InitialValue;
 
-    public InitializeTask(TaskKey<T> key, T initialValue) : this(key, async b => initialValue) {}
+    public InitializeTask(TaskKey<T> key, T initialValue) : this(key, b => Task.FromResult(initialValue)) {}
 
     public InitializeTask(TaskKey<T> key, Func<EvaluationContext, Task<T>> initialValue) : base(key) {
       this.InitialValue = initialValue;

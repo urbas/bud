@@ -11,16 +11,16 @@ namespace Bud.SettingsConstruction {
   public class TaskDefinition<T> : ITaskDefinition {
     public readonly Func<EvaluationContext, Task<T>> TaskFunction;
 
-    public TaskDefinition(Func<EvaluationContext, Task<T>> taskFunction) : this(taskFunction, ImmutableHashSet<ITaskKey>.Empty) {}
+    public TaskDefinition(Func<EvaluationContext, Task<T>> taskFunction) : this(taskFunction, ImmutableHashSet<TaskKey>.Empty) {}
 
-    public TaskDefinition(Func<EvaluationContext, Task<T>> taskFunction, ImmutableHashSet<ITaskKey> dependencies) {
+    public TaskDefinition(Func<EvaluationContext, Task<T>> taskFunction, ImmutableHashSet<TaskKey> dependencies) {
       TaskFunction = taskFunction;
       Dependencies = dependencies;
     }
 
-    public ImmutableHashSet<ITaskKey> Dependencies { get; private set; }
+    public ImmutableHashSet<TaskKey> Dependencies { get; private set; }
 
-    public TaskDefinition<T> WithDependencies(IEnumerable<ITaskKey> newDependencies) {
+    public TaskDefinition<T> WithDependencies(IEnumerable<TaskKey> newDependencies) {
       return new TaskDefinition<T>(TaskFunction, Dependencies.Union(newDependencies));
     }
 

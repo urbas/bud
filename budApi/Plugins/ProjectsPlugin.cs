@@ -33,7 +33,7 @@ namespace Bud.Plugins {
         .EnsureInitialized(ListOfProjects, ImmutableHashSet.Create<SettingKey>());
     }
 
-    private async static Task<Unit> CleanProjectTask(EvaluationContext buildConfiguration, ISettingKey project) {
+    private static Unit CleanProjectTask(EvaluationContext buildConfiguration, ISettingKey project) {
       var outputDir = buildConfiguration.GetOutputDir(project);
       Directory.Delete(outputDir, true);
       return Unit.Instance;

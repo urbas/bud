@@ -4,9 +4,9 @@ using System.Collections.Generic;
 
 namespace Bud.SettingsConstruction.Ops {
   public class AddDependencies<T> : Setting {
-    private IEnumerable<ITaskKey> extraDependencies;
+    private IEnumerable<TaskKey> extraDependencies;
 
-    public AddDependencies(TaskKey<T> key, IEnumerable<ITaskKey> extraDependencies) : base(key) {
+    public AddDependencies(TaskKey<T> key, IEnumerable<TaskKey> extraDependencies) : base(key) {
       this.extraDependencies = extraDependencies;
     }
 

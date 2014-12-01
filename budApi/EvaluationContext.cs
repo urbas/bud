@@ -10,8 +10,8 @@ namespace Bud {
   public class EvaluationContext {
     public readonly IDictionary<ISettingKey, IValueDefinition> SettingKeysToValues;
     // TODO: Assign sequential indices to keys and use arrays to access evaluated values (instead of dictionaries).
-    private readonly Dictionary<IValuedKey, object> configValues = new Dictionary<IValuedKey, object>();
-    private readonly Dictionary<ITaskKey, Task> taskValues = new Dictionary<ITaskKey, Task>();
+    private readonly Dictionary<ConfigKey, object> configValues = new Dictionary<ConfigKey, object>();
+    private readonly Dictionary<TaskKey, Task> taskValues = new Dictionary<TaskKey, Task>();
 
     private EvaluationContext(IDictionary<ISettingKey, IValueDefinition> settingKeysToValues) {
       this.SettingKeysToValues = settingKeysToValues;
@@ -28,7 +28,7 @@ namespace Bud {
       }
     }
 
-    public Task Evaluate(ITaskKey key) {
+    public Task Evaluate(TaskKey key) {
       Task value;
       if (taskValues.TryGetValue(key, out value)) {
         return value;
@@ -40,7 +40,7 @@ namespace Bud {
     }
 
     public Task<T> Evaluate<T>(TaskKey<T> key) {
-      return (Task<T>)Evaluate((ITaskKey)key);
+      return (Task<T>)Evaluate((TaskKey)key);
     }
 
     public static EvaluationContext ToEvaluationContext(Settings settings) {

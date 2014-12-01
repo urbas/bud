@@ -17,7 +17,7 @@ namespace Bud.Plugins.CSharp {
 
     public static Settings AddCSharpSupport(this ScopedSettings scopedSettings) {
       return Initialise(scopedSettings)
-        .EnsureInitialized(CSharpBuild.In(scopedSettings.Scope), async buildConfig => MonoCompiler.Compile(buildConfig, scopedSettings.Scope));
+        .EnsureInitialized(CSharpBuild.In(scopedSettings.Scope), buildConfig => MonoCompiler.Compile(buildConfig, scopedSettings.Scope));
     }
 
     private static Settings Initialise(Settings existingSettings) {
@@ -37,10 +37,9 @@ namespace Bud.Plugins.CSharp {
 
   public static class MonoCompiler {
 
-    public async static Task<Unit> Compile(EvaluationContext buildConfiguration) {
-      // TODO: evaluate per-project builds in parallel.
-      foreach (var project in buildConfiguration.Evaluate(ProjectPlugin.ListOfProjects)) {
-        buildConfiguration.Evaluate(CSharpPlugin.CSharpBuild.In(project));
+    public async static Task<Unit> Compile(EvaluationContext context) {
+      foreach (var project in context.Evaluate(ProjectPlugin.ListOfProjects)) {
+        await context.Evaluate(CSharpPlugin.CSharpBuild.In(project));
       }
       return Unit.Instance;
     }

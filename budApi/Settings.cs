@@ -58,7 +58,7 @@ namespace Bud {
       return Add(new ModifyTask<T>(key, modifier));
     }
 
-    public Settings AddDependencies<T>(TaskKey<T> key, params ITaskKey[] dependencies) {
+    public Settings AddDependencies<T>(TaskKey<T> key, params TaskKey[] dependencies) {
       return Add(new AddDependencies<T>(key, dependencies));
     }
 
