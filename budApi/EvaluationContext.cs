@@ -10,6 +10,7 @@ namespace Bud {
   public class EvaluationContext {
     public readonly IDictionary<ISettingKey, IValueDefinition> SettingKeysToValues;
     // TODO: Assign sequential indices to keys and use arrays to access evaluated values (instead of dictionaries).
+    // TODO: Consider using concurrent dictionaries here (so that people can access the execution context and evaluate tasks from different threads).
     private readonly Dictionary<ConfigKey, object> configValues = new Dictionary<ConfigKey, object>();
     private readonly Dictionary<TaskKey, Task> taskValues = new Dictionary<TaskKey, Task>();
 
