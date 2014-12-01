@@ -13,8 +13,9 @@ namespace Bud.SettingsConstruction.Ops {
     public override void ApplyTo(ImmutableDictionary<ISettingKey, IValueDefinition>.Builder buildConfigurationBuilder) {
       IValueDefinition value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
-        TaskDefinition<T> existingValue = (TaskDefinition<T>)value;
-        buildConfigurationBuilder[Key] = new TaskDefinition<T>(context => TaskModification(context, () => existingValue.Evaluate(context)));
+        TaskDefinition<T> existingTaskDef = (TaskDefinition<T>)value;
+        // TODO: The existing task definition might be evaluated more than once. Make sure it doesn. :)
+        buildConfigurationBuilder[Key] = new TaskDefinition<T>(context => TaskModification(context, () => existingTaskDef.Evaluate(context)));
       } else {
         throw new InvalidOperationException(string.Format("Cannot modify the task '{0}'. This task has not yet been defined.", Key.GetType().FullName));
       }
