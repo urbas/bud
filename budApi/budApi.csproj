@@ -61,7 +61,8 @@
     <Compile Include="SettingsConstruction\Ops\InitializeTask.cs" />
     <Compile Include="SettingsConstruction\Setting.cs" />
     <Compile Include="ScopedSettings.cs" />
-    <Compile Include="SettingsConstruction\ScopeUtils.cs" />
+    <Compile Include="Util\SettingKeyUtils.cs" />
+    <Compile Include="Util\ScopeUtils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -70,6 +71,7 @@
     <Folder Include="SettingsConstruction\" />
     <Folder Include="SettingsConstruction\Ops\" />
     <Folder Include="Plugins\Projects\" />
+    <Folder Include="Util\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
 using Bud.SettingsConstruction;
+using Bud.Util;
 
 namespace Bud {
 
@@ -12,8 +13,6 @@ namespace Bud {
     ImmutableList<ISettingKey> Scope { get; }
 
     SettingKey In(ISettingKey subScope);
-
-    StringBuilder ToString(StringBuilder sb);
   }
 
   public interface IValuedKey : ISettingKey {
@@ -67,25 +66,7 @@ namespace Bud {
     }
 
     public override string ToString() {
-      if (Scope.IsEmpty) {
-        return Id;
-      }
-      return ToString(new StringBuilder()).ToString();
-    }
-
-    public StringBuilder ToString(StringBuilder sb) {
-      if (!Scope.IsEmpty) {
-        foreach (var key in Scope) {
-          if (key.Scope.IsEmpty) {
-            key.ToString(sb).Append(':');
-          } else {
-            sb.Append('{');
-            key.ToString(sb);
-            sb.Append("}:");
-          }
-        }
-      }
-      return sb.Append(Id);
+      return SettingKeyUtils.KeyAsString(this);
     }
     
   }

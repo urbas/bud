@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
 
-namespace Bud.SettingsConstruction
-{
-	public static class ScopeUtils
-	{
+namespace Bud.Util {
+  public static class ScopeUtils {
+
     public static bool AreEqual(ImmutableList<ISettingKey> scopeA, ImmutableList<ISettingKey> scopeB) {
       if (scopeA.Count != scopeB.Count) {
         return false;
@@ -20,5 +19,5 @@ namespace Bud.SettingsConstruction
       }
       return true;
     }
-	}
+  }
 }
