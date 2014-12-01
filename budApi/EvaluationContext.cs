@@ -13,6 +13,7 @@ namespace Bud {
     // TODO: Consider using concurrent dictionaries here (so that people can access the execution context and evaluate tasks from different threads).
     private readonly Dictionary<ConfigKey, object> configValues = new Dictionary<ConfigKey, object>();
     private readonly Dictionary<TaskKey, Task> taskValues = new Dictionary<TaskKey, Task>();
+    private readonly Dictionary<ITaskDefinition, Task> modifiedTaskValues = new Dictionary<ITaskDefinition, Task>();
 
     private EvaluationContext(IDictionary<ISettingKey, IValueDefinition> settingKeysToValues) {
       this.SettingKeysToValues = settingKeysToValues;
@@ -23,25 +24,34 @@ namespace Bud {
       if (configValues.TryGetValue(key, out value)) {
         return (T)value;
       } else {
-        var evaluatedValue = ((ConfigDefinition<T>)SettingKeysToValues[key]).Evaluate(this);
+        T evaluatedValue = ((ConfigDefinition<T>)SettingKeysToValues[key]).Evaluate(this);
         configValues.Add(key, evaluatedValue);
         return evaluatedValue;
       }
     }
 
     public Task Evaluate(TaskKey key) {
-      Task value;
-      if (taskValues.TryGetValue(key, out value)) {
-        return value;
-      } else {
-        var evaluatedValue = ((ITaskDefinition)SettingKeysToValues[key]).Evaluate(this);
-        taskValues.Add(key, evaluatedValue);
-        return evaluatedValue;
+      Task evaluationAsTask;
+      if (!taskValues.TryGetValue(key, out evaluationAsTask)) {
+        evaluationAsTask = ((ITaskDefinition)SettingKeysToValues[key]).Evaluate(this);
+        taskValues.Add(key, evaluationAsTask);
       }
+      return evaluationAsTask;
     }
 
     public Task<T> Evaluate<T>(TaskKey<T> key) {
       return (Task<T>)Evaluate((TaskKey)key);
+    }
+
+    public Task<T> Evaluate<T>(TaskDefinition<T> overwrittenTaskDef) {
+      Task existingEvaluation;
+      if (modifiedTaskValues.TryGetValue(overwrittenTaskDef, out existingEvaluation)) {
+        return (Task<T>)existingEvaluation;
+      } else {
+        Task<T> freshEvaluation = overwrittenTaskDef.Evaluate(this);
+        modifiedTaskValues.Add(overwrittenTaskDef, freshEvaluation);
+        return freshEvaluation;
+      }
     }
 
     public static EvaluationContext ToEvaluationContext(Settings settings) {

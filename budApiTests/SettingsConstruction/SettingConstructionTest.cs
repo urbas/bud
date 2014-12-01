@@ -89,7 +89,10 @@ namespace Bud {
       bool wasDependentInvoked = false;
       var buildConfiguration = Settings.Start
         .Initialize(TestTaskKey, b => "foo")
-        .Initialize(TestTaskKey2, b => { wasDependentInvoked = true; return "bar"; })
+        .Initialize(TestTaskKey2, b => {
+        wasDependentInvoked = true;
+        return "bar";
+      })
         .AddDependencies(TestTaskKey, TestTaskKey2);
       buildConfiguration.ToEvaluationContext().Evaluate(TestTaskKey);
       Assert.IsTrue(wasDependentInvoked);
@@ -99,7 +102,10 @@ namespace Bud {
     public void AddDependencies_MUST_invoke_the_dependent_task_only_once() {
       int numberOfTimesDependentInvoked = 0;
       var buildConfiguration = Settings.Start
-        .Initialize(TestTaskKey, b => { ++numberOfTimesDependentInvoked; return "foo";})
+        .Initialize(TestTaskKey, b => {
+        ++numberOfTimesDependentInvoked;
+        return "foo";
+      })
         .Initialize(TestTaskKey2, b => "bar").AddDependencies(TestTaskKey2, TestTaskKey)
         .Initialize(TestTaskKey3, b => "zar").AddDependencies(TestTaskKey3, TestTaskKey2, TestTaskKey);
       buildConfiguration.ToEvaluationContext().Evaluate(TestTaskKey3);
@@ -110,11 +116,30 @@ namespace Bud {
     public async void AddDependencies_MUST_invoke_the_dependent_task_only_once_WHEN_tasks_are_also_evaluated_in_the_tasks_body() {
       int numberOfTimesDependentInvoked = 0;
       var buildConfiguration = Settings.Start
-        .Initialize(TestTaskKey, b => { ++numberOfTimesDependentInvoked; return "foo";})
+        .Initialize(TestTaskKey, b => {
+        ++numberOfTimesDependentInvoked;
+        return "foo";
+      })
         .Initialize(TestTaskKey2, async b => await b.Evaluate(TestTaskKey) + "bar").AddDependencies(TestTaskKey2, TestTaskKey)
         .Initialize(TestTaskKey3, async b => await b.Evaluate(TestTaskKey) + await b.Evaluate(TestTaskKey2) + "zar").AddDependencies(TestTaskKey3, TestTaskKey2, TestTaskKey);
       var evaluatedValue = await buildConfiguration.ToEvaluationContext().Evaluate(TestTaskKey3);
       Assert.AreEqual("foofoobarzar", evaluatedValue);
+      Assert.AreEqual(1, numberOfTimesDependentInvoked);
+    }
+
+    [Test]
+    public async void Modify_MUST_invoke_the_previous_task_only_once_WHEN_the_new_task_tries_to_invoke_it_twice() {
+      int numberOfTimesDependentInvoked = 0;
+
+      var evaluatedValue = await Settings.Start
+        .Initialize(TestTaskKey, context => {
+        ++numberOfTimesDependentInvoked;
+        return "foo";
+      })
+        .Modify(TestTaskKey, async (context, previousTask) => await previousTask() + await previousTask())
+        .ToEvaluationContext().Evaluate(TestTaskKey);
+
+      Assert.AreEqual("foofoo", evaluatedValue);
       Assert.AreEqual(1, numberOfTimesDependentInvoked);
     }
   }

@@ -14,8 +14,7 @@ namespace Bud.SettingsConstruction.Ops {
       IValueDefinition value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
         TaskDefinition<T> existingTaskDef = (TaskDefinition<T>)value;
-        // TODO: The existing task definition might be evaluated more than once. Make sure it doesn. :)
-        buildConfigurationBuilder[Key] = new TaskDefinition<T>(context => TaskModification(context, () => existingTaskDef.Evaluate(context)));
+        buildConfigurationBuilder[Key] = new TaskDefinition<T>(context => TaskModification(context, () => context.Evaluate(existingTaskDef)));
       } else {
         throw new InvalidOperationException(string.Format("Cannot modify the task '{0}'. This task has not yet been defined.", Key.GetType().FullName));
       }
