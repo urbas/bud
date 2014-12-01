@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="SettingsConstruction\SettingConstructionTest.cs" />
     <Compile Include="Plugins\ProjectsPluginTest.cs" />
+    <Compile Include="SettingKeyTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="SettingsConstruction\" />

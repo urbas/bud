@@ -2,13 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
+using Bud.SettingsConstruction;
 
 namespace Bud {
 
   public interface ISettingKey {
-    ISettingKey In(ISettingKey subScope);
     string Id { get; }
-    ISettingKey Scope { get; }
+
+    ImmutableList<ISettingKey> Scope { get; }
+
+    SettingKey In(ISettingKey subScope);
+
+    StringBuilder ToString(StringBuilder sb);
   }
 
   public interface IValuedKey : ISettingKey {
@@ -24,18 +29,26 @@ namespace Bud {
   }
 
   public class SettingKey : ISettingKey {
+
+    protected readonly int hash;
+
     public string Id { get; private set; }
-    public ISettingKey Scope  { get; private set; }
 
-    public SettingKey(string id) : this(id, GlobalScope.Instance) {}
+    public ImmutableList<ISettingKey> Scope  { get; private set; }
 
-    public SettingKey(string id, ISettingKey scope) {
-      this.Id = id;
-      this.Scope = scope;
+    public SettingKey(string id) : this(id, ImmutableList<ISettingKey>.Empty, id.GetHashCode()) {
     }
 
-    ISettingKey ISettingKey.In(ISettingKey subScope) {
-      return new SettingKey(Id, subScope.In(Scope));
+    protected SettingKey(string id, ImmutableList<ISettingKey> scope, int hash) {
+      this.Id = id;
+      this.Scope = scope;
+      this.hash = hash;
+    }
+
+    public SettingKey In(ISettingKey subScope) {
+      unchecked {
+        return new SettingKey(Id, Scope.Add(subScope), hash ^ subScope.GetHashCode());
+      }
     }
 
     public override bool Equals(object obj) {
@@ -46,17 +59,33 @@ namespace Bud {
       if (!(obj is ISettingKey))
         return false;
       ISettingKey other = (ISettingKey)obj;
-      return Id.Equals(other.Id) && Scope.Equals(other.Scope);
+      return Id.Equals(other.Id) && ScopeUtils.AreEqual(Scope, other.Scope);
     }
 
     public override int GetHashCode() {
-      unchecked {
-        return Id.GetHashCode() ^ Scope.GetHashCode();
-      }
+        return hash;
     }
 
     public override string ToString() {
-      return Scope.ToString() + ":" + Id;
+      if (Scope.IsEmpty) {
+        return Id;
+      }
+      return ToString(new StringBuilder()).ToString();
+    }
+
+    public StringBuilder ToString(StringBuilder sb) {
+      if (!Scope.IsEmpty) {
+        foreach (var key in Scope) {
+          if (key.Scope.IsEmpty) {
+            key.ToString(sb).Append(':');
+          } else {
+            sb.Append('{');
+            key.ToString(sb);
+            sb.Append("}:");
+          }
+        }
+      }
+      return sb.Append(Id);
     }
     
   }
@@ -68,15 +97,17 @@ namespace Bud {
     public ConfigKey(string id) : base(id) {
     }
 
-    public ConfigKey(string id, ISettingKey scope) : base(id, scope) {
+    private ConfigKey(string id, ImmutableList<ISettingKey> scope, int hash) : base(id, scope, hash) {
     }
 
-    ISettingKey ISettingKey.In(ISettingKey subScope) {
+    SettingKey ISettingKey.In(ISettingKey subScope) {
       return In(subScope);
     }
 
-    public ConfigKey<T> In(ISettingKey subScope) {
-      return new ConfigKey<T>(Id, Scope.In(subScope));
+    public new ConfigKey<T> In(ISettingKey subScope) {
+      unchecked {
+        return new ConfigKey<T>(Id, Scope.Add(subScope), hash ^ subScope.GetHashCode());
+      }
     }
   }
 
@@ -88,43 +119,17 @@ namespace Bud {
     public TaskKey(string id) : base(id) {
     }
 
-    public TaskKey(string id, ISettingKey scope) : base(id, scope) {
+    private TaskKey(string id, ImmutableList<ISettingKey> scope, int hash) : base(id, scope, hash) {
     }
 
-    ISettingKey ISettingKey.In(ISettingKey subScope) {
+    SettingKey ISettingKey.In(ISettingKey subScope) {
       return In(subScope);
     }
 
-    public TaskKey<T> In(ISettingKey subScope) {
-      return new TaskKey<T>(Id, Scope.In(subScope));
-    }
-  }
-
-  public sealed class GlobalScope : ISettingKey {
-
-    public static readonly ISettingKey Instance = new GlobalScope();
-
-    private GlobalScope() {}
-
-    public string Id { get { return "GlobalScope"; } }
-
-    public ISettingKey Scope { get { return null; } }
-
-    public ISettingKey In(ISettingKey subScope) {
-      return new SettingKey(Id, subScope);
-    }
-
-    public override bool Equals(object obj) {
-      if (obj == null)
-        return false;
-      if (ReferenceEquals(this, obj))
-        return true;
-      return obj.GetType() == typeof(GlobalScope);
-    }
-
-
-    public override int GetHashCode() {
-      return Id.GetHashCode();
+    public new TaskKey<T> In(ISettingKey subScope) {
+      unchecked {
+        return new TaskKey<T>(Id, Scope.Add(subScope), hash ^ subScope.GetHashCode());
+      }
     }
   }
 }

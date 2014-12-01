@@ -61,6 +61,7 @@
     <Compile Include="SettingsConstruction\Ops\InitializeTask.cs" />
     <Compile Include="SettingsConstruction\Setting.cs" />
     <Compile Include="ScopedSettings.cs" />
+    <Compile Include="SettingsConstruction\ScopeUtils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -11,7 +11,7 @@ namespace Bud {
       var buildConfiguration = ProjectPlugin.Project("foo", "./fooDir").ToBuildConfiguration();
       var listOfProjects = buildConfiguration.Evaluate(ProjectPlugin.ListOfProjects);
       Assert.AreEqual(
-        ImmutableHashSet.Create<Project>().Add(new Project("foo")),
+        ImmutableHashSet.Create<SettingKey>().Add(Project.New("foo")),
         listOfProjects
       );
     }
@@ -25,7 +25,7 @@ namespace Bud {
     [Test]
     public void Create_MUST_insert_the_directory_of_the_project() {
       var buildConfiguration = ProjectPlugin.Project("foo", "./fooDir").ToBuildConfiguration();
-      var baseDir = buildConfiguration.Evaluate(ProjectPlugin.BaseDir.In(new Project("foo")));
+      var baseDir = buildConfiguration.Evaluate(ProjectPlugin.BaseDir.In(Project.New("foo")));
       Assert.AreEqual("./fooDir", baseDir);
     }
 
