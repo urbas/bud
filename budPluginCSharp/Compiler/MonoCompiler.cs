@@ -15,7 +15,7 @@ namespace Bud.Plugins.CSharp.Compiler {
       return Unit.Instance;
     }
 
-    public static Task<Unit> CompileProjects(EvaluationContext context, ISettingKey project) {
+    public static Task<Unit> CompileProject(EvaluationContext context, Scope project) {
       var sourceDirectory = context.GetCSharpSourceDir(project);
       var outputFile = context.GetCSharpOutputAssemblyFile(project);
       return Task.Run(() => {

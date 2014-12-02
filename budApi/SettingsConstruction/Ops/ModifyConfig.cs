@@ -6,13 +6,11 @@ namespace Bud.SettingsConstruction.Ops {
   public class ModifyConfig<T> : Setting {
     Func<EvaluationContext, T, T> ValueModifier;
 
-    public ModifyConfig(ConfigKey<T> key, Func<T, T> valueModifier) : this(key, (buildConfig, previousValue) => valueModifier(previousValue)) {}
-
     public ModifyConfig(ConfigKey<T> key, Func<EvaluationContext, T, T> valueModifier) : base(key) {
       this.ValueModifier = valueModifier;
     }
 
-    public override void ApplyTo(ImmutableDictionary<ISettingKey, IValueDefinition>.Builder buildConfigurationBuilder) {
+    public override void ApplyTo(ImmutableDictionary<Scope, IValueDefinition>.Builder buildConfigurationBuilder) {
       IValueDefinition value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
         ConfigDefinition<T> existingValue = (ConfigDefinition<T>)value;

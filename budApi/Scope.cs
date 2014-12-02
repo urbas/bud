@@ -5,14 +5,17 @@ using Bud.SettingsConstruction.Ops;
 using System.Text;
 
 namespace Bud {
-  public sealed class Scope {
-    public static readonly Scope Global = new Scope(null, "Global");
+  public class Scope {
+    public static readonly Scope Global = new Scope("Global", null);
     public readonly Scope Parent;
     public readonly string Id;
     public readonly int Depth;
     public readonly int Hash;
 
-    private Scope(Scope parent, string id) {
+    public Scope(string id) : this(id, Global) {
+    }
+
+    protected Scope(string id, Scope parent) {
       Parent = parent ?? this;
       Id = id;
       Depth = parent == null ? 1 : (parent.Depth + 1);
@@ -25,10 +28,8 @@ namespace Bud {
       get { return ReferenceEquals(this, Global); }
     }
 
-    public Scope Add(string subScope) {
-      unchecked {
-        return new Scope(this, subScope);
-      }
+    public Scope In(Scope parent) {
+      return new Scope(Id, parent);
     }
 
     public bool Equals(Scope otherScope) {
@@ -45,7 +46,7 @@ namespace Bud {
       if (other == null) {
         return false;
       }
-      if (GetType() != other.GetType()) {
+      if (!(other is Scope)) {
         return false;
       }
       return Equals((Scope)other);
@@ -58,7 +59,7 @@ namespace Bud {
     public override string ToString() {
       return IsGlobal ? Id : AppendAsString(new StringBuilder()).ToString();
     }
-    
+
     private StringBuilder AppendAsString(StringBuilder stringBuilder) {
       return IsGlobal ? stringBuilder.Append(Id) : Parent.AppendAsString(stringBuilder).Append(':').Append(Id);
     }

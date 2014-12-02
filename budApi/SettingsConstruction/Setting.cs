@@ -4,13 +4,13 @@ using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction {
   public abstract class Setting {
-    public readonly SettingKey Key;
+    public readonly Scope Key;
 
-    public Setting(SettingKey key) {
+    public Setting(Scope key) {
       this.Key = key;
     }
 
-    public abstract void ApplyTo(ImmutableDictionary<ISettingKey, IValueDefinition>.Builder buildConfigurationBuilder);
+    public abstract void ApplyTo(ImmutableDictionary<Scope, IValueDefinition>.Builder buildConfigurationBuilder);
   }
 }
 

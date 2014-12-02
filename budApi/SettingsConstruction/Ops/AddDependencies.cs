@@ -10,12 +10,12 @@ namespace Bud.SettingsConstruction.Ops {
       this.extraDependencies = extraDependencies;
     }
 
-    public override void ApplyTo(ImmutableDictionary<ISettingKey, IValueDefinition>.Builder buildConfigurationBuilder) {
+    public override void ApplyTo(ImmutableDictionary<Scope, IValueDefinition>.Builder buildConfigurationBuilder) {
       IValueDefinition value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
         buildConfigurationBuilder[Key] = ((TaskDefinition<T>)value).WithDependencies(extraDependencies);
       } else {
-        throw new InvalidOperationException(string.Format("Cannot add dependencies to the task '{0}'. This task has not yet been defined.", Key.GetType().FullName));
+        throw new InvalidOperationException(string.Format("Cannot add dependencies to the task '{0}'. This task has not yet been defined.", Key));
       }
     }
   }

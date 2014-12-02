@@ -8,15 +8,15 @@ using System.Threading.Tasks;
 
 namespace Bud {
   public class EvaluationContext {
-    public readonly IDictionary<ISettingKey, IValueDefinition> SettingKeysToValues;
+    public readonly IDictionary<Scope, IValueDefinition> ScopesToValues;
     // TODO: Assign sequential indices to keys and use arrays to access evaluated values (instead of dictionaries).
     // TODO: Consider using concurrent dictionaries here (so that people can access the execution context and evaluate tasks from different threads).
-    private readonly Dictionary<ConfigKey, object> configValues = new Dictionary<ConfigKey, object>();
+    private readonly Dictionary<Scope, object> configValues = new Dictionary<Scope, object>();
     private readonly Dictionary<TaskKey, Task> taskValues = new Dictionary<TaskKey, Task>();
     private readonly Dictionary<ITaskDefinition, Task> modifiedTaskValues = new Dictionary<ITaskDefinition, Task>();
 
-    private EvaluationContext(IDictionary<ISettingKey, IValueDefinition> settingKeysToValues) {
-      this.SettingKeysToValues = settingKeysToValues;
+    private EvaluationContext(IDictionary<Scope, IValueDefinition> settingKeysToValues) {
+      this.ScopesToValues = settingKeysToValues;
     }
 
     public T Evaluate<T>(ConfigKey<T> key) {
@@ -24,7 +24,7 @@ namespace Bud {
       if (configValues.TryGetValue(key, out value)) {
         return (T)value;
       } else {
-        T evaluatedValue = ((ConfigDefinition<T>)SettingKeysToValues[key]).Evaluate(this);
+        T evaluatedValue = ((ConfigDefinition<T>)ScopesToValues[key]).Evaluate(this);
         configValues.Add(key, evaluatedValue);
         return evaluatedValue;
       }
@@ -33,7 +33,7 @@ namespace Bud {
     public Task Evaluate(TaskKey key) {
       Task evaluationAsTask;
       if (!taskValues.TryGetValue(key, out evaluationAsTask)) {
-        evaluationAsTask = ((ITaskDefinition)SettingKeysToValues[key]).Evaluate(this);
+        evaluationAsTask = ((ITaskDefinition)ScopesToValues[(Scope)key]).Evaluate(this);
         taskValues.Add(key, evaluationAsTask);
       }
       return evaluationAsTask;
@@ -60,7 +60,7 @@ namespace Bud {
 
     public override string ToString() {
       StringBuilder sb = new StringBuilder("EvaluationContext{");
-      var enumerator = SettingKeysToValues.Keys.GetEnumerator();
+      var enumerator = ScopesToValues.Keys.GetEnumerator();
       if (enumerator.MoveNext()) {
         sb.Append(enumerator.Current);
         while (enumerator.MoveNext()) {

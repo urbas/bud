@@ -11,7 +11,7 @@ namespace Bud {
       var context = Project.New("foo", "./fooDir").ToEvaluationContext();
       var listOfProjects = context.GetListOfProjects();
       Assert.AreEqual(
-        ImmutableHashSet.Create<SettingKey>().Add(Project.Key("foo")),
+        ImmutableHashSet.Create<Scope>().Add(Project.Key("foo")),
         listOfProjects
       );
     }
@@ -21,7 +21,7 @@ namespace Bud {
     public void Create_MUST_not_insert_two_same_projects_to_the_list_of_projects() {
       var projectFoo1 = Project.New("foo", "./fooDir");
       var projectFoo2 = Project.New("foo", "./fooDir");
-      projectFoo1.Add(projectFoo2).ToEvaluationContext();
+      projectFoo1.Globally(s => s.Add(projectFoo2)).ToEvaluationContext();
     }
 
     [Test]

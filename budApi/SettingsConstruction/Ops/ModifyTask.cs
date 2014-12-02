@@ -10,7 +10,7 @@ namespace Bud.SettingsConstruction.Ops {
       this.TaskModification = taskModification;
     }
 
-    public override void ApplyTo(ImmutableDictionary<ISettingKey, IValueDefinition>.Builder buildConfigurationBuilder) {
+    public override void ApplyTo(ImmutableDictionary<Scope, IValueDefinition>.Builder buildConfigurationBuilder) {
       IValueDefinition value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
         TaskDefinition<T> existingTaskDef = (TaskDefinition<T>)value;

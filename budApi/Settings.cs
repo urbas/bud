@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Bud {
 
-  // TODO: Make settings scoped and introduce method variants that automatically scope.
   public class Settings {
     public static readonly Settings Start = new Settings(ImmutableList.Create<Setting>());
 
@@ -24,6 +23,7 @@ namespace Bud {
     public Settings Add(Settings settings) {
       return new Settings(SettingsList.AddRange(settings.SettingsList));
     }
+
     public Settings Initialize<T>(ConfigKey<T> key, T initialValue) {
       return Add(new InitializeConfig<T>(key, initialValue));
     }
@@ -36,7 +36,7 @@ namespace Bud {
       return Add(new InitializeTask<T>(key, context => Task.FromResult(initialValue(context))));
     }
 
-    public Settings Initialize<T>(TaskKey<T> key, Func<EvaluationContext, Task<T>> task) {
+    public Settings InitializeAsync<T>(TaskKey<T> key, Func<EvaluationContext, Task<T>> task) {
       return Add(new InitializeTask<T>(key, task));
     }
 
@@ -53,7 +53,7 @@ namespace Bud {
     }
 
     public Settings Modify<T>(ConfigKey<T> key, Func<T, T> modifier) {
-      return Add(new ModifyConfig<T>(key, modifier));
+      return Add(new ModifyConfig<T>(key, (context, previousValue) => modifier(previousValue)));
     }
 
     public Settings Modify<T>(TaskKey<T> key, Func<EvaluationContext, Func<Task<T>>, Task<T>> modifier) {
@@ -64,8 +64,8 @@ namespace Bud {
       return Add(new AddDependencies<T>(key, dependencies));
     }
 
-    public ScopedSettings ScopedTo(ISettingKey settingKey) {
-      return new ScopedSettings(SettingsList, settingKey);
+    public ScopedSettings ScopedTo(Scope scope) {
+      return new ScopedSettings(SettingsList, scope);
     }
 
     public EvaluationContext ToEvaluationContext() {

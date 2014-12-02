@@ -13,21 +13,21 @@ namespace Bud.Plugins.Projects {
         .AddProjectSupport()
         .Modify(ProjectKeys.ListOfProjects, listOfProjects => listOfProjects.Add(project))
         .AddDependencies(BuildPlugin.Clean, BuildPlugin.Clean.In(project))
-        .Initialize(ProjectKeys.BaseDir.In(project), baseDir)
-        .Initialize(ProjectKeys.BudDir.In(project), ctxt => Project.GetDefaultBudDir(ctxt, project))
-        .Initialize(ProjectKeys.OutputDir.In(project), ctxt => Project.GetDefaultOutputDir(ctxt, project))
-        .Initialize(ProjectKeys.BuildConfigCacheDir.In(project), ctxt => Project.GetDefaultBuildConfigCacheDir(ctxt, project))
-        .Initialize(BuildPlugin.Clean.In(project), ctxt => CleanProjectTask(ctxt, project))
-        .ScopedTo(project);
+        .ScopedTo(project)
+        .Initialize(ProjectKeys.BaseDir, baseDir)
+        .Initialize(ProjectKeys.BudDir, Project.GetDefaultBudDir)
+        .Initialize(ProjectKeys.OutputDir, Project.GetDefaultOutputDir)
+        .Initialize(ProjectKeys.BuildConfigCacheDir, Project.GetDefaultBuildConfigCacheDir)
+        .Initialize(BuildPlugin.Clean, CleanProjectTask);
     }
 
     private static Settings AddProjectSupport(this Settings existingSettings) {
       return existingSettings
         .AddBuildSupport()
-        .EnsureInitialized(ProjectKeys.ListOfProjects, ImmutableHashSet.Create<SettingKey>());
+        .EnsureInitialized(ProjectKeys.ListOfProjects, ImmutableHashSet.Create<Scope>());
     }
 
-    private static Unit CleanProjectTask(EvaluationContext context, ISettingKey project) {
+    private static Unit CleanProjectTask(EvaluationContext context, Scope project) {
       var outputDir = context.GetOutputDir(project);
       Directory.Delete(outputDir, true);
       return Unit.Instance;

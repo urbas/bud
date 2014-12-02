@@ -9,7 +9,7 @@ namespace Bud.SettingsConstruction.Ops {
       this.InitialValue = initialValue;
     }
 
-    public override void ApplyTo(ImmutableDictionary<ISettingKey, IValueDefinition>.Builder buildConfigurationBuilder) {
+    public override void ApplyTo(ImmutableDictionary<Scope, IValueDefinition>.Builder buildConfigurationBuilder) {
       if (!buildConfigurationBuilder.ContainsKey(Key)) {
         buildConfigurationBuilder[Key] = InitialValue;
       }
