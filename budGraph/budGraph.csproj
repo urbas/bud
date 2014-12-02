@@ -40,7 +40,6 @@
     <Compile Include="ConfigKey.cs" />
     <Compile Include="EvaluationContext.cs" />
     <Compile Include="Scope.cs" />
-    <Compile Include="ScopedSettings.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TaskKey.cs" />
     <Compile Include="Unit.cs" />

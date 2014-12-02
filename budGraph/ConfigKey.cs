@@ -14,9 +14,8 @@ namespace Bud {
     public new ConfigKey<T> In(Scope parent) {
       if (Parent.Equals(parent)) {
         return this;
-      } else {
-        return new ConfigKey<T>(Id, parent);
       }
+      return new ConfigKey<T>(Id, parent);
     }
   }
 }

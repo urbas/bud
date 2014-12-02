@@ -9,8 +9,8 @@ namespace Bud {
     public static readonly Scope Global = new Scope("Global", null);
     public readonly Scope Parent;
     public readonly string Id;
-    public readonly int Depth;
-    public readonly int Hash;
+    private readonly int Depth;
+    private readonly int Hash;
 
     public Scope(string id) : this(id, Global) {
     }
@@ -29,6 +29,9 @@ namespace Bud {
     }
 
     public Scope In(Scope parent) {
+      if (Parent.Equals(parent)) {
+        return this;
+      }
       return new Scope(Id, parent);
     }
 

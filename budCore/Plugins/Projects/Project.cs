@@ -6,12 +6,12 @@ using Bud.SettingsConstruction.Ops;
 namespace Bud.Plugins.Projects {
 
   public static class Project {
-    public static ScopedSettings New(string id, string baseDir) {
+    public static Settings New(string id, string baseDir) {
       return Settings.Start.AddProject(id, baseDir);
     }
 
-    public static Scope Key(string id) {
-      return new Scope(id).In(ProjectKeys.Projects);
+    public static Scope CreateProjectScope(this Settings settings, string id) {
+      return new Scope(id).In(ProjectKeys.Project.In(settings.CurrentScope));
     }
 
     public static ImmutableHashSet<Scope> GetListOfProjects(this EvaluationContext buildConfiguration) {

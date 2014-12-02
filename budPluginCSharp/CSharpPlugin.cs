@@ -1,6 +1,7 @@
 using Bud.Plugins.CSharp.Compiler;
 using Bud.Plugins.Projects;
 using System.IO;
+using Bud.Util;
 
 namespace Bud.Plugins.CSharp {
 
@@ -8,14 +9,18 @@ namespace Bud.Plugins.CSharp {
     public static readonly Scope CSharp = new Scope("CSharp");
     public static readonly TaskKey<Unit> CSharpBuild = BuildPlugin.Build.In(CSharp);
 
-    public static ScopedSettings BuildsCSharp(this ScopedSettings scopedSettings) {
-      return scopedSettings
-        .EnsureInitialized(CSharpBuild, MonoCompiler.CompileProject)
-        .Globally(s => s
-          .AddBuildSupport()
-          .EnsureInitialized(CSharpBuild, MonoCompiler.CompileAllProjects)
-          .AddDependencies(BuildPlugin.Build, CSharpBuild)
-        );
+    public static Settings BuildsCSharp(this Settings settings) {
+      return settings
+        .AddBuildSupport()
+        .AddCSharpBuildSupport()
+        .InitOrKeep(CSharpBuild.In(settings.CurrentScope), ctxt => MonoCompiler.CompileProject(ctxt, settings.CurrentScope))
+        .AddDependencies(CSharpBuild, CSharpBuild.In(settings.CurrentScope));
+    }
+
+    public static Settings AddCSharpBuildSupport(this Settings existingSettings) {
+      return existingSettings
+        .InitOrKeep(CSharpBuild, TaskUtils.NoOpTask)
+        .AddDependencies(BuildPlugin.Build, CSharpBuild);
     }
 
     public static string GetCSharpSourceDir(this EvaluationContext context, Scope project) {

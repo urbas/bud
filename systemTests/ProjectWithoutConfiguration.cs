@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Bud.Test;
 using Bud.Test.Assertions;
 using NUnit.Framework;
@@ -11,26 +12,38 @@ namespace Bud.SystemTests {
     [Test]
     public async void compile_MUST_produce_the_executable() {
       using (var testProjectCopy = TestProjects.TemporaryCopy("ProjectWithoutConfiguration")) {
-        var buildConfiguration = BuildConfigurationLoader.Load(testProjectCopy.Path);
+        var context = BuildConfigurationLoader.Load(testProjectCopy.Path);
 
-        var expectedCompiledFile = buildConfiguration.GetCSharpOutputAssemblyFile(Project.Key("root"));
+        var compiledAssemblyFiles = CompiledAssemblyFiles(context);
 
-        await buildConfiguration.Evaluate(BuildPlugin.Build);
-        FileAssertions.AssertFileExists(expectedCompiledFile);
+        await context.Evaluate(BuildPlugin.Build);
+        foreach (var assemblyFile in compiledAssemblyFiles) {
+          FileAssertions.AssertFileExists(assemblyFile);
+        }
 
-        await buildConfiguration.Evaluate(BuildPlugin.Clean);
-        FileAssertions.AssertFileDoesNotExist(expectedCompiledFile);
+        Assert.IsNotEmpty(compiledAssemblyFiles);
+
+        await context.Evaluate(BuildPlugin.Clean);
+        foreach (var assemblyFile in compiledAssemblyFiles) {
+          FileAssertions.AssertFileDoesNotExist(assemblyFile);
+        }
       }
     }
 
     [Test]
     public async void compile_MUST_produce_no_executable_WHEN_the_project_folder_is_empty() {
       using (var emptyProject = TestProjects.EmptyProject()) {
-        var buildConfiguration = BuildConfigurationLoader.Load(emptyProject.Path);
-        await buildConfiguration.Evaluate(BuildPlugin.Build);
-        var unexpectedCompiledFile = buildConfiguration.GetCSharpOutputAssemblyFile(Project.Key("root"));
-        FileAssertions.AssertFileDoesNotExist(unexpectedCompiledFile);
+        var context = BuildConfigurationLoader.Load(emptyProject.Path);
+        await context.Evaluate(BuildPlugin.Build);
+        var unexpectedCompiledFiles = CompiledAssemblyFiles(context);
+        foreach (var assemblyFile in unexpectedCompiledFiles) {
+          FileAssertions.AssertFileDoesNotExist(assemblyFile);
+        }
       }
+    }
+
+    static System.Collections.Generic.IEnumerable<string> CompiledAssemblyFiles(EvaluationContext context) {
+      return from project in context.GetListOfProjects() select context.GetCSharpOutputAssemblyFile(project);
     }
   }
 }

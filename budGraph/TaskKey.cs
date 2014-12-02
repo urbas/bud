@@ -28,9 +28,8 @@ namespace Bud {
     public new TaskKey<T> In(Scope parent) {
       if (Parent.Equals(parent)) {
         return this;
-      } else {
-        return new TaskKey<T>(Id, parent);
       }
+      return new TaskKey<T>(Id, parent);
     }
   }
 }

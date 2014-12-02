@@ -8,13 +8,6 @@ using System.Linq;
 namespace Bud.Plugins.CSharp.Compiler {
   public static class MonoCompiler {
 
-    public async static Task<Unit> CompileAllProjects(EvaluationContext context) {
-      foreach (var project in context.Evaluate(ProjectKeys.ListOfProjects)) {
-        await context.Evaluate(CSharpPlugin.CSharpBuild.In(project));
-      }
-      return Unit.Instance;
-    }
-
     public static Task<Unit> CompileProject(EvaluationContext context, Scope project) {
       var sourceDirectory = context.GetCSharpSourceDir(project);
       var outputFile = context.GetCSharpOutputAssemblyFile(project);
