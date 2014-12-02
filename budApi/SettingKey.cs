@@ -10,51 +10,57 @@ namespace Bud {
   public interface ISettingKey {
     string Id { get; }
 
-    ImmutableList<ISettingKey> Scope { get; }
+    Scope Scope { get; }
 
     SettingKey In(ISettingKey subScope);
   }
 
   public class SettingKey : ISettingKey {
 
-    protected readonly int hash;
+    public Scope Scope  { get; private set; }
 
-    public string Id { get; private set; }
+    public string Id { get { return Scope.Id; } }
 
-    public ImmutableList<ISettingKey> Scope  { get; private set; }
-
-    public SettingKey(string id) : this(id, ImmutableList<ISettingKey>.Empty, id.GetHashCode()) {
+    public SettingKey(string id) : this(Scope.Global.Add(id)) {
     }
 
-    protected SettingKey(string id, ImmutableList<ISettingKey> scope, int hash) {
-      this.Id = id;
+    protected SettingKey(Scope scope) {
       this.Scope = scope;
-      this.hash = hash;
     }
 
     public SettingKey In(ISettingKey subScope) {
       unchecked {
-        return new SettingKey(Id, Scope.Add(subScope), hash ^ subScope.GetHashCode());
+        return new SettingKey(CreateSubScope(subScope));
       }
     }
 
-    public override bool Equals(object obj) {
-      if (obj == null)
+    public bool Equals(ISettingKey other) {
+      return Scope.Equals(other.Scope);
+    }
+
+    public override bool Equals(object other) {
+      if (other == null) {
         return false;
-      if (ReferenceEquals(this, obj))
+      }
+      if (ReferenceEquals(this, other)) {
         return true;
-      if (!(obj is ISettingKey))
+      }
+      if (!(other is ISettingKey)) {
         return false;
-      ISettingKey other = (ISettingKey)obj;
-      return Id.Equals(other.Id) && ScopeUtils.AreEqual(Scope, other.Scope);
+      }
+      return Equals((ISettingKey)other);
     }
 
     public override int GetHashCode() {
-        return hash;
+      return Scope.GetHashCode();
     }
 
     public override string ToString() {
-      return SettingKeyUtils.KeyAsString(this);
+      return Scope.ToString();
+    }
+
+    protected Scope CreateSubScope(ISettingKey subScope) {
+      return Scope.Parent.Add(subScope.Id).Add(Scope.Id);
     }
     
   }
@@ -69,7 +75,7 @@ namespace Bud {
     public ConfigKey(string id) : base(id) {
     }
 
-    private ConfigKey(string id, ImmutableList<ISettingKey> scope, int hash) : base(id, scope, hash) {
+    private ConfigKey(Scope scope) : base(scope) {
     }
 
     SettingKey ISettingKey.In(ISettingKey subScope) {
@@ -78,7 +84,7 @@ namespace Bud {
 
     public new ConfigKey<T> In(ISettingKey subScope) {
       unchecked {
-        return new ConfigKey<T>(Id, Scope.Add(subScope), hash ^ subScope.GetHashCode());
+        return new ConfigKey<T>(CreateSubScope(subScope));
       }
     }
   }
@@ -94,7 +100,7 @@ namespace Bud {
     public TaskKey(string id) : base(id) {
     }
 
-    private TaskKey(string id, ImmutableList<ISettingKey> scope, int hash) : base(id, scope, hash) {
+    private TaskKey(Scope scope) : base(scope) {
     }
 
     SettingKey ISettingKey.In(ISettingKey subScope) {
@@ -103,7 +109,7 @@ namespace Bud {
 
     public new TaskKey<T> In(ISettingKey subScope) {
       unchecked {
-        return new TaskKey<T>(Id, Scope.Add(subScope), hash ^ subScope.GetHashCode());
+        return new TaskKey<T>(CreateSubScope(subScope));
       }
     }
   }

@@ -4,6 +4,7 @@ using Bud.Test.Assertions;
 using NUnit.Framework;
 using Bud.Plugins.CSharp;
 using Bud.Plugins;
+using Bud.Plugins.Projects;
 
 namespace Bud.SystemTests {
   public class ProjectWithoutConfiguration {

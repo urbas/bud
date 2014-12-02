@@ -1,14 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Bud.Plugins.Projects;
 using System.IO;
 using Bud.Cli;
+using System;
+using System.Linq;
 
 namespace Bud.Plugins.CSharp.Compiler {
   public static class MonoCompiler {
 
     public async static Task<Unit> CompileAllProjects(EvaluationContext context) {
-      foreach (var project in context.Evaluate(ProjectPlugin.ListOfProjects)) {
+      foreach (var project in context.Evaluate(ProjectKeys.ListOfProjects)) {
         await context.Evaluate(CSharpPlugin.CSharpBuild.In(project));
       }
       return Unit.Instance;

@@ -6,6 +6,8 @@ using Bud.SettingsConstruction.Ops;
 using System.Threading.Tasks;
 
 namespace Bud {
+
+  // TODO: Make settings scoped and introduce method variants that automatically scope.
   public class Settings {
     public static readonly Settings Start = new Settings(ImmutableList.Create<Setting>());
 

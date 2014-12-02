@@ -40,7 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ProjectWithoutConfiguration.cs" />
-    <Compile Include="BuildWithDependencies.cs" />
+    <Compile Include="Build.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

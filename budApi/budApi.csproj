@@ -41,10 +41,8 @@
     <Compile Include="IO\Directories.cs" />
     <Compile Include="Cli\ProcessBuilder.cs" />
     <Compile Include="IO\TemporaryDirectory.cs" />
-    <Compile Include="Build.cs" />
     <Compile Include="SettingKey.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="Plugins\ProjectsPlugin.cs" />
     <Compile Include="Plugins\Projects\Project.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="SettingsConstruction\Ops\ModifyConfig.cs" />
@@ -61,11 +59,14 @@
     <Compile Include="SettingsConstruction\Setting.cs" />
     <Compile Include="ScopedSettings.cs" />
     <Compile Include="Util\SettingKeyUtils.cs" />
-    <Compile Include="Util\ScopeUtils.cs" />
     <Compile Include="Util\SettingsUtils.cs" />
     <Compile Include="EvaluationContext.cs" />
     <Compile Include="Util\TaskUtils.cs" />
     <Compile Include="Plugins\DependenciesPlugin.cs" />
+    <Compile Include="BuildDefinition.cs" />
+    <Compile Include="Plugins\Projects\ProjectKeys.cs" />
+    <Compile Include="Plugins\Projects\ProjectsPlugin.cs" />
+    <Compile Include="Scope.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

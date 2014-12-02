@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Bud {
-  public interface Build {
+  public interface BuildDefinition {
     Settings GetSettings(string baseDir);
   }
 }

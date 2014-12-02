@@ -2,6 +2,7 @@ using System;
 using Bud.Plugins;
 using System.Collections.Immutable;
 using Bud.Plugins.CSharp;
+using Bud.Plugins.Projects;
 
 namespace Bud {
   public static class BuildConfigurationLoader {

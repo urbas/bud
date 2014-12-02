@@ -8,16 +8,10 @@ namespace Bud.Util {
     }
 
     public static StringBuilder AppendKeyAsString(StringBuilder sb, ISettingKey key) {
-      if (!key.Scope.IsEmpty) {
-        foreach (var subScope in key.Scope) {
-          if (subScope.Scope.IsEmpty) {
-            AppendKeyAsString(sb, subScope).Append(':');
-          } else {
-            sb.Append('{');
-            AppendKeyAsString(sb, subScope);
-            sb.Append("}:");
-          }
-        }
+      var curScope = key.Scope;
+      while (!curScope.IsGlobal) {
+        sb.Append(curScope.Id).Append(':');
+        curScope = curScope.Parent;
       }
       return sb.Append(key.Id);
     }

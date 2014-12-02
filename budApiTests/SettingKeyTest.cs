@@ -89,7 +89,7 @@ namespace Bud {
 
     [Test]
     public void ToString_MUST_return_the_id_of_the_key_WHEN_its_scope_is_global() {
-      Assert.AreEqual("A", settingKeyA.ToString());
+      Assert.AreEqual("Global:A", settingKeyA.ToString());
     }
 
     [Test]
@@ -99,7 +99,7 @@ namespace Bud {
         .In(new SettingKey("C").In(new SettingKey("foo")))
         .In(new ConfigKey<bool>("D"))
         .In(new TaskKey<uint>("E"));
-      Assert.AreEqual("B:{foo:C}:D:E:A", deeplyNestedKey.ToString());
+      Assert.AreEqual("Global:B:C:D:E:A", deeplyNestedKey.ToString());
     }
 
     [Test]
