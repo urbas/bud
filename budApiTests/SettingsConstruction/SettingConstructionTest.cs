@@ -120,8 +120,8 @@ namespace Bud {
         ++numberOfTimesDependentInvoked;
         return "foo";
       })
-        .InitializeAsync(TestTaskKey2, async context => await context.Evaluate(TestTaskKey) + "bar").AddDependencies(TestTaskKey2, TestTaskKey)
-        .InitializeAsync(TestTaskKey3, async context => await context.Evaluate(TestTaskKey) + await context.Evaluate(TestTaskKey2) + "zar").AddDependencies(TestTaskKey3, TestTaskKey2, TestTaskKey);
+        .Initialize(TestTaskKey2, async context => await context.Evaluate(TestTaskKey) + "bar").AddDependencies(TestTaskKey2, TestTaskKey)
+        .Initialize(TestTaskKey3, async context => await context.Evaluate(TestTaskKey) + await context.Evaluate(TestTaskKey2) + "zar").AddDependencies(TestTaskKey3, TestTaskKey2, TestTaskKey);
       var evaluatedValue = await buildConfiguration.ToEvaluationContext().Evaluate(TestTaskKey3);
       Assert.AreEqual("foofoobarzar", evaluatedValue);
       Assert.AreEqual(1, numberOfTimesDependentInvoked);

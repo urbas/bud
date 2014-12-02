@@ -36,7 +36,7 @@ namespace Bud {
       return Add(new InitializeTask<T>(key, context => Task.FromResult(initialValue(context))));
     }
 
-    public Settings InitializeAsync<T>(TaskKey<T> key, Func<EvaluationContext, Task<T>> task) {
+    public Settings Initialize<T>(TaskKey<T> key, Func<EvaluationContext, Task<T>> task) {
       return Add(new InitializeTask<T>(key, task));
     }
 

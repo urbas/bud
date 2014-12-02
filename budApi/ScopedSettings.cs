@@ -43,7 +43,7 @@ namespace Bud
       return Add(new InitializeTask<T>(key.In(Scope), context => Task.FromResult(task(context, Scope))));
     }
 
-    public ScopedSettings InitializeAsync<T>(TaskKey<T> key, Func<EvaluationContext, Scope, Task<T>> task) {
+    public ScopedSettings InitAsync<T>(TaskKey<T> key, Func<EvaluationContext, Scope, Task<T>> task) {
       return Add(new InitializeTask<T>(key.In(Scope), context => task(context, Scope)));
     }
 
