@@ -41,43 +41,26 @@
     <Compile Include="IO\Directories.cs" />
     <Compile Include="Cli\ProcessBuilder.cs" />
     <Compile Include="IO\TemporaryDirectory.cs" />
-    <Compile Include="Settings.cs" />
     <Compile Include="Plugins\Projects\Project.cs" />
-    <Compile Include="Unit.cs" />
-    <Compile Include="SettingsConstruction\Ops\ModifyConfig.cs" />
-    <Compile Include="SettingsConstruction\Ops\EnsureTaskInitialized.cs" />
-    <Compile Include="SettingsConstruction\Ops\InitializeConfig.cs" />
-    <Compile Include="SettingsConstruction\Ops\EnsureConfigInitialized.cs" />
-    <Compile Include="SettingsConstruction\TaskDefinition.cs" />
     <Compile Include="Plugins\BuildPlugin.cs" />
-    <Compile Include="SettingsConstruction\Ops\ModifyTask.cs" />
-    <Compile Include="SettingsConstruction\ConfigDefinition.cs" />
-    <Compile Include="SettingsConstruction\IValueDefinition.cs" />
-    <Compile Include="SettingsConstruction\Ops\AddDependencies.cs" />
-    <Compile Include="SettingsConstruction\Ops\InitializeTask.cs" />
-    <Compile Include="SettingsConstruction\Setting.cs" />
-    <Compile Include="ScopedSettings.cs" />
-    <Compile Include="Util\SettingsUtils.cs" />
-    <Compile Include="EvaluationContext.cs" />
-    <Compile Include="Util\TaskUtils.cs" />
     <Compile Include="Plugins\DependenciesPlugin.cs" />
     <Compile Include="BuildDefinition.cs" />
     <Compile Include="Plugins\Projects\ProjectKeys.cs" />
     <Compile Include="Plugins\Projects\ProjectsPlugin.cs" />
-    <Compile Include="Scope.cs" />
-    <Compile Include="TaskKey.cs" />
-    <Compile Include="ConfigKey.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Cli\" />
     <Folder Include="Plugins\" />
-    <Folder Include="SettingsConstruction\" />
-    <Folder Include="SettingsConstruction\Ops\" />
     <Folder Include="Plugins\Projects\" />
-    <Folder Include="Util\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\budGraph\budGraph.csproj">
+      <Project>{626FA4F4-1E1D-4417-A441-03EEAAED817F}</Project>
+      <Name>budGraph</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

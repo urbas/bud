@@ -48,10 +48,6 @@
       <Project>{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}</Project>
       <Name>bud</Name>
     </ProjectReference>
-    <ProjectReference Include="..\budApi\budApi.csproj">
-      <Project>{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}</Project>
-      <Name>budApi</Name>
-    </ProjectReference>
     <ProjectReference Include="..\budTest\budTest.csproj">
       <Project>{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}</Project>
       <Name>budTest</Name>
@@ -59,6 +55,14 @@
     <ProjectReference Include="..\budPluginCSharp\budPluginCSharp.csproj">
       <Project>{4E20C380-468E-4363-82B2-B0DD2467047E}</Project>
       <Name>budPluginCSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\budGraph\budGraph.csproj">
+      <Project>{626FA4F4-1E1D-4417-A441-03EEAAED817F}</Project>
+      <Name>budGraph</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\budCore\budCore.csproj">
+      <Project>{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}</Project>
+      <Name>budCore</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

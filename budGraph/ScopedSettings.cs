@@ -2,8 +2,6 @@ using System;
 using System.Linq;
 using System.IO;
 using System.Diagnostics;
-using Bud.Cli;
-using Bud.Plugins;
 using System.Collections.Immutable;
 using Bud.SettingsConstruction;
 using Bud.SettingsConstruction.Ops;

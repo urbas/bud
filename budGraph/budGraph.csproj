@@ -5,10 +5,10 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}</ProjectGuid>
+    <ProjectGuid>{626FA4F4-1E1D-4417-A441-03EEAAED817F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Bud</RootNamespace>
-    <AssemblyName>BudApiTests</AssemblyName>
+    <AssemblyName>budGraph</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -31,33 +31,34 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="nunit.framework">
-      <Package>nunit</Package>
-    </Reference>
     <Reference Include="System.Collections.Immutable">
       <HintPath>..\packages\Microsoft.Bcl.Immutable.1.0.34\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ConfigKey.cs" />
+    <Compile Include="EvaluationContext.cs" />
+    <Compile Include="Scope.cs" />
+    <Compile Include="ScopedSettings.cs" />
+    <Compile Include="Settings.cs" />
+    <Compile Include="TaskKey.cs" />
+    <Compile Include="Unit.cs" />
+    <Compile Include="SettingsConstruction\ConfigDefinition.cs" />
+    <Compile Include="SettingsConstruction\IValueDefinition.cs" />
+    <Compile Include="SettingsConstruction\Ops\AddDependencies.cs" />
+    <Compile Include="SettingsConstruction\Ops\EnsureConfigInitialized.cs" />
+    <Compile Include="SettingsConstruction\Ops\EnsureTaskInitialized.cs" />
+    <Compile Include="SettingsConstruction\Ops\InitializeConfig.cs" />
+    <Compile Include="SettingsConstruction\Ops\InitializeTask.cs" />
+    <Compile Include="SettingsConstruction\Ops\ModifyConfig.cs" />
+    <Compile Include="SettingsConstruction\Ops\ModifyTask.cs" />
+    <Compile Include="SettingsConstruction\Setting.cs" />
+    <Compile Include="SettingsConstruction\TaskDefinition.cs" />
+    <Compile Include="Util\SettingsUtils.cs" />
+    <Compile Include="Util\TaskUtils.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <ProjectReference Include="..\budApi\budApi.csproj">
-      <Project>{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}</Project>
-      <Name>budApi</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\budTest\budTest.csproj">
-      <Project>{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}</Project>
-      <Name>budTest</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="SettingsConstruction\SettingConstructionTest.cs" />
-    <Compile Include="Plugins\ProjectsPluginTest.cs" />
-    <Compile Include="SettingKeyTest.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="SettingsConstruction\" />
-    <Folder Include="Plugins\" />
-  </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
