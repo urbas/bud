@@ -43,7 +43,7 @@ namespace Bud.SystemTests {
     }
 
     static System.Collections.Generic.IEnumerable<string> CompiledAssemblyFiles(EvaluationContext context) {
-      return from project in context.GetListOfProjects() select context.GetCSharpOutputAssemblyFile(project);
+      return from project in context.GetAllProjects() select context.GetCSharpOutputAssemblyFile(project.Value);
     }
   }
 }

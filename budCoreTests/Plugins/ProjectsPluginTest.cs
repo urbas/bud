@@ -10,7 +10,7 @@ namespace Bud {
     [Test]
     public void Create_MUST_add_the_project_to_the_list_of_projects() {
       var context = Project.New("foo", "./fooDir").ToEvaluationContext();
-      var namesOfProjects = context.GetListOfProjects().Select(project => project.Id);
+      var namesOfProjects = context.GetAllProjects().Select(project => project.Key);
       Assert.AreEqual(new [] { "foo" }, namesOfProjects);
     }
 
@@ -28,7 +28,7 @@ namespace Bud {
     [Test]
     public void Create_MUST_insert_the_directory_of_the_project() {
       var context = Project.New("foo", "./fooDir").ToEvaluationContext();
-      var projectsBaseDirs = context.GetListOfProjects().Select(project => context.GetBaseDir(project));
+      var projectsBaseDirs = context.GetAllProjects().Select(project => context.GetBaseDir(project.Value));
       Assert.AreEqual(new []{ "./fooDir" }, projectsBaseDirs);
     }
 

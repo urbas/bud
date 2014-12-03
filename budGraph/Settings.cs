@@ -70,7 +70,7 @@ namespace Bud {
       return Add(new AddDependencies<T>(key, dependencies));
     }
 
-    public Settings ScopedTo(Scope scope) {
+    public Settings SetCurrentScope(Scope scope) {
       if (CurrentScope.Equals(scope)) {
         return this;
       }
