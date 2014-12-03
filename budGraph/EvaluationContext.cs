@@ -54,7 +54,7 @@ namespace Bud {
       }
     }
 
-    public static EvaluationContext ToEvaluationContext(Settings settings) {
+    public static EvaluationContext FromSettings(Settings settings) {
       return new EvaluationContext(SettingsUtils.ToCompiledSettings(settings));
     }
 

@@ -81,7 +81,7 @@ namespace Bud {
     }
 
     public EvaluationContext ToEvaluationContext() {
-      return EvaluationContext.ToEvaluationContext(this);
+      return EvaluationContext.FromSettings(this);
     }
   }
 }

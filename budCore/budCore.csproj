@@ -56,6 +56,13 @@
     <Compile Include="Plugins\Dependencies\Dependencies.cs" />
     <Compile Include="Plugins\Dependencies\Dependency.cs" />
     <Compile Include="Plugins\Dependencies\DependencySource.cs" />
+    <Compile Include="Plugins\BuildLoading\BuildLoading.cs" />
+    <Compile Include="Plugins\CSharp\CSharp.cs" />
+    <Compile Include="Plugins\CSharp\CSharpKeys.cs" />
+    <Compile Include="Plugins\CSharp\CSharpPlugin.cs" />
+    <Compile Include="Plugins\CSharp\Compiler\MonoCompiler.cs" />
+    <Compile Include="Plugins\BuildLoading\BuildLoadingKeys.cs" />
+    <Compile Include="Plugins\BuildLoading\BuildLoadingPlugin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -64,6 +71,8 @@
     <Folder Include="Plugins\Projects\" />
     <Folder Include="Plugins\Build\" />
     <Folder Include="Plugins\Dependencies\" />
+    <Folder Include="Plugins\BuildLoading\" />
+    <Folder Include="Plugins\CSharp\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

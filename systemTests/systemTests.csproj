@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ProjectWithoutConfiguration.cs" />
+    <Compile Include="BuildConfigurationProject.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -71,5 +72,7 @@
     <Folder Include="testProjects\ProjectWithSourceDependency\" />
     <Folder Include="testProjects\ProjectWithSourceDependency\" />
     <Folder Include="testProjects\ProjectWithSourceDependency\" />
+    <Folder Include="testProjects\" />
+    <Folder Include="testProjects\" />
   </ItemGroup>
 </Project>

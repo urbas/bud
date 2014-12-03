@@ -1,11 +1,12 @@
 using System;
 using System.IO;
 using Bud.Plugins.CSharp;
+using Bud.Plugins.BuildLoading;
 
 namespace Bud {
-  class BudCli {
+  public static class BudCli {
     public static void Main(string[] args) {
-      EvaluationContext buildConfiguration = BuildLoader.Load(Directory.GetCurrentDirectory());
+      EvaluationContext buildConfiguration = BuildLoading.Load(Directory.GetCurrentDirectory());
       buildConfiguration.Evaluate(CSharpKeys.Build);
     }
   }
