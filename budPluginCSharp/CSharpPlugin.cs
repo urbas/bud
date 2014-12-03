@@ -8,7 +8,7 @@ namespace Bud.Plugins.CSharp {
 
   public static class CSharpPlugin {
     public static readonly Scope CSharp = new Scope("CSharp");
-    public static readonly TaskKey<Unit> CSharpBuild = BuildPlugin.Build.In(CSharp);
+    public static readonly TaskKey<Unit> CSharpBuild = BuildKeys.Build.In(CSharp);
 
     public static Settings BuildsCSharp(this Settings settings) {
       return settings
@@ -21,7 +21,7 @@ namespace Bud.Plugins.CSharp {
     public static Settings AddCSharpBuildSupport(this Settings existingSettings) {
       return existingSettings
         .InitOrKeep(CSharpBuild, TaskUtils.NoOpTask)
-        .AddDependencies(BuildPlugin.Build, CSharpBuild);
+        .AddDependencies(BuildKeys.Build, CSharpBuild);
     }
 
     public static string GetCSharpSourceDir(this EvaluationContext context, Scope project) {

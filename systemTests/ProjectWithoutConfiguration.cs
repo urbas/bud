@@ -1,12 +1,9 @@
-using System;
-using System.Linq;
-using Bud.Test;
 using Bud.Test.Assertions;
 using NUnit.Framework;
-using Bud.Plugins.CSharp;
-using Bud.Plugins;
-using Bud.Plugins.Projects;
+using System.Linq;
 using Bud.Plugins.Build;
+using Bud.Plugins.Projects;
+using Bud.Plugins.CSharp;
 
 namespace Bud.SystemTests {
   public class ProjectWithoutConfiguration {
@@ -17,14 +14,14 @@ namespace Bud.SystemTests {
 
         var compiledAssemblyFiles = CompiledAssemblyFiles(context);
 
-        await context.Evaluate(BuildPlugin.Build);
+        await context.BuildAll();
         foreach (var assemblyFile in compiledAssemblyFiles) {
           FileAssertions.AssertFileExists(assemblyFile);
         }
 
         Assert.IsNotEmpty(compiledAssemblyFiles);
 
-        await context.Evaluate(BuildPlugin.Clean);
+        await context.CleanAll();
         foreach (var assemblyFile in compiledAssemblyFiles) {
           FileAssertions.AssertFileDoesNotExist(assemblyFile);
         }
@@ -35,7 +32,7 @@ namespace Bud.SystemTests {
     public async void compile_MUST_produce_no_executable_WHEN_the_project_folder_is_empty() {
       using (var emptyProject = TestProjects.EmptyProject()) {
         var context = BuildConfigurationLoader.Load(emptyProject.Path);
-        await context.Evaluate(BuildPlugin.Build);
+        await context.Evaluate(BuildKeys.Build);
         var unexpectedCompiledFiles = CompiledAssemblyFiles(context);
         foreach (var assemblyFile in unexpectedCompiledFiles) {
           FileAssertions.AssertFileDoesNotExist(assemblyFile);
