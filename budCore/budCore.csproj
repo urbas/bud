@@ -42,17 +42,22 @@
     <Compile Include="Cli\ProcessBuilder.cs" />
     <Compile Include="IO\TemporaryDirectory.cs" />
     <Compile Include="Plugins\Projects\Project.cs" />
-    <Compile Include="Plugins\BuildPlugin.cs" />
-    <Compile Include="Plugins\DependenciesPlugin.cs" />
     <Compile Include="BuildDefinition.cs" />
     <Compile Include="Plugins\Projects\ProjectKeys.cs" />
     <Compile Include="Plugins\Projects\ProjectsPlugin.cs" />
+    <Compile Include="Plugins\Build\BuildPlugin.cs" />
+    <Compile Include="Plugins\Dependencies\DependenciesPlugin.cs" />
+    <Compile Include="Plugins\Build\BuildDirs.cs" />
+    <Compile Include="Plugins\Build\BuildDirsKeys.cs" />
+    <Compile Include="Plugins\Build\BuildDirsPlugin.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Folder Include="Cli\" />
     <Folder Include="Plugins\" />
     <Folder Include="Plugins\Projects\" />
+    <Folder Include="Plugins\Build\" />
+    <Folder Include="Plugins\Dependencies\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

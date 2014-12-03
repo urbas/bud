@@ -2,6 +2,7 @@ using Bud.Plugins.CSharp.Compiler;
 using Bud.Plugins.Projects;
 using System.IO;
 using Bud.Util;
+using Bud.Plugins.Build;
 
 namespace Bud.Plugins.CSharp {
 

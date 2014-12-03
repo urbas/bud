@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Bud.Plugins.CSharp;
 using Bud.Plugins;
 using Bud.Plugins.Projects;
+using Bud.Plugins.Build;
 
 namespace Bud.SystemTests {
   public class ProjectWithoutConfiguration {

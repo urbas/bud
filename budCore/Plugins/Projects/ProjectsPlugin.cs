@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
+using Bud.Plugins.Build;
 
 namespace Bud.Plugins.Projects {
 
@@ -9,27 +10,11 @@ namespace Bud.Plugins.Projects {
     public static Settings AddProject(this Settings existingSettings, string id, string baseDir) {
       var project = existingSettings.CreateProjectScope(id);
       return existingSettings
-        .AddProjectSupport()
-        .Modify(ProjectKeys.AllProjects, listOfProjects => listOfProjects.Add(id, project))
-        .AddDependencies(BuildPlugin.Clean, BuildPlugin.Clean.In(project))
-        .Init(ProjectKeys.BaseDir.In(project), baseDir)
-        .Init(ProjectKeys.BudDir.In(project), ctxt => Project.GetDefaultBudDir(ctxt, project))
-        .Init(ProjectKeys.OutputDir.In(project), ctxt => Project.GetDefaultOutputDir(ctxt, project))
-        .Init(ProjectKeys.BuildConfigCacheDir.In(project), ctxt => Project.GetDefaultBuildConfigCacheDir(ctxt, project))
-        .Init(BuildPlugin.Clean.In(project), ctxt => CleanProjectTask(ctxt, project))
-        .SetCurrentScope(project);
-    }
-
-    private static Settings AddProjectSupport(this Settings existingSettings) {
-      return existingSettings
         .AddBuildSupport()
-        .InitOrKeep(ProjectKeys.AllProjects, ImmutableDictionary.Create<string, Scope>());
-    }
-
-    private static Unit CleanProjectTask(EvaluationContext context, Scope project) {
-      var outputDir = context.GetOutputDir(project);
-      Directory.Delete(outputDir, true);
-      return Unit.Instance;
+        .InitOrKeep(ProjectKeys.AllProjects, ImmutableDictionary.Create<string, Scope>())
+        .SetCurrentScope(project)
+        .AddBuildDirs(baseDir)
+        .Modify(ProjectKeys.AllProjects, listOfProjects => listOfProjects.Add(id, project));
     }
   }
 }

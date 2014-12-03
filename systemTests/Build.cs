@@ -1,5 +1,6 @@
 using Bud;
 using Bud.Plugins.CSharp;
+using Bud.Plugins.Dependencies;
 using Bud.Plugins.Projects;
 
 public class Build : BuildDefinition {

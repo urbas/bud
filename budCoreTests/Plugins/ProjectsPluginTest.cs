@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using System.Collections.Immutable;
 using Bud.Plugins.Projects;
+using Bud.Plugins.Build;
 
 namespace Bud {
   public class ProjectsPluginTest {
