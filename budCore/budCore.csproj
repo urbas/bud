@@ -52,6 +52,10 @@
     <Compile Include="Plugins\Build\BuildDirsPlugin.cs" />
     <Compile Include="Plugins\Build\BuildKeys.cs" />
     <Compile Include="Plugins\Build\Build.cs" />
+    <Compile Include="Plugins\Dependencies\DependenciesKeys.cs" />
+    <Compile Include="Plugins\Dependencies\Dependencies.cs" />
+    <Compile Include="Plugins\Dependencies\Dependency.cs" />
+    <Compile Include="Plugins\Dependencies\DependencySource.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

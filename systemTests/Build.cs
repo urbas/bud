@@ -1,12 +1,12 @@
 using Bud;
 using Bud.Plugins.CSharp;
 using Bud.Plugins.Dependencies;
-using Bud.Plugins.Projects;
+using System.IO;
 
 public class Build : BuildDefinition {
   public Settings GetSettings(string baseDir) {
-    return Project.New("root", baseDir)
-      .Add(CSharpPlugin.Instance)
-      .WithDependency("Foo.Bar", "0.1.3");
+    var projectA = CSharp.Project("A", Path.Combine(baseDir, "A"));
+    var projectB = CSharp.Project("B", Path.Combine(baseDir, "B")).DependsOn(projectA);
+    return projectA.Add(projectB);
   }
 }

@@ -10,7 +10,7 @@ namespace Bud.SystemTests {
     [Test]
     public async void compile_MUST_produce_the_executable() {
       using (var testProjectCopy = TestProjects.TemporaryCopy("ProjectWithoutConfiguration")) {
-        var context = BuildConfigurationLoader.Load(testProjectCopy.Path);
+        var context = BuildLoader.Load(testProjectCopy.Path);
 
         var compiledAssemblyFiles = CompiledAssemblyFiles(context);
 
@@ -31,7 +31,7 @@ namespace Bud.SystemTests {
     [Test]
     public async void compile_MUST_produce_no_executable_WHEN_the_project_folder_is_empty() {
       using (var emptyProject = TestProjects.EmptyProject()) {
-        var context = BuildConfigurationLoader.Load(emptyProject.Path);
+        var context = BuildLoader.Load(emptyProject.Path);
         await context.Evaluate(BuildKeys.Build);
         var unexpectedCompiledFiles = CompiledAssemblyFiles(context);
         foreach (var assemblyFile in unexpectedCompiledFiles) {

@@ -3,6 +3,7 @@ using Bud.Plugins.Projects;
 using System.IO;
 using Bud.Util;
 using Bud.Plugins.Build;
+using Bud.Plugins.Dependencies;
 
 namespace Bud.Plugins.CSharp {
 
@@ -15,6 +16,7 @@ namespace Bud.Plugins.CSharp {
     public Settings ApplyTo(Settings settings, Scope scope) {
       return settings
         .Add(BuildPlugin.Instance)
+        .Add(DependenciesPlugin.Instance)
         .InitOrKeep(CSharpKeys.Build, TaskUtils.NoOpTask)
         .AddDependencies(BuildKeys.Build, CSharpKeys.Build)
         .InitOrKeep(CSharpKeys.Build.In(scope), ctxt => MonoCompiler.CompileProject(ctxt, scope))
