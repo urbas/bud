@@ -6,30 +6,19 @@ using Bud.Plugins.Build;
 
 namespace Bud.Plugins.CSharp {
 
-  public static class CSharpPlugin {
-    public static readonly Scope CSharp = new Scope("CSharp");
-    public static readonly TaskKey<Unit> CSharpBuild = BuildKeys.Build.In(CSharp);
+  public class CSharpPlugin : BudPlugin {
+    public static readonly CSharpPlugin Instance = new CSharpPlugin();
 
-    public static Settings BuildsCSharp(this Settings settings) {
+    private CSharpPlugin() {
+    }
+
+    public Settings ApplyTo(Settings settings, Scope scope) {
       return settings
-        .AddBuildSupport()
-        .AddCSharpBuildSupport()
-        .InitOrKeep(CSharpBuild.In(settings.CurrentScope), ctxt => MonoCompiler.CompileProject(ctxt, settings.CurrentScope))
-        .AddDependencies(CSharpBuild, CSharpBuild.In(settings.CurrentScope));
-    }
-
-    public static Settings AddCSharpBuildSupport(this Settings existingSettings) {
-      return existingSettings
-        .InitOrKeep(CSharpBuild, TaskUtils.NoOpTask)
-        .AddDependencies(BuildKeys.Build, CSharpBuild);
-    }
-
-    public static string GetCSharpSourceDir(this EvaluationContext context, Scope project) {
-      return Path.Combine(context.GetBaseDir(project), "src", "main", "cs");
-    }
-
-    public static string GetCSharpOutputAssemblyFile(this EvaluationContext context, Scope project) {
-      return Path.Combine(context.GetOutputDir(project), ".net-4.5", "main", "debug", "bin", "program.exe");
+        .Add(BuildPlugin.Instance)
+        .InitOrKeep(CSharpKeys.Build, TaskUtils.NoOpTask)
+        .AddDependencies(BuildKeys.Build, CSharpKeys.Build)
+        .InitOrKeep(CSharpKeys.Build.In(scope), ctxt => MonoCompiler.CompileProject(ctxt, scope))
+        .AddDependencies(CSharpKeys.Build, CSharpKeys.Build.In(scope));
     }
   }
 }

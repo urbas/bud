@@ -6,7 +6,7 @@ namespace Bud {
   class BudCli {
     public static void Main(string[] args) {
       EvaluationContext buildConfiguration = BuildConfigurationLoader.Load(Directory.GetCurrentDirectory());
-      buildConfiguration.Evaluate(CSharpPlugin.CSharpBuild);
+      buildConfiguration.Evaluate(CSharpKeys.Build);
     }
   }
 }

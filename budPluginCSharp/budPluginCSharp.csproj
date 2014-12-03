@@ -40,6 +40,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="CSharpPlugin.cs" />
     <Compile Include="Compiler\MonoCompiler.cs" />
+    <Compile Include="CSharp.cs" />
+    <Compile Include="CSharpKeys.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

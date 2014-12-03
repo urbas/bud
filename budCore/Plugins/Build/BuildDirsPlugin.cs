@@ -3,10 +3,16 @@ using System.IO;
 
 namespace Bud.Plugins.Build {
 
-  public static class BuildDirsPlugin {
-    public static Settings AddBuildDirs(this Settings existingSettings, string baseDir) {
-      var scope = existingSettings.CurrentScope;
-      return existingSettings
+  public class BuildDirsPlugin : BudPlugin {
+    private readonly string baseDir;
+
+    public BuildDirsPlugin(string baseDir) {
+      this.baseDir = baseDir;
+    }
+
+    public Settings ApplyTo(Settings settings, Scope scope) {
+      return settings
+        .Add(BuildPlugin.Instance)
         .AddDependencies(BuildKeys.Clean, BuildKeys.Clean.In(scope))
         .Init(BuildDirsKeys.BaseDir.In(scope), baseDir)
         .Init(BuildDirsKeys.BudDir.In(scope), ctxt => BuildDirs.GetDefaultBudDir(ctxt, scope))

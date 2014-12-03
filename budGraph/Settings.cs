@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace Bud {
-
   public class Settings {
     public static readonly Settings Start = new Settings(ImmutableList.Create<Setting>());
 
@@ -28,6 +27,10 @@ namespace Bud {
 
     public Settings Add(Settings settings) {
       return new Settings(SettingsList.AddRange(settings.SettingsList));
+    }
+
+    public Settings Add(BudPlugin plugin) {
+      return plugin.ApplyTo(this, CurrentScope);
     }
 
     public Settings Init<T>(ConfigKey<T> key, T initialValue) {

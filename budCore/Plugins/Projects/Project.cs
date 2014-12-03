@@ -7,15 +7,15 @@ namespace Bud.Plugins.Projects {
 
   public static class Project {
     public static Settings New(string id, string baseDir) {
-      return Settings.Start.AddProject(id, baseDir);
+      return Settings.Start.Add(new ProjectPlugin(id, baseDir));
     }
 
-    public static Scope CreateProjectScope(this Settings settings, string id) {
-      return new Scope(id).In(ProjectKeys.Project.In(settings.CurrentScope));
+    public static Scope Key(string id, Scope scope) {
+      return new Scope(id).In(ProjectKeys.Project.In(scope));
     }
 
     public static ImmutableDictionary<string, Scope> GetAllProjects(this EvaluationContext buildConfiguration) {
-      return buildConfiguration.Evaluate(ProjectKeys.AllProjects);
+      return buildConfiguration.Evaluate(ProjectKeys.Projects);
     }
 
     public static Scope GetProject(this EvaluationContext context, string id) {

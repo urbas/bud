@@ -6,15 +6,22 @@ using Bud.Plugins.Build;
 
 namespace Bud.Plugins.Projects {
 
-  public static class ProjectPlugin {
-    public static Settings AddProject(this Settings existingSettings, string id, string baseDir) {
-      var project = existingSettings.CreateProjectScope(id);
-      return existingSettings
-        .AddBuildSupport()
-        .InitOrKeep(ProjectKeys.AllProjects, ImmutableDictionary.Create<string, Scope>())
+  public class ProjectPlugin : BudPlugin {
+    private readonly string id;
+    private readonly string baseDir;
+
+    public ProjectPlugin(string id, string baseDir) {
+      this.baseDir = baseDir;
+      this.id = id;
+    }
+
+    public Settings ApplyTo(Settings settings, Scope scope) {
+      var project = Project.Key(id, scope);
+      return settings
+        .InitOrKeep(ProjectKeys.Projects, ImmutableDictionary.Create<string, Scope>())
         .SetCurrentScope(project)
-        .AddBuildDirs(baseDir)
-        .Modify(ProjectKeys.AllProjects, listOfProjects => listOfProjects.Add(id, project));
+        .Add(new BuildDirsPlugin(baseDir))
+        .Modify(ProjectKeys.Projects, allProjects => allProjects.Add(id, project));
     }
   }
 }

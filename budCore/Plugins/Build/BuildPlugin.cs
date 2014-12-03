@@ -3,10 +3,14 @@ using System.IO;
 using Bud.Util;
 
 namespace Bud.Plugins.Build {
-  public static class BuildPlugin {
+  public class BuildPlugin : BudPlugin {
+    public static readonly BuildPlugin Instance = new BuildPlugin();
 
-    public static Settings AddBuildSupport(this Settings existingSettings) {
-      return existingSettings
+    private BuildPlugin() {
+    }
+
+    public Settings ApplyTo(Settings settings, Scope scope) {
+      return settings
         .InitOrKeep(BuildKeys.Clean, TaskUtils.NoOpTask)
         .InitOrKeep(BuildKeys.Build, TaskUtils.NoOpTask);
     }
