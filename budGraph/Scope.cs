@@ -15,7 +15,7 @@ namespace Bud {
     public Scope(string id) : this(id, Global) {
     }
 
-    protected Scope(string id, Scope parent) {
+    public Scope(string id, Scope parent) {
       Parent = parent ?? this;
       Id = id;
       Depth = parent == null ? 1 : (parent.Depth + 1);
@@ -25,14 +25,21 @@ namespace Bud {
     }
 
     public bool IsGlobal {
-      get { return ReferenceEquals(this, Global); }
+      get { return this == Parent; }
     }
 
     public Scope In(Scope parent) {
-      if (Parent.Equals(parent)) {
-        return this;
+      return Concat(parent, this);
+    }
+
+    public static Scope Concat(Scope parentScope, Scope childScope) {
+      if (parentScope.IsGlobal) {
+        return childScope;
+      } else if (childScope.IsGlobal) {
+        return parentScope;
+      } else {
+        return new Scope(childScope.Id, Concat(parentScope, childScope.Parent));
       }
-      return new Scope(Id, parent);
     }
 
     public bool Equals(Scope otherScope) {

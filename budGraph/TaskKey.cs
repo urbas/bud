@@ -26,10 +26,10 @@ namespace Bud {
     }
 
     public new TaskKey<T> In(Scope parent) {
-      if (Parent.Equals(parent)) {
+      if (parent.IsGlobal) {
         return this;
       }
-      return new TaskKey<T>(Id, parent);
+      return new TaskKey<T>(Id, Concat(parent, Parent));
     }
   }
 }

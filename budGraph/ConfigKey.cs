@@ -12,10 +12,10 @@ namespace Bud {
     }
 
     public new ConfigKey<T> In(Scope parent) {
-      if (Parent.Equals(parent)) {
+      if (parent.IsGlobal) {
         return this;
       }
-      return new ConfigKey<T>(Id, parent);
+      return new ConfigKey<T>(Id, Concat(parent, Parent));
     }
   }
 }
