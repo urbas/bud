@@ -70,9 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="testProjects\ProjectWithSourceDependency\" />
-    <Folder Include="testProjects\ProjectWithSourceDependency\" />
-    <Folder Include="testProjects\ProjectWithSourceDependency\" />
     <Folder Include="testProjects\" />
-    <Folder Include="testProjects\" />
+    <Folder Include="testProjects\BuildConfigurationProject\.bud\" />
   </ItemGroup>
 </Project>

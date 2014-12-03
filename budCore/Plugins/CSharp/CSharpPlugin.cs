@@ -4,6 +4,9 @@ using System.IO;
 using Bud.Util;
 using Bud.Plugins.Build;
 using Bud.Plugins.Dependencies;
+using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Threading.Tasks;
 
 namespace Bud.Plugins.CSharp {
 
@@ -17,10 +20,20 @@ namespace Bud.Plugins.CSharp {
       return settings
         .Add(BuildPlugin.Instance)
         .Add(DependenciesPlugin.Instance)
-        .InitOrKeep(CSharpKeys.Build, TaskUtils.NoOpTask)
-        .AddDependencies(BuildKeys.Build, CSharpKeys.Build)
         .InitOrKeep(CSharpKeys.Build.In(scope), ctxt => MonoCompiler.CompileProject(ctxt, scope))
-        .AddDependencies(CSharpKeys.Build, CSharpKeys.Build.In(scope));
+        .InitOrKeep(CSharpKeys.Build, TaskUtils.NoOpTask)
+        .InitOrKeep(CSharpKeys.SourceFiles.In(scope), context => FindSources(context, scope))
+        .AddDependencies(CSharpKeys.Build, CSharpKeys.Build.In(scope))
+        .AddDependencies(BuildKeys.Build, CSharpKeys.Build);
+    }
+
+    public IEnumerable<string> FindSources(EvaluationContext context, Scope scope) {
+      var sourceDirectory = context.GetCSharpSourceDir(scope);
+      if (Directory.Exists(sourceDirectory)) {
+        return Directory.EnumerateFiles(sourceDirectory);
+      } else {
+        return ImmutableList<string>.Empty;
+      }
     }
   }
 }

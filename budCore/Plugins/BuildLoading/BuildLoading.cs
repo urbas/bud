@@ -7,12 +7,17 @@ using System.Threading.Tasks;
 
 namespace Bud.Plugins.BuildLoading {
   public static class BuildLoading {
-    public static Settings Project(string projectId, string baseDir, string dirOfProjectToBeBuilt) {
-      return CSharp.CSharp.Project(projectId, baseDir).Add(new BuildLoadingPlugin(dirOfProjectToBeBuilt));
+    public static Settings Project(string projectId, string budDir, string dirOfProjectToBeBuilt) {
+      return CSharp.CSharp.Project(projectId, budDir)
+        .Add(new BuildLoadingPlugin(dirOfProjectToBeBuilt));
     }
 
     public async static Task<Settings> LoadBuildSettings(this EvaluationContext context, Scope buildLoadingProject) {
-      return await context.Evaluate(BuildLoadingKyes.LoadBuildSettings);
+      return await context.Evaluate(BuildLoadingKeys.LoadBuildSettings.In(buildLoadingProject));
+    }
+
+    public static string GetDirOfProjectToBeBuilt(this EvaluationContext context, Scope buildLoadingProject) {
+      return context.Evaluate(BuildLoadingKeys.DirOfProjectToBeBuilt.In(buildLoadingProject));
     }
 
     public async static Task<Settings> LoadBuildSettings(string path) {

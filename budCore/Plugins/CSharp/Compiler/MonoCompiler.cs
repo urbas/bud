@@ -7,16 +7,15 @@ using System.Linq;
 
 namespace Bud.Plugins.CSharp.Compiler {
   public static class MonoCompiler {
+    public static readonly string CSharpCompiler = "/usr/bin/mcs";
 
     public static Task<Unit> CompileProject(EvaluationContext context, Scope project) {
-      var sourceDirectory = context.GetCSharpSourceDir(project);
-      var outputFile = context.GetCSharpOutputAssemblyFile(project);
-      return Task.Run(() => {
-        var sourceFiles = Directory.EnumerateFiles(sourceDirectory);
-        if (Directory.Exists(sourceDirectory) && sourceFiles.Any()) {
+      return Task.Run(async () => {
+        var outputFile = context.GetCSharpOutputAssemblyFile(project);
+        var sourceFiles = await context.GetCSharpSources(project);
+        if (sourceFiles.Any()) {
           Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
-          var cSharpCompiler = "/usr/bin/mcs";
-          var exitCode = ProcessBuilder.Executable(cSharpCompiler).WithArgument("-out:" + outputFile).WithArguments(sourceFiles).Start(Console.Out, Console.Error);
+          var exitCode = ProcessBuilder.Executable(CSharpCompiler).WithArgument("-out:" + outputFile).WithArguments(sourceFiles).Start(Console.Out, Console.Error);
           if (exitCode != 0) {
             throw new Exception("Compilation failed.");
           }
