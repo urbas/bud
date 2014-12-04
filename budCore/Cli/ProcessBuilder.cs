@@ -3,6 +3,7 @@ using System.Text;
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
+using System.Collections.Immutable;
 
 namespace Bud.Cli {
   public class ProcessBuilder {
@@ -20,21 +21,37 @@ namespace Bud.Cli {
 
     public string Arguments { get { return arguments.ToString(); } }
 
-    public ProcessBuilder WithArgument(string argument) {
+    public ProcessBuilder AddArgument(string argument) {
+      return AddParamArgument(argument, ImmutableList<string>.Empty);
+    }
+
+    public ProcessBuilder AddParamArgument(string argumentHead, params string[] argumentParams) {
+      return AddParamArgument(argumentHead, (IEnumerable<string>)argumentParams);
+    }
+
+    public ProcessBuilder AddParamArgument(string argumentHead, IEnumerable<string> argumentParams) {
       if (arguments.Length > 0) {
         arguments.Append(' ');
       }
-      arguments.Append('"').Append(argument).Append('"');
+      arguments.Append('"').Append(argumentHead);
+      var argumentEnumerator = argumentParams.GetEnumerator();
+      if (argumentEnumerator.MoveNext()) {
+        arguments.Append(argumentEnumerator.Current);
+        while (argumentEnumerator.MoveNext()) {
+          arguments.Append(",").Append(argumentEnumerator.Current);
+        }
+      }
+      arguments.Append('"');
       return this;
     }
 
-    public ProcessBuilder WithArguments(params string[] arguments) {
-      return WithArguments((IEnumerable<string>)arguments);
+    public ProcessBuilder AddArguments(params string[] arguments) {
+      return AddArguments((IEnumerable<string>)arguments);
     }
 
-    public ProcessBuilder WithArguments(IEnumerable<string> arguments) {
+    public ProcessBuilder AddArguments(IEnumerable<string> arguments) {
       foreach (var argument in arguments) {
-        WithArgument(argument);
+        AddArgument(argument);
       }
       return this;
     }

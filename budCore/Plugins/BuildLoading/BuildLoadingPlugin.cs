@@ -14,27 +14,44 @@ namespace Bud.Plugins.BuildLoading
 {
   public class BuildLoadingPlugin : BudPlugin	{
     private readonly string dirOfProjectToBeBuilt;
+    private readonly string budAssembliesDir;
 
-    public BuildLoadingPlugin(string dirOfProjectToBeBuilt) {
+    public BuildLoadingPlugin(string dirOfProjectToBeBuilt, string budAssembliesDir) {
+      this.budAssembliesDir = budAssembliesDir;
       this.dirOfProjectToBeBuilt = dirOfProjectToBeBuilt;
     }
 
     public Settings ApplyTo(Settings settings, Scope scope) {
       return settings
         .Add(CSharpPlugin.Instance)
-        .InitOrKeep(BuildLoadingKeys.DirOfProjectToBeBuilt.In(scope), dirOfProjectToBeBuilt)
+        .Init(BuildLoadingKeys.BuildConfigSourceFile.In(scope), context => Path.Combine(context.GetBaseDir(scope), "Build.cs"))
+        .Init(BuildLoadingKeys.DirOfProjectToBeBuilt.In(scope), dirOfProjectToBeBuilt)
         .Modify(CSharpKeys.SourceFiles.In(scope), (context, previousTask) => AddBuildDefinitionSourceFile(context, previousTask, scope))
-        .InitOrKeep(BuildLoadingKeys.LoadBuildSettings.In(scope), context => LoadOrBuildSettings(context, scope));
+        .InitOrKeep(BuildLoadingKeys.LoadBuildSettings.In(scope), context => LoadOrBuildSettings(context, scope))
+        .Modify(CSharpKeys.AssemblyType.In(scope), prevValue => AssemblyType.Library)
+        .Modify(CSharpKeys.ReferencedAssemblies.In(scope), assemblies => assemblies.AddRange(GetBudAssemblies(budAssembliesDir)));
     }
 
     private async Task<Settings> LoadOrBuildSettings(EvaluationContext context, Scope scope) {
-      await context.BuildAll();
-      return CSharp.CSharp.Project("root", context.GetDirOfProjectToBeBuilt(scope));
+      var buildConfigSourceFile = context.GetBuildConfigSourceFile(scope);
+      if (File.Exists(buildConfigSourceFile)) {
+        await context.BuildAll();
+        return CSharp.CSharp.Project("root", context.GetDirOfProjectToBeBuilt(scope));
+      } else {
+        return CSharp.CSharp.Project("root", context.GetDirOfProjectToBeBuilt(scope));
+      }
     }
 
     private async Task<IEnumerable<string>> AddBuildDefinitionSourceFile(EvaluationContext context, Func<Task<IEnumerable<string>>> previousSourcesTask, Scope scope) {
       var previousSources = await previousSourcesTask();
-      return previousSources.Concat(new []{ Path.Combine(context.GetBaseDir(scope), "Build.cs") });
+      return previousSources.Concat(new []{ context.GetBuildConfigSourceFile(scope) });
+    }
+
+    public static IEnumerable<string> GetBudAssemblies(string assembliesDir) {
+      return new [] {
+        "Bud.Graph.dll",
+        "Bud.Core.dll"
+      }.Select(assemblyName => Path.Combine(assembliesDir, assemblyName));
     }
   }
 

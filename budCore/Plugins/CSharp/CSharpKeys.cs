@@ -1,11 +1,15 @@
 ﻿using System;
 using Bud.Plugins.Build;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Bud.Plugins.CSharp {
   public static class CSharpKeys {
     public static readonly Scope CSharp = new Scope("CSharp");
+    public static readonly ConfigKey<AssemblyType> AssemblyType = new ConfigKey<AssemblyType>("AssemblyType").In(CSharp);
+    public static readonly ConfigKey<string> OutputAssemblyFile = new ConfigKey<string>("OutputAssemblyFile").In(CSharp);
     public static readonly TaskKey<IEnumerable<string>> SourceFiles = new TaskKey<IEnumerable<string>>("SourceFiles").In(CSharp);
+    public static readonly ConfigKey<ImmutableList<string>> ReferencedAssemblies = new ConfigKey<ImmutableList<string>>("ReferencedAssemblies").In(CSharp);
     public static readonly TaskKey<Unit> Build = BuildKeys.Build.In(CSharp);
   }
 }

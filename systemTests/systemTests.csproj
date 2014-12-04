@@ -8,7 +8,7 @@
     <ProjectGuid>{8021ED96-0C60-4C9F-926D-FBBD6E08CCAF}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Bud.SystemTests</RootNamespace>
-    <AssemblyName>systemTests</AssemblyName>
+    <AssemblyName>Bud.SystemTests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -51,10 +51,6 @@
     <ProjectReference Include="..\budTest\budTest.csproj">
       <Project>{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}</Project>
       <Name>budTest</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\budPluginCSharp\budPluginCSharp.csproj">
-      <Project>{4E20C380-468E-4363-82B2-B0DD2467047E}</Project>
-      <Name>budPluginCSharp</Name>
     </ProjectReference>
     <ProjectReference Include="..\budGraph\budGraph.csproj">
       <Project>{626FA4F4-1E1D-4417-A441-03EEAAED817F}</Project>

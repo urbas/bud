@@ -43,10 +43,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\budPluginCSharp\budPluginCSharp.csproj">
-      <Project>{4E20C380-468E-4363-82B2-B0DD2467047E}</Project>
-      <Name>budPluginCSharp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\budGraph\budGraph.csproj">
       <Project>{626FA4F4-1E1D-4417-A441-03EEAAED817F}</Project>
       <Name>budGraph</Name>

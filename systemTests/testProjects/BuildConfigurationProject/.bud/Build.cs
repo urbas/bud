@@ -3,7 +3,7 @@ using Bud.Plugins.CSharp;
 using Bud.Plugins.Dependencies;
 using System.IO;
 
-public class Build : BuildDefinition {
+public class Build : IBuild {
   public Settings GetSettings(string baseDir) {
     var projectA = CSharp.Project("A", Path.Combine(baseDir, "A"));
     var projectB = CSharp.Project("B", Path.Combine(baseDir, "B")).DependsOn(projectA);

@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budCore", "budCore\budCore.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "systemTests", "systemTests\systemTests.csproj", "{8021ED96-0C60-4C9F-926D-FBBD6E08CCAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budPluginCSharp", "budPluginCSharp\budPluginCSharp.csproj", "{4E20C380-468E-4363-82B2-B0DD2467047E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budCoreTests", "budCoreTests\budCoreTests.csproj", "{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budGraph", "budGraph\budGraph.csproj", "{626FA4F4-1E1D-4417-A441-03EEAAED817F}"
@@ -31,10 +29,6 @@ Global
 		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Debug|x86.Build.0 = Debug|Any CPU
 		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Release|x86.ActiveCfg = Release|Any CPU
 		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Release|x86.Build.0 = Release|Any CPU
-		{4E20C380-468E-4363-82B2-B0DD2467047E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4E20C380-468E-4363-82B2-B0DD2467047E}.Debug|x86.Build.0 = Debug|Any CPU
-		{4E20C380-468E-4363-82B2-B0DD2467047E}.Release|x86.ActiveCfg = Release|Any CPU
-		{4E20C380-468E-4363-82B2-B0DD2467047E}.Release|x86.Build.0 = Release|Any CPU
 		{626FA4F4-1E1D-4417-A441-03EEAAED817F}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{626FA4F4-1E1D-4417-A441-03EEAAED817F}.Debug|x86.Build.0 = Debug|Any CPU
 		{626FA4F4-1E1D-4417-A441-03EEAAED817F}.Release|x86.ActiveCfg = Release|Any CPU
@@ -67,6 +61,7 @@ Global
 		$1.inheritsScope = text/plain
 		$1.scope = text/x-csharp
 		$0.CSharpFormattingPolicy = $2
+		$2.IndentSwitchBody = True
 		$2.NamespaceBraceStyle = EndOfLine
 		$2.ClassBraceStyle = EndOfLine
 		$2.InterfaceBraceStyle = EndOfLine

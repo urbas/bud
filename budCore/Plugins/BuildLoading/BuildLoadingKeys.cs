@@ -6,6 +6,7 @@ using System.IO;
 
 namespace Bud.Plugins.BuildLoading {
   public static class BuildLoadingKeys {
+    public static readonly ConfigKey<string> BuildConfigSourceFile = new ConfigKey<string>("BuildConfigSourceFile");
     public static readonly ConfigKey<string> DirOfProjectToBeBuilt = new ConfigKey<string>("DirOfProjectToBeBuilt");
     public static readonly TaskKey<Settings> LoadBuildSettings = new TaskKey<Settings>("LoadBuildSettings");
   }

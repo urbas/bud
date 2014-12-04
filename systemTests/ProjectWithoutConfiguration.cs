@@ -5,24 +5,25 @@ using Bud.Plugins.Build;
 using Bud.Plugins.Projects;
 using Bud.Plugins.CSharp;
 using Bud.Plugins.BuildLoading;
+using System;
 
 namespace Bud.SystemTests {
   public class ProjectWithoutConfiguration {
     [Test]
-    public async void compile_MUST_produce_the_executable() {
+    public void compile_MUST_produce_the_executable() {
       using (var testProjectCopy = TestProjects.TemporaryCopy("ProjectWithoutConfiguration")) {
         var context = BuildLoading.Load(testProjectCopy.Path);
 
         var compiledAssemblyFiles = CompiledAssemblyFiles(context);
 
-        await context.BuildAll();
+        context.BuildAll().Wait();
         foreach (var assemblyFile in compiledAssemblyFiles) {
           FileAssertions.AssertFileExists(assemblyFile);
         }
 
         Assert.IsNotEmpty(compiledAssemblyFiles);
 
-        await context.CleanAll();
+        context.CleanAll().Wait();
         foreach (var assemblyFile in compiledAssemblyFiles) {
           FileAssertions.AssertFileDoesNotExist(assemblyFile);
         }
@@ -30,10 +31,10 @@ namespace Bud.SystemTests {
     }
 
     [Test]
-    public async void compile_MUST_produce_no_executable_WHEN_the_project_folder_is_empty() {
+    public void compile_MUST_produce_no_executable_WHEN_the_project_folder_is_empty() {
       using (var emptyProject = TestProjects.EmptyProject()) {
         var context = BuildLoading.Load(emptyProject.Path);
-        await context.Evaluate(BuildKeys.Build);
+        context.Evaluate(BuildKeys.Build).Wait();
         var unexpectedCompiledFiles = CompiledAssemblyFiles(context);
         foreach (var assemblyFile in unexpectedCompiledFiles) {
           FileAssertions.AssertFileDoesNotExist(assemblyFile);
