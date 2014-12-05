@@ -9,6 +9,7 @@ using System.IO;
 using System.Collections.Generic;
 using Bud;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Bud.Plugins.BuildLoading
 {
@@ -38,7 +39,10 @@ namespace Bud.Plugins.BuildLoading
       var buildConfigSourceFile = context.GetBuildConfigSourceFile(scope);
       if (File.Exists(buildConfigSourceFile)) {
         await context.BuildAll();
-        return CSharp.CSharp.Project("root", context.GetDirOfProjectToBeBuilt(scope));
+        var objectHandle = Activator.CreateInstanceFrom(context.GetCSharpOutputAssemblyFile(scope), "Build");
+        var buildDefinition = (IBuild)objectHandle.Unwrap();
+        var dirOfProjectToBeBuilt = context.GetDirOfProjectToBeBuilt(scope);
+        return buildDefinition.GetSettings(dirOfProjectToBeBuilt);
       } else {
         return CSharp.CSharp.Project("root", context.GetDirOfProjectToBeBuilt(scope));
       }
