@@ -25,7 +25,9 @@ namespace Bud.Plugins.CSharp {
         .InitOrKeep(CSharpKeys.SourceFiles.In(scope), context => FindSources(context, scope))
         .InitOrKeep(CSharpKeys.AssemblyType.In(scope), AssemblyType.Exe)
         .InitOrKeep(CSharpKeys.ReferencedAssemblies.In(scope), ImmutableList<string>.Empty)
-        .InitOrKeep(CSharpKeys.OutputAssemblyFile.In(scope), context => Path.Combine(context.GetOutputDir(scope), ".net-4.5", "main", "debug", "bin", string.Format("{0}.{1}", scope.Id, context.GetAssemblyFileExtension(scope))))
+        .InitOrKeep(CSharpKeys.OutputAssemblyDir.In(scope), context => Path.Combine(context.GetOutputDir(scope), ".net-4.5", "main", "debug", "bin"))
+        .InitOrKeep(CSharpKeys.OutputAssemblyName.In(scope), context => scope.Id)
+        .InitOrKeep(CSharpKeys.OutputAssemblyFile.In(scope), context => Path.Combine(context.GetCSharpOutputAssemblyDir(scope), string.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(scope), context.GetAssemblyFileExtension(scope))))
         .AddDependencies(CSharpKeys.Build, CSharpKeys.Build.In(scope))
         .AddDependencies(BuildKeys.Build, CSharpKeys.Build);
     }

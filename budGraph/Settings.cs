@@ -69,6 +69,10 @@ namespace Bud {
       return Add(new ModifyConfig<T>(key, (context, previousValue) => modifier(previousValue)));
     }
 
+    public Settings Modify<T>(ConfigKey<T> key, Func<EvaluationContext, T, T> modifier) {
+      return Add(new ModifyConfig<T>(key, (context, previousValue) => modifier(context, previousValue)));
+    }
+
     public Settings Modify<T>(TaskKey<T> key, Func<EvaluationContext, Func<Task<T>>, Task<T>> modifier) {
       return Add(new ModifyTask<T>(key, modifier));
     }

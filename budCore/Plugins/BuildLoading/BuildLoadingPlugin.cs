@@ -27,6 +27,8 @@ namespace Bud.Plugins.BuildLoading
         .Init(BuildLoadingKeys.BuildConfigSourceFile.In(scope), context => Path.Combine(context.GetBaseDir(scope), "Build.cs"))
         .Init(BuildLoadingKeys.DirOfProjectToBeBuilt.In(scope), dirOfProjectToBeBuilt)
         .Modify(CSharpKeys.SourceFiles.In(scope), (context, previousTask) => AddBuildDefinitionSourceFile(context, previousTask, scope))
+        .Modify(CSharpKeys.OutputAssemblyDir.In(scope), (context, previousValue) => context.GetBaseDir(scope))
+        .Modify(CSharpKeys.OutputAssemblyName.In(scope), (context, previousValue) => "Build")
         .InitOrKeep(BuildLoadingKeys.LoadBuildSettings.In(scope), context => LoadOrBuildSettings(context, scope))
         .Modify(CSharpKeys.AssemblyType.In(scope), prevValue => AssemblyType.Library)
         .Modify(CSharpKeys.ReferencedAssemblies.In(scope), assemblies => assemblies.AddRange(GetBudAssemblies(budAssembliesDir)));

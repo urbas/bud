@@ -11,8 +11,8 @@ namespace Bud.SystemTests {
     [Test]
     public void Load_MUST_produce_the_build_assembly() {
       using (var testProjectCopy = TestProjects.TemporaryCopy("BuildConfigurationProject")) {
-        var settings = BuildLoading.Load(testProjectCopy.Path);
-        FileAssertions.AssertFileExists(Path.Combine(testProjectCopy.Path, ".bud", ".bud", "output", ".net-4.5", "main", "debug", "bin", "BuildDefinition.dll"));
+        BuildLoading.Load(testProjectCopy.Path);
+        FileAssertions.AssertFileExists(Path.Combine(testProjectCopy.Path, ".bud", "Build.dll"));
       }
     }
   }

@@ -20,6 +20,14 @@ namespace Bud.Plugins.CSharp {
       return context.Evaluate(CSharpKeys.SourceFiles.In(project));
     }
 
+    public static string GetCSharpOutputAssemblyDir(this EvaluationContext context, Scope project) {
+      return context.Evaluate(CSharpKeys.OutputAssemblyDir.In(project));
+    }
+
+    public static string GetCSharpOutputAssemblyName(this EvaluationContext context, Scope project) {
+      return context.Evaluate(CSharpKeys.OutputAssemblyName.In(project));
+    }
+
     public static string GetCSharpOutputAssemblyFile(this EvaluationContext context, Scope project) {
       return context.Evaluate(CSharpKeys.OutputAssemblyFile.In(project));
     }
