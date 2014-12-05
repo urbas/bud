@@ -14,19 +14,12 @@ namespace Bud.SystemTests {
       using (var testProjectCopy = TestProjects.TemporaryCopy("ProjectWithoutConfiguration")) {
         var context = BuildLoading.Load(testProjectCopy.Path);
 
-        var compiledAssemblyFiles = CompiledAssemblyFiles(context);
-
         context.BuildAll().Wait();
-        foreach (var assemblyFile in compiledAssemblyFiles) {
-          FileAssertions.AssertFileExists(assemblyFile);
-        }
-
-        Assert.IsNotEmpty(compiledAssemblyFiles);
+        FileAssertions.AssertFilesExist(CompiledAssemblyFiles(context));
+        Assert.IsNotEmpty(CompiledAssemblyFiles(context));
 
         context.CleanAll().Wait();
-        foreach (var assemblyFile in compiledAssemblyFiles) {
-          FileAssertions.AssertFileDoesNotExist(assemblyFile);
-        }
+        FileAssertions.AssertFilesDoNotExist(CompiledAssemblyFiles(context));
       }
     }
 
@@ -35,15 +28,14 @@ namespace Bud.SystemTests {
       using (var emptyProject = TestProjects.EmptyProject()) {
         var context = BuildLoading.Load(emptyProject.Path);
         context.Evaluate(BuildKeys.Build).Wait();
-        var unexpectedCompiledFiles = CompiledAssemblyFiles(context);
-        foreach (var assemblyFile in unexpectedCompiledFiles) {
-          FileAssertions.AssertFileDoesNotExist(assemblyFile);
-        }
+        FileAssertions.AssertFilesDoNotExist(CompiledAssemblyFiles(context));
       }
     }
 
     static System.Collections.Generic.IEnumerable<string> CompiledAssemblyFiles(EvaluationContext context) {
-      return from project in context.GetAllProjects() select context.GetCSharpOutputAssemblyFile(project.Value);
+      return context
+        .GetAllProjects()
+        .Select(project => context.GetCSharpOutputAssemblyFile(project.Value));
     }
   }
 }
