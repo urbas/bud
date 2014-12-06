@@ -9,7 +9,7 @@ namespace Bud.Plugins.BuildLoading {
   public static class BuildLoading {
     public static Settings Project(string projectId, string budDir, string dirOfProjectToBeBuilt) {
       return CSharp.CSharp.Project(projectId, budDir)
-        .Add(new BuildLoadingPlugin(dirOfProjectToBeBuilt, "/home/matej/Programming/bud/systemTests/bin/Debug"));
+        .Add(new BuildLoadingPlugin(dirOfProjectToBeBuilt));
     }
 
     public static string GetBuildConfigSourceFile(this EvaluationContext context, Scope buildLoadingProject) {

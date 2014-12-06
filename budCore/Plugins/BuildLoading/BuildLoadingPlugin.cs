@@ -15,10 +15,8 @@ namespace Bud.Plugins.BuildLoading
 {
   public class BuildLoadingPlugin : IPlugin	{
     private readonly string dirOfProjectToBeBuilt;
-    private readonly string budAssembliesDir;
 
-    public BuildLoadingPlugin(string dirOfProjectToBeBuilt, string budAssembliesDir) {
-      this.budAssembliesDir = budAssembliesDir;
+    public BuildLoadingPlugin(string dirOfProjectToBeBuilt) {
       this.dirOfProjectToBeBuilt = dirOfProjectToBeBuilt;
     }
 
@@ -32,7 +30,7 @@ namespace Bud.Plugins.BuildLoading
         .Modify(CSharpKeys.OutputAssemblyName.In(scope), (context, previousValue) => "Build")
         .InitOrKeep(BuildLoadingKeys.LoadBuildSettings.In(scope), context => LoadOrBuildSettings(context, scope))
         .Modify(CSharpKeys.AssemblyType.In(scope), prevValue => AssemblyType.Library)
-        .Modify(CSharpKeys.ReferencedAssemblies.In(scope), assemblies => assemblies.AddRange(GetBudAssemblies(budAssembliesDir)));
+        .Modify(CSharpKeys.ReferencedAssemblies.In(scope), assemblies => assemblies.AddRange(GetBudAssemblies()));
     }
 
     public async Task<Settings> LoadOrBuildSettings(EvaluationContext context, Scope scope) {
@@ -54,11 +52,8 @@ namespace Bud.Plugins.BuildLoading
       return previousSources.Concat(new []{ context.GetBuildConfigSourceFile(scope) });
     }
 
-    public static IEnumerable<string> GetBudAssemblies(string assembliesDir) {
-      return new [] {
-        "Bud.Graph.dll",
-        "Bud.Core.dll"
-      }.Select(assemblyName => Path.Combine(assembliesDir, assemblyName));
+    public static IEnumerable<string> GetBudAssemblies() {
+      return AppDomain.CurrentDomain.GetAssemblies().Select(assembly => assembly.Location);
     }
   }
 
