@@ -79,9 +79,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\budGraph\budGraph.csproj">
+    <ProjectReference Include="..\budGraph\Graph.csproj">
       <Project>{626FA4F4-1E1D-4417-A441-03EEAAED817F}</Project>
-      <Name>budGraph</Name>
+      <Name>Graph</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

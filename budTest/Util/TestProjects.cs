@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using Bud.Test.Util;
 
-namespace Bud {
+namespace Bud.Test.Util {
   public static class TestProjects {
 
     public static TemporaryDirectory TemporaryCopy(string projectDirName) {

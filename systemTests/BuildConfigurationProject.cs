@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Bud.Test.Assertions;
 using System.IO;
 using Bud.Plugins.Build;
+using Bud.Test.Util;
 
 namespace Bud.SystemTests {
   public class BuildConfigurationProject {

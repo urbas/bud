@@ -1,19 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bud", "bud\bud.csproj", "{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud", "bud\Bud.csproj", "{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budTest", "budTest\budTest.csproj", "{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "budTest\Test.csproj", "{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budCore", "budCore\budCore.csproj", "{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "budCore\Core.csproj", "{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "systemTests", "systemTests\systemTests.csproj", "{8021ED96-0C60-4C9F-926D-FBBD6E08CCAF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemTests", "systemTests\SystemTests.csproj", "{8021ED96-0C60-4C9F-926D-FBBD6E08CCAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budCoreTests", "budCoreTests\budCoreTests.csproj", "{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "budCoreTests\Core.Tests.csproj", "{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budGraph", "budGraph\budGraph.csproj", "{626FA4F4-1E1D-4417-A441-03EEAAED817F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graph", "budGraph\Graph.csproj", "{626FA4F4-1E1D-4417-A441-03EEAAED817F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "budGraphTests", "budGraphTests\budGraphTests.csproj", "{CFFA7A16-FAFD-4985-941F-7228C2A589CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graph.Tests", "budGraphTests\Graph.Tests.csproj", "{CFFA7A16-FAFD-4985-941F-7228C2A589CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,7 +51,7 @@ Global
 		{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = bud\bud.csproj
+		StartupItem = bud\Bud.csproj
 		Policies = $0
 		$0.TextStylePolicy = $1
 		$1.FileWidth = 120

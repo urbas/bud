@@ -5,10 +5,10 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{8021ED96-0C60-4C9F-926D-FBBD6E08CCAF}</ProjectGuid>
+    <ProjectGuid>{CFFA7A16-FAFD-4985-941F-7228C2A589CA}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Bud.SystemTests</RootNamespace>
-    <AssemblyName>Bud.SystemTests</AssemblyName>
+    <RootNamespace>Bud</RootNamespace>
+    <AssemblyName>Graph.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -32,41 +32,24 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="nunit.framework">
-      <Package>nunit</Package>
+      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System.Collections.Immutable">
       <HintPath>..\packages\Microsoft.Bcl.Immutable.1.0.34\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ProjectWithoutConfiguration.cs" />
-    <Compile Include="BuildConfigurationProject.cs" />
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <ProjectReference Include="..\bud\bud.csproj">
-      <Project>{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}</Project>
-      <Name>bud</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\budTest\budTest.csproj">
-      <Project>{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}</Project>
-      <Name>budTest</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\budGraph\budGraph.csproj">
-      <Project>{626FA4F4-1E1D-4417-A441-03EEAAED817F}</Project>
-      <Name>budGraph</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\budCore\budCore.csproj">
-      <Project>{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}</Project>
-      <Name>budCore</Name>
-    </ProjectReference>
-  </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="testProjects\ProjectWithSourceDependency\" />
-    <Folder Include="testProjects\" />
-    <Folder Include="testProjects\BuildConfigurationProject\.bud\" />
+    <ProjectReference Include="..\budGraph\Graph.csproj">
+      <Project>{626FA4F4-1E1D-4417-A441-03EEAAED817F}</Project>
+      <Name>Graph</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="SettingsConstruction\SettingConstructionTest.cs" />
+    <Compile Include="ScopeTest.cs" />
   </ItemGroup>
 </Project>

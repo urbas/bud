@@ -6,6 +6,7 @@ using Bud.Plugins.Projects;
 using Bud.Plugins.CSharp;
 using Bud.Plugins.BuildLoading;
 using System;
+using Bud.Test.Util;
 
 namespace Bud.SystemTests {
   public class ProjectWithoutConfiguration {
