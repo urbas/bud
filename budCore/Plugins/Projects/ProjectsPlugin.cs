@@ -6,7 +6,7 @@ using Bud.Plugins.Build;
 
 namespace Bud.Plugins.Projects {
 
-  public class ProjectPlugin : BudPlugin {
+  public class ProjectPlugin : IPlugin {
     private readonly string id;
     private readonly string baseDir;
 

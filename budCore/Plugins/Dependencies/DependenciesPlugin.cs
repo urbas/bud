@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 
 namespace Bud.Plugins.Dependencies {
-  public class DependenciesPlugin : BudPlugin {
+  public class DependenciesPlugin : IPlugin {
 
     public static readonly DependenciesPlugin Instance = new DependenciesPlugin();
 

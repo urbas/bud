@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Bud.Plugins.CSharp {
 
-  public class CSharpPlugin : BudPlugin {
+  public class CSharpPlugin : IPlugin {
     public static readonly CSharpPlugin Instance = new CSharpPlugin();
 
     private CSharpPlugin() {

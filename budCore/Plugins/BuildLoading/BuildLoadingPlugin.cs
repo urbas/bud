@@ -13,7 +13,7 @@ using System.Reflection;
 
 namespace Bud.Plugins.BuildLoading
 {
-  public class BuildLoadingPlugin : BudPlugin	{
+  public class BuildLoadingPlugin : IPlugin	{
     private readonly string dirOfProjectToBeBuilt;
     private readonly string budAssembliesDir;
 
@@ -35,20 +35,21 @@ namespace Bud.Plugins.BuildLoading
         .Modify(CSharpKeys.ReferencedAssemblies.In(scope), assemblies => assemblies.AddRange(GetBudAssemblies(budAssembliesDir)));
     }
 
-    private async Task<Settings> LoadOrBuildSettings(EvaluationContext context, Scope scope) {
+    public async Task<Settings> LoadOrBuildSettings(EvaluationContext context, Scope scope) {
       var buildConfigSourceFile = context.GetBuildConfigSourceFile(scope);
+      var dirOfProjectToBeBuilt = context.GetDirOfProjectToBeBuilt(scope);
+      // TODO: Check if the BakedBuild.dll file exists. If it does, just load it.
       if (File.Exists(buildConfigSourceFile)) {
         await context.BuildAll();
         var objectHandle = Activator.CreateInstanceFrom(context.GetCSharpOutputAssemblyFile(scope), "Build");
         var buildDefinition = (IBuild)objectHandle.Unwrap();
-        var dirOfProjectToBeBuilt = context.GetDirOfProjectToBeBuilt(scope);
         return buildDefinition.GetSettings(dirOfProjectToBeBuilt);
       } else {
-        return CSharp.CSharp.Project("root", context.GetDirOfProjectToBeBuilt(scope));
+        return CSharp.CSharp.Project(Path.GetFileName(dirOfProjectToBeBuilt), dirOfProjectToBeBuilt);
       }
     }
 
-    private async Task<IEnumerable<string>> AddBuildDefinitionSourceFile(EvaluationContext context, Func<Task<IEnumerable<string>>> previousSourcesTask, Scope scope) {
+    public async Task<IEnumerable<string>> AddBuildDefinitionSourceFile(EvaluationContext context, Func<Task<IEnumerable<string>>> previousSourcesTask, Scope scope) {
       var previousSources = await previousSourcesTask();
       return previousSources.Concat(new []{ context.GetBuildConfigSourceFile(scope) });
     }

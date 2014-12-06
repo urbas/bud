@@ -29,7 +29,7 @@ namespace Bud {
       return new Settings(SettingsList.AddRange(settings.SettingsList));
     }
 
-    public Settings Add(BudPlugin plugin) {
+    public Settings Add(IPlugin plugin) {
       return plugin.ApplyTo(this, CurrentScope);
     }
 

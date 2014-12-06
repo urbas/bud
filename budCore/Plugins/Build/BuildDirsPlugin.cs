@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Bud.Plugins.Build {
 
-  public class BuildDirsPlugin : BudPlugin {
+  public class BuildDirsPlugin : IPlugin {
     private readonly string baseDir;
 
     public BuildDirsPlugin(string baseDir) {

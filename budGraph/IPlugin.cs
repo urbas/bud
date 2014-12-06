@@ -1,7 +1,7 @@
 ﻿using System;
 
 namespace Bud {
-  public interface BudPlugin {
+  public interface IPlugin {
     Settings ApplyTo(Settings settings, Scope scope);
   }
 }

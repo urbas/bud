@@ -3,7 +3,7 @@ using System.IO;
 using Bud.Util;
 
 namespace Bud.Plugins.Build {
-  public class BuildPlugin : BudPlugin {
+  public class BuildPlugin : IPlugin {
     public static readonly BuildPlugin Instance = new BuildPlugin();
 
     private BuildPlugin() {
