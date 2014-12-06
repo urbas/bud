@@ -9,8 +9,8 @@ namespace Bud {
     public static readonly Scope Global = new Scope("Global", null);
     public readonly Scope Parent;
     public readonly string Id;
-    private readonly int Depth;
-    private readonly int Hash;
+    private readonly int depth;
+    private readonly int hash;
 
     public Scope(string id) : this(id, Global) {
     }
@@ -18,9 +18,9 @@ namespace Bud {
     public Scope(string id, Scope parent) {
       Parent = parent ?? this;
       Id = id;
-      Depth = parent == null ? 1 : (parent.Depth + 1);
+      depth = parent == null ? 1 : (parent.depth + 1);
       unchecked {
-        Hash = (parent == null ? -1498327287 : parent.Hash) ^ Id.GetHashCode();
+        hash = (parent == null ? -1498327287 : parent.hash) ^ Id.GetHashCode();
       }
     }
 
@@ -46,7 +46,7 @@ namespace Bud {
       if (ReferenceEquals(this, otherScope)) {
         return true;
       }
-      if (Depth != otherScope.Depth) {
+      if (depth != otherScope.depth) {
         return false;
       }
       return Id.Equals(otherScope.Id) && Parent.Equals(otherScope.Parent);
@@ -63,7 +63,7 @@ namespace Bud {
     }
 
     public override int GetHashCode() {
-      return Hash;
+      return hash;
     }
 
     public override string ToString() {

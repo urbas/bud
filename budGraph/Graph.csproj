@@ -54,7 +54,6 @@
     <Compile Include="SettingsConstruction\Ops\ModifyTask.cs" />
     <Compile Include="SettingsConstruction\Setting.cs" />
     <Compile Include="SettingsConstruction\TaskDefinition.cs" />
-    <Compile Include="Util\SettingsUtils.cs" />
     <Compile Include="Util\TaskUtils.cs" />
     <Compile Include="IPlugin.cs" />
   </ItemGroup>

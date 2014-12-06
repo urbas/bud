@@ -55,7 +55,7 @@ namespace Bud {
     }
 
     public static EvaluationContext FromSettings(Settings settings) {
-      return new EvaluationContext(SettingsUtils.ToCompiledSettings(settings));
+      return new EvaluationContext(settings.Compile());
     }
 
     public override string ToString() {

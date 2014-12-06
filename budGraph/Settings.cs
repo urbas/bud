@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace Bud {
   public class Settings {
-    public static readonly Settings Start = new Settings(ImmutableList.Create<Setting>());
+    public static readonly Settings Empty = new Settings(ImmutableList<Setting>.Empty);
 
     public readonly Scope CurrentScope;
     public readonly ImmutableList<Setting> SettingsList;
@@ -88,8 +88,12 @@ namespace Bud {
       return new Settings(SettingsList, scope);
     }
 
-    public EvaluationContext ToEvaluationContext() {
-      return EvaluationContext.FromSettings(this);
+    public IDictionary<Scope, IValueDefinition> Compile() {
+      var compiledSettingsBuilder = ImmutableDictionary.CreateBuilder<Scope, IValueDefinition>();
+      foreach (var setting in SettingsList) {
+        setting.ApplyTo(compiledSettingsBuilder);
+      }
+      return compiledSettingsBuilder.ToImmutable();
     }
   }
 }

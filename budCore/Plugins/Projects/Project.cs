@@ -7,7 +7,7 @@ namespace Bud.Plugins.Projects {
 
   public static class Project {
     public static Settings New(string id, string baseDir) {
-      return Settings.Start.Add(new ProjectPlugin(id, baseDir));
+      return Settings.Empty.Add(new ProjectPlugin(id, baseDir));
     }
 
     public static Scope Key(string id, Scope scope) {

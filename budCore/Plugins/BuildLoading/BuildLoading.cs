@@ -31,8 +31,6 @@ namespace Bud.Plugins.BuildLoading {
     }
 
     public static EvaluationContext Load(string path) {
-      // Does the .bud/bakedBuild/Build.dll file exist?
-      //  - load it and be done with it :)
       return EvaluationContext.FromSettings(LoadBuildSettings(path).Result);
     }
 
