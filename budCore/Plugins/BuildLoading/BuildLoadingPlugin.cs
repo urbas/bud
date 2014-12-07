@@ -53,7 +53,9 @@ namespace Bud.Plugins.BuildLoading
     }
 
     public static IEnumerable<string> GetBudAssemblies() {
-      return AppDomain.CurrentDomain.GetAssemblies().Select(assembly => assembly.Location);
+      return AppDomain.CurrentDomain.GetAssemblies()
+        .Where(assembly => assembly.GetName().Name.StartsWith("Bud."))
+        .Select(assembly => assembly.Location);
     }
   }
 

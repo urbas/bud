@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="ProjectWithoutConfiguration.cs" />
     <Compile Include="BuildConfigurationProject.cs" />
+    <Compile Include="ProjectWithDependency.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -65,8 +66,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="testProjects\ProjectWithSourceDependency\" />
     <Folder Include="testProjects\" />
     <Folder Include="testProjects\BuildConfigurationProject\.bud\" />
+    <Folder Include="testProjects\ProjectWithDependency\" />
   </ItemGroup>
 </Project>

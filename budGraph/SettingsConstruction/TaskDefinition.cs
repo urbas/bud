@@ -33,7 +33,7 @@ namespace Bud.SettingsConstruction {
       return await TaskFunction(context);
     }
 
-    async private Task InvokeDependencies(EvaluationContext context) {
+    private async Task InvokeDependencies(EvaluationContext context) {
       foreach (var dependency in Dependencies) {
         await context.Evaluate(dependency);
       }
