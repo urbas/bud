@@ -14,7 +14,7 @@ namespace Bud.Plugins.CSharp.Compiler {
       return Task.Run(async () => {
         var outputFile = context.GetCSharpOutputAssemblyFile(project);
         var sourceFiles = await context.GetCSharpSources(project);
-        var libraryDependencies = context.GetCSharpReferencedAssemblies(project);
+        var libraryDependencies = await context.CollectCSharpReferencedAssemblies(project);
         if (sourceFiles.Any()) {
           Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
           var monoCompilerProcess = ProcessBuilder
@@ -25,6 +25,7 @@ namespace Bud.Plugins.CSharp.Compiler {
           }
           monoCompilerProcess = monoCompilerProcess.AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(project)));
           monoCompilerProcess = monoCompilerProcess.AddArguments(sourceFiles);
+          Console.WriteLine(monoCompilerProcess.Arguments);
           var exitCode = monoCompilerProcess.Start(Console.Out, Console.Error);
           if (exitCode != 0) {
             throw new Exception("Compilation failed.");

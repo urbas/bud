@@ -12,6 +12,11 @@ namespace Bud.Plugins.CSharp {
         .Add(CSharpPlugin.Instance);
     }
 
+    public static Settings LibraryProject(string id, string baseDir) {
+      var project = Project(id, baseDir);
+      return project.Modify(CSharpKeys.AssemblyType.In(project.CurrentScope), assemblyType => AssemblyType.Library);
+    }
+
     public static string GetCSharpSourceDir(this EvaluationContext context, Scope project) {
       return Path.Combine(context.GetBaseDir(project), "src", "main", "cs");
     }
@@ -32,13 +37,17 @@ namespace Bud.Plugins.CSharp {
       return context.Evaluate(CSharpKeys.OutputAssemblyFile.In(project));
     }
 
-    public static IEnumerable<string> GetCSharpReferencedAssemblies(this EvaluationContext context, Scope project) {
-      return context.Evaluate(CSharpKeys.ReferencedAssemblies.In(project));
+    public static Task<ImmutableList<string>> CollectCSharpReferencedAssemblies(this EvaluationContext context, Scope project) {
+      return context.Evaluate(CSharpKeys.CollectReferencedAssemblies.In(project));
     }
 
     public static AssemblyType GetCSharpAssemblyType(this EvaluationContext context, Scope project) {
       return context.Evaluate(CSharpKeys.AssemblyType.In(project));
     }
+
+    public static Task CSharpBuild(this EvaluationContext context, Scope project) {
+      return context.Evaluate(CSharpKeys.Build.In(project));
+     }
 
     public static string GetAssemblyFileExtension(this EvaluationContext context, Scope project) {
       switch (context.GetCSharpAssemblyType(project)) {

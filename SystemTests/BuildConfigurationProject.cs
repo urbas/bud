@@ -16,7 +16,7 @@ namespace Bud.SystemTests {
         var context = BuildLoading.Load(testProjectCopy.Path);
         FileAssertions.AssertFileExists(Path.Combine(testProjectCopy.Path, ".bud", "Build.dll"));
         Assert.AreEqual(
-          new [] {"A", "B"},
+          new [] { "Bar", "Foo" },
           context.GetAllProjects().Keys.OrderBy(k => k)
         );
       }

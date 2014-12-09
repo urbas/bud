@@ -11,7 +11,7 @@ namespace Bud.Plugins.CSharp {
     public static readonly ConfigKey<string> OutputAssemblyName = new ConfigKey<string>("OutputAssemblyName").In(CSharp);
     public static readonly ConfigKey<string> OutputAssemblyFile = new ConfigKey<string>("OutputAssemblyFile").In(CSharp);
     public static readonly TaskKey<IEnumerable<string>> SourceFiles = new TaskKey<IEnumerable<string>>("SourceFiles").In(CSharp);
-    public static readonly ConfigKey<ImmutableList<string>> ReferencedAssemblies = new ConfigKey<ImmutableList<string>>("ReferencedAssemblies").In(CSharp);
+    public static readonly TaskKey<ImmutableList<string>> CollectReferencedAssemblies = new TaskKey<ImmutableList<string>>("CollectReferencedAssemblies").In(CSharp);
     public static readonly TaskKey<Unit> Build = BuildKeys.Build.In(CSharp);
   }
 }

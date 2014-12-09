@@ -30,7 +30,7 @@ namespace Bud.Plugins.BuildLoading
         .Modify(CSharpKeys.OutputAssemblyName.In(scope), (context, previousValue) => "Build")
         .InitOrKeep(BuildLoadingKeys.LoadBuildSettings.In(scope), context => LoadOrBuildSettings(context, scope))
         .Modify(CSharpKeys.AssemblyType.In(scope), prevValue => AssemblyType.Library)
-        .Modify(CSharpKeys.ReferencedAssemblies.In(scope), assemblies => assemblies.AddRange(GetBudAssemblies()));
+        .Modify(CSharpKeys.CollectReferencedAssemblies.In(scope), async (context, assemblies) => (await assemblies()).AddRange(GetBudAssemblies()));
     }
 
     public async Task<Settings> LoadOrBuildSettings(EvaluationContext context, Scope scope) {
@@ -39,8 +39,10 @@ namespace Bud.Plugins.BuildLoading
       // TODO: Check if the BakedBuild.dll file exists. If it does, just load it.
       if (File.Exists(buildConfigSourceFile)) {
         await context.BuildAll();
-        var objectHandle = Activator.CreateInstanceFrom(context.GetCSharpOutputAssemblyFile(scope), "Build");
-        var buildDefinition = (IBuild)objectHandle.Unwrap();
+        var buildConfigurationAssemblyFile = context.GetCSharpOutputAssemblyFile(scope);
+        Console.WriteLine("Build configuration file: " + buildConfigurationAssemblyFile);
+        var appDomain = AppDomain.CreateDomain("BuildConfiguration");
+        var buildDefinition = (IBuild)appDomain.CreateInstanceFrom(buildConfigurationAssemblyFile, "Build");
         return buildDefinition.GetSettings(dirOfProjectToBeBuilt);
       } else {
         return CSharp.CSharp.Project(Path.GetFileName(dirOfProjectToBeBuilt), dirOfProjectToBeBuilt);

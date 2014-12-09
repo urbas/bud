@@ -5,8 +5,8 @@ using System.IO;
 
 public class Build : IBuild {
   public Settings GetSettings(string baseDir) {
-    var projectA = CSharp.Project("A", Path.Combine(baseDir, "A"));
-    var projectB = CSharp.Project("B", Path.Combine(baseDir, "B")).DependsOn(projectA);
-    return projectA.Add(projectB);
+    var projectFoo = CSharp.Project("Foo", Path.Combine(baseDir, "Foo"));
+    var projectBar = CSharp.Project("Bar", Path.Combine(baseDir, "Bar")).DependsOn(projectFoo);
+    return projectFoo.Add(projectBar);
   }
 }
