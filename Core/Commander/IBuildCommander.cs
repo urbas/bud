@@ -6,9 +6,8 @@ using System.Reflection;
 using Bud.Plugins.Build;
 using Bud.Plugins.BuildLoading;
 
-namespace Bud {
-  public interface IBuild {
-    Settings GetSettings(string baseDir);
+namespace Bud.Commander {
+  public interface IBuildCommander : IDisposable {
+    string Evaluate(string command);
   }
 }
-

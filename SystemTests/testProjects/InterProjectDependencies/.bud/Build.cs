@@ -2,6 +2,13 @@ using Bud;
 using Bud.Plugins.CSharp;
 using Bud.Plugins.Dependencies;
 using System.IO;
+using System;
+
+public class Testek {
+  public string GetMessage() {
+    return "This is Sparta!";
+  }
+}
 
 public class Build : IBuild {
   public Settings GetSettings(string baseDir) {

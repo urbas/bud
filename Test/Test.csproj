@@ -39,6 +39,7 @@
   <ItemGroup>
     <Compile Include="Util\TestProjects.cs" />
     <Compile Include="Assertions\FileAssertions.cs" />
+    <Compile Include="Util\TemporaryDirBuildCommander.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">

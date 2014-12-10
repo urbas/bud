@@ -64,6 +64,13 @@
     <Compile Include="Plugins\BuildLoading\BuildLoadingPlugin.cs" />
     <Compile Include="Plugins\CSharp\AssemblyType.cs" />
     <Compile Include="IBuild.cs" />
+    <Compile Include="BudAssemblies.cs" />
+    <Compile Include="Commander\AppDomainBuildCommander.cs" />
+    <Compile Include="Commander\AssemblyBuildCommander.cs" />
+    <Compile Include="Commander\BuildCommanderUtils.cs" />
+    <Compile Include="Commander\IBuildCommander.cs" />
+    <Compile Include="Commander\CommandEvaluator.cs" />
+    <Compile Include="Commander\DefaultBuildCommander.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -74,6 +81,7 @@
     <Folder Include="Plugins\Dependencies\" />
     <Folder Include="Plugins\BuildLoading\" />
     <Folder Include="Plugins\CSharp\" />
+    <Folder Include="Commander\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

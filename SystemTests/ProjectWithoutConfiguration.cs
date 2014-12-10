@@ -1,42 +1,32 @@
-using Bud.Test.Assertions;
-using NUnit.Framework;
-using System.Linq;
-using Bud.Plugins.Build;
-using Bud.Plugins.Projects;
-using Bud.Plugins.CSharp;
-using Bud.Plugins.BuildLoading;
-using System;
+using Bud.Commander;
 using Bud.Test.Util;
+using Bud.Plugins.Build;
+using Bud.Test.Assertions;
+using System.IO;
+using NUnit.Framework;
 
 namespace Bud.SystemTests {
   public class ProjectWithoutConfiguration {
     [Test]
     public void compile_MUST_produce_the_executable() {
-      using (var testProjectCopy = TestProjects.TemporaryCopy("ProjectWithoutConfiguration")) {
-        var context = BuildLoading.Load(testProjectCopy.Path);
-
-        context.BuildAll().Wait();
-        FileAssertions.AssertFilesExist(CompiledAssemblyFiles(context));
-        Assert.IsNotEmpty(CompiledAssemblyFiles(context));
-
-        context.CleanAll().Wait();
-        FileAssertions.AssertFilesDoNotExist(CompiledAssemblyFiles(context));
+      using (var buildCommander = TestProjects.LoadBuildCommander("ProjectWithoutConfiguration")) {
+        buildCommander.Evaluate(BuildKeys.Build);
+        FileAssertions.AssertFileExists(BuiltAssemblyPath(buildCommander));
+        buildCommander.Evaluate(BuildKeys.Clean);
+        FileAssertions.AssertFileDoesNotExist(BuiltAssemblyPath(buildCommander));
       }
     }
 
     [Test]
     public void compile_MUST_produce_no_executable_WHEN_the_project_folder_is_empty() {
-      using (var emptyProject = TestProjects.EmptyProject()) {
-        var context = BuildLoading.Load(emptyProject.Path);
-        context.Evaluate(BuildKeys.Build).Wait();
-        FileAssertions.AssertFilesDoNotExist(CompiledAssemblyFiles(context));
+      using (var buildCommander = TestProjects.LoadBuildCommander()) {
+        buildCommander.Evaluate(BuildKeys.Build);
+        FileAssertions.AssertFileDoesNotExist(BuiltAssemblyPath(buildCommander));
       }
     }
 
-    static System.Collections.Generic.IEnumerable<string> CompiledAssemblyFiles(EvaluationContext context) {
-      return context
-        .GetAllProjects()
-        .Select(project => context.GetCSharpOutputAssemblyFile(project.Value));
+    static string BuiltAssemblyPath(TemporaryDirBuildCommander buildCommander) {
+      return Path.Combine(buildCommander.TemporaryDirectory.Path, ".bud", "output", ".net-4.5", "main", "debug", "bin", Path.GetFileName(buildCommander.TemporaryDirectory.Path) + ".exe");
     }
   }
 }

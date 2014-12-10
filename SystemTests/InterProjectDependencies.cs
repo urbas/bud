@@ -8,25 +8,25 @@ using Bud.Plugins.CSharp;
 using Bud.Plugins.BuildLoading;
 using System;
 using Bud.Test.Util;
+using Bud.Commander;
 
 namespace Bud.SystemTests {
   public class InterProjectDependencies {
     [Test]
     public void compile_MUST_produce_the_executable() {
-      using (var testProjectCopy = TestProjects.TemporaryCopy("InterProjectDependencies")) {
-        var context = BuildLoading.Load(testProjectCopy.Path);
-        Console.WriteLine(context.GetAllProjects().Select(project => context.GetDependencies(project.Value)).Aggregate((lstA, lstB) => lstA.AddRange(lstB)).Aggregate("", (str, dep) => str + "; " + dep));
-        context.BuildAll().Wait();
-        FileAssertions.AssertFilesExist(CompiledAssemblyFiles(context));
-        Assert.AreEqual(2, CompiledAssemblyFiles(context).Count());
+      using (var buildCommander = TestProjects.LoadBuildCommander("InterProjectDependencies")) {
+        buildCommander.Evaluate(BuildKeys.Build);
+//        Console.WriteLine(context.GetAllProjects().Select(project => context.GetDependencies(project.Value)).Aggregate((lstA, lstB) => lstA.AddRange(lstB)).Aggregate("", (str, dep) => str + "; " + dep));
+//        FileAssertions.AssertFilesExist(CompiledAssemblyFiles(builder));
+//        Assert.AreEqual(2, CompiledAssemblyFiles(builder).Count());
       }
     }
 
-    static System.Collections.Generic.IEnumerable<string> CompiledAssemblyFiles(EvaluationContext context) {
-      return context
-        .GetAllProjects()
-        .Select(project => context.GetCSharpOutputAssemblyFile(project.Value))
-        .OrderBy(name => name);
-    }
+//    static System.Collections.Generic.IEnumerable<string> CompiledAssemblyFiles(TemporaryDirBuilder builder) {
+//      return context
+//        .GetAllProjects()
+//        .Select(project => context.GetCSharpOutputAssemblyFile(project.Value))
+//        .OrderBy(name => name);
+//    }
   }
 }

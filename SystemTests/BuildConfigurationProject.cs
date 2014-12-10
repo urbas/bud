@@ -12,13 +12,8 @@ namespace Bud.SystemTests {
   public class BuildConfigurationProject {
     [Test]
     public void Load_MUST_produce_the_build_assembly() {
-      using (var testProjectCopy = TestProjects.TemporaryCopy("BuildConfigurationProject")) {
-        var context = BuildLoading.Load(testProjectCopy.Path);
-        FileAssertions.AssertFileExists(Path.Combine(testProjectCopy.Path, ".bud", "Build.dll"));
-        Assert.AreEqual(
-          new [] { "Bar", "Foo" },
-          context.GetAllProjects().Keys.OrderBy(k => k)
-        );
+      using (var buildCommander = TestProjects.LoadBuildCommander("BuildConfigurationProject")) {
+        FileAssertions.AssertFileExists(Path.Combine(buildCommander.TemporaryDirectory.Path, ".bud", "Build.dll"));
       }
     }
   }
