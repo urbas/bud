@@ -41,7 +41,7 @@
   <ItemGroup>
     <Compile Include="ProjectWithoutConfiguration.cs" />
     <Compile Include="BuildConfigurationProject.cs" />
-    <Compile Include="ProjectWithDependency.cs" />
+    <Compile Include="InterProjectDependencies.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

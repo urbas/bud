@@ -43,6 +43,7 @@ namespace Bud.Plugins.BuildLoading
         Console.WriteLine("Build configuration file: " + buildConfigurationAssemblyFile);
         var appDomain = AppDomain.CreateDomain("BuildConfiguration");
         var buildDefinition = (IBuild)appDomain.CreateInstanceFrom(buildConfigurationAssemblyFile, "Build");
+        // TODO: Unload the AppDomain once we stopped using it (use IDisposable).
         return buildDefinition.GetSettings(dirOfProjectToBeBuilt);
       } else {
         return CSharp.CSharp.Project(Path.GetFileName(dirOfProjectToBeBuilt), dirOfProjectToBeBuilt);
