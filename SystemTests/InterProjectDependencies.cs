@@ -9,6 +9,7 @@ using Bud.Plugins.BuildLoading;
 using System;
 using Bud.Test.Util;
 using Bud.Commander;
+using System.IO;
 
 namespace Bud.SystemTests {
   public class InterProjectDependencies {
@@ -16,17 +17,15 @@ namespace Bud.SystemTests {
     public void compile_MUST_produce_the_executable() {
       using (var buildCommander = TestProjects.LoadBuildCommander("InterProjectDependencies")) {
         buildCommander.Evaluate(BuildKeys.Build);
-//        Console.WriteLine(context.GetAllProjects().Select(project => context.GetDependencies(project.Value)).Aggregate((lstA, lstB) => lstA.AddRange(lstB)).Aggregate("", (str, dep) => str + "; " + dep));
-//        FileAssertions.AssertFilesExist(CompiledAssemblyFiles(builder));
-//        Assert.AreEqual(2, CompiledAssemblyFiles(builder).Count());
+        FileAssertions.AssertFilesExist(new [] {
+          BuiltAssemblyPath(buildCommander, "A", ".dll"),
+          BuiltAssemblyPath(buildCommander, "B", ".exe")
+        });
       }
     }
 
-//    static System.Collections.Generic.IEnumerable<string> CompiledAssemblyFiles(TemporaryDirBuilder builder) {
-//      return context
-//        .GetAllProjects()
-//        .Select(project => context.GetCSharpOutputAssemblyFile(project.Value))
-//        .OrderBy(name => name);
-//    }
+    static string BuiltAssemblyPath(TemporaryDirBuildCommander buildCommander, string projectName, string extension) {
+      return Path.Combine(buildCommander.TemporaryDirectory.Path, projectName, ".bud", "output", ".net-4.5", "main", "debug", "bin", projectName + extension);
+    }
   }
 }

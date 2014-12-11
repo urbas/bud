@@ -28,12 +28,12 @@ namespace Bud.Plugins.BuildLoading {
         .Modify(CSharpKeys.SourceFiles.In(scope), (context, previousTask) => AddBuildDefinitionSourceFile(context, previousTask, scope))
         .Modify(CSharpKeys.OutputAssemblyDir.In(scope), (context, previousValue) => context.GetBaseDir(scope))
         .Modify(CSharpKeys.OutputAssemblyName.In(scope), (context, previousValue) => "Build")
-        .InitOrKeep(BuildLoadingKeys.CreateBuildCommander.In(scope), context => CreateBuildCommandInvoker(context, scope))
+        .InitOrKeep(BuildLoadingKeys.CreateBuildCommander.In(scope), context => CreateBuildCommander(context, scope))
         .Modify(CSharpKeys.AssemblyType.In(scope), prevValue => AssemblyType.Library)
         .Modify(CSharpKeys.CollectReferencedAssemblies.In(scope), async (context, assemblies) => (await assemblies()).AddRange(BudAssemblies.GetBudAssembliesLocations()));
     }
 
-    public async Task<IBuildCommander> CreateBuildCommandInvoker(EvaluationContext context, Scope scope) {
+    public async Task<IBuildCommander> CreateBuildCommander(EvaluationContext context, Scope scope) {
       var buildConfigSourceFile = context.GetBuildConfigSourceFile(scope);
       var dirOfProjectToBeBuilt = context.GetDirOfProjectToBeBuilt(scope);
       // TODO: Check if the BakedBuild.dll file exists. If it does, just load it.

@@ -68,6 +68,5 @@
   <ItemGroup>
     <Folder Include="testProjects\" />
     <Folder Include="testProjects\BuildConfigurationProject\.bud\" />
-    <Folder Include="testProjects\ProjectWithDependency\" />
   </ItemGroup>
 </Project>
