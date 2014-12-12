@@ -25,7 +25,6 @@ namespace Bud.Plugins.CSharp.Compiler {
           }
           monoCompilerProcess = monoCompilerProcess.AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(project)));
           monoCompilerProcess = monoCompilerProcess.AddArguments(sourceFiles);
-          Console.WriteLine(monoCompilerProcess.Arguments);
           var exitCode = monoCompilerProcess.Start(Console.Out, Console.Error);
           if (exitCode != 0) {
             throw new Exception("Compilation failed.");

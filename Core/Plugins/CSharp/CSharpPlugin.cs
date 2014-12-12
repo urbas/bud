@@ -7,6 +7,7 @@ using Bud.Plugins.Dependencies;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
+using System.Linq;
 using System;
 
 namespace Bud.Plugins.CSharp {
@@ -34,12 +35,11 @@ namespace Bud.Plugins.CSharp {
     }
 
     public static async Task<ImmutableList<string>> CollectAssembliesFromDependencies(EvaluationContext context, Scope currentProject) {
-      var dependencies = context.GetDependencies(currentProject);
       var collectedAssemblies = ImmutableList<string>.Empty;
+      var dependencies = context.GetScopeDependencies(currentProject);
+      await Task.WhenAll(dependencies.Select(dependency => context.CSharpBuild(dependency.Scope)));
       foreach (var dependency in dependencies) {
-        await context.CSharpBuild(dependency.Scope);
-        var dependencyAssemblyPath = context.GetCSharpOutputAssemblyFile(dependency.Scope);
-        collectedAssemblies = collectedAssemblies.Add(dependencyAssemblyPath);
+        collectedAssemblies = collectedAssemblies.Add(context.GetCSharpOutputAssemblyFile(dependency.Scope));
       }
       return collectedAssemblies;
     }

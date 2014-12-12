@@ -11,7 +11,7 @@ namespace Bud.Plugins.Dependencies {
 
     public Settings ApplyTo(Settings settings, Scope scope) {
       return settings
-        .InitOrKeep(DependenciesKeys.Dependencies.In(scope), ImmutableList<Dependency>.Empty);
+        .InitOrKeep(DependenciesKeys.Dependencies.In(scope), ImmutableList<IDependency>.Empty);
     }
 
   }
