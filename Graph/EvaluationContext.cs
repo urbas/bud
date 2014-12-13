@@ -19,6 +19,10 @@ namespace Bud {
       this.ScopesToValues = settingKeysToValues;
     }
 
+    public bool Exists(Scope scope) {
+      return ScopesToValues.ContainsKey(scope);
+    }
+
     public T Evaluate<T>(ConfigKey<T> key) {
       object value;
       if (configValues.TryGetValue(key, out value)) {

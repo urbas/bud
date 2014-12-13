@@ -12,7 +12,9 @@ namespace Bud.Plugins.Build {
     public Settings ApplyTo(Settings settings, Scope scope) {
       return settings
         .InitOrKeep(BuildKeys.Clean, TaskUtils.NoOpTask)
-        .InitOrKeep(BuildKeys.Build, TaskUtils.NoOpTask);
+        .InitOrKeep(BuildKeys.Build, TaskUtils.NoOpTask)
+        .InitOrKeep(BuildKeys.Build.In(scope), TaskUtils.NoOpTask)
+        .AddDependencies(BuildKeys.Build, BuildKeys.Build.In(scope));
     }
   }
 }

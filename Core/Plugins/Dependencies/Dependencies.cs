@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Immutable;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Bud.Plugins.Dependencies {
   public static class Dependencies {
@@ -20,6 +21,10 @@ namespace Bud.Plugins.Dependencies {
 
     public static IEnumerable<ScopeDependency> GetScopeDependencies(this EvaluationContext context, Scope inScope) {
       return context.GetDependencies(inScope).Where(dependency => dependency is ScopeDependency).OfType<ScopeDependency>();
+    }
+
+    public static Task<ImmutableList<IResolvedDependency>> ResolveDependencies(this EvaluationContext context, Scope inScope) {
+      return context.Evaluate(DependenciesKeys.ResolveDependencies.In(inScope));
     }
   }
 }

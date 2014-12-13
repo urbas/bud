@@ -10,6 +10,10 @@ namespace Bud.Plugins.Dependencies
       this.Scope = scopeOfDependency;
     }
 
+    public System.Threading.Tasks.Task<IResolvedDependency> Resolve(EvaluationContext context) {
+      return context.Evaluate(DependenciesKeys.ResolveScopeDependency.In(Scope));
+    }
+
     public override string ToString() {
       return string.Format("Dependency({0})", Scope);
     }

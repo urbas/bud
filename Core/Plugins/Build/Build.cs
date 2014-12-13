@@ -3,6 +3,10 @@ using System.Threading.Tasks;
 
 namespace Bud.Plugins.Build {
   public static class Build {
+    public static Task BuildScope(this EvaluationContext context, Scope scope) {
+      return context.Evaluate(BuildKeys.Build.In(scope));
+    }
+
     public static Task BuildAll(this EvaluationContext context) {
       return context.Evaluate(BuildKeys.Build);
     }
