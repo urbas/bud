@@ -75,9 +75,9 @@
     <Compile Include="Plugins\NuGet\NuGetDependency.cs" />
     <Compile Include="Plugins\Dependencies\IDependency.cs" />
     <Compile Include="Plugins\Dependencies\ScopeDependency.cs" />
-    <Compile Include="Plugins\NuGet\NuGet.cs" />
     <Compile Include="Plugins\Dependencies\IResolvedDependency.cs" />
     <Compile Include="Plugins\Dependencies\ResolvedScopeDependency.cs" />
+    <Compile Include="Plugins\NuGet\NuGetUtils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

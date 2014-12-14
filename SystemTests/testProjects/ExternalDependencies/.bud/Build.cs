@@ -6,6 +6,7 @@ using System;
 
 public class Build : IBuild {
   public Settings GetSettings(string baseDir) {
-    return CSharp.Project("Foo", baseDir).NeedsNuGet("Microsoft.Bcl.Immutable", "1.0.34");
+    return CSharp.Project("Foo", baseDir)
+      .NuGet("Microsoft.Bcl.Immutable", "1.0.34");
   }
 }

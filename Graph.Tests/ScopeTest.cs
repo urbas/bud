@@ -81,7 +81,7 @@ namespace Bud {
     }
 
     [Test]
-    public void Equals_MUST_return_different_has_codes_WHEN_the_keys_have_a_different_scope() {
+    public void GetHashCode_MUST_be_different_WHEN_the_scopes_are_not_equal() {
       Assert.AreNotEqual(scopeA.GetHashCode(), scopedScopeA.GetHashCode());
       Assert.AreNotEqual(configKeyA.GetHashCode(), scopedConfigKeyA.GetHashCode());
       Assert.AreNotEqual(taskKeyA.GetHashCode(), scopedTaskKeyA.GetHashCode());
