@@ -21,7 +21,8 @@ namespace Bud.Plugins.NuGet {
     }
 
     public Settings ApplyTo(Settings settings, Scope scope) {
-      return settings;
+      return settings
+        .InitOrKeep(NuGetKeys.NuGetDependencyResolver, context => new NuGetDependencyResolver());
     }
   }
 

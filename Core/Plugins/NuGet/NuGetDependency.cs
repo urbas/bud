@@ -1,4 +1,5 @@
 using Bud.Plugins.Dependencies;
+using System.Threading.Tasks;
 
 namespace Bud.Plugins.NuGet {
   public class NuGetDependency : IDependency {
@@ -10,8 +11,8 @@ namespace Bud.Plugins.NuGet {
       this.PackageName = packageName;
     }
 
-    public System.Threading.Tasks.Task<IResolvedDependency> Resolve(EvaluationContext context) {
-      throw new System.NotImplementedException();
+    public Task<IResolvedDependency> Resolve(EvaluationContext context) {
+      return (Task<IResolvedDependency>)context.GetNuGetDependencyResolver().Resolve(context, this);
     }
   }
 }

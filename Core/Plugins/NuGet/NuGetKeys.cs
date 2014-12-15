@@ -7,6 +7,7 @@ using Bud.Commander;
 
 namespace Bud.Plugins.NuGet {
   public static class NuGetKeys {
+    public static readonly ConfigKey<NuGetDependencyResolver> NuGetDependencyResolver = new ConfigKey<NuGetDependencyResolver>("NuGetDependencyResolver");
   }
 }
 
