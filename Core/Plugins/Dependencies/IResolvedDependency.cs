@@ -9,7 +9,7 @@ namespace Bud.Plugins.Dependencies
   public interface IResolvedDependency {
   }
 
-  public interface IResolvedDependency<TDependency> : IResolvedDependency
+  public interface IResolvedDependency<out TDependency> : IResolvedDependency
 	{
     TDependency Dependency { get; }
 	}

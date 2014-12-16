@@ -6,16 +6,17 @@ using System.IO;
 using Bud.Commander;
 using System.Threading.Tasks;
 using Bud.Plugins.Dependencies;
+using NuGet.Versioning;
 
 namespace Bud.Plugins.NuGet
 {
 	public class NuGetPackage
 	{
     public readonly string PackageName;
-    public readonly string PackageVersion;
+    public readonly NuGetVersion PackageVersion;
     public readonly string DllPath;
 
-    public NuGetPackage(string packageName, string packageVersion, string dllPath) {
+    public NuGetPackage(string packageName, NuGetVersion packageVersion, string dllPath) {
       this.DllPath = dllPath;
       this.PackageVersion = packageVersion;
       this.PackageName = packageName;
