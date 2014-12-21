@@ -9,6 +9,7 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
+using Bud.Plugins.NuGet;
 
 namespace Bud.Plugins.CSharp {
 
@@ -22,6 +23,7 @@ namespace Bud.Plugins.CSharp {
       return settings
         .Add(BuildPlugin.Instance)
         .Add(DependenciesPlugin.Instance)
+        .Add(NuGetPlugin.Instance)
         .InitOrKeep(CSharpKeys.Build.In(scope), ctxt => MonoCompiler.CompileProject(ctxt, scope))
         .InitOrKeep(CSharpKeys.SourceFiles.In(scope), context => FindSources(context, scope))
         .InitOrKeep(CSharpKeys.AssemblyType.In(scope), AssemblyType.Exe)

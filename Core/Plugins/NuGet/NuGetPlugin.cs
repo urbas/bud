@@ -1,16 +1,4 @@
-using System;
-using System.Linq;
-using Bud.Plugins;
-using System.Collections.Immutable;
-using Bud.Plugins.Projects;
-using Bud.Plugins.CSharp;
-using Bud.Plugins.Build;
-using System.IO;
-using System.Collections.Generic;
-using Bud;
-using System.Threading.Tasks;
-using System.Reflection;
-using Bud.Commander;
+using Bud.Plugins.Dependencies;
 
 namespace Bud.Plugins.NuGet {
   public class NuGetPlugin : IPlugin {
@@ -22,6 +10,7 @@ namespace Bud.Plugins.NuGet {
 
     public Settings ApplyTo(Settings settings, Scope scope) {
       return settings
+        .Add(DependenciesPlugin.Instance)
         .InitOrKeep(NuGetKeys.NuGetDependencyResolver, context => new NuGetDependencyResolver());
     }
   }
