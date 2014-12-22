@@ -19,10 +19,6 @@ namespace Bud.Plugins.Dependencies {
       return context.Evaluate(DependenciesKeys.Dependencies.In(inScope));
     }
 
-    public static IEnumerable<ScopeDependency> GetScopeDependencies(this EvaluationContext context, Scope inScope) {
-      return context.GetDependencies(inScope).Where(dependency => dependency is ScopeDependency).OfType<ScopeDependency>();
-    }
-
     public static Task<ImmutableList<IResolvedDependency>> ResolveDependencies(this EvaluationContext context, Scope inScope) {
       return context.Evaluate(DependenciesKeys.ResolveDependencies.In(inScope));
     }
