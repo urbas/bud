@@ -31,15 +31,9 @@ namespace Bud {
     public void GetPackage_MUST_put_it_into_the_right_place() {
       //ID of the package to be looked up
       string packageID = "EntityFramework";
-
-      //Connect to the official package repository
       IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository("http://packages.nuget.org/api/v2");
-
-      //Initialize the package manager
-      string path = ".";
-      PackageManager packageManager = new PackageManager(repo, path);
-
-      //Download and unzip the package
+      PackageManager packageManager = new PackageManager(repo, ".");
+      packageManager.PackageInstalled += (object sender, PackageOperationEventArgs e) => Console.WriteLine("Package installed: " + e);
       packageManager.InstallPackage(packageID, SemanticVersion.Parse("5.0.0"));
     }
   }
