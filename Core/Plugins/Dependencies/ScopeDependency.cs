@@ -1,8 +1,9 @@
 using System;
+using System.Threading.Tasks;
 
 namespace Bud.Plugins.Dependencies
 {
-  public class ScopeDependency : IDependency
+  public class ScopeDependency
   {
     public readonly Scope Scope;
 
@@ -10,7 +11,7 @@ namespace Bud.Plugins.Dependencies
       this.Scope = scopeOfDependency;
     }
 
-    public System.Threading.Tasks.Task<IResolvedDependency> Resolve(EvaluationContext context) {
+    public Task<ResolvedScopeDependency> Resolve(EvaluationContext context) {
       return context.Evaluate(DependenciesKeys.ResolveScopeDependency.In(Scope));
     }
 

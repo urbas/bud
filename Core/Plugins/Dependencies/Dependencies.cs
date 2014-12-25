@@ -11,16 +11,16 @@ namespace Bud.Plugins.Dependencies {
       return dependent.Needs(new ScopeDependency(dependency.CurrentScope));
     }
 
-    public static Settings Needs(this Settings dependent, IDependency dependency) {
-      return dependent.Modify(DependenciesKeys.Dependencies.In(dependent.CurrentScope), dependencies => dependencies.Add(dependency));
+    public static Settings Needs(this Settings dependent, ScopeDependency dependency) {
+      return dependent.Modify(DependenciesKeys.ScopeDependencies.In(dependent.CurrentScope), dependencies => dependencies.Add(dependency));
     }
 
-    public static ImmutableList<IDependency> GetDependencies(this EvaluationContext context, Scope inScope) {
-      return context.Evaluate(DependenciesKeys.Dependencies.In(inScope));
+    public static ImmutableList<ScopeDependency> GetDependencies(this EvaluationContext context, Scope inScope) {
+      return context.Evaluate(DependenciesKeys.ScopeDependencies.In(inScope));
     }
 
-    public static Task<ImmutableList<IResolvedDependency>> ResolveDependencies(this EvaluationContext context, Scope inScope) {
-      return context.Evaluate(DependenciesKeys.ResolveDependencies.In(inScope));
+    public static Task<ImmutableList<ResolvedScopeDependency>> ResolveDependencies(this EvaluationContext context, Scope inScope) {
+      return context.Evaluate(DependenciesKeys.ResolveScopeDependencies.In(inScope));
     }
   }
 }

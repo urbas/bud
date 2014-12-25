@@ -41,9 +41,6 @@
     <Reference Include="NuGet.Core">
       <HintPath>..\packages\Nuget.Core.2.8.3\lib\net40-Client\NuGet.Core.dll</HintPath>
     </Reference>
-    <Reference Include="NuGet.Versioning">
-      <HintPath>..\packages\NuGet.Versioning.1.0.4\lib\portable-net40+win\NuGet.Versioning.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.6.0.7\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -65,7 +62,6 @@
     <Compile Include="Plugins\Build\Build.cs" />
     <Compile Include="Plugins\Dependencies\DependenciesKeys.cs" />
     <Compile Include="Plugins\Dependencies\Dependencies.cs" />
-    <Compile Include="Plugins\Dependencies\DependencySource.cs" />
     <Compile Include="Plugins\BuildLoading\BuildLoading.cs" />
     <Compile Include="Plugins\CSharp\CSharp.cs" />
     <Compile Include="Plugins\CSharp\CSharpKeys.cs" />
@@ -85,14 +81,9 @@
     <Compile Include="Plugins\NuGet\NuGetPlugin.cs" />
     <Compile Include="Plugins\NuGet\NuGetKeys.cs" />
     <Compile Include="Plugins\NuGet\NuGetDependency.cs" />
-    <Compile Include="Plugins\Dependencies\IDependency.cs" />
     <Compile Include="Plugins\Dependencies\ScopeDependency.cs" />
-    <Compile Include="Plugins\Dependencies\IResolvedDependency.cs" />
     <Compile Include="Plugins\Dependencies\ResolvedScopeDependency.cs" />
     <Compile Include="Plugins\NuGet\NuGetUtils.cs" />
-    <Compile Include="Plugins\NuGet\NuGetDependencyResolver.cs" />
-    <Compile Include="Plugins\NuGet\NuGetResolvedDependency.cs" />
-    <Compile Include="Plugins\NuGet\NuGetPackage.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

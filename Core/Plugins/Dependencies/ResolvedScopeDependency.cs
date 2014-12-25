@@ -5,7 +5,7 @@ using Bud.Plugins.Build;
 
 namespace Bud.Plugins.Dependencies
 {
-  public class ResolvedScopeDependency : IResolvedDependency<Scope>
+  public class ResolvedScopeDependency
 	{
     public ResolvedScopeDependency(Scope scope) {
       Dependency = scope;

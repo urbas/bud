@@ -1,4 +1,9 @@
-using Bud.Plugins.Dependencies;
+using System.Collections.Immutable;
+using System.Threading.Tasks;
+using NuGet;
+using Bud.Plugins.Build;
+using System.IO;
+using System;
 
 namespace Bud.Plugins.NuGet {
   public class NuGetPlugin : IPlugin {
@@ -10,8 +15,33 @@ namespace Bud.Plugins.NuGet {
 
     public Settings ApplyTo(Settings settings, Scope scope) {
       return settings
-        .Add(DependenciesPlugin.Instance)
-        .InitOrKeep(NuGetKeys.NuGetDependencyResolver, context => new NuGetDependencyResolver());
+        .InitOrKeep(NuGetKeys.ScopesWithNuGetDependencies, ImmutableList<Scope>.Empty)
+        .InitOrKeep(NuGetKeys.NuGetRepositoryDir, context => Path.Combine(context.GetBudDir(scope), "nuGetRepository"))
+        .InitOrKeep(NuGetKeys.ResolveNuGetDependencies, ResolveNuGetDependenciesImpl)
+        .InitOrKeep(NuGetKeys.NuGetDependencies.In(scope), ImmutableList<NuGetDependency>.Empty)
+        .Modify(NuGetKeys.ScopesWithNuGetDependencies, (context, oldValue) => oldValue.Add(scope));
+    }
+
+    public static Task<ImmutableDictionary<string, IPackage>> ResolveNuGetDependenciesImpl(EvaluationContext context) {
+      return Task.Run(() => {
+        var dependencies = context.GetNuGetDependencies();
+        var nuGetRepositoryDir = context.GetNuGetRepositoryDir();
+        var resolvedDependencies = ImmutableDictionary.CreateBuilder<string, IPackage>();
+
+        IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository("http://packages.nuget.org/api/v2");
+        PackageManager packageManager = new PackageManager(repo, nuGetRepositoryDir);
+
+        packageManager.PackageInstalled += (object sender, PackageOperationEventArgs e) => {
+          Console.WriteLine("Package installed: " + e);
+          resolvedDependencies.Add(e.Package.Id, e.Package);
+        };
+
+        foreach (var dependency in dependencies) {
+          packageManager.InstallPackage(dependency.PackageName, dependency.PackageVersion);
+        }
+
+        return resolvedDependencies.ToImmutable();
+      });
     }
   }
 
