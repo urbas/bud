@@ -16,7 +16,7 @@ namespace Bud.Commander {
       settings = build.GetSettings(baseDirectory);
     }
 
-    public string Evaluate(string command) {
+    public Evaluation Evaluate(string command) {
       return CommandEvaluator.Evaluate(settings, command);
     }
 

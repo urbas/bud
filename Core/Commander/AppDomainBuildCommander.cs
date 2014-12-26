@@ -17,7 +17,7 @@ namespace Bud.Commander {
       assemblyBuildCommander.LoadBuildConfiguration(buildConfigurationAssemblyFile, dirOfProjectToBeBuilt);
     }
 
-    public string Evaluate(string command) {
+    public Evaluation Evaluate(string command) {
       return assemblyBuildCommander.Evaluate(command);
     }
 

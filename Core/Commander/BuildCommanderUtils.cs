@@ -9,7 +9,9 @@ using Bud.Plugins.BuildLoading;
 namespace Bud.Commander {
   public static class BuildCommanderUtils {
     public static string Evaluate(this IBuildCommander budCommander, Scope scope) {
-      return budCommander.Evaluate(scope.ToString());
+      var evaluation = budCommander.Evaluate(scope.ToString());
+      evaluation.Result.Wait();
+      return evaluation.Result.Result;
     }
   }
 }

@@ -12,17 +12,20 @@ using System.Threading.Tasks;
 using System.Reflection;
 using Bud.Commander;
 
-namespace Bud.Commander
-{
+namespace Bud.Commander {
   public static class CommandEvaluator {
-    public static string Evaluate(Settings settings, string command) {
+    public static Evaluation Evaluate(Settings settings, string command) {
+      Scope scopeToEvaluate;
       if (BuildKeys.Build.ToString().Equals(command)) {
-        EvaluationContext.FromSettings(settings).BuildAll().Wait();
+        scopeToEvaluate = BuildKeys.Build;
+      } else {
+        scopeToEvaluate = BuildKeys.Clean;
       }
-      else {
-        EvaluationContext.FromSettings(settings).CleanAll().Wait();
-      }
-      return string.Empty;
+      var evaluationContext = EvaluationContext.FromSettings(settings);
+      var evaluationResult = evaluationContext
+        .Evaluate(scopeToEvaluate)
+        .ContinueWith(t => evaluationContext.GetOutputOf(scopeToEvaluate));
+      return new Evaluation(evaluationResult);
     }
   }
 }

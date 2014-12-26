@@ -8,6 +8,6 @@ using Bud.Plugins.BuildLoading;
 
 namespace Bud.Commander {
   public interface IBuildCommander : IDisposable {
-    string Evaluate(string command);
+    Evaluation Evaluate(string command);
   }
 }

@@ -3,9 +3,10 @@ using System.Collections.Immutable;
 using Bud.SettingsConstruction;
 using Bud.SettingsConstruction.Ops;
 using System.Text;
+using System;
 
 namespace Bud {
-  public class Scope {
+  public class Scope : MarshalByRefObject {
     public static readonly Scope Global = new Scope("Global", null);
     public readonly Scope Parent;
     public readonly string Id;

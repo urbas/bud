@@ -14,6 +14,8 @@ namespace Bud {
     private readonly Dictionary<Scope, object> configValues = new Dictionary<Scope, object>();
     private readonly Dictionary<TaskKey, Task> taskValues = new Dictionary<TaskKey, Task>();
     private readonly Dictionary<ITaskDefinition, Task> modifiedTaskValues = new Dictionary<ITaskDefinition, Task>();
+    private readonly EvaluationLogger evaluationLogger = new EvaluationLogger();
+    private readonly Dictionary<Scope, string> scopeToOutput = new Dictionary<Scope, string>();
 
     private EvaluationContext(IDictionary<Scope, IValueDefinition> settingKeysToValues) {
       this.ScopesToValues = settingKeysToValues;
@@ -56,6 +58,10 @@ namespace Bud {
         modifiedTaskValues.Add(overwrittenTaskDef, freshEvaluation);
         return freshEvaluation;
       }
+    }
+
+    public string GetOutputOf(Scope scope) {
+      return scopeToOutput[scope];
     }
 
     public static EvaluationContext FromSettings(Settings settings) {
