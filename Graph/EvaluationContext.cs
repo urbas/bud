@@ -25,6 +25,14 @@ namespace Bud {
       return ScopesToValues.ContainsKey(scope);
     }
 
+    public Task Evaluate(Scope scope) {
+      if (scope is TaskKey) {
+        return Evaluate((TaskKey)scope);
+      } else {
+        return Task.FromResult(Evaluate<object>((ConfigKey<object>)scope));
+      }
+    }
+
     public T Evaluate<T>(ConfigKey<T> key) {
       object value;
       if (configValues.TryGetValue(key, out value)) {

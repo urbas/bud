@@ -8,8 +8,12 @@ namespace Bud.SettingsConstruction {
       this.ConfigValue = configValue;
     }
 
-    public T Evaluate(EvaluationContext buildConfiguration) {
-      return ConfigValue(buildConfiguration);
+    object IValueDefinition.Evaluate(EvaluationContext context) {
+      return Evaluate(context);
+    }
+
+    public T Evaluate(EvaluationContext context) {
+      return ConfigValue(context);
     }
   }
 }

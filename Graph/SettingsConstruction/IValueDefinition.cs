@@ -1,6 +1,8 @@
 ﻿using System;
 
 namespace Bud {
-  public interface IValueDefinition { }
+  public interface IValueDefinition {
+    object Evaluate(EvaluationContext context);
+  }
 }
 

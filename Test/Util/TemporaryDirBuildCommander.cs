@@ -14,7 +14,7 @@ namespace Bud.Test.Util {
       this.BuildCommander = BuildLoading.Load(TemporaryDirectory.Path);
     }
 
-    public string Evaluate(string command) {
+    public Evaluation Evaluate(string command) {
       return BuildCommander.Evaluate(command);
     }
 

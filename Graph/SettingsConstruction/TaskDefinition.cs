@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Bud.SettingsConstruction {
   public interface ITaskDefinition : IValueDefinition {
-    Task Evaluate(EvaluationContext buildConfiguration);
+    new Task Evaluate(EvaluationContext buildConfiguration);
   }
 
   public class TaskDefinition<T> : ITaskDefinition {
@@ -22,6 +22,10 @@ namespace Bud.SettingsConstruction {
 
     public TaskDefinition<T> WithDependencies(IEnumerable<TaskKey> newDependencies) {
       return new TaskDefinition<T>(TaskFunction, Dependencies.Union(newDependencies));
+    }
+
+    object IValueDefinition.Evaluate(EvaluationContext context) {
+      return Evaluate(context);
     }
 
     Task ITaskDefinition.Evaluate(EvaluationContext context) {
