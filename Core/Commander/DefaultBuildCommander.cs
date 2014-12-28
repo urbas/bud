@@ -9,7 +9,7 @@ namespace Bud.Commander {
       settings = CSharp.Project(Path.GetFileName(dirOfProjectToBeBuilt), dirOfProjectToBeBuilt);
     }
 
-    public Evaluation Evaluate(string command) {
+    public object Evaluate(string command) {
       return CommandEvaluator.Evaluate(settings, command);
     }
 
