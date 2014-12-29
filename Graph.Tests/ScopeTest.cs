@@ -89,14 +89,14 @@ namespace Bud {
 
     [Test]
     public void ToString_MUST_return_the_id_of_the_key_WHEN_its_scope_is_global() {
-      Assert.AreEqual("Global:A", scopeA.ToString());
+      Assert.AreEqual(":A", scopeA.ToString());
     }
 
     [Test]
     public void ToString_MUST_return_the_id_and_the_ids_of_scopes_WHEN_the_key_is_nested_in_multiple_scopes() {
       var deeplyNestedKey = taskKeyA
         .In(new TaskKey<uint>("E").In(new Scope("D").In(new Scope("foo").In(new ConfigKey<bool>("C").In(configKeyB)))));
-      Assert.AreEqual("Global:B:C:foo:D:E:A", deeplyNestedKey.ToString());
+      Assert.AreEqual(":B:C:foo:D:E:A", deeplyNestedKey.ToString());
     }
 
     [Test]
@@ -143,6 +143,48 @@ namespace Bud {
       );
     }
 
+    [Test]
+    [ExpectedException(typeof(ArgumentException))]
+    public void Parse_MUST_throw_an_exception_WHEN_given_an_empty_string() {
+      Scope.Parse(String.Empty);
+    }
+
+    [Test]
+    public void Parse_MUST_return_the_global_scope() {
+      var parsedScope = Scope.Parse(":");
+      Assert.AreEqual(Scope.Global, parsedScope);
+    }
+
+    [Test]
+    public void Parse_MUST_a_child_scope_of_the_global_scope() {
+      var parsedScope = Scope.Parse("child");
+      Assert.AreEqual(new Scope("child"), parsedScope);
+    }
+
+    [Test]
+    public void Parse_MUST_a_child_scope_of_the_global_scope_WHEN_prefixed_with_the_global_colon() {
+      var parsedScope = Scope.Parse(":child");
+      Assert.AreEqual(new Scope("child"), parsedScope);
+    }
+
+    [Test]
+    public void Parse_MUST_return_a_chain_of_scopes() {
+      var parsedScope = Scope.Parse("parent:child");
+      Assert.AreEqual(new Scope("child").In(new Scope("parent")), parsedScope);
+    }
+
+    [Test]
+    public void Parse_MUST_return_a_chain_of_scopes_WHEN_prefixed_with_the_global_colon() {
+      var parsedScope = Scope.Parse(":parent:child");
+      Assert.AreEqual(new Scope("child").In(new Scope("parent")), parsedScope);
+    }
+
+    [Test]
+    public void Parse_MUST_perform_the_inverse_of_ToString() {
+      var deeplyNestedKey = taskKeyA.In(new TaskKey<uint>("E").In(new Scope("D").In(new Scope("foo").In(new ConfigKey<bool>("C").In(configKeyB)))));
+      Assert.AreEqual(deeplyNestedKey, Scope.Parse(deeplyNestedKey.ToString()));
+      Assert.AreEqual(":B:C:foo:D:E:A", Scope.Parse(":B:C:foo:D:E:A").ToString());
+    }
   }
 }
 

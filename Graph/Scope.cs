@@ -8,6 +8,8 @@ using System;
 namespace Bud {
   public class Scope : MarshalByRefObject {
     public static readonly Scope Global = new Scope("Global", null);
+    public const char ScopeSeparator = ':';
+    private static readonly char[] ScopeSplitter = new char[] {ScopeSeparator};
     public readonly Scope Parent;
     public readonly string Id;
     private readonly int depth;
@@ -43,6 +45,18 @@ namespace Bud {
       }
     }
 
+    public static Scope Parse(string scope) {
+      if (string.IsNullOrEmpty(scope)) {
+        throw new ArgumentException("Could not parse an empty string. An empty string is not a valid scope.");
+      }
+      var scopeIdChain = scope.Split(ScopeSplitter, StringSplitOptions.RemoveEmptyEntries);
+      Scope parsedScope = Global;
+      foreach (var scopeId in scopeIdChain) {
+        parsedScope = new Scope(scopeId, parsedScope);
+      }
+      return parsedScope;
+    }
+
     public bool Equals(Scope otherScope) {
       if (ReferenceEquals(this, otherScope)) {
         return true;
@@ -72,7 +86,7 @@ namespace Bud {
     }
 
     private StringBuilder AppendAsString(StringBuilder stringBuilder) {
-      return IsGlobal ? stringBuilder.Append(Id) : Parent.AppendAsString(stringBuilder).Append(':').Append(Id);
+      return IsGlobal ? stringBuilder : Parent.AppendAsString(stringBuilder).Append(':').Append(Id);
     }
   }
 }
