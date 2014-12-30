@@ -12,7 +12,7 @@ namespace Bud {
     // TODO: Assign sequential indices to keys and use arrays to access evaluated values (instead of dictionaries).
     // TODO: Consider using concurrent dictionaries here (so that people can access the execution context and evaluate tasks from different threads).
     private readonly Dictionary<Scope, object> configValues = new Dictionary<Scope, object>();
-    private readonly Dictionary<TaskKey, Task> taskValues = new Dictionary<TaskKey, Task>();
+    private readonly Dictionary<Scope, Task> taskValues = new Dictionary<Scope, Task>();
     private readonly Dictionary<ITaskDefinition, Task> modifiedTaskValues = new Dictionary<ITaskDefinition, Task>();
     private readonly Dictionary<Scope, object> scopeToOutput = new Dictionary<Scope, object>();
 
@@ -25,11 +25,38 @@ namespace Bud {
     }
 
     public Task Evaluate(Scope scope) {
-      if (scope is TaskKey) {
-        return Evaluate((TaskKey)scope);
-      } else {
-        return Task.FromResult(Evaluate<object>((ConfigKey<object>)scope));
+      Task task;
+      if (taskValues.TryGetValue(scope, out task)) {
+        return task;
       }
+
+      object value;
+      if (configValues.TryGetValue(scope, out value)) {
+        return Task.FromResult(value);
+      }
+
+      if (TryEvaluateAndCacheValue(scope, out value)) {
+        return (value as Task) ?? Task.FromResult(value);
+      }
+
+      throw new ArgumentException(string.Format("Could not evaluate scope '{0}'. The value for this scope was not defined.", scope));
+    }
+
+    private bool TryEvaluateAndCacheValue(Scope taskScope, out object value) {
+      IValueDefinition valueDefinition;
+      if (ScopesToValues.TryGetValue(taskScope, out valueDefinition)) {
+        if (valueDefinition is ITaskDefinition) {
+          Task taskValue = ((ITaskDefinition)valueDefinition).Evaluate(this);
+          value = taskValue;
+          taskValues.Add(taskScope, taskValue);
+        } else {
+          value = valueDefinition.Evaluate(this);
+          configValues.Add(taskScope, value);
+        }
+        return true;
+      }
+      value = null;
+      return false;
     }
 
     public T Evaluate<T>(ConfigKey<T> key) {
