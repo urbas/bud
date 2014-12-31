@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Bud.SettingsConstruction {
-  public interface ITaskDefinition : IValueDefinition {
-    new Task Evaluate(EvaluationContext buildConfiguration);
+  public interface ITaskDefinition {
+    Task Evaluate(ITaskEvaluator buildConfiguration);
   }
 
   public class TaskDefinition<T> : ITaskDefinition {
@@ -22,10 +22,6 @@ namespace Bud.SettingsConstruction {
 
     public TaskDefinition<T> WithDependencies(IEnumerable<TaskKey> newDependencies) {
       return new TaskDefinition<T>(TaskFunction, Dependencies.Union(newDependencies));
-    }
-
-    object IValueDefinition.Evaluate(EvaluationContext context) {
-      return Evaluate(context);
     }
 
     Task ITaskDefinition.Evaluate(EvaluationContext context) {

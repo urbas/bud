@@ -44,7 +44,6 @@
     <Compile Include="TaskKey.cs" />
     <Compile Include="Unit.cs" />
     <Compile Include="SettingsConstruction\ConfigDefinition.cs" />
-    <Compile Include="SettingsConstruction\IValueDefinition.cs" />
     <Compile Include="SettingsConstruction\Ops\AddDependencies.cs" />
     <Compile Include="SettingsConstruction\Ops\EnsureConfigInitialized.cs" />
     <Compile Include="SettingsConstruction\Ops\EnsureTaskInitialized.cs" />

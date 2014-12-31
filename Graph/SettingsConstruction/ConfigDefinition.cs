@@ -1,7 +1,9 @@
 ﻿using System;
 
 namespace Bud.SettingsConstruction {
-  public interface IConfigDefinition : IValueDefinition {}
+  public interface IConfigDefinition {
+    object Evaluate(IConfiguration context);
+  }
 
   public class ConfigDefinition<T> : IConfigDefinition {
     public readonly Func<EvaluationContext, T> ConfigValue;
@@ -10,11 +12,11 @@ namespace Bud.SettingsConstruction {
       this.ConfigValue = configValue;
     }
 
-    object IValueDefinition.Evaluate(EvaluationContext context) {
+    object IConfigDefinition.Evaluate(IConfiguration context) {
       return Evaluate(context);
     }
 
-    public T Evaluate(EvaluationContext context) {
+    public T Evaluate(IConfiguration context) {
       return ConfigValue(context);
     }
   }
