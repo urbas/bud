@@ -12,6 +12,8 @@ namespace Bud {
     ImmutableDictionary<Scope, ITaskDefinition> TaskDefinitions { get; }
     bool IsTaskDefined(Scope scope);
     Task<T> Evaluate<T>(TaskKey<T> scope);
+    Task EvaluateTask(Scope scope);
+    Task EvaluateScope(Scope scope);
   }
 
   // TODO: Make this class thread-safe.
@@ -77,7 +79,7 @@ namespace Bud {
       return new EvaluationContext(settings.Compile());
     }
 
-    protected Task EvaluateTask(Scope scope) {
+    public Task EvaluateTask(Scope scope) {
       Task value;
       if (taskValues.TryGetValue(scope, out value)) {
         return value;
