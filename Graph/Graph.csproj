@@ -43,21 +43,21 @@
     <Compile Include="Settings.cs" />
     <Compile Include="TaskKey.cs" />
     <Compile Include="Unit.cs" />
-    <Compile Include="SettingsConstruction\ConfigDefinition.cs" />
-    <Compile Include="SettingsConstruction\Ops\AddDependencies.cs" />
-    <Compile Include="SettingsConstruction\Ops\InitializeConfig.cs" />
-    <Compile Include="SettingsConstruction\Ops\InitializeTask.cs" />
-    <Compile Include="SettingsConstruction\Ops\ModifyConfig.cs" />
-    <Compile Include="SettingsConstruction\Ops\ModifyTask.cs" />
-    <Compile Include="SettingsConstruction\TaskDefinition.cs" />
     <Compile Include="Util\TaskUtils.cs" />
     <Compile Include="IPlugin.cs" />
-    <Compile Include="SettingsConstruction\Ops\TaskDefinitionConstructor.cs" />
-    <Compile Include="SettingsConstruction\Ops\ConfigDefinitionConstructor.cs" />
     <Compile Include="Plugin.cs" />
     <Compile Include="ScopeDefinitions.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="PluginUtils.cs" />
+    <Compile Include="SettingsConstruction\AddDependencies.cs" />
+    <Compile Include="SettingsConstruction\ConfigDefinitionConstructor.cs" />
+    <Compile Include="SettingsConstruction\InitializeConfig.cs" />
+    <Compile Include="SettingsConstruction\InitializeTask.cs" />
+    <Compile Include="SettingsConstruction\ModifyConfig.cs" />
+    <Compile Include="SettingsConstruction\ModifyTask.cs" />
+    <Compile Include="SettingsConstruction\TaskDefinitionConstructor.cs" />
+    <Compile Include="ConfigDefinition.cs" />
+    <Compile Include="TaskDefinition.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

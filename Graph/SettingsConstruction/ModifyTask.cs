@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 
-namespace Bud.SettingsConstruction.Ops {
+namespace Bud.SettingsConstruction {
   public class ModifyTask<T> : TaskDefinitionConstructor {
     public Func<EvaluationContext, Func<Task<T>>, Task<T>> TaskModification;
 

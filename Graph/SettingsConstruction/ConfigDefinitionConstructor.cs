@@ -2,7 +2,7 @@
 using Bud.SettingsConstruction;
 using System.Collections.Immutable;
 
-namespace Bud {
+namespace Bud.SettingsConstruction {
   public abstract class ConfigDefinitionConstructor {
     public readonly ConfigKey Key;
 

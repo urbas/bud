@@ -1,7 +1,6 @@
 using System.IO;
 using System.Collections.Immutable;
 using Bud.SettingsConstruction;
-using Bud.SettingsConstruction.Ops;
 using System.Text;
 using System;
 
@@ -15,8 +14,7 @@ namespace Bud {
     private readonly int depth;
     private readonly int hash;
 
-    public Scope(string id) : this(id, Global) {
-    }
+    public Scope(string id) : this(id, Global) {}
 
     public Scope(string id, Scope parent) {
       Parent = parent ?? this;
@@ -27,9 +25,7 @@ namespace Bud {
       }
     }
 
-    public bool IsGlobal {
-      get { return this == Parent; }
-    }
+    public bool IsGlobal { get { return this == Parent; } }
 
     public Scope In(Scope parent) {
       return Concat(parent, this);

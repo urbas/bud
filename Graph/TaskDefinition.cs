@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Bud.SettingsConstruction {
+namespace Bud {
 
   public interface ITaskDefinition {
     Task Evaluate(EvaluationContext context);

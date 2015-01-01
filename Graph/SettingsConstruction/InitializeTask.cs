@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 
-namespace Bud.SettingsConstruction.Ops {
+namespace Bud.SettingsConstruction {
   public class InitializeTask<T> : TaskDefinitionConstructor {
     public Func<EvaluationContext, Task<T>> InitialValue;
 

@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.Collections.Generic;
 
-namespace Bud.SettingsConstruction.Ops {
+namespace Bud.SettingsConstruction {
   public class AddDependencies<T> : TaskDefinitionConstructor {
     private IEnumerable<TaskKey> extraDependencies;
 

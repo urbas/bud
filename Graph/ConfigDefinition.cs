@@ -1,6 +1,7 @@
 ﻿using System;
 
-namespace Bud.SettingsConstruction {
+namespace Bud {
+
   public interface IConfigDefinition {
     object Evaluate(Configuration context);
   }

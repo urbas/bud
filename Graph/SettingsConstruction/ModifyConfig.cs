@@ -2,7 +2,7 @@ using System;
 using System.Collections.Immutable;
 using Bud;
 
-namespace Bud.SettingsConstruction.Ops {
+namespace Bud.SettingsConstruction {
   public class ModifyConfig<T> : ConfigDefinitionConstructor {
     Func<Configuration, T, T> ValueModifier;
 

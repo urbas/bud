@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 
-namespace Bud.SettingsConstruction.Ops {
+namespace Bud.SettingsConstruction {
   public class InitializeConfig<T> : ConfigDefinitionConstructor {
     public Func<Configuration, T> InitialValue;
 

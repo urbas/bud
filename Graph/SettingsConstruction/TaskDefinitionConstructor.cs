@@ -1,8 +1,7 @@
 ﻿using System;
-using Bud.SettingsConstruction;
 using System.Collections.Immutable;
 
-namespace Bud {
+namespace Bud.SettingsConstruction {
   public abstract class TaskDefinitionConstructor {
     public readonly TaskKey Key;
 
