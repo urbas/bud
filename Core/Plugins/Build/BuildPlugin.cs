@@ -6,8 +6,7 @@ namespace Bud.Plugins.Build {
   public class BuildPlugin : IPlugin {
     public static readonly BuildPlugin Instance = new BuildPlugin();
 
-    private BuildPlugin() {
-    }
+    private BuildPlugin() {}
 
     public Settings ApplyTo(Settings settings, Scope scope) {
       return settings

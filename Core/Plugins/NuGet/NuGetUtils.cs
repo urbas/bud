@@ -11,10 +11,6 @@ using NuGet;
 
 namespace Bud.Plugins.NuGet {
   public static class NuGetUtils {
-    public static Settings NuGet(this Settings dependent, string packageName, string packageVersion) {
-      return dependent.Modify(NuGetKeys.NuGetDependencies.In(dependent.CurrentScope), dependencies => dependencies.Add(new NuGetDependency(packageName, packageVersion)));
-    }
-    
     public static string GetNuGetRepositoryDir(this EvaluationContext context) {
       return context.Evaluate(NuGetKeys.NuGetRepositoryDir);
     }

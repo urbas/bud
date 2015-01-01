@@ -1,20 +1,25 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using Bud.Plugins.Build;
+using Bud.Plugins.Projects;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Bud.Plugins.CSharp {
   public static class CSharp {
-    public static Settings Project(string id, string baseDir) {
-      return Bud.Plugins.Projects.Project.New(id, baseDir)
-        .Add(CSharpPlugin.Instance);
+    public static Settings CSharpProject(this Settings build, string id, string baseDir, IPlugin plugin = null) {
+      return build
+        .AddProject(id, baseDir, CSharpPlugin.Instance.With(plugin));
     }
 
-    public static Settings LibraryProject(string id, string baseDir) {
-      var project = Project(id, baseDir);
-      return project.Modify(CSharpKeys.AssemblyType.In(project.CurrentScope), assemblyType => AssemblyType.Library);
+    public static Settings LibraryProject(this Settings build, string id, string baseDir) {
+      return build.CSharpProject(id, baseDir, Plugin.Create(SetLibraryAssemblyType));
+    }
+
+    public static Settings SetLibraryAssemblyType(Settings existingSettings, Scope scope) {
+      return existingSettings.Modify(CSharpKeys.AssemblyType.In(scope), assemblyType => AssemblyType.Library);
     }
 
     public static string GetCSharpSourceDir(this EvaluationContext context, Scope project) {

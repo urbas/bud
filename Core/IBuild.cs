@@ -8,7 +8,7 @@ using Bud.Plugins.BuildLoading;
 
 namespace Bud {
   public interface IBuild {
-    Settings GetSettings(string baseDir);
+    Settings SetUp(Settings build, string baseDir);
   }
 }
 

@@ -7,37 +7,40 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace Bud {
+
+  public delegate Settings SettingApplication(Settings existingSettings, Scope toScope);
+
   public class Settings {
     public static readonly Settings Empty = new Settings();
 
-    public readonly Scope CurrentScope;
     public readonly ImmutableList<ConfigDefinitionConstructor> ConfigConstructors;
     public readonly ImmutableList<TaskDefinitionConstructor> TaskConstructors;
 
     public Settings() : this(ImmutableList<ConfigDefinitionConstructor>.Empty, ImmutableList<TaskDefinitionConstructor>.Empty) {}
 
-    public Settings(ImmutableList<ConfigDefinitionConstructor> configConstructors, ImmutableList<TaskDefinitionConstructor> taskConstructors) : this(configConstructors, taskConstructors, Scope.Global) {    }
-
-    public Settings(ImmutableList<ConfigDefinitionConstructor> configConstructors, ImmutableList<TaskDefinitionConstructor> taskConstructors, Scope currentScope) {
+    public Settings(ImmutableList<ConfigDefinitionConstructor> configConstructors, ImmutableList<TaskDefinitionConstructor> taskConstructors) {
       this.ConfigConstructors = configConstructors;
       this.TaskConstructors = taskConstructors;
-      this.CurrentScope = currentScope;
     }
 
     public Settings Add(ConfigDefinitionConstructor configConstructor) {
-      return new Settings(ConfigConstructors.Add(configConstructor), TaskConstructors, CurrentScope);
+      return new Settings(ConfigConstructors.Add(configConstructor), TaskConstructors);
     }
 
     public Settings Add(TaskDefinitionConstructor taskConstructor) {
-      return new Settings(ConfigConstructors, TaskConstructors.Add(taskConstructor), CurrentScope);
+      return new Settings(ConfigConstructors, TaskConstructors.Add(taskConstructor));
     }
 
     public Settings Add(Settings settings) {
       return new Settings(ConfigConstructors.AddRange(settings.ConfigConstructors), TaskConstructors.AddRange(settings.TaskConstructors));
     }
 
-    public Settings Add(IPlugin plugin) {
-      return plugin.ApplyTo(this, CurrentScope);
+    public Settings ApplyGlobally(IPlugin plugin) {
+      return plugin.ApplyTo(this, Scope.Global);
+    }
+
+    public Settings Apply(Scope toScope, IPlugin plugin) {
+      return plugin.ApplyTo(this, toScope);
     }
 
     public Settings Init<T>(ConfigKey<T> key, T initialValue) {
@@ -86,13 +89,6 @@ namespace Bud {
 
     public Settings AddDependencies<T>(TaskKey<T> key, params TaskKey[] dependencies) {
       return Add(new AddDependencies<T>(key, dependencies));
-    }
-
-    public Settings SetCurrentScope(Scope scope) {
-      if (CurrentScope.Equals(scope)) {
-        return this;
-      }
-      return new Settings(ConfigConstructors, TaskConstructors, scope);
     }
 
     public ScopeDefinitions Compile() {

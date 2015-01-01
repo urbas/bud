@@ -55,9 +55,11 @@
     <Compile Include="Util\TaskUtils.cs" />
     <Compile Include="IPlugin.cs" />
     <Compile Include="LogLevel.cs" />
-    <Compile Include="EvaluationLogger.cs" />
     <Compile Include="SettingsConstruction\Ops\TaskDefinitionConstructor.cs" />
     <Compile Include="SettingsConstruction\Ops\ConfigDefinitionConstructor.cs" />
+    <Compile Include="Plugin.cs" />
+    <Compile Include="ScopeDefinitions.cs" />
+    <Compile Include="Configuration.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

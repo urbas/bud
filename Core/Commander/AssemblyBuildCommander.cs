@@ -16,7 +16,7 @@ namespace Bud.Commander {
       Console.SetError(standardErrorTextWriter);
       var assembly = AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(buildConfigurationAssemblyFile));
       var build = (IBuild)assembly.CreateInstance("Build");
-      settings = build.GetSettings(baseDirectory);
+      settings = build.SetUp(GlobalBuild.New(baseDirectory), baseDirectory);
     }
 
     public object Evaluate(string command) {

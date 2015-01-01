@@ -21,9 +21,9 @@ namespace Bud.Plugins.CSharp {
 
     public Settings ApplyTo(Settings settings, Scope scope) {
       return settings
-        .Add(BuildPlugin.Instance)
-        .Add(DependenciesPlugin.Instance)
-        .Add(NuGetPlugin.Instance)
+        .Apply(scope, BuildPlugin.Instance)
+        .Apply(scope, DependenciesPlugin.Instance)
+        .Apply(scope, NuGetPlugin.Instance)
         .InitOrKeep(CSharpKeys.Build.In(scope), ctxt => MonoCompiler.CompileProject(ctxt, scope))
         .InitOrKeep(CSharpKeys.SourceFiles.In(scope), context => FindSources(context, scope))
         .InitOrKeep(CSharpKeys.AssemblyType.In(scope), AssemblyType.Exe)

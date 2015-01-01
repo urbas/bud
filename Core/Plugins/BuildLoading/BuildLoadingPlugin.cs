@@ -22,7 +22,7 @@ namespace Bud.Plugins.BuildLoading {
 
     public Settings ApplyTo(Settings settings, Scope scope) {
       return settings
-        .Add(CSharpPlugin.Instance)
+        .Apply(scope, CSharpPlugin.Instance)
         .Init(BuildLoadingKeys.BuildConfigSourceFile.In(scope), context => Path.Combine(context.GetBaseDir(scope), "Build.cs"))
         .Init(BuildLoadingKeys.DirOfProjectToBeBuilt.In(scope), dirOfProjectToBeBuilt)
         .Modify(CSharpKeys.SourceFiles.In(scope), (context, previousTask) => AddBuildDefinitionSourceFile(context, previousTask, scope))

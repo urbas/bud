@@ -15,13 +15,11 @@ namespace Bud.Plugins.Projects {
       this.id = id;
     }
 
-    public Settings ApplyTo(Settings settings, Scope scope) {
-      var project = Project.Key(id, scope);
+    public Settings ApplyTo(Settings settings, Scope projectScope) {
       return settings
         .InitOrKeep(ProjectKeys.Projects, ImmutableDictionary.Create<string, Scope>())
-        .SetCurrentScope(project)
-        .Add(new BuildDirsPlugin(baseDir))
-        .Modify(ProjectKeys.Projects, allProjects => allProjects.Add(id, project));
+        .Apply(projectScope, new BuildDirsPlugin(baseDir))
+        .Modify(ProjectKeys.Projects, allProjects => allProjects.Add(id, projectScope));
     }
   }
 }

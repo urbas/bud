@@ -12,7 +12,7 @@ namespace Bud.Plugins.Build {
 
     public Settings ApplyTo(Settings settings, Scope scope) {
       return settings
-        .Add(BuildPlugin.Instance)
+        .Apply(scope, BuildPlugin.Instance)
         .AddDependencies(BuildKeys.Clean, BuildKeys.Clean.In(scope))
         .Init(BuildDirsKeys.BaseDir.In(scope), baseDir)
         .Init(BuildDirsKeys.BudDir.In(scope), ctxt => BuildDirs.GetDefaultBudDir(ctxt, scope))

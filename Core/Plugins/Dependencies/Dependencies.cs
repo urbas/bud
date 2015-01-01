@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace Bud.Plugins.Dependencies {
   public static class Dependencies {
 
-    public static Settings Needs(this Settings dependent, Settings dependency) {
-      return dependent.Needs(new ScopeDependency(dependency.CurrentScope));
+    public static Plugin ToDependency(this Scope scope) {
+      return Plugin.Create((existingSettings, dependentScope) => existingSettings.AddDependency(dependentScope, new ScopeDependency(scope)));
     }
 
-    public static Settings Needs(this Settings dependent, ScopeDependency dependency) {
-      return dependent.Modify(DependenciesKeys.ScopeDependencies.In(dependent.CurrentScope), dependencies => dependencies.Add(dependency));
+    public static Settings AddDependency(this Settings settings, Scope dependent, ScopeDependency dependency) {
+      return settings.Modify(DependenciesKeys.ScopeDependencies.In(dependent), dependencies => dependencies.Add(dependency));
     }
 
     public static ImmutableList<ScopeDependency> GetDependencies(this EvaluationContext context, Scope inScope) {

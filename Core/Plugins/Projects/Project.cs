@@ -1,17 +1,25 @@
 using System.IO;
 using System.Collections.Immutable;
-using Bud.SettingsConstruction;
-using Bud.SettingsConstruction.Ops;
+using System.Collections.Generic;
+using Bud.Plugins.Dependencies;
 
 namespace Bud.Plugins.Projects {
 
   public static class Project {
-    public static Settings New(string id, string baseDir) {
-      return Settings.Empty.Add(new ProjectPlugin(id, baseDir));
+
+    public static Settings AddProject(this Settings build, string id, string baseDir, IPlugin plugin = null) {
+      var projectScope = ProjectScope(id);
+      return build
+        .Apply(projectScope, new ProjectPlugin(id, baseDir))
+        .Apply(projectScope, plugin ?? Plugin.New);
     }
 
-    public static Scope Key(string id, Scope scope) {
-      return new Scope(id).In(ProjectKeys.Project.In(scope));
+    public static IPlugin Dependency(string projectId) {
+      return ProjectScope(projectId).ToDependency();
+    }
+
+    public static Scope ProjectScope(string id) {
+      return new Scope(id).In(ProjectKeys.Project);
     }
 
     public static ImmutableDictionary<string, Scope> GetAllProjects(this Configuration buildConfiguration) {
