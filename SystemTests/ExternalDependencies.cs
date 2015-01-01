@@ -17,14 +17,13 @@ namespace Bud.SystemTests {
     [Test]
     public void compile_MUST_produce_the_executable() {
       using (var buildCommander = TestProjects.LoadBuildCommander("ExternalDependencies")) {
-        buildCommander.Evaluate(NuGetKeys.ResolveNuGetDependencies);
         buildCommander.Evaluate(BuildKeys.Build);
-        FileAssertions.AssertFileExists(BuiltAssemblyPath(buildCommander, "Program", ".exe"));
+        FileAssertions.AssertFileExists(BuiltAssemblyPath(buildCommander, "Foo", ".exe"));
       }
     }
 
     static string BuiltAssemblyPath(TemporaryDirBuildCommander buildCommander, string projectName, string extension) {
-      return Path.Combine(buildCommander.TemporaryDirectory.Path, projectName, ".bud", "output", ".net-4.5", "main", "debug", "bin", projectName + extension);
+      return Path.Combine(buildCommander.TemporaryDirectory.Path, ".bud", "output", ".net-4.5", "main", "debug", "bin", projectName + extension);
     }
   }
 }

@@ -35,15 +35,10 @@ namespace Bud.Plugins.CSharp {
     }
 
     public static async Task<ImmutableList<string>> CollectAssembliesFromDependencies(EvaluationContext context, Scope currentProject) {
-      var collectedAssemblies = ImmutableList<string>.Empty;
-      var resolvedDependencies = await context.ResolveDependencies(currentProject);
-      foreach (var resolvedDependency in resolvedDependencies) {
-        var resolvedScopeDependency = resolvedDependency as ResolvedScopeDependency;
-        if (resolvedScopeDependency != null && context.IsScopeDefined(CSharpKeys.OutputAssemblyFile.In(resolvedScopeDependency.Dependency))) {
-          collectedAssemblies = collectedAssemblies.Add(context.GetCSharpOutputAssemblyFile(resolvedScopeDependency.Dependency));
-        }
-      }
-      return collectedAssemblies;
+      var scopeDependencies = await CollectScopeDependencies(context, currentProject);
+      var nuGetDependencies = await CollectNuGetDependencies(context, currentProject);
+      var gacDependencies = ImmutableList.Create<string>("Facades/System.Runtime.dll");
+      return scopeDependencies.AddRange(nuGetDependencies).AddRange(gacDependencies);
     }
 
     public IEnumerable<string> FindSources(EvaluationContext context, Scope scope) {
@@ -53,6 +48,31 @@ namespace Bud.Plugins.CSharp {
       } else {
         return ImmutableList<string>.Empty;
       }
+    }
+
+    private static async Task<ImmutableList<string>> CollectScopeDependencies(EvaluationContext context, Scope currentProject) {
+      var collectedAssemblies = ImmutableList.CreateBuilder<string>();
+      var resolvedDependencies = await context.ResolveDependencies(currentProject);
+      foreach (var resolvedDependency in resolvedDependencies) {
+        var resolvedScopeDependency = resolvedDependency as ResolvedScopeDependency;
+        if (resolvedScopeDependency != null && context.IsScopeDefined(CSharpKeys.OutputAssemblyFile.In(resolvedScopeDependency.Dependency))) {
+          collectedAssemblies.Add(context.GetCSharpOutputAssemblyFile(resolvedScopeDependency.Dependency));
+        }
+      }
+      return collectedAssemblies.ToImmutable();
+    }
+
+    private static async Task<ImmutableList<string>> CollectNuGetDependencies(EvaluationContext context, Scope currentProject) {
+      var collectedAssemblies = ImmutableList.CreateBuilder<string>();
+      var nuGetDependencies = await context.ResolveNuGetDependencies();
+      var packagePath = context.GetNuGetRepositoryDir();
+      foreach (var package in nuGetDependencies.Values) {
+        foreach (var assembly in package.AssemblyReferences) {
+          var pathToAssembly = Path.Combine(packagePath, package.Id + "." + package.Version, assembly.Path);
+          collectedAssemblies.Add(pathToAssembly);
+        }
+      }
+      return collectedAssemblies.ToImmutable();
     }
   }
 }

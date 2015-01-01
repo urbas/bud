@@ -10,8 +10,7 @@ namespace Bud.Plugins.NuGet {
 
     public static readonly NuGetPlugin Instance = new NuGetPlugin();
 
-    private NuGetPlugin() {
-    }
+    private NuGetPlugin() {}
 
     public Settings ApplyTo(Settings settings, Scope scope) {
       return settings
@@ -32,7 +31,6 @@ namespace Bud.Plugins.NuGet {
         PackageManager packageManager = new PackageManager(repo, nuGetRepositoryDir);
 
         packageManager.PackageInstalled += (object sender, PackageOperationEventArgs e) => {
-          Console.WriteLine("Package installed: " + e);
           resolvedDependencies.Add(e.Package.Id, e.Package);
         };
 

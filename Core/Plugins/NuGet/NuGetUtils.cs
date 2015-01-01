@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Bud.Commander;
 using Bud.Plugins.Dependencies;
+using NuGet;
 
 namespace Bud.Plugins.NuGet {
   public static class NuGetUtils {
@@ -30,6 +31,10 @@ namespace Bud.Plugins.NuGet {
 
     public static ImmutableList<Scope> GetScopesWithNuGetDependencies(this EvaluationContext context) {
       return context.Evaluate(NuGetKeys.ScopesWithNuGetDependencies);
+    }
+
+    public static Task<ImmutableDictionary<string, IPackage>> ResolveNuGetDependencies(this EvaluationContext context) {
+      return context.Evaluate(NuGetKeys.ResolveNuGetDependencies);
     }
   }
 }
