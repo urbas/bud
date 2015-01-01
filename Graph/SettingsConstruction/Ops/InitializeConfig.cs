@@ -12,10 +12,9 @@ namespace Bud.SettingsConstruction.Ops {
     }
 
     public override void ApplyTo(ImmutableDictionary<Scope, IConfigDefinition>.Builder buildConfigurationBuilder) {
-      if (buildConfigurationBuilder.ContainsKey(Key)) {
-        throw new InvalidOperationException(string.Format("The setting '{0}' has already been initialized.", Key));
+      if (!buildConfigurationBuilder.ContainsKey(Key)) {
+        buildConfigurationBuilder[Key] = new ConfigDefinition<T>(InitialValue);
       }
-      buildConfigurationBuilder[Key] = new ConfigDefinition<T>(InitialValue);
     }
   }
 }

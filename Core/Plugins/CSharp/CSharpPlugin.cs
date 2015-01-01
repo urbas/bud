@@ -24,13 +24,13 @@ namespace Bud.Plugins.CSharp {
         .Apply(scope, BuildPlugin.Instance)
         .Apply(scope, DependenciesPlugin.Instance)
         .Apply(scope, NuGetPlugin.Instance)
-        .InitOrKeep(CSharpKeys.Build.In(scope), ctxt => MonoCompiler.CompileProject(ctxt, scope))
-        .InitOrKeep(CSharpKeys.SourceFiles.In(scope), context => FindSources(context, scope))
-        .InitOrKeep(CSharpKeys.AssemblyType.In(scope), AssemblyType.Exe)
-        .InitOrKeep(CSharpKeys.CollectReferencedAssemblies.In(scope), context => CollectAssembliesFromDependencies(context, scope))
-        .InitOrKeep(CSharpKeys.OutputAssemblyDir.In(scope), context => Path.Combine(context.GetOutputDir(scope), ".net-4.5", "main", "debug", "bin"))
-        .InitOrKeep(CSharpKeys.OutputAssemblyName.In(scope), context => scope.Id)
-        .InitOrKeep(CSharpKeys.OutputAssemblyFile.In(scope), context => Path.Combine(context.GetCSharpOutputAssemblyDir(scope), string.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(scope), context.GetAssemblyFileExtension(scope))))
+        .Init(CSharpKeys.Build.In(scope), ctxt => MonoCompiler.CompileProject(ctxt, scope))
+        .Init(CSharpKeys.SourceFiles.In(scope), context => FindSources(context, scope))
+        .Init(CSharpKeys.AssemblyType.In(scope), AssemblyType.Exe)
+        .Init(CSharpKeys.CollectReferencedAssemblies.In(scope), context => CollectAssembliesFromDependencies(context, scope))
+        .Init(CSharpKeys.OutputAssemblyDir.In(scope), context => Path.Combine(context.GetOutputDir(scope), ".net-4.5", "main", "debug", "bin"))
+        .Init(CSharpKeys.OutputAssemblyName.In(scope), context => scope.Id)
+        .Init(CSharpKeys.OutputAssemblyFile.In(scope), context => Path.Combine(context.GetCSharpOutputAssemblyDir(scope), string.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(scope), context.GetAssemblyFileExtension(scope))))
         .AddDependencies(BuildKeys.Build.In(scope), CSharpKeys.Build.In(scope));
     }
 

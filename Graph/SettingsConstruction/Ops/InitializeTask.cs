@@ -13,10 +13,9 @@ namespace Bud.SettingsConstruction.Ops {
     }
 
     public override void ApplyTo(ImmutableDictionary<Scope, ITaskDefinition>.Builder buildConfigurationBuilder) {
-      if (buildConfigurationBuilder.ContainsKey(Key)) {
-        throw new InvalidOperationException(string.Format("Cannot initialize the task '{0}'. It has already been initialized.", Key));
+      if (!buildConfigurationBuilder.ContainsKey(Key)) {
+        buildConfigurationBuilder[Key] = new TaskDefinition<T>(InitialValue);
       }
-      buildConfigurationBuilder[Key] = new TaskDefinition<T>(InitialValue);
     }
   }
 }

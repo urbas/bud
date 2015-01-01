@@ -14,10 +14,10 @@ namespace Bud.Plugins.NuGet {
 
     public Settings ApplyTo(Settings settings, Scope scope) {
       return settings
-        .InitOrKeep(NuGetKeys.ScopesWithNuGetDependencies, ImmutableList<Scope>.Empty)
-        .InitOrKeep(NuGetKeys.NuGetRepositoryDir, context => Path.Combine(context.GetBudDir(scope), "nuGetRepository"))
-        .InitOrKeep(NuGetKeys.ResolveNuGetDependencies, ResolveNuGetDependenciesImpl)
-        .InitOrKeep(NuGetKeys.NuGetDependencies.In(scope), ImmutableList<NuGetDependency>.Empty)
+        .Init(NuGetKeys.ScopesWithNuGetDependencies, ImmutableList<Scope>.Empty)
+        .Init(NuGetKeys.NuGetRepositoryDir, context => Path.Combine(context.GetBudDir(scope), "nuGetRepository"))
+        .Init(NuGetKeys.ResolveNuGetDependencies, ResolveNuGetDependenciesImpl)
+        .Init(NuGetKeys.NuGetDependencies.In(scope), ImmutableList<NuGetDependency>.Empty)
         .Modify(NuGetKeys.ScopesWithNuGetDependencies, (context, oldValue) => oldValue.Add(scope));
     }
 

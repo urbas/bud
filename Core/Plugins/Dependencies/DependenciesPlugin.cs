@@ -14,9 +14,9 @@ namespace Bud.Plugins.Dependencies {
     public Settings ApplyTo(Settings settings, Scope scope) {
       return settings
         .Apply(scope, BuildPlugin.Instance)
-        .InitOrKeep(DependenciesKeys.ScopeDependencies.In(scope), ImmutableList<ScopeDependency>.Empty)
-        .InitOrKeep(DependenciesKeys.ResolveScopeDependencies.In(scope), context => ResolveDependenciesImpl(context, scope))
-        .InitOrKeep(DependenciesKeys.ResolveScopeDependency.In(scope), context => ResolveScopeDependencyImpl(context, scope));
+        .Init(DependenciesKeys.ScopeDependencies.In(scope), ImmutableList<ScopeDependency>.Empty)
+        .Init(DependenciesKeys.ResolveScopeDependencies.In(scope), context => ResolveDependenciesImpl(context, scope))
+        .Init(DependenciesKeys.ResolveScopeDependency.In(scope), context => ResolveScopeDependencyImpl(context, scope));
     }
 
     public static Task<ImmutableList<ResolvedScopeDependency>> ResolveDependenciesImpl(EvaluationContext context, Scope scope) {

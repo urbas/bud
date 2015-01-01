@@ -18,19 +18,10 @@ namespace Bud {
     }
 
     [Test]
-    [ExpectedException(typeof(InvalidOperationException))]
-    public void Initializing_the_same_config_twice_MUST_throw_an_exception() {
-      EvaluationContext.FromSettings(Settings.Empty
-        .Init(TestKey, "bar")
-        .Init(TestKey, "foo")
-      );
-    }
-
-    [Test]
-    public void Evaluating_a_config_WHEN_ensure_initialized_is_performed_after_initialization_MUST_return_the_value_of_initialization() {
+    public void Evaluating_a_config_WHEN_initialization_is_performed_the_second_time_MUST_return_the_value_of_initialization() {
       var settings = Settings.Empty
         .Init(TestKey, "bar")
-        .InitOrKeep(TestKey, "foo");
+        .Init(TestKey, "foo");
       Assert.AreEqual("bar", EvaluationContext.FromSettings(settings).Evaluate(TestKey));
     }
 
@@ -55,28 +46,20 @@ namespace Bud {
     }
 
     [Test]
-    [ExpectedException(typeof(InvalidOperationException))]
-    public void Initializing_a_task_twice_MUST_throw_an_exception() {
-      EvaluationContext.FromSettings(
-        Settings.Empty.Init(TestTaskKey, context => "foo").Init(TestTaskKey, context => "boo")
-      );
-    }
-
-    [Test]
-    public async void EnsureInitialized_MUST_keep_the_value_of_the_first_initialization() {
-      var settings = Settings.Empty.Init(TestTaskKey, context => "boo").InitOrKeep(TestTaskKey, context => "foo");
+    public async void Init_MUST_keep_the_value_of_the_first_initialization() {
+      var settings = Settings.Empty.Init(TestTaskKey, context => "boo").Init(TestTaskKey, context => "foo");
       Assert.AreEqual("boo", await EvaluationContext.FromSettings(settings).Evaluate(TestTaskKey));
     }
 
     [Test]
-    public async void EnsureInitialized_MUST_keep_the_value_of_the_first_ensure_initialization() {
-      var settings = Settings.Empty.InitOrKeep(TestTaskKey, context => "boo").InitOrKeep(TestTaskKey, context => "foo");
+    public async void Init_MUST_keep_the_value_of_the_first_ensure_initialization() {
+      var settings = Settings.Empty.Init(TestTaskKey, context => "boo").Init(TestTaskKey, context => "foo");
       Assert.AreEqual("boo", await EvaluationContext.FromSettings(settings).Evaluate(TestTaskKey));
     }
 
     [Test]
-    public async void EnsureInitialized_MUST_set_the_value() {
-      var settings = Settings.Empty.InitOrKeep(TestTaskKey, context => "foo");
+    public async void Init_MUST_set_the_value() {
+      var settings = Settings.Empty.Init(TestTaskKey, context => "foo");
       Assert.AreEqual("foo", await EvaluationContext.FromSettings(settings).Evaluate(TestTaskKey));
     }
 

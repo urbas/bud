@@ -45,8 +45,6 @@
     <Compile Include="Unit.cs" />
     <Compile Include="SettingsConstruction\ConfigDefinition.cs" />
     <Compile Include="SettingsConstruction\Ops\AddDependencies.cs" />
-    <Compile Include="SettingsConstruction\Ops\EnsureConfigInitialized.cs" />
-    <Compile Include="SettingsConstruction\Ops\EnsureTaskInitialized.cs" />
     <Compile Include="SettingsConstruction\Ops\InitializeConfig.cs" />
     <Compile Include="SettingsConstruction\Ops\InitializeTask.cs" />
     <Compile Include="SettingsConstruction\Ops\ModifyConfig.cs" />
@@ -54,7 +52,6 @@
     <Compile Include="SettingsConstruction\TaskDefinition.cs" />
     <Compile Include="Util\TaskUtils.cs" />
     <Compile Include="IPlugin.cs" />
-    <Compile Include="LogLevel.cs" />
     <Compile Include="SettingsConstruction\Ops\TaskDefinitionConstructor.cs" />
     <Compile Include="SettingsConstruction\Ops\ConfigDefinitionConstructor.cs" />
     <Compile Include="Plugin.cs" />

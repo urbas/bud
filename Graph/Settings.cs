@@ -59,22 +59,6 @@ namespace Bud {
       return Add(new InitializeTask<T>(key, task));
     }
 
-    public Settings InitOrKeep<T>(ConfigKey<T> key, T initialValue) {
-      return Add(new EnsureConfigInitialized<T>(key, initialValue));
-    }
-
-    public Settings InitOrKeep<T>(ConfigKey<T> key, Func<Configuration, T> initialValue) {
-      return Add(new EnsureConfigInitialized<T>(key, initialValue));
-    }
-
-    public Settings InitOrKeep<T>(TaskKey<T> key, Func<EvaluationContext, T> task) {
-      return Add(new EnsureTaskInitialized<T>(key, new TaskDefinition<T>(context => Task.FromResult(task(context)))));
-    }
-
-    public Settings InitOrKeep<T>(TaskKey<T> key, Func<EvaluationContext, Task<T>> task) {
-      return Add(new EnsureTaskInitialized<T>(key, new TaskDefinition<T>(task)));
-    }
-
     public Settings Modify<T>(ConfigKey<T> key, Func<T, T> modifier) {
       return Add(new ModifyConfig<T>(key, (context, previousValue) => modifier(previousValue)));
     }
