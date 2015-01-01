@@ -30,15 +30,15 @@ namespace Bud.Plugins.CSharp {
       return context.Evaluate(CSharpKeys.SourceFiles.In(project));
     }
 
-    public static string GetCSharpOutputAssemblyDir(this Configuration context, Scope project) {
+    public static string GetCSharpOutputAssemblyDir(this IConfiguration context, Scope project) {
       return context.Evaluate(CSharpKeys.OutputAssemblyDir.In(project));
     }
 
-    public static string GetCSharpOutputAssemblyName(this Configuration context, Scope project) {
+    public static string GetCSharpOutputAssemblyName(this IConfiguration context, Scope project) {
       return context.Evaluate(CSharpKeys.OutputAssemblyName.In(project));
     }
 
-    public static string GetCSharpOutputAssemblyFile(this Configuration context, Scope project) {
+    public static string GetCSharpOutputAssemblyFile(this IConfiguration context, Scope project) {
       return context.Evaluate(CSharpKeys.OutputAssemblyFile.In(project));
     }
 
@@ -46,7 +46,7 @@ namespace Bud.Plugins.CSharp {
       return context.Evaluate(CSharpKeys.CollectReferencedAssemblies.In(project));
     }
 
-    public static AssemblyType GetCSharpAssemblyType(this Configuration context, Scope project) {
+    public static AssemblyType GetCSharpAssemblyType(this IConfiguration context, Scope project) {
       return context.Evaluate(CSharpKeys.AssemblyType.In(project));
     }
 
@@ -54,7 +54,7 @@ namespace Bud.Plugins.CSharp {
       return context.Evaluate(CSharpKeys.Build.In(project));
      }
 
-    public static string GetAssemblyFileExtension(this Configuration context, Scope project) {
+    public static string GetAssemblyFileExtension(this IConfiguration context, Scope project) {
       switch (context.GetCSharpAssemblyType(project)) {
         case AssemblyType.Exe:
           return "exe";

@@ -22,11 +22,11 @@ namespace Bud.Plugins.Projects {
       return new Scope(id).In(ProjectKeys.Project);
     }
 
-    public static ImmutableDictionary<string, Scope> GetAllProjects(this Configuration buildConfiguration) {
+    public static ImmutableDictionary<string, Scope> GetAllProjects(this IConfiguration buildConfiguration) {
       return buildConfiguration.Evaluate(ProjectKeys.Projects);
     }
 
-    public static Scope GetProject(this Configuration context, string id) {
+    public static Scope GetProject(this IConfiguration context, string id) {
       return GetAllProjects(context)[id];
     }
   }

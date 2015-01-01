@@ -1,27 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using Bud.SettingsConstruction;
+using System.Collections.Immutable;
+using System.Text;
 
 namespace Bud {
+
+  public interface IConfiguration {
+    ImmutableDictionary<Scope, IConfigDefinition> ConfigDefinitions { get; }
+    bool IsConfigDefined(Scope scope);
+    T Evaluate<T>(ConfigKey<T> configKey);
+    object EvaluateConfig(Scope scope);
+  }
+
   // TODO: Make this class thread-safe.
-  public class Configuration {
-    public readonly ScopeDefinitions ScopeDefinitions;
+  public class Configuration : IConfiguration {
+    private readonly ImmutableDictionary<Scope, IConfigDefinition> configDefinitions;
     private readonly Dictionary<Scope, object> configValues = new Dictionary<Scope, object>();
 
-    protected Configuration(ScopeDefinitions scopeDefinitions) {
-      this.ScopeDefinitions = scopeDefinitions;
+    public Configuration(ImmutableDictionary<Scope, IConfigDefinition> scopeDefinitions) {
+      this.configDefinitions = scopeDefinitions;
     }
 
-    public bool IsScopeDefined(Scope scope) {
-      return IsConfigDefined(scope) || IsTaskDefined(scope);
-    }
+    public ImmutableDictionary<Scope, IConfigDefinition> ConfigDefinitions { get { return configDefinitions; } }
 
     public bool IsConfigDefined(Scope scope) {
-      return ScopeDefinitions.ConfigDefinitions.ContainsKey(scope);
-    }
-
-    public bool IsTaskDefined(Scope scope) {
-      return ScopeDefinitions.TaskDefinitions.ContainsKey(scope);
+      return configDefinitions.ContainsKey(scope);
     }
 
     public object Evaluate(ConfigKey scope) {
@@ -32,13 +36,13 @@ namespace Bud {
       return (T)Evaluate((ConfigKey)configKey);
     }
 
-    protected object EvaluateConfig(Scope scope) {
+    public object EvaluateConfig(Scope scope) {
       object value;
       if (configValues.TryGetValue(scope, out value)) {
         return value;
       }
       IConfigDefinition configDefinition;
-      if (ScopeDefinitions.ConfigDefinitions.TryGetValue(scope, out configDefinition)) {
+      if (configDefinitions.TryGetValue(scope, out configDefinition)) {
         value = configDefinition.Evaluate(this);
         configValues.Add(scope, value);
         return value;

@@ -8,20 +8,50 @@ using System.Threading.Tasks;
 
 namespace Bud {
 
+  public interface IEvaluationContext : IConfiguration {
+    ImmutableDictionary<Scope, ITaskDefinition> TaskDefinitions { get; }
+    bool IsTaskDefined(Scope scope);
+    Task<T> Evaluate<T>(TaskKey<T> scope);
+  }
+
   // TODO: Make this class thread-safe.
-  public class EvaluationContext : Configuration {
+  public class EvaluationContext : IEvaluationContext {
+    private readonly IConfiguration configuration;
+    private readonly ImmutableDictionary<Scope, ITaskDefinition> taskDefinitions;
     private readonly Dictionary<Scope, Task> taskValues = new Dictionary<Scope, Task>();
     private readonly Dictionary<ITaskDefinition, Task> oldTaskValues = new Dictionary<ITaskDefinition, Task>();
     private readonly Dictionary<Scope, object> scopeToOutput = new Dictionary<Scope, object>();
 
-    public EvaluationContext(ScopeDefinitions scopeDefinitions) : base(scopeDefinitions) {
+    public EvaluationContext(ScopeDefinitions scopeDefinitions) {
+      this.configuration = new Configuration(scopeDefinitions.ConfigDefinitions);
+      this.taskDefinitions = scopeDefinitions.TaskDefinitions;
+    }
+
+    public ImmutableDictionary<Scope, IConfigDefinition> ConfigDefinitions { get { return configuration.ConfigDefinitions; } }
+
+    public ImmutableDictionary<Scope, ITaskDefinition> TaskDefinitions { get { return taskDefinitions; } }
+
+    public bool IsConfigDefined(Scope scope) {
+      return configuration.IsConfigDefined(scope);
+    }
+
+    public T Evaluate<T>(ConfigKey<T> configKey) {
+      return configuration.Evaluate(configKey);
+    }
+
+    public object EvaluateConfig(Scope scope) {
+      return configuration.EvaluateConfig(scope);
+    }
+
+    public bool IsTaskDefined(Scope scope) {
+      return taskDefinitions.ContainsKey(scope);
     }
 
     public Task EvaluateScope(Scope scope) {
       if (IsTaskDefined(scope)) {
         return EvaluateTask(scope);
       }
-      return Task.FromResult(EvaluateConfig(scope));
+      return Task.FromResult(configuration.EvaluateConfig(scope));
     }
 
     public Task Evaluate(TaskKey scope) {
@@ -53,7 +83,7 @@ namespace Bud {
         return value;
       }
       ITaskDefinition taskDefinition;
-      if (ScopeDefinitions.TaskDefinitions.TryGetValue(scope, out taskDefinition)) {
+      if (taskDefinitions.TryGetValue(scope, out taskDefinition)) {
         value = taskDefinition.Evaluate(this);
         taskValues.Add(scope, value);
         return value;
@@ -71,13 +101,13 @@ namespace Bud {
 
     public override string ToString() {
       StringBuilder sb = new StringBuilder("EvaluationContext(Configurations: [");
-      ToString(sb, ScopeDefinitions.ConfigDefinitions.Keys);
+      ToString(sb, configuration.ConfigDefinitions.Keys);
       sb.Append("], Tasks: [");
-      ToString(sb, ScopeDefinitions.TaskDefinitions.Keys);
+      ToString(sb, taskDefinitions.Keys);
       return sb.Append("])").ToString();
     }
 
-    static void ToString(StringBuilder sb, IEnumerable<Scope> scopes) {
+    public static void ToString(StringBuilder sb, IEnumerable<Scope> scopes) {
       var enumerator = scopes.GetEnumerator();
       if (enumerator.MoveNext()) {
         sb.Append(enumerator.Current);
