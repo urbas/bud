@@ -60,6 +60,7 @@
     <Compile Include="Plugin.cs" />
     <Compile Include="ScopeDefinitions.cs" />
     <Compile Include="Configuration.cs" />
+    <Compile Include="PluginUtils.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
