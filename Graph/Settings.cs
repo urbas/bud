@@ -8,25 +8,32 @@ using System.Collections.Generic;
 
 namespace Bud {
   public class Settings {
-    public static readonly Settings Empty = new Settings(ImmutableList<Setting>.Empty);
+    public static readonly Settings Empty = new Settings();
 
     public readonly Scope CurrentScope;
-    public readonly ImmutableList<Setting> SettingsList;
+    public readonly ImmutableList<ConfigDefinitionConstructor> ConfigConstructors;
+    public readonly ImmutableList<TaskDefinitionConstructor> TaskConstructors;
 
-    public Settings(ImmutableList<Setting> settings) : this(settings, Scope.Global) {
-    }
+    public Settings() : this(ImmutableList<ConfigDefinitionConstructor>.Empty, ImmutableList<TaskDefinitionConstructor>.Empty) {}
 
-    public Settings(ImmutableList<Setting> settings, Scope currentScope) {
-      this.SettingsList = settings;
+    public Settings(ImmutableList<ConfigDefinitionConstructor> configConstructors, ImmutableList<TaskDefinitionConstructor> taskConstructors) : this(configConstructors, taskConstructors, Scope.Global) {    }
+
+    public Settings(ImmutableList<ConfigDefinitionConstructor> configConstructors, ImmutableList<TaskDefinitionConstructor> taskConstructors, Scope currentScope) {
+      this.ConfigConstructors = configConstructors;
+      this.TaskConstructors = taskConstructors;
       this.CurrentScope = currentScope;
     }
 
-    public Settings Add(Setting setting) {
-      return new Settings(SettingsList.Add(setting), CurrentScope);
+    public Settings Add(ConfigDefinitionConstructor configConstructor) {
+      return new Settings(ConfigConstructors.Add(configConstructor), TaskConstructors, CurrentScope);
+    }
+
+    public Settings Add(TaskDefinitionConstructor taskConstructor) {
+      return new Settings(ConfigConstructors, TaskConstructors.Add(taskConstructor), CurrentScope);
     }
 
     public Settings Add(Settings settings) {
-      return new Settings(SettingsList.AddRange(settings.SettingsList));
+      return new Settings(ConfigConstructors.AddRange(settings.ConfigConstructors), TaskConstructors.AddRange(settings.TaskConstructors));
     }
 
     public Settings Add(IPlugin plugin) {
@@ -37,7 +44,7 @@ namespace Bud {
       return Add(new InitializeConfig<T>(key, initialValue));
     }
 
-    public Settings Init<T>(ConfigKey<T> key, Func<EvaluationContext, T> initialValue) {
+    public Settings Init<T>(ConfigKey<T> key, Func<Configuration, T> initialValue) {
       return Add(new InitializeConfig<T>(key, initialValue));
     }
 
@@ -53,7 +60,7 @@ namespace Bud {
       return Add(new EnsureConfigInitialized<T>(key, initialValue));
     }
 
-    public Settings InitOrKeep<T>(ConfigKey<T> key, Func<EvaluationContext, T> initialValue) {
+    public Settings InitOrKeep<T>(ConfigKey<T> key, Func<Configuration, T> initialValue) {
       return Add(new EnsureConfigInitialized<T>(key, initialValue));
     }
 
@@ -69,7 +76,7 @@ namespace Bud {
       return Add(new ModifyConfig<T>(key, (context, previousValue) => modifier(previousValue)));
     }
 
-    public Settings Modify<T>(ConfigKey<T> key, Func<EvaluationContext, T, T> modifier) {
+    public Settings Modify<T>(ConfigKey<T> key, Func<Configuration, T, T> modifier) {
       return Add(new ModifyConfig<T>(key, (context, previousValue) => modifier(context, previousValue)));
     }
 
@@ -85,15 +92,19 @@ namespace Bud {
       if (CurrentScope.Equals(scope)) {
         return this;
       }
-      return new Settings(SettingsList, scope);
+      return new Settings(ConfigConstructors, TaskConstructors, scope);
     }
 
-    public IDictionary<Scope, IValueDefinition> Compile() {
-      var compiledSettingsBuilder = ImmutableDictionary.CreateBuilder<Scope, IValueDefinition>();
-      foreach (var setting in SettingsList) {
-        setting.ApplyTo(compiledSettingsBuilder);
+    public ScopeDefinitions Compile() {
+      var configDefinitions = ImmutableDictionary.CreateBuilder<Scope, IConfigDefinition>();
+      foreach (var configConstructor in ConfigConstructors) {
+        configConstructor.ApplyTo(configDefinitions);
       }
-      return compiledSettingsBuilder.ToImmutable();
+      var taskDefinitions = ImmutableDictionary.CreateBuilder<Scope, ITaskDefinition>();
+      foreach (var taskConstructor in TaskConstructors) {
+        taskConstructor.ApplyTo(taskDefinitions);
+      }
+      return new ScopeDefinitions(configDefinitions.ToImmutable(), taskDefinitions.ToImmutable());
     }
   }
 }

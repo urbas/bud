@@ -3,15 +3,15 @@ using System.Collections.Immutable;
 using Bud;
 
 namespace Bud.SettingsConstruction.Ops {
-  public class ModifyConfig<T> : Setting {
-    Func<EvaluationContext, T, T> ValueModifier;
+  public class ModifyConfig<T> : ConfigDefinitionConstructor {
+    Func<Configuration, T, T> ValueModifier;
 
-    public ModifyConfig(ConfigKey<T> key, Func<EvaluationContext, T, T> valueModifier) : base(key) {
+    public ModifyConfig(ConfigKey<T> key, Func<Configuration, T, T> valueModifier) : base(key) {
       this.ValueModifier = valueModifier;
     }
 
-    public override void ApplyTo(ImmutableDictionary<Scope, IValueDefinition>.Builder buildConfigurationBuilder) {
-      IValueDefinition value;
+    public override void ApplyTo(ImmutableDictionary<Scope, IConfigDefinition>.Builder buildConfigurationBuilder) {
+      IConfigDefinition value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
         ConfigDefinition<T> existingValue = (ConfigDefinition<T>)value;
         buildConfigurationBuilder[Key] = new ConfigDefinition<T>(b => ValueModifier(b, existingValue.Evaluate(b)));

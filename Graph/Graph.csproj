@@ -51,12 +51,13 @@
     <Compile Include="SettingsConstruction\Ops\InitializeTask.cs" />
     <Compile Include="SettingsConstruction\Ops\ModifyConfig.cs" />
     <Compile Include="SettingsConstruction\Ops\ModifyTask.cs" />
-    <Compile Include="SettingsConstruction\Setting.cs" />
     <Compile Include="SettingsConstruction\TaskDefinition.cs" />
     <Compile Include="Util\TaskUtils.cs" />
     <Compile Include="IPlugin.cs" />
     <Compile Include="LogLevel.cs" />
     <Compile Include="EvaluationLogger.cs" />
+    <Compile Include="SettingsConstruction\Ops\TaskDefinitionConstructor.cs" />
+    <Compile Include="SettingsConstruction\Ops\ConfigDefinitionConstructor.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

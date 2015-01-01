@@ -14,11 +14,11 @@ namespace Bud.Plugins.Projects {
       return new Scope(id).In(ProjectKeys.Project.In(scope));
     }
 
-    public static ImmutableDictionary<string, Scope> GetAllProjects(this EvaluationContext buildConfiguration) {
+    public static ImmutableDictionary<string, Scope> GetAllProjects(this Configuration buildConfiguration) {
       return buildConfiguration.Evaluate(ProjectKeys.Projects);
     }
 
-    public static Scope GetProject(this EvaluationContext context, string id) {
+    public static Scope GetProject(this Configuration context, string id) {
       return GetAllProjects(context)[id];
     }
   }

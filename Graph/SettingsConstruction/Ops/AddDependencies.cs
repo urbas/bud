@@ -3,15 +3,15 @@ using System.Collections.Immutable;
 using System.Collections.Generic;
 
 namespace Bud.SettingsConstruction.Ops {
-  public class AddDependencies<T> : Setting {
+  public class AddDependencies<T> : TaskDefinitionConstructor {
     private IEnumerable<TaskKey> extraDependencies;
 
     public AddDependencies(TaskKey<T> key, IEnumerable<TaskKey> extraDependencies) : base(key) {
       this.extraDependencies = extraDependencies;
     }
 
-    public override void ApplyTo(ImmutableDictionary<Scope, IValueDefinition>.Builder buildConfigurationBuilder) {
-      IValueDefinition value;
+    public override void ApplyTo(ImmutableDictionary<Scope, ITaskDefinition>.Builder buildConfigurationBuilder) {
+      ITaskDefinition value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
         buildConfigurationBuilder[Key] = ((TaskDefinition<T>)value).WithDependencies(extraDependencies);
       } else {

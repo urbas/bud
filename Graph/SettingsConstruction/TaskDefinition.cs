@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Bud.SettingsConstruction {
+
   public interface ITaskDefinition {
-    Task Evaluate(ITaskEvaluator buildConfiguration);
+    Task Evaluate(EvaluationContext context);
   }
 
   public class TaskDefinition<T> : ITaskDefinition {
+
     public readonly Func<EvaluationContext, Task<T>> TaskFunction;
 
     public TaskDefinition(Func<EvaluationContext, Task<T>> taskFunction) : this(taskFunction, ImmutableHashSet<TaskKey>.Empty) {}
@@ -41,4 +43,3 @@ namespace Bud.SettingsConstruction {
   }
 
 }
-

@@ -2,21 +2,21 @@
 
 namespace Bud.SettingsConstruction {
   public interface IConfigDefinition {
-    object Evaluate(IConfiguration context);
+    object Evaluate(Configuration context);
   }
 
   public class ConfigDefinition<T> : IConfigDefinition {
-    public readonly Func<EvaluationContext, T> ConfigValue;
+    public readonly Func<Configuration, T> ConfigValue;
 
-    public ConfigDefinition(Func<EvaluationContext, T> configValue) {
+    public ConfigDefinition(Func<Configuration, T> configValue) {
       this.ConfigValue = configValue;
     }
 
-    object IConfigDefinition.Evaluate(IConfiguration context) {
+    object IConfigDefinition.Evaluate(Configuration context) {
       return Evaluate(context);
     }
 
-    public T Evaluate(IConfiguration context) {
+    public T Evaluate(Configuration context) {
       return ConfigValue(context);
     }
   }

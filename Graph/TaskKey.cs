@@ -7,12 +7,9 @@ using Bud.Util;
 
 namespace Bud {
 
-  public class TaskKey : Scope {
-    protected TaskKey(string id) : base(id) {
-    }
-
-    protected TaskKey(string id, Scope parent) : base(id, parent) {
-    }
+  public abstract class TaskKey : Scope {
+    protected TaskKey(string id) : base(id) {}
+    protected TaskKey(string id, Scope parent) : base(id, parent) {}
   }
 
   /// <summary>

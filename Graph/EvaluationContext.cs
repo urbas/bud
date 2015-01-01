@@ -8,161 +8,111 @@ using System.Threading.Tasks;
 
 namespace Bud {
 
-  public interface IConfiguration {
-    T Evaluate<T>(ConfigKey<T> configKey);
+  public class ScopeDefinitions {
+    public readonly ImmutableDictionary<Scope, IConfigDefinition> ConfigDefinitions;
+    public readonly ImmutableDictionary<Scope, ITaskDefinition> TaskDefinitions;
+
+    public ScopeDefinitions(ImmutableDictionary<Scope, IConfigDefinition> configDefinitions, ImmutableDictionary<Scope, ITaskDefinition> taskDefinitions) {
+      ConfigDefinitions = configDefinitions;
+      TaskDefinitions = taskDefinitions;
+    }
   }
 
-  public class Configuration : IConfiguration {
-    private readonly IDictionary<Scope, IConfigDefinition> configDefinitions;
+  // TODO: Make this class thread-safe.
+  public class Configuration {
+    public readonly ScopeDefinitions ScopeDefinitions;
     private readonly Dictionary<Scope, object> configValues = new Dictionary<Scope, object>();
 
-    private Configuration(IDictionary<Scope, IConfigDefinition> configDefinitions) {
-      this.configDefinitions = configDefinitions;
+    protected Configuration(ScopeDefinitions scopeDefinitions) {
+      this.ScopeDefinitions = scopeDefinitions;
     }
 
-    public object Evaluate(Scope scope) {
+    public bool IsScopeDefined(Scope scope) {
+      return IsConfigDefined(scope) || IsTaskDefined(scope);
+    }
+
+    public bool IsConfigDefined(Scope scope) {
+      return ScopeDefinitions.ConfigDefinitions.ContainsKey(scope);
+    }
+
+    public bool IsTaskDefined(Scope scope) {
+      return ScopeDefinitions.TaskDefinitions.ContainsKey(scope);
+    }
+
+    public object Evaluate(ConfigKey scope) {
+      return EvaluateConfig(scope);
+    }
+
+    public T Evaluate<T>(ConfigKey<T> configKey) {
+      return (T)Evaluate((ConfigKey)configKey);
+    }
+
+    protected object EvaluateConfig(Scope scope) {
       object value;
       if (configValues.TryGetValue(scope, out value)) {
         return value;
       }
-
       IConfigDefinition configDefinition;
-      if (configDefinitions.TryGetValue(scope, out configDefinition)) {
+      if (ScopeDefinitions.ConfigDefinitions.TryGetValue(scope, out configDefinition)) {
         value = configDefinition.Evaluate(this);
         configValues.Add(scope, value);
         return value;
       }
-
       throw new ArgumentException(string.Format("Could not evaluate configuration '{0}'. The value for this configuration was not defined.", scope));
     }
-
-    public T Evaluate<T>(ConfigKey<T> configKey) {
-      return (T)Evaluate((Scope)configKey);
-    }
   }
 
-  public interface ITaskEvaluator {
-    Task<T> Evaluate<T>(TaskKey<T> scope);
-  }
-
-  public class EvaluationContext : ITaskEvaluator {
-    private readonly IConfiguration configuration;
-    private readonly IDictionary<Scope, ITaskDefinition> taskDefinitions;
+  // TODO: Make this class thread-safe.
+  public class EvaluationContext : Configuration {
     private readonly Dictionary<Scope, Task> taskValues = new Dictionary<Scope, Task>();
-    private readonly Dictionary<ITaskDefinition, Task> modifiedTaskValues = new Dictionary<ITaskDefinition, Task>();
+    private readonly Dictionary<ITaskDefinition, Task> oldTaskValues = new Dictionary<ITaskDefinition, Task>();
+    private readonly Dictionary<Scope, object> scopeToOutput = new Dictionary<Scope, object>();
 
-    public EvaluationContext(IDictionary<Scope, ITaskDefinition> taskDefinitions, IConfiguration configuration) {
-      this.taskDefinitions = taskDefinitions;
-      this.configuration = configuration;
+    public EvaluationContext(ScopeDefinitions scopeDefinitions) : base(scopeDefinitions) {
     }
 
-    public Task Evaluate(Scope scope) {
+    public Task EvaluateScope(Scope scope) {
+      if (IsTaskDefined(scope)) {
+        return EvaluateTask(scope);
+      }
+      return Task.FromResult(EvaluateConfig(scope));
+    }
+
+    public Task Evaluate(TaskKey scope) {
+      return EvaluateTask(scope);
+    }
+
+    public Task<T> Evaluate<T>(TaskKey<T> scope) {
+      return (Task<T>)Evaluate((TaskKey)scope);
+    }
+
+    public Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition) {
+      Task existingEvaluation;
+      if (oldTaskValues.TryGetValue(taskDefinition, out existingEvaluation)) {
+        return (Task<T>)existingEvaluation;
+      } else {
+        Task<T> freshEvaluation = taskDefinition.Evaluate(this);
+        oldTaskValues.Add(taskDefinition, freshEvaluation);
+        return freshEvaluation;
+      }
+    }
+
+    public static EvaluationContext FromSettings(Settings settings) {
+      return new EvaluationContext(settings.Compile());
+    }
+
+    protected Task EvaluateTask(Scope scope) {
       Task value;
       if (taskValues.TryGetValue(scope, out value)) {
         return value;
       }
-
       ITaskDefinition taskDefinition;
-      if (taskDefinitions.TryGetValue(scope, out taskDefinition)) {
+      if (ScopeDefinitions.TaskDefinitions.TryGetValue(scope, out taskDefinition)) {
         value = taskDefinition.Evaluate(this);
         taskValues.Add(scope, value);
         return value;
       }
-
       throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. The value for this task was not defined.", scope));
-    }
-
-    public Task<T> Evaluate<T>(TaskKey<T> scope) {
-      return (Task<T>)Evaluate((Scope)scope);
-    }
-  }
-
-  public class EvaluationContext {
-    private readonly Configuration Configuration;
-    private readonly IDictionary<Scope, IValueDefinition> ScopeDefinitions;
-    // TODO: Assign sequential indices to keys and use arrays to access evaluated values (instead of dictionaries).
-    // TODO: Consider using concurrent dictionaries here (so that people can access the execution context and evaluate tasks from different threads).
-    private readonly Dictionary<Scope, object> configValues = new Dictionary<Scope, object>();
-    private readonly Dictionary<Scope, Task> taskValues = new Dictionary<Scope, Task>();
-    private readonly Dictionary<ITaskDefinition, Task> modifiedTaskValues = new Dictionary<ITaskDefinition, Task>();
-    private readonly Dictionary<Scope, object> scopeToOutput = new Dictionary<Scope, object>();
-
-    private EvaluationContext(IDictionary<Scope, IValueDefinition> scopeDefinitions) {
-      this.ScopeDefinitions = scopeDefinitions;
-    }
-
-    public bool Exists(Scope scope) {
-      return ScopeDefinitions.ContainsKey(scope);
-    }
-
-    public Task Evaluate(Scope scope) {
-      Task task;
-      if (taskValues.TryGetValue(scope, out task)) {
-        return task;
-      }
-
-      object value;
-      if (configValues.TryGetValue(scope, out value)) {
-        return Task.FromResult(value);
-      }
-
-      if (TryEvaluateAndCacheValue(scope, out value)) {
-        return (value as Task) ?? Task.FromResult(value);
-      }
-
-      throw new ArgumentException(string.Format("Could not evaluate scope '{0}'. The value for this scope was not defined.", scope));
-    }
-
-    private bool TryEvaluateAndCacheValue(Scope taskScope, out object value) {
-      IValueDefinition valueDefinition;
-      if (ScopeDefinitions.TryGetValue(taskScope, out valueDefinition)) {
-        if (valueDefinition is ITaskDefinition) {
-          Task taskValue = ((ITaskDefinition)valueDefinition).Evaluate(this);
-          value = taskValue;
-          taskValues.Add(taskScope, taskValue);
-        } else {
-          value = valueDefinition.Evaluate(this);
-          configValues.Add(taskScope, value);
-        }
-        return true;
-      }
-      value = null;
-      return false;
-    }
-
-    public T Evaluate<T>(ConfigKey<T> key) {
-      object value;
-      if (configValues.TryGetValue(key, out value)) {
-        return (T)value;
-      } else {
-        T evaluatedValue = ((ConfigDefinition<T>)ScopeDefinitions[key]).Evaluate(this);
-        configValues.Add(key, evaluatedValue);
-        return evaluatedValue;
-      }
-    }
-
-    public Task Evaluate(TaskKey key) {
-      Task evaluationAsTask;
-      if (!taskValues.TryGetValue(key, out evaluationAsTask)) {
-        evaluationAsTask = ((ITaskDefinition)ScopeDefinitions[(Scope)key]).Evaluate(this);
-        taskValues.Add(key, evaluationAsTask);
-      }
-      return evaluationAsTask;
-    }
-
-    public Task<T> Evaluate<T>(TaskKey<T> key) {
-      return (Task<T>)Evaluate((TaskKey)key);
-    }
-
-    public Task<T> Evaluate<T>(TaskDefinition<T> overwrittenTaskDef) {
-      Task existingEvaluation;
-      if (modifiedTaskValues.TryGetValue(overwrittenTaskDef, out existingEvaluation)) {
-        return (Task<T>)existingEvaluation;
-      } else {
-        Task<T> freshEvaluation = overwrittenTaskDef.Evaluate(this);
-        modifiedTaskValues.Add(overwrittenTaskDef, freshEvaluation);
-        return freshEvaluation;
-      }
     }
 
     public object GetOutputOf(Scope scope) {
@@ -173,13 +123,16 @@ namespace Bud {
       return null;
     }
 
-    public static EvaluationContext FromSettings(Settings settings) {
-      return new EvaluationContext(settings.Compile());
+    public override string ToString() {
+      StringBuilder sb = new StringBuilder("EvaluationContext(Configurations: [");
+      ToString(sb, ScopeDefinitions.ConfigDefinitions.Keys);
+      sb.Append("], Tasks: [");
+      ToString(sb, ScopeDefinitions.TaskDefinitions.Keys);
+      return sb.Append("])").ToString();
     }
 
-    public override string ToString() {
-      StringBuilder sb = new StringBuilder("EvaluationContext{");
-      var enumerator = ScopeDefinitions.Keys.GetEnumerator();
+    static void ToString(StringBuilder sb, IEnumerable<Scope> scopes) {
+      var enumerator = scopes.GetEnumerator();
       if (enumerator.MoveNext()) {
         sb.Append(enumerator.Current);
         while (enumerator.MoveNext()) {
@@ -187,7 +140,6 @@ namespace Bud {
           sb.Append(enumerator.Current);
         }
       }
-      return sb.Append('}').ToString();
     }
   }
 }

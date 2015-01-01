@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Bud.SettingsConstruction.Ops {
-  public class InitializeTask<T> : Setting {
+  public class InitializeTask<T> : TaskDefinitionConstructor {
     public Func<EvaluationContext, Task<T>> InitialValue;
 
     public InitializeTask(TaskKey<T> key, T initialValue) : this(key, b => Task.FromResult(initialValue)) {}
@@ -12,7 +12,7 @@ namespace Bud.SettingsConstruction.Ops {
       this.InitialValue = initialValue;
     }
 
-    public override void ApplyTo(ImmutableDictionary<Scope, IValueDefinition>.Builder buildConfigurationBuilder) {
+    public override void ApplyTo(ImmutableDictionary<Scope, ITaskDefinition>.Builder buildConfigurationBuilder) {
       if (buildConfigurationBuilder.ContainsKey(Key)) {
         throw new InvalidOperationException(string.Format("Cannot initialize the task '{0}'. It has already been initialized.", Key));
       }

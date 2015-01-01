@@ -39,7 +39,7 @@ namespace Bud.Plugins.CSharp {
       var resolvedDependencies = await context.ResolveDependencies(currentProject);
       foreach (var resolvedDependency in resolvedDependencies) {
         var resolvedScopeDependency = resolvedDependency as ResolvedScopeDependency;
-        if (resolvedScopeDependency != null && context.Exists(CSharpKeys.OutputAssemblyFile.In(resolvedScopeDependency.Dependency))) {
+        if (resolvedScopeDependency != null && context.IsScopeDefined(CSharpKeys.OutputAssemblyFile.In(resolvedScopeDependency.Dependency))) {
           collectedAssemblies = collectedAssemblies.Add(context.GetCSharpOutputAssemblyFile(resolvedScopeDependency.Dependency));
         }
       }

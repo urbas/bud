@@ -18,7 +18,7 @@ namespace Bud.Commander {
       Scope scopeToEvaluate = Scope.Parse(command);
       var evaluationContext = EvaluationContext.FromSettings(settings);
       var evaluationResult = evaluationContext
-        .Evaluate(scopeToEvaluate)
+        .EvaluateScope(scopeToEvaluate)
         .ContinueWith(t => evaluationContext.GetOutputOf(scopeToEvaluate));
       evaluationResult.Wait();
       return evaluationResult.Result;
