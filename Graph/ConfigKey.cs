@@ -11,11 +11,9 @@ namespace Bud {
   /// Values of this key are evaluated once only per settings compilation.
   /// </summary>
   public class ConfigKey<T> : ConfigKey {
-    public ConfigKey(string id) : base(id) {
-    }
+    public ConfigKey(string id) : base(id) {}
 
-    private ConfigKey(string id, Key parent) : base(id, parent) {
-    }
+    private ConfigKey(string id, Key parent) : base(id, parent) {}
 
     public new ConfigKey<T> In(Key parent) {
       if (parent.IsGlobal) {

@@ -16,11 +16,9 @@ namespace Bud {
   /// Values of this key are evaluated once per evaluation context.
   /// </summary>
   public class TaskKey<T> : TaskKey {
-    public TaskKey(string id) : base(id) {
-    }
+    public TaskKey(string id) : base(id) {}
 
-    private TaskKey(string id, Key parent) : base(id, parent) {
-    }
+    private TaskKey(string id, Key parent) : base(id, parent) {}
 
     public new TaskKey<T> In(Key parent) {
       if (parent.IsGlobal) {

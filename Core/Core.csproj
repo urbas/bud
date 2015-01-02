@@ -83,7 +83,6 @@
     <Compile Include="Plugins\Dependencies\ScopeDependency.cs" />
     <Compile Include="Plugins\Dependencies\ResolvedScopeDependency.cs" />
     <Compile Include="Plugins\Build\GlobalBuildPlugin.cs" />
-    <Compile Include="Plugins\Build\GlobalBuildKeys.cs" />
     <Compile Include="Plugins\Build\GlobalBuild.cs" />
     <Compile Include="Plugins\NuGet\NuGet.cs" />
     <Compile Include="Commander\BuildCommander.cs" />

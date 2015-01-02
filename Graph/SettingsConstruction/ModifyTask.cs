@@ -16,7 +16,7 @@ namespace Bud.SettingsConstruction {
         TaskDefinition<T> existingTaskDef = (TaskDefinition<T>)value;
         buildConfigurationBuilder[Key] = new TaskDefinition<T>(context => TaskModification(context, () => context.Evaluate(existingTaskDef)));
       } else {
-        throw new InvalidOperationException(string.Format("Cannot modify the task '{0}'. This task has not yet been defined.", Key.GetType().FullName));
+        throw new InvalidOperationException(string.Format("Cannot modify the task '{0}'. This task has not yet been defined.", Key));
       }
     }
   }

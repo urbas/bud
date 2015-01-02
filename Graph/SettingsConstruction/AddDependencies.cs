@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Immutable;
 using System.Collections.Generic;
 
@@ -7,7 +8,7 @@ namespace Bud.SettingsConstruction {
     private IEnumerable<TaskKey> extraDependencies;
 
     public AddDependencies(TaskKey<T> key, IEnumerable<TaskKey> extraDependencies) : base(key) {
-      this.extraDependencies = extraDependencies;
+      this.extraDependencies = extraDependencies.Where(dependency => !dependency.Equals(key));
     }
 
     public override void ApplyTo(ImmutableDictionary<Key, ITaskDefinition>.Builder buildConfigurationBuilder) {

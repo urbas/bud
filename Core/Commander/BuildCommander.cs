@@ -13,7 +13,7 @@ namespace Bud.Commander {
   public static class BuildCommander {
 
     public static IBuildCommander Load(string path) {
-      var buildProjectDir = Path.Combine(path, ".bud");
+      var buildProjectDir = Path.Combine(path, BuildDirs.BudDirName);
       var buildProjectId = "BuildDefinition";
       var buildProject = GlobalBuild.New(buildProjectDir).BuildProject(buildProjectId, buildProjectDir, path);
       var evaluationContext = EvaluationContext.FromSettings(buildProject);

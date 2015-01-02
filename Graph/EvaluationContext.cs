@@ -10,10 +10,10 @@ namespace Bud {
 
   public interface IEvaluationContext : IConfiguration {
     ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions { get; }
-    bool IsTaskDefined(Key scope);
-    Task<T> Evaluate<T>(TaskKey<T> scope);
-    Task EvaluateTask(Key scope);
-    Task EvaluateScope(Key scope);
+    bool IsTaskDefined(Key key);
+    Task<T> Evaluate<T>(TaskKey<T> key);
+    Task EvaluateTask(Key key);
+    Task EvaluateKey(Key key);
   }
 
   // TODO: Make this class thread-safe.
@@ -22,7 +22,7 @@ namespace Bud {
     private readonly ImmutableDictionary<Key, ITaskDefinition> taskDefinitions;
     private readonly Dictionary<Key, Task> taskValues = new Dictionary<Key, Task>();
     private readonly Dictionary<ITaskDefinition, Task> oldTaskValues = new Dictionary<ITaskDefinition, Task>();
-    private readonly Dictionary<Key, object> scopeToOutput = new Dictionary<Key, object>();
+    private readonly Dictionary<Key, object> keyToOutput = new Dictionary<Key, object>();
 
     private EvaluationContext(ImmutableDictionary<Key, IConfigDefinition> configDefinitions, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) : this(new Configuration(configDefinitions), taskDefinitions) {}
 
@@ -35,35 +35,35 @@ namespace Bud {
 
     public ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions { get { return taskDefinitions; } }
 
-    public bool IsConfigDefined(Key scope) {
-      return configuration.IsConfigDefined(scope);
+    public bool IsConfigDefined(Key key) {
+      return configuration.IsConfigDefined(key);
     }
 
     public T Evaluate<T>(ConfigKey<T> configKey) {
       return configuration.Evaluate(configKey);
     }
 
-    public object EvaluateConfig(Key scope) {
-      return configuration.EvaluateConfig(scope);
+    public object EvaluateConfig(Key key) {
+      return configuration.EvaluateConfig(key);
     }
 
-    public bool IsTaskDefined(Key scope) {
-      return taskDefinitions.ContainsKey(scope);
+    public bool IsTaskDefined(Key key) {
+      return taskDefinitions.ContainsKey(key);
     }
 
-    public Task EvaluateScope(Key scope) {
-      if (IsTaskDefined(scope)) {
-        return EvaluateTask(scope);
+    public Task EvaluateKey(Key key) {
+      if (IsTaskDefined(key)) {
+        return EvaluateTask(key);
       }
-      return Task.FromResult(configuration.EvaluateConfig(scope));
+      return Task.FromResult(configuration.EvaluateConfig(key));
     }
 
-    public Task Evaluate(TaskKey scope) {
-      return EvaluateTask(scope);
+    public Task Evaluate(TaskKey key) {
+      return EvaluateTask(key);
     }
 
-    public Task<T> Evaluate<T>(TaskKey<T> scope) {
-      return (Task<T>)Evaluate((TaskKey)scope);
+    public Task<T> Evaluate<T>(TaskKey<T> key) {
+      return (Task<T>)Evaluate((TaskKey)key);
     }
 
     public Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition) {
@@ -81,23 +81,23 @@ namespace Bud {
       return new EvaluationContext(settings.ConfigDefinitions, settings.TaskDefinitions);
     }
 
-    public Task EvaluateTask(Key scope) {
+    public Task EvaluateTask(Key key) {
       Task value;
-      if (taskValues.TryGetValue(scope, out value)) {
+      if (taskValues.TryGetValue(key, out value)) {
         return value;
       }
       ITaskDefinition taskDefinition;
-      if (taskDefinitions.TryGetValue(scope, out taskDefinition)) {
+      if (taskDefinitions.TryGetValue(key, out taskDefinition)) {
         value = taskDefinition.Evaluate(this);
-        taskValues.Add(scope, value);
+        taskValues.Add(key, value);
         return value;
       }
-      throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. The value for this task was not defined.", scope));
+      throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. The value for this task was not defined.", key));
     }
 
-    public object GetOutputOf(Key scope) {
+    public object GetOutputOf(Key key) {
       object evaluationOutput;
-      if (scopeToOutput.TryGetValue(scope, out evaluationOutput)) {
+      if (keyToOutput.TryGetValue(key, out evaluationOutput)) {
         return evaluationOutput;
       }
       return null;
@@ -111,8 +111,8 @@ namespace Bud {
       return sb.Append("])").ToString();
     }
 
-    public static void ToString(StringBuilder sb, IEnumerable<Key> scopes) {
-      var enumerator = scopes.GetEnumerator();
+    public static void ToString(StringBuilder sb, IEnumerable<Key> keys) {
+      var enumerator = keys.GetEnumerator();
       if (enumerator.MoveNext()) {
         sb.Append(enumerator.Current);
         while (enumerator.MoveNext()) {

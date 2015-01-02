@@ -12,9 +12,8 @@ namespace Bud.Plugins.Build {
 
     public Settings ApplyTo(Settings settings, Key scope) {
       return settings
-        .Init(GlobalBuildKeys.GlobalBaseDir, baseDir)
-        .Init(GlobalBuildKeys.GlobalBudDir, ctxt => Path.Combine(ctxt.GetGlobalBaseDir(), ".bud", "global"))
-        .Init(GlobalBuildKeys.GlobalBuildConfigCacheDir, ctxt => Path.Combine(ctxt.GetGlobalBudDir(), "buildConfigCache"));
+        .Apply(Key.Global, new BuildDirsPlugin(baseDir))
+        .Modify(BuildDirsKeys.BudDir, (ctxt, oldValue) => Path.Combine(ctxt.GetBaseDir(), BuildDirs.BudDirName, "global"));
     }
   }
 }

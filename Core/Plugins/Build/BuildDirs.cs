@@ -5,6 +5,14 @@ using Bud.SettingsConstruction;
 namespace Bud.Plugins.Build {
 
   public static class BuildDirs {
+    public const string BudDirName = ".bud";
+    public const string BuildConfigCacheDirName = "buildConfigCache";
+    public const string PersistentBuildConfigDirName = "persistentBuildConfig";
+
+    public static string GetBaseDir(this IConfiguration buildConfiguration) {
+      return buildConfiguration.GetBaseDir(Key.Global);
+    }
+
     public static string GetBaseDir(this IConfiguration buildConfiguration, Key project) {
       return buildConfiguration.Evaluate(BuildDirsKeys.BaseDir.In(project));
     }
@@ -14,27 +22,38 @@ namespace Bud.Plugins.Build {
     }
 
     public static string GetDefaultBudDir(this Configuration ctxt, Key scope) {
-      return Path.Combine(ctxt.GetBaseDir(scope), ".bud");
+      return Path.Combine(ctxt.GetBaseDir(scope), BudDirName);
     }
 
     /// <returns>The directory where build output (such as compiled assemblies) are stored.</returns>
-    /// <param name="projectBaseDir">The root directory of the project being built.</param>
     public static string GetOutputDir(this IConfiguration buildConfiguration, Key project) {
       return buildConfiguration.Evaluate(BuildDirsKeys.OutputDir.In(project));
     }
 
-    public static string GetDefaultOutputDir(this IConfiguration ctxt, Key scope) {
-      return Path.Combine(ctxt.GetBudDir(scope), "output");
+    public static string GetDefaultOutputDir(this IConfiguration ctxt, Key project) {
+      return Path.Combine(ctxt.GetBudDir(project), "output");
     }
 
-    /// <returns>The directory where data gathered during build configuration is stored (e.g.: downloaded dependencies).</returns>
-    /// <param name="projectBaseDir">The root directory of the project being built.</param>
+    /// <returns>The directory where transient data gathered during build configuration is stored (e.g.: downloaded dependencies).</returns>
     public static string GetBuildConfigCacheDir(this IConfiguration buildConfiguration, Key project) {
       return buildConfiguration.Evaluate(BuildDirsKeys.BuildConfigCacheDir.In(project));
     }
 
     public static string GetDefaultBuildConfigCacheDir(this IConfiguration ctxt, Key scope) {
-      return Path.Combine(ctxt.GetBudDir(scope), "buildConfigCache");
+      return Path.Combine(ctxt.GetBudDir(scope), BuildConfigCacheDirName);
+    }
+
+    /// <returns>
+    /// The directory where persistent data gathered during build configuration is stored (e.g.: locked version of downloaded dependencies).
+    /// 
+    /// This directoy should be committed to the VCS.
+    /// </returns>
+    public static string GetPersistentBuildConfigDir(this IConfiguration buildConfiguration, Key project) {
+      return buildConfiguration.Evaluate(BuildDirsKeys.PersistentBuildConfigDir.In(project));
+    }
+
+    public static string GetDefaultPersistentBuildConfigDir(this IConfiguration ctxt, Key scope) {
+      return Path.Combine(ctxt.GetBudDir(scope), PersistentBuildConfigDirName);
     }
   }
 

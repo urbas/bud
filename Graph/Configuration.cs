@@ -8,9 +8,9 @@ namespace Bud {
 
   public interface IConfiguration {
     ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions { get; }
-    bool IsConfigDefined(Key scope);
+    bool IsConfigDefined(Key key);
     T Evaluate<T>(ConfigKey<T> configKey);
-    object EvaluateConfig(Key scope);
+    object EvaluateConfig(Key key);
   }
 
   // TODO: Make this class thread-safe.
@@ -18,36 +18,36 @@ namespace Bud {
     private readonly ImmutableDictionary<Key, IConfigDefinition> configDefinitions;
     private readonly Dictionary<Key, object> configValues = new Dictionary<Key, object>();
 
-    public Configuration(ImmutableDictionary<Key, IConfigDefinition> scopeDefinitions) {
-      this.configDefinitions = scopeDefinitions;
+    public Configuration(ImmutableDictionary<Key, IConfigDefinition> configDefinitions) {
+      this.configDefinitions = configDefinitions;
     }
 
     public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions { get { return configDefinitions; } }
 
-    public bool IsConfigDefined(Key scope) {
-      return configDefinitions.ContainsKey(scope);
+    public bool IsConfigDefined(Key key) {
+      return configDefinitions.ContainsKey(key);
     }
 
-    public object Evaluate(ConfigKey scope) {
-      return EvaluateConfig(scope);
+    public object Evaluate(ConfigKey key) {
+      return EvaluateConfig(key);
     }
 
     public T Evaluate<T>(ConfigKey<T> configKey) {
       return (T)Evaluate((ConfigKey)configKey);
     }
 
-    public object EvaluateConfig(Key scope) {
+    public object EvaluateConfig(Key key) {
       object value;
-      if (configValues.TryGetValue(scope, out value)) {
+      if (configValues.TryGetValue(key, out value)) {
         return value;
       }
       IConfigDefinition configDefinition;
-      if (configDefinitions.TryGetValue(scope, out configDefinition)) {
+      if (configDefinitions.TryGetValue(key, out configDefinition)) {
         value = configDefinition.Evaluate(this);
-        configValues.Add(scope, value);
+        configValues.Add(key, value);
         return value;
       }
-      throw new ArgumentException(string.Format("Could not evaluate configuration '{0}'. The value for this configuration was not defined.", scope));
+      throw new ArgumentException(string.Format("Could not evaluate configuration '{0}'. The value for this configuration was not defined.", key));
     }
   }
 }
