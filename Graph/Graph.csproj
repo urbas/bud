@@ -46,7 +46,6 @@
     <Compile Include="Util\TaskUtils.cs" />
     <Compile Include="IPlugin.cs" />
     <Compile Include="Plugin.cs" />
-    <Compile Include="ScopeDefinitions.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="PluginUtils.cs" />
     <Compile Include="SettingsConstruction\AddDependencies.cs" />

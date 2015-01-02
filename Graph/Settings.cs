@@ -74,16 +74,24 @@ namespace Bud {
       return Add(new AddDependencies<T>(key, dependencies));
     }
 
-    public ScopeDefinitions Compile() {
-      var configDefinitions = ImmutableDictionary.CreateBuilder<Scope, IConfigDefinition>();
-      foreach (var configConstructor in ConfigConstructors) {
-        configConstructor.ApplyTo(configDefinitions);
+    public ImmutableDictionary<Scope, IConfigDefinition> ConfigDefinitions {
+      get {
+        var configDefinitions = ImmutableDictionary.CreateBuilder<Scope, IConfigDefinition>();
+        foreach (var configConstructor in ConfigConstructors) {
+          configConstructor.ApplyTo(configDefinitions);
+        }
+        return configDefinitions.ToImmutable();
       }
-      var taskDefinitions = ImmutableDictionary.CreateBuilder<Scope, ITaskDefinition>();
-      foreach (var taskConstructor in TaskConstructors) {
-        taskConstructor.ApplyTo(taskDefinitions);
+    }
+
+    public ImmutableDictionary<Scope, ITaskDefinition> TaskDefinitions {
+      get {
+        var taskDefinitions = ImmutableDictionary.CreateBuilder<Scope, ITaskDefinition>();
+        foreach (var taskConstructor in TaskConstructors) {
+          taskConstructor.ApplyTo(taskDefinitions);
+        }
+        return taskDefinitions.ToImmutable();
       }
-      return new ScopeDefinitions(configDefinitions.ToImmutable(), taskDefinitions.ToImmutable());
     }
   }
 }

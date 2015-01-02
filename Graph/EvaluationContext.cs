@@ -24,9 +24,9 @@ namespace Bud {
     private readonly Dictionary<ITaskDefinition, Task> oldTaskValues = new Dictionary<ITaskDefinition, Task>();
     private readonly Dictionary<Scope, object> scopeToOutput = new Dictionary<Scope, object>();
 
-    public EvaluationContext(ScopeDefinitions scopeDefinitions) {
-      this.configuration = new Configuration(scopeDefinitions.ConfigDefinitions);
-      this.taskDefinitions = scopeDefinitions.TaskDefinitions;
+    public EvaluationContext(ImmutableDictionary<Scope, IConfigDefinition> configDefinitions, ImmutableDictionary<Scope, ITaskDefinition> taskDefinitions) {
+      this.configuration = new Configuration(configDefinitions);
+      this.taskDefinitions = taskDefinitions;
     }
 
     public ImmutableDictionary<Scope, IConfigDefinition> ConfigDefinitions { get { return configuration.ConfigDefinitions; } }
@@ -76,7 +76,7 @@ namespace Bud {
     }
 
     public static EvaluationContext FromSettings(Settings settings) {
-      return new EvaluationContext(settings.Compile());
+      return new EvaluationContext(settings.ConfigDefinitions, settings.TaskDefinitions);
     }
 
     public Task EvaluateTask(Scope scope) {
