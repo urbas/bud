@@ -4,12 +4,12 @@ namespace Bud {
   public class Plugin : IPlugin {
     public static readonly Plugin New = new Plugin();
 
-    public readonly SettingsTransform SettingApplication;
+    public readonly SettingsTransform SettingsTransform;
 
     private Plugin() : this((existingSettings, scope) => existingSettings) {}
 
-    public Plugin(SettingsTransform settingApplication) {
-      SettingApplication = settingApplication;
+    public Plugin(SettingsTransform settingsTransform) {
+      SettingsTransform = settingsTransform;
     }
 
     public static Plugin Create(SettingsTransform settingApplication) {
@@ -17,7 +17,7 @@ namespace Bud {
     }
 
     public Settings ApplyTo(Settings settings, Key scope) {
-      return SettingApplication(settings, scope);
+      return SettingsTransform(settings, scope);
     }
 	}
 }
