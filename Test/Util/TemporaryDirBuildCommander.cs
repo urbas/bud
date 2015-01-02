@@ -7,15 +7,15 @@ using Bud.Commander;
 namespace Bud.Test.Util {
   public class TemporaryDirBuildCommander : IBuildCommander {
     public readonly TemporaryDirectory TemporaryDirectory;
-    public readonly IBuildCommander BuildCommander;
+    private readonly IBuildCommander buildCommander;
 
     public TemporaryDirBuildCommander(TemporaryDirectory temporaryDirectory) {
       this.TemporaryDirectory = temporaryDirectory;
-      this.BuildCommander = BuildLoading.Load(TemporaryDirectory.Path);
+      this.buildCommander = BuildCommander.Load(TemporaryDirectory.Path);
     }
 
     public object Evaluate(string command) {
-      return BuildCommander.Evaluate(command);
+      return buildCommander.Evaluate(command);
     }
 
     public void Dispose() {
@@ -25,7 +25,7 @@ namespace Bud.Test.Util {
       } catch (Exception ex) {
         tempDirDisposeException = ex;
       }
-      BuildCommander.Dispose();
+      buildCommander.Dispose();
 
       if (tempDirDisposeException != null) {
         throw tempDirDisposeException;

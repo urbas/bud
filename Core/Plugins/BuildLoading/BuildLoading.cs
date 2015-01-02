@@ -26,19 +26,6 @@ namespace Bud.Plugins.BuildLoading {
     public static string GetDirOfProjectToBeBuilt(this EvaluationContext context, Scope buildLoadingProject) {
       return context.Evaluate(BuildLoadingKeys.DirOfProjectToBeBuilt.In(buildLoadingProject));
     }
-
-    public async static Task<IBuildCommander> CreateBuildCommander(string path) {
-      var buildProjectDir = Path.Combine(path, ".bud");
-      var buildProjectId = "BuildDefinition";
-      var buildProject = GlobalBuild.New(buildProjectDir).BuildProject(buildProjectId, buildProjectDir, path);
-      var evaluationContext = EvaluationContext.FromSettings(buildProject);
-      return await evaluationContext.CreateBuildCommander(Project.ProjectScope(buildProjectId));
-    }
-
-    public static IBuildCommander Load(string path) {
-      return CreateBuildCommander(path).Result;
-    }
-
   }
 }
 

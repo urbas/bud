@@ -74,7 +74,6 @@
     <Compile Include="BudAssemblies.cs" />
     <Compile Include="Commander\AppDomainBuildCommander.cs" />
     <Compile Include="Commander\AssemblyBuildCommander.cs" />
-    <Compile Include="Commander\BuildCommanderUtils.cs" />
     <Compile Include="Commander\IBuildCommander.cs" />
     <Compile Include="Commander\CommandEvaluator.cs" />
     <Compile Include="Commander\DefaultBuildCommander.cs" />
@@ -87,6 +86,7 @@
     <Compile Include="Plugins\Build\GlobalBuildKeys.cs" />
     <Compile Include="Plugins\Build\GlobalBuild.cs" />
     <Compile Include="Plugins\NuGet\NuGet.cs" />
+    <Compile Include="Commander\BuildCommander.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

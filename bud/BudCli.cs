@@ -1,13 +1,13 @@
 using System;
 using System.IO;
-using Bud.Plugins.CSharp;
-using Bud.Plugins.BuildLoading;
+using Bud.Plugins.Build;
+using Bud.Commander;
 
 namespace Bud {
   public static class BudCli {
     public static void Main(string[] args) {
-      var buildCommandInvoker = BuildLoading.Load(Directory.GetCurrentDirectory());
-      buildCommandInvoker.Evaluate(CSharpKeys.Build.ToString());
+      var buildCommander = BuildCommander.Load(Directory.GetCurrentDirectory());
+      buildCommander.Evaluate(BuildKeys.Build);
     }
   }
 }
