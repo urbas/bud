@@ -6,7 +6,7 @@ namespace Bud {
       return otherPlugin == null ? thisPlugin : thisPlugin.With(otherPlugin.ApplyTo);
     }
 
-    public static IPlugin With(this IPlugin thisPlugin, SettingApplication settingApplication) {
+    public static IPlugin With(this IPlugin thisPlugin, SettingsTransform settingApplication) {
       return new Plugin((existingSettings, scope) => settingApplication(thisPlugin.ApplyTo(existingSettings, scope), scope));
     }
   }

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Bud {
 
-  public delegate Settings SettingApplication(Settings existingSettings, Scope toScope);
+  public delegate Settings SettingsTransform(Settings existingSettings, Scope toScope);
 
   public class Settings {
     public static readonly Settings Empty = new Settings();
@@ -32,10 +32,6 @@ namespace Bud {
 
     public Settings Add(Settings settings) {
       return new Settings(ConfigConstructors.AddRange(settings.ConfigConstructors), TaskConstructors.AddRange(settings.TaskConstructors));
-    }
-
-    public Settings ApplyGlobally(IPlugin plugin) {
-      return plugin.ApplyTo(this, Scope.Global);
     }
 
     public Settings Apply(Scope toScope, IPlugin plugin) {

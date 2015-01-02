@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 namespace Bud.Plugins.Build {
   public static class GlobalBuild {
     public static Settings New(string globalBuildDir = ".") {
-      return Settings.Empty.ApplyGlobally(new GlobalBuildPlugin(globalBuildDir));
+      return Settings.Empty.Apply(Scope.Global, new GlobalBuildPlugin(globalBuildDir));
     }
 
     public static string GetGlobalBaseDir(this Configuration ctxt) {

@@ -4,15 +4,15 @@ namespace Bud {
   public class Plugin : IPlugin {
     public static readonly Plugin New = new Plugin();
 
-    public readonly SettingApplication SettingApplication;
+    public readonly SettingsTransform SettingApplication;
 
     private Plugin() : this((existingSettings, scope) => existingSettings) {}
 
-    public Plugin(SettingApplication settingApplication) {
+    public Plugin(SettingsTransform settingApplication) {
       SettingApplication = settingApplication;
     }
 
-    public static Plugin Create(SettingApplication settingApplication) {
+    public static Plugin Create(SettingsTransform settingApplication) {
       return new Plugin(settingApplication);
     }
 

@@ -24,8 +24,10 @@ namespace Bud {
     private readonly Dictionary<ITaskDefinition, Task> oldTaskValues = new Dictionary<ITaskDefinition, Task>();
     private readonly Dictionary<Scope, object> scopeToOutput = new Dictionary<Scope, object>();
 
-    public EvaluationContext(ImmutableDictionary<Scope, IConfigDefinition> configDefinitions, ImmutableDictionary<Scope, ITaskDefinition> taskDefinitions) {
-      this.configuration = new Configuration(configDefinitions);
+    private EvaluationContext(ImmutableDictionary<Scope, IConfigDefinition> configDefinitions, ImmutableDictionary<Scope, ITaskDefinition> taskDefinitions) : this(new Configuration(configDefinitions), taskDefinitions) {}
+
+    private EvaluationContext(IConfiguration configuration, ImmutableDictionary<Scope, ITaskDefinition> taskDefinitions) {
+      this.configuration = configuration;
       this.taskDefinitions = taskDefinitions;
     }
 
