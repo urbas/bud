@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace Bud {
 
-  public delegate Settings SettingsTransform(Settings existingSettings, Scope toScope);
+  public delegate Settings SettingsTransform(Settings existingSettings, Key scope);
 
   public class Settings {
     public static readonly Settings Empty = new Settings();
@@ -34,8 +34,8 @@ namespace Bud {
       return new Settings(ConfigConstructors.AddRange(settings.ConfigConstructors), TaskConstructors.AddRange(settings.TaskConstructors));
     }
 
-    public Settings Apply(Scope toScope, IPlugin plugin) {
-      return plugin.ApplyTo(this, toScope);
+    public Settings Apply(Key scope, IPlugin plugin) {
+      return plugin.ApplyTo(this, scope);
     }
 
     public Settings Init<T>(ConfigKey<T> key, T initialValue) {
@@ -70,9 +70,9 @@ namespace Bud {
       return Add(new AddDependencies<T>(key, dependencies));
     }
 
-    public ImmutableDictionary<Scope, IConfigDefinition> ConfigDefinitions {
+    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions {
       get {
-        var configDefinitions = ImmutableDictionary.CreateBuilder<Scope, IConfigDefinition>();
+        var configDefinitions = ImmutableDictionary.CreateBuilder<Key, IConfigDefinition>();
         foreach (var configConstructor in ConfigConstructors) {
           configConstructor.ApplyTo(configDefinitions);
         }
@@ -80,9 +80,9 @@ namespace Bud {
       }
     }
 
-    public ImmutableDictionary<Scope, ITaskDefinition> TaskDefinitions {
+    public ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions {
       get {
-        var taskDefinitions = ImmutableDictionary.CreateBuilder<Scope, ITaskDefinition>();
+        var taskDefinitions = ImmutableDictionary.CreateBuilder<Key, ITaskDefinition>();
         foreach (var taskConstructor in TaskConstructors) {
           taskConstructor.ApplyTo(taskDefinitions);
         }

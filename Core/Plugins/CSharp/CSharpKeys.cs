@@ -5,7 +5,7 @@ using System.Collections.Immutable;
 
 namespace Bud.Plugins.CSharp {
   public static class CSharpKeys {
-    public static readonly Scope CSharp = new Scope("CSharp");
+    public static readonly Key CSharp = new Key("CSharp");
     public static readonly ConfigKey<AssemblyType> AssemblyType = new ConfigKey<AssemblyType>("AssemblyType").In(CSharp);
     public static readonly ConfigKey<string> OutputAssemblyDir = new ConfigKey<string>("OutputAssemblyDir").In(CSharp);
     public static readonly ConfigKey<string> OutputAssemblyName = new ConfigKey<string>("OutputAssemblyName").In(CSharp);

@@ -19,7 +19,7 @@ namespace Bud.Plugins.CSharp {
     private CSharpPlugin() {
     }
 
-    public Settings ApplyTo(Settings settings, Scope scope) {
+    public Settings ApplyTo(Settings settings, Key scope) {
       return settings
         .Apply(scope, BuildPlugin.Instance)
         .Apply(scope, DependenciesPlugin.Instance)
@@ -34,14 +34,14 @@ namespace Bud.Plugins.CSharp {
         .AddDependencies(BuildKeys.Build.In(scope), CSharpKeys.Build.In(scope));
     }
 
-    public static async Task<ImmutableList<string>> CollectAssembliesFromDependencies(EvaluationContext context, Scope currentProject) {
+    public static async Task<ImmutableList<string>> CollectAssembliesFromDependencies(EvaluationContext context, Key currentProject) {
       var scopeDependencies = await CollectScopeDependencies(context, currentProject);
       var nuGetDependencies = await CollectNuGetDependencies(context, currentProject);
       var gacDependencies = ImmutableList.Create<string>("Facades/System.Runtime.dll");
       return scopeDependencies.AddRange(nuGetDependencies).AddRange(gacDependencies);
     }
 
-    public IEnumerable<string> FindSources(EvaluationContext context, Scope scope) {
+    public IEnumerable<string> FindSources(EvaluationContext context, Key scope) {
       var sourceDirectory = context.GetCSharpSourceDir(scope);
       if (Directory.Exists(sourceDirectory)) {
         return Directory.EnumerateFiles(sourceDirectory);
@@ -50,7 +50,7 @@ namespace Bud.Plugins.CSharp {
       }
     }
 
-    private static async Task<ImmutableList<string>> CollectScopeDependencies(EvaluationContext context, Scope currentProject) {
+    private static async Task<ImmutableList<string>> CollectScopeDependencies(EvaluationContext context, Key currentProject) {
       var collectedAssemblies = ImmutableList.CreateBuilder<string>();
       var resolvedDependencies = await context.ResolveDependencies(currentProject);
       foreach (var resolvedDependency in resolvedDependencies) {
@@ -62,7 +62,7 @@ namespace Bud.Plugins.CSharp {
       return collectedAssemblies.ToImmutable();
     }
 
-    private static async Task<ImmutableList<string>> CollectNuGetDependencies(EvaluationContext context, Scope currentProject) {
+    private static async Task<ImmutableList<string>> CollectNuGetDependencies(EvaluationContext context, Key currentProject) {
       var collectedAssemblies = ImmutableList.CreateBuilder<string>();
       var nuGetDependencies = await context.ResolveNuGetDependencies();
       var packagePath = context.GetNuGetRepositoryDir();

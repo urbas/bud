@@ -10,7 +10,7 @@ namespace Bud.SettingsConstruction {
       Key = key;
     }
 
-    public abstract void ApplyTo(ImmutableDictionary<Scope, IConfigDefinition>.Builder buildConfigurationBuilder);
+    public abstract void ApplyTo(ImmutableDictionary<Key, IConfigDefinition>.Builder buildConfigurationBuilder);
   }
 }
 

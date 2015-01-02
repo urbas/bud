@@ -10,7 +10,7 @@ namespace Bud.SettingsConstruction {
       this.ValueModifier = valueModifier;
     }
 
-    public override void ApplyTo(ImmutableDictionary<Scope, IConfigDefinition>.Builder buildConfigurationBuilder) {
+    public override void ApplyTo(ImmutableDictionary<Key, IConfigDefinition>.Builder buildConfigurationBuilder) {
       IConfigDefinition value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
         ConfigDefinition<T> existingValue = (ConfigDefinition<T>)value;

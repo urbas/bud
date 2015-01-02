@@ -20,11 +20,11 @@ namespace Bud.Plugins.NuGet {
       return ImmutableList.CreateRange(nuGetDependencies);
     }
 
-    public static ImmutableList<NuGetDependency> GetNuGetDependencies(this EvaluationContext context, Scope scope) {
+    public static ImmutableList<NuGetDependency> GetNuGetDependencies(this EvaluationContext context, Key scope) {
       return context.Evaluate(NuGetKeys.NuGetDependencies.In(scope));
     }
 
-    public static ImmutableList<Scope> GetScopesWithNuGetDependencies(this EvaluationContext context) {
+    public static ImmutableList<Key> GetScopesWithNuGetDependencies(this EvaluationContext context) {
       return context.Evaluate(NuGetKeys.ScopesWithNuGetDependencies);
     }
 

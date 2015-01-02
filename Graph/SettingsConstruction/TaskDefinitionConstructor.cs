@@ -9,7 +9,7 @@ namespace Bud.SettingsConstruction {
       Key = key;
     }
 
-    public abstract void ApplyTo(ImmutableDictionary<Scope, ITaskDefinition>.Builder taskDefinitionBuilder);
+    public abstract void ApplyTo(ImmutableDictionary<Key, ITaskDefinition>.Builder taskDefinitionBuilder);
   }
 }
 

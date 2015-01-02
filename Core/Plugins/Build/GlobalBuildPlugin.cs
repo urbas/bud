@@ -10,7 +10,7 @@ namespace Bud.Plugins.Build {
       this.baseDir = baseDir;
     }
 
-    public Settings ApplyTo(Settings settings, Scope scope) {
+    public Settings ApplyTo(Settings settings, Key scope) {
       return settings
         .Init(GlobalBuildKeys.GlobalBaseDir, baseDir)
         .Init(GlobalBuildKeys.GlobalBudDir, ctxt => Path.Combine(ctxt.GetGlobalBaseDir(), ".bud", "global"))

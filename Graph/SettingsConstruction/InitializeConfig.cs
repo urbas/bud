@@ -11,7 +11,7 @@ namespace Bud.SettingsConstruction {
       this.InitialValue = initialValue;
     }
 
-    public override void ApplyTo(ImmutableDictionary<Scope, IConfigDefinition>.Builder buildConfigurationBuilder) {
+    public override void ApplyTo(ImmutableDictionary<Key, IConfigDefinition>.Builder buildConfigurationBuilder) {
       if (!buildConfigurationBuilder.ContainsKey(Key)) {
         buildConfigurationBuilder[Key] = new ConfigDefinition<T>(InitialValue);
       }

@@ -18,43 +18,43 @@ namespace Bud.Plugins.CSharp {
       return build.CSharpProject(id, baseDir, Plugin.Create(SetLibraryAssemblyType));
     }
 
-    public static Settings SetLibraryAssemblyType(Settings existingSettings, Scope scope) {
+    public static Settings SetLibraryAssemblyType(Settings existingSettings, Key scope) {
       return existingSettings.Modify(CSharpKeys.AssemblyType.In(scope), assemblyType => AssemblyType.Library);
     }
 
-    public static string GetCSharpSourceDir(this EvaluationContext context, Scope project) {
+    public static string GetCSharpSourceDir(this EvaluationContext context, Key project) {
       return Path.Combine(context.GetBaseDir(project), "src", "main", "cs");
     }
 
-    public static Task<IEnumerable<string>> GetCSharpSources(this EvaluationContext context, Scope project) {
+    public static Task<IEnumerable<string>> GetCSharpSources(this EvaluationContext context, Key project) {
       return context.Evaluate(CSharpKeys.SourceFiles.In(project));
     }
 
-    public static string GetCSharpOutputAssemblyDir(this IConfiguration context, Scope project) {
+    public static string GetCSharpOutputAssemblyDir(this IConfiguration context, Key project) {
       return context.Evaluate(CSharpKeys.OutputAssemblyDir.In(project));
     }
 
-    public static string GetCSharpOutputAssemblyName(this IConfiguration context, Scope project) {
+    public static string GetCSharpOutputAssemblyName(this IConfiguration context, Key project) {
       return context.Evaluate(CSharpKeys.OutputAssemblyName.In(project));
     }
 
-    public static string GetCSharpOutputAssemblyFile(this IConfiguration context, Scope project) {
+    public static string GetCSharpOutputAssemblyFile(this IConfiguration context, Key project) {
       return context.Evaluate(CSharpKeys.OutputAssemblyFile.In(project));
     }
 
-    public static Task<ImmutableList<string>> CollectCSharpReferencedAssemblies(this EvaluationContext context, Scope project) {
+    public static Task<ImmutableList<string>> CollectCSharpReferencedAssemblies(this EvaluationContext context, Key project) {
       return context.Evaluate(CSharpKeys.CollectReferencedAssemblies.In(project));
     }
 
-    public static AssemblyType GetCSharpAssemblyType(this IConfiguration context, Scope project) {
+    public static AssemblyType GetCSharpAssemblyType(this IConfiguration context, Key project) {
       return context.Evaluate(CSharpKeys.AssemblyType.In(project));
     }
 
-    public static Task CSharpBuild(this EvaluationContext context, Scope project) {
+    public static Task CSharpBuild(this EvaluationContext context, Key project) {
       return context.Evaluate(CSharpKeys.Build.In(project));
      }
 
-    public static string GetAssemblyFileExtension(this IConfiguration context, Scope project) {
+    public static string GetAssemblyFileExtension(this IConfiguration context, Key project) {
       switch (context.GetCSharpAssemblyType(project)) {
         case AssemblyType.Exe:
           return "exe";

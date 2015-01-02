@@ -10,7 +10,7 @@ namespace Bud.Plugins.Build {
       this.baseDir = baseDir;
     }
 
-    public Settings ApplyTo(Settings settings, Scope scope) {
+    public Settings ApplyTo(Settings settings, Key scope) {
       return settings
         .Apply(scope, BuildPlugin.Instance)
         .AddDependencies(BuildKeys.Clean, BuildKeys.Clean.In(scope))
@@ -21,7 +21,7 @@ namespace Bud.Plugins.Build {
         .Init(BuildKeys.Clean.In(scope), ctxt => CleanBuildDirsTask(ctxt, scope));
     }
 
-    private static Unit CleanBuildDirsTask(EvaluationContext context, Scope project) {
+    private static Unit CleanBuildDirsTask(EvaluationContext context, Key project) {
       var outputDir = context.GetOutputDir(project);
       Directory.Delete(outputDir, true);
       return Unit.Instance;

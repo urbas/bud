@@ -2,7 +2,7 @@
 
 namespace Bud {
   public interface IPlugin {
-    Settings ApplyTo(Settings settings, Scope scope);
+    Settings ApplyTo(Settings settings, Key scope);
   }
 }
 

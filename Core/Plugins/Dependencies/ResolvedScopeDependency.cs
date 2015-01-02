@@ -7,11 +7,11 @@ namespace Bud.Plugins.Dependencies
 {
   public class ResolvedScopeDependency
 	{
-    public ResolvedScopeDependency(Scope scope) {
+    public ResolvedScopeDependency(Key scope) {
       Dependency = scope;
     }
 
-    public Scope Dependency { get; private set; }
+    public Key Dependency { get; private set; }
 	}
 }
 

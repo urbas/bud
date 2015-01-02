@@ -18,15 +18,15 @@ namespace Bud.Plugins.Projects {
       return ProjectScope(projectId).ToDependency();
     }
 
-    public static Scope ProjectScope(string id) {
-      return new Scope(id).In(ProjectKeys.Project);
+    public static Key ProjectScope(string id) {
+      return new Key(id).In(ProjectKeys.Project);
     }
 
-    public static ImmutableDictionary<string, Scope> GetAllProjects(this IConfiguration buildConfiguration) {
+    public static ImmutableDictionary<string, Key> GetAllProjects(this IConfiguration buildConfiguration) {
       return buildConfiguration.Evaluate(ProjectKeys.Projects);
     }
 
-    public static Scope GetProject(this IConfiguration context, string id) {
+    public static Key GetProject(this IConfiguration context, string id) {
       return GetAllProjects(context)[id];
     }
   }

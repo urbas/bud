@@ -5,9 +5,9 @@ namespace Bud.Plugins.Dependencies
 {
   public class ScopeDependency
   {
-    public readonly Scope Scope;
+    public readonly Key Scope;
 
-    public ScopeDependency(Scope scopeOfDependency) {
+    public ScopeDependency(Key scopeOfDependency) {
       this.Scope = scopeOfDependency;
     }
 

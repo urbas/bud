@@ -12,9 +12,9 @@ namespace Bud.Plugins.NuGet {
 
     private NuGetPlugin() {}
 
-    public Settings ApplyTo(Settings settings, Scope scope) {
+    public Settings ApplyTo(Settings settings, Key scope) {
       return settings
-        .Init(NuGetKeys.ScopesWithNuGetDependencies, ImmutableList<Scope>.Empty)
+        .Init(NuGetKeys.ScopesWithNuGetDependencies, ImmutableList<Key>.Empty)
         .Init(NuGetKeys.NuGetRepositoryDir, context => Path.Combine(context.GetBudDir(scope), "nuGetRepository"))
         .Init(NuGetKeys.ResolveNuGetDependencies, ResolveNuGetDependenciesImpl)
         .Init(NuGetKeys.NuGetDependencies.In(scope), ImmutableList<NuGetDependency>.Empty)

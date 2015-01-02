@@ -22,7 +22,7 @@ namespace Bud.Commander {
       return buildCommanderTask.Result;
     }
 
-    public static object Evaluate(this IBuildCommander budCommander, Scope scope) {
+    public static object Evaluate(this IBuildCommander budCommander, Key scope) {
       return budCommander.Evaluate(scope.ToString());
     }
   }

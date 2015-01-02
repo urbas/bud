@@ -8,7 +8,7 @@ namespace Bud.Plugins.Build {
 
     private BuildPlugin() {}
 
-    public Settings ApplyTo(Settings settings, Scope scope) {
+    public Settings ApplyTo(Settings settings, Key scope) {
       return settings
         .Init(BuildKeys.Clean, TaskUtils.NoOpTask)
         .Init(BuildKeys.Build, TaskUtils.NoOpTask)

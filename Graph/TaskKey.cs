@@ -7,9 +7,9 @@ using Bud.Util;
 
 namespace Bud {
 
-  public abstract class TaskKey : Scope {
+  public abstract class TaskKey : Key {
     protected TaskKey(string id) : base(id) {}
-    protected TaskKey(string id, Scope parent) : base(id, parent) {}
+    protected TaskKey(string id, Key parent) : base(id, parent) {}
   }
 
   /// <summary>
@@ -19,10 +19,10 @@ namespace Bud {
     public TaskKey(string id) : base(id) {
     }
 
-    private TaskKey(string id, Scope parent) : base(id, parent) {
+    private TaskKey(string id, Key parent) : base(id, parent) {
     }
 
-    public new TaskKey<T> In(Scope parent) {
+    public new TaskKey<T> In(Key parent) {
       if (parent.IsGlobal) {
         return this;
       }

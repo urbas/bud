@@ -15,7 +15,7 @@ using Bud.Commander;
 namespace Bud.Commander {
   public static class CommandEvaluator {
     public static object Evaluate(Settings settings, string command) {
-      Scope scopeToEvaluate = Scope.Parse(command);
+      Key scopeToEvaluate = Key.Parse(command);
       var evaluationContext = EvaluationContext.FromSettings(settings);
       var evaluationResult = evaluationContext
         .EvaluateScope(scopeToEvaluate)

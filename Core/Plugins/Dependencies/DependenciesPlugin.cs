@@ -11,7 +11,7 @@ namespace Bud.Plugins.Dependencies {
     private DependenciesPlugin() {
     }
 
-    public Settings ApplyTo(Settings settings, Scope scope) {
+    public Settings ApplyTo(Settings settings, Key scope) {
       return settings
         .Apply(scope, BuildPlugin.Instance)
         .Init(DependenciesKeys.ScopeDependencies.In(scope), ImmutableList<ScopeDependency>.Empty)
@@ -19,12 +19,12 @@ namespace Bud.Plugins.Dependencies {
         .Init(DependenciesKeys.ResolveScopeDependency.In(scope), context => ResolveScopeDependencyImpl(context, scope));
     }
 
-    public static Task<ImmutableList<ResolvedScopeDependency>> ResolveDependenciesImpl(EvaluationContext context, Scope scope) {
+    public static Task<ImmutableList<ResolvedScopeDependency>> ResolveDependenciesImpl(EvaluationContext context, Key scope) {
       var resolvedDependencies = Task.WhenAll(context.GetDependencies(scope).Select(dependency => dependency.Resolve(context)));
       return resolvedDependencies.ContinueWith<ImmutableList<ResolvedScopeDependency>>(completedTask => ImmutableList.CreateRange(completedTask.Result));
     }
 
-    public static async Task<ResolvedScopeDependency> ResolveScopeDependencyImpl(EvaluationContext context, Scope scope) {
+    public static async Task<ResolvedScopeDependency> ResolveScopeDependencyImpl(EvaluationContext context, Key scope) {
       await context.BuildScope(scope);
       return new ResolvedScopeDependency(scope);
     }

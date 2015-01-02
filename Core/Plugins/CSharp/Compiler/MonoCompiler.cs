@@ -10,7 +10,7 @@ namespace Bud.Plugins.CSharp.Compiler {
   public static class MonoCompiler {
     public static readonly string CSharpCompiler = "/usr/bin/mcs";
 
-    public static Task<Unit> CompileProject(EvaluationContext context, Scope project) {
+    public static Task<Unit> CompileProject(EvaluationContext context, Key project) {
       return Task.Run(async () => {
         var outputFile = context.GetCSharpOutputAssemblyFile(project);
         var sourceFiles = await context.GetCSharpSources(project);

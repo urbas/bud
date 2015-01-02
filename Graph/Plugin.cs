@@ -16,7 +16,7 @@ namespace Bud {
       return new Plugin(settingApplication);
     }
 
-    public Settings ApplyTo(Settings settings, Scope scope) {
+    public Settings ApplyTo(Settings settings, Key scope) {
       return SettingApplication(settings, scope);
     }
 	}
