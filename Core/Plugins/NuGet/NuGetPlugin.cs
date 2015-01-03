@@ -12,13 +12,13 @@ namespace Bud.Plugins.NuGet {
 
     private NuGetPlugin() {}
 
-    public Settings ApplyTo(Settings settings, Key scope) {
+    public Settings ApplyTo(Settings settings, Key key) {
       return settings
-        .Init(NuGetKeys.ScopesWithNuGetDependencies, ImmutableList<Key>.Empty)
-        .Init(NuGetKeys.NuGetRepositoryDir, context => Path.Combine(context.GetBudDir(scope), "nuGetRepository"))
+        .Init(NuGetKeys.KeysWithNuGetDependencies, ImmutableList<Key>.Empty)
+        .Init(NuGetKeys.NuGetRepositoryDir, context => Path.Combine(context.GetBudDir(key), "nuGetRepository"))
         .Init(NuGetKeys.ResolveNuGetDependencies, ResolveNuGetDependenciesImpl)
-        .Init(NuGetKeys.NuGetDependencies.In(scope), ImmutableList<NuGetDependency>.Empty)
-        .Modify(NuGetKeys.ScopesWithNuGetDependencies, (context, oldValue) => oldValue.Add(scope));
+        .Init(NuGetKeys.NuGetDependencies.In(key), ImmutableList<NuGetDependency>.Empty)
+        .Modify(NuGetKeys.KeysWithNuGetDependencies, (context, oldValue) => oldValue.Add(key));
     }
 
     public static Task<ImmutableDictionary<string, IPackage>> ResolveNuGetDependenciesImpl(EvaluationContext context) {

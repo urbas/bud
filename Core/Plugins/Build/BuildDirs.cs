@@ -21,8 +21,8 @@ namespace Bud.Plugins.Build {
       return buildConfiguration.Evaluate(BuildDirsKeys.BudDir.In(project));
     }
 
-    public static string GetDefaultBudDir(this Configuration ctxt, Key scope) {
-      return Path.Combine(ctxt.GetBaseDir(scope), BudDirName);
+    public static string GetDefaultBudDir(this Configuration ctxt, Key key) {
+      return Path.Combine(ctxt.GetBaseDir(key), BudDirName);
     }
 
     /// <returns>The directory where build output (such as compiled assemblies) are stored.</returns>
@@ -39,8 +39,8 @@ namespace Bud.Plugins.Build {
       return buildConfiguration.Evaluate(BuildDirsKeys.BuildConfigCacheDir.In(project));
     }
 
-    public static string GetDefaultBuildConfigCacheDir(this IConfiguration ctxt, Key scope) {
-      return Path.Combine(ctxt.GetBudDir(scope), BuildConfigCacheDirName);
+    public static string GetDefaultBuildConfigCacheDir(this IConfiguration ctxt, Key key) {
+      return Path.Combine(ctxt.GetBudDir(key), BuildConfigCacheDirName);
     }
 
     /// <returns>
@@ -52,8 +52,8 @@ namespace Bud.Plugins.Build {
       return buildConfiguration.Evaluate(BuildDirsKeys.PersistentBuildConfigDir.In(project));
     }
 
-    public static string GetDefaultPersistentBuildConfigDir(this IConfiguration ctxt, Key scope) {
-      return Path.Combine(ctxt.GetBudDir(scope), PersistentBuildConfigDirName);
+    public static string GetDefaultPersistentBuildConfigDir(this IConfiguration ctxt, Key key) {
+      return Path.Combine(ctxt.GetBudDir(key), PersistentBuildConfigDirName);
     }
   }
 

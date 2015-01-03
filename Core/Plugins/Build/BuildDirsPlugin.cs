@@ -11,15 +11,15 @@ namespace Bud.Plugins.Build {
       this.baseDir = baseDir;
     }
 
-    public Settings ApplyTo(Settings settings, Key scope) {
+    public Settings ApplyTo(Settings settings, Key key) {
       return settings
-        .Apply(scope, BuildPlugin.Instance)
-        .Init(BuildDirsKeys.BaseDir.In(scope), baseDir)
-        .Init(BuildDirsKeys.BudDir.In(scope), ctxt => BuildDirs.GetDefaultBudDir(ctxt, scope))
-        .Init(BuildDirsKeys.OutputDir.In(scope), ctxt => BuildDirs.GetDefaultOutputDir(ctxt, scope))
-        .Init(BuildDirsKeys.BuildConfigCacheDir.In(scope), ctxt => BuildDirs.GetDefaultBuildConfigCacheDir(ctxt, scope))
-        .Init(BuildDirsKeys.PersistentBuildConfigDir.In(scope), ctxt => BuildDirs.GetDefaultPersistentBuildConfigDir(ctxt, scope))
-        .Modify(BuildKeys.Clean.In(scope), (ctxt, oldTask) => CleanBuildDirsTask(ctxt, oldTask, scope));
+        .Apply(key, BuildPlugin.Instance)
+        .Init(BuildDirsKeys.BaseDir.In(key), baseDir)
+        .Init(BuildDirsKeys.BudDir.In(key), ctxt => BuildDirs.GetDefaultBudDir(ctxt, key))
+        .Init(BuildDirsKeys.OutputDir.In(key), ctxt => BuildDirs.GetDefaultOutputDir(ctxt, key))
+        .Init(BuildDirsKeys.BuildConfigCacheDir.In(key), ctxt => BuildDirs.GetDefaultBuildConfigCacheDir(ctxt, key))
+        .Init(BuildDirsKeys.PersistentBuildConfigDir.In(key), ctxt => BuildDirs.GetDefaultPersistentBuildConfigDir(ctxt, key))
+        .Modify(BuildKeys.Clean.In(key), (ctxt, oldTask) => CleanBuildDirsTask(ctxt, oldTask, key));
     }
 
     private async static Task<Unit> CleanBuildDirsTask(EvaluationContext context, Func<Task<Unit>> oldCleanTask, Key project) {

@@ -20,34 +20,34 @@ namespace Bud.Plugins.BuildLoading {
       this.dirOfProjectToBeBuilt = dirOfProjectToBeBuilt;
     }
 
-    public Settings ApplyTo(Settings settings, Key scope) {
+    public Settings ApplyTo(Settings settings, Key key) {
       return settings
-        .Apply(scope, CSharpPlugin.Instance)
-        .Init(BuildLoadingKeys.BuildConfigSourceFile.In(scope), context => Path.Combine(context.GetBaseDir(scope), "Build.cs"))
-        .Init(BuildLoadingKeys.DirOfProjectToBeBuilt.In(scope), dirOfProjectToBeBuilt)
-        .Modify(CSharpKeys.SourceFiles.In(scope), (context, previousTask) => AddBuildDefinitionSourceFile(context, previousTask, scope))
-        .Modify(CSharpKeys.OutputAssemblyDir.In(scope), (context, previousValue) => context.GetBaseDir(scope))
-        .Modify(CSharpKeys.OutputAssemblyName.In(scope), (context, previousValue) => "Build")
-        .Init(BuildLoadingKeys.CreateBuildCommander.In(scope), context => CreateBuildCommander(context, scope))
-        .Modify(CSharpKeys.AssemblyType.In(scope), prevValue => AssemblyType.Library)
-        .Modify(CSharpKeys.CollectReferencedAssemblies.In(scope), async (context, assemblies) => (await assemblies()).AddRange(BudAssemblies.GetBudAssembliesLocations()));
+        .Apply(key, CSharpPlugin.Instance)
+        .Init(BuildLoadingKeys.BuildConfigSourceFile.In(key), context => Path.Combine(context.GetBaseDir(key), "Build.cs"))
+        .Init(BuildLoadingKeys.DirOfProjectToBeBuilt.In(key), dirOfProjectToBeBuilt)
+        .Modify(CSharpKeys.SourceFiles.In(key), (context, previousTask) => AddBuildDefinitionSourceFile(context, previousTask, key))
+        .Modify(CSharpKeys.OutputAssemblyDir.In(key), (context, previousValue) => context.GetBaseDir(key))
+        .Modify(CSharpKeys.OutputAssemblyName.In(key), (context, previousValue) => "Build")
+        .Init(BuildLoadingKeys.CreateBuildCommander.In(key), context => CreateBuildCommander(context, key))
+        .Modify(CSharpKeys.AssemblyType.In(key), prevValue => AssemblyType.Library)
+        .Modify(CSharpKeys.CollectReferencedAssemblies.In(key), async (context, assemblies) => (await assemblies()).AddRange(BudAssemblies.GetBudAssembliesLocations()));
     }
 
-    public async Task<IBuildCommander> CreateBuildCommander(EvaluationContext context, Key scope) {
-      var buildConfigSourceFile = context.GetBuildConfigSourceFile(scope);
-      var dirOfProjectToBeBuilt = context.GetDirOfProjectToBeBuilt(scope);
+    public async Task<IBuildCommander> CreateBuildCommander(EvaluationContext context, Key key) {
+      var buildConfigSourceFile = context.GetBuildConfigSourceFile(key);
+      var dirOfProjectToBeBuilt = context.GetDirOfProjectToBeBuilt(key);
       // TODO: Check if the BakedBuild.dll file exists. If it does, just load it.
       if (File.Exists(buildConfigSourceFile)) {
         await context.BuildAll();
-        return new AppDomainBuildCommander(context.GetCSharpOutputAssemblyFile(scope), dirOfProjectToBeBuilt);
+        return new AppDomainBuildCommander(context.GetCSharpOutputAssemblyFile(key), dirOfProjectToBeBuilt);
       } else {
         return new DefaultBuildCommander(dirOfProjectToBeBuilt);
       }
     }
 
-    public async Task<IEnumerable<string>> AddBuildDefinitionSourceFile(EvaluationContext context, Func<Task<IEnumerable<string>>> previousSourcesTask, Key scope) {
+    public async Task<IEnumerable<string>> AddBuildDefinitionSourceFile(EvaluationContext context, Func<Task<IEnumerable<string>>> previousSourcesTask, Key key) {
       var previousSources = await previousSourcesTask();
-      return previousSources.Concat(new []{ context.GetBuildConfigSourceFile(scope) });
+      return previousSources.Concat(new []{ context.GetBuildConfigSourceFile(key) });
     }
   }
 

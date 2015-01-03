@@ -7,11 +7,11 @@ using System.Collections.Generic;
 
 namespace Bud {
 
-  public delegate Settings SettingsTransform(Settings existingSettings, Key scope);
+  public delegate Settings SettingsTransform(Settings existingSettings, Key key);
 
   public class Settings {
-    public static readonly Settings Empty = new Settings();
 
+    public static readonly Settings Empty = new Settings();
     public readonly ImmutableList<ConfigDefinitionConstructor> ConfigConstructors;
     public readonly ImmutableList<TaskDefinitionConstructor> TaskConstructors;
 
@@ -34,8 +34,8 @@ namespace Bud {
       return new Settings(ConfigConstructors.AddRange(settings.ConfigConstructors), TaskConstructors.AddRange(settings.TaskConstructors));
     }
 
-    public Settings Apply(Key scope, IPlugin plugin) {
-      return plugin.ApplyTo(this, scope);
+    public Settings Apply(Key key, IPlugin plugin) {
+      return plugin.ApplyTo(this, key);
     }
 
     public Settings Init<T>(ConfigKey<T> key, T initialValue) {

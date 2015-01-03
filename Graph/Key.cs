@@ -7,8 +7,8 @@ using System;
 namespace Bud {
   public class Key : MarshalByRefObject {
     public static readonly Key Global = new Key("Global", null);
-    public const char ScopeSeparator = ':';
-    private static readonly char[] ScopeSplitter = new char[] {ScopeSeparator};
+    public const char KeySeparator = ':';
+    private static readonly char[] KeySplitter = new char[] {KeySeparator};
     public readonly Key Parent;
     public readonly string Id;
     private readonly int depth;
@@ -31,36 +31,36 @@ namespace Bud {
       return Concat(parent, this);
     }
 
-    public static Key Concat(Key parentScope, Key childScope) {
-      if (parentScope.IsGlobal) {
-        return childScope;
-      } else if (childScope.IsGlobal) {
-        return parentScope;
+    public static Key Concat(Key parentKey, Key childKey) {
+      if (parentKey.IsGlobal) {
+        return childKey;
+      } else if (childKey.IsGlobal) {
+        return parentKey;
       } else {
-        return new Key(childScope.Id, Concat(parentScope, childScope.Parent));
+        return new Key(childKey.Id, Concat(parentKey, childKey.Parent));
       }
     }
 
-    public static Key Parse(string scope) {
-      if (string.IsNullOrEmpty(scope)) {
-        throw new ArgumentException("Could not parse an empty string. An empty string is not a valid scope.");
+    public static Key Parse(string key) {
+      if (string.IsNullOrEmpty(key)) {
+        throw new ArgumentException("Could not parse an empty string. An empty string is not a valid key.");
       }
-      var scopeIdChain = scope.Split(ScopeSplitter, StringSplitOptions.RemoveEmptyEntries);
-      Key parsedScope = Global;
-      foreach (var scopeId in scopeIdChain) {
-        parsedScope = new Key(scopeId, parsedScope);
+      var keyIdChain = key.Split(KeySplitter, StringSplitOptions.RemoveEmptyEntries);
+      Key parsedKey = Global;
+      foreach (var keyId in keyIdChain) {
+        parsedKey = new Key(keyId, parsedKey);
       }
-      return parsedScope;
+      return parsedKey;
     }
 
-    public bool Equals(Key otherScope) {
-      if (ReferenceEquals(this, otherScope)) {
+    public bool Equals(Key otherKey) {
+      if (ReferenceEquals(this, otherKey)) {
         return true;
       }
-      if (depth != otherScope.depth) {
+      if (depth != otherKey.depth) {
         return false;
       }
-      return Id.Equals(otherScope.Id) && Parent.Equals(otherScope.Parent);
+      return Id.Equals(otherKey.Id) && Parent.Equals(otherKey.Parent);
     }
 
     public override bool Equals(object other) {

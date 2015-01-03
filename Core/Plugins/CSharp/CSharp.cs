@@ -18,8 +18,8 @@ namespace Bud.Plugins.CSharp {
       return build.CSharpProject(id, baseDir, Plugin.Create(SetLibraryAssemblyType));
     }
 
-    public static Settings SetLibraryAssemblyType(Settings existingSettings, Key scope) {
-      return existingSettings.Modify(CSharpKeys.AssemblyType.In(scope), assemblyType => AssemblyType.Library);
+    public static Settings SetLibraryAssemblyType(Settings existingSettings, Key key) {
+      return existingSettings.Modify(CSharpKeys.AssemblyType.In(key), assemblyType => AssemblyType.Library);
     }
 
     public static string GetCSharpSourceDir(this EvaluationContext context, Key project) {

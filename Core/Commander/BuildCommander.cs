@@ -17,13 +17,13 @@ namespace Bud.Commander {
       var buildProjectId = "BuildDefinition";
       var buildProject = GlobalBuild.New(buildProjectDir).BuildProject(buildProjectId, buildProjectDir, path);
       var evaluationContext = EvaluationContext.FromSettings(buildProject);
-      var buildCommanderTask = evaluationContext.CreateBuildCommander(Project.ProjectScope(buildProjectId));
+      var buildCommanderTask = evaluationContext.CreateBuildCommander(Project.ProjectKey(buildProjectId));
       buildCommanderTask.Wait();
       return buildCommanderTask.Result;
     }
 
-    public static object Evaluate(this IBuildCommander budCommander, Key scope) {
-      return budCommander.Evaluate(scope.ToString());
+    public static object Evaluate(this IBuildCommander budCommander, Key key) {
+      return budCommander.Evaluate(key.ToString());
     }
   }
 }

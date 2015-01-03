@@ -54,14 +54,12 @@
     <Compile Include="Plugins\Projects\ProjectKeys.cs" />
     <Compile Include="Plugins\Projects\ProjectsPlugin.cs" />
     <Compile Include="Plugins\Build\BuildPlugin.cs" />
-    <Compile Include="Plugins\Dependencies\DependenciesPlugin.cs" />
     <Compile Include="Plugins\Build\BuildDirs.cs" />
     <Compile Include="Plugins\Build\BuildDirsKeys.cs" />
     <Compile Include="Plugins\Build\BuildDirsPlugin.cs" />
     <Compile Include="Plugins\Build\BuildKeys.cs" />
     <Compile Include="Plugins\Build\Build.cs" />
     <Compile Include="Plugins\Dependencies\DependenciesKeys.cs" />
-    <Compile Include="Plugins\Dependencies\Dependencies.cs" />
     <Compile Include="Plugins\BuildLoading\BuildLoading.cs" />
     <Compile Include="Plugins\CSharp\CSharp.cs" />
     <Compile Include="Plugins\CSharp\CSharpKeys.cs" />
@@ -80,12 +78,11 @@
     <Compile Include="Plugins\NuGet\NuGetPlugin.cs" />
     <Compile Include="Plugins\NuGet\NuGetKeys.cs" />
     <Compile Include="Plugins\NuGet\NuGetDependency.cs" />
-    <Compile Include="Plugins\Dependencies\ScopeDependency.cs" />
-    <Compile Include="Plugins\Dependencies\ResolvedScopeDependency.cs" />
     <Compile Include="Plugins\Build\GlobalBuildPlugin.cs" />
     <Compile Include="Plugins\Build\GlobalBuild.cs" />
     <Compile Include="Plugins\NuGet\NuGet.cs" />
     <Compile Include="Commander\BuildCommander.cs" />
+    <Compile Include="Plugins\Dependencies\Dependencies.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

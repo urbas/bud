@@ -7,7 +7,7 @@ namespace Bud {
     }
 
     public static IPlugin With(this IPlugin thisPlugin, SettingsTransform settingApplication) {
-      return new Plugin((existingSettings, scope) => settingApplication(thisPlugin.ApplyTo(existingSettings, scope), scope));
+      return new Plugin((existingSettings, key) => settingApplication(thisPlugin.ApplyTo(existingSettings, key), key));
     }
   }
 }

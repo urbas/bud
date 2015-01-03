@@ -8,14 +8,14 @@ namespace Bud.Plugins.Build {
 
     private BuildPlugin() {}
 
-    public Settings ApplyTo(Settings settings, Key scope) {
+    public Settings ApplyTo(Settings settings, Key key) {
       return settings
         .Init(BuildKeys.Clean, TaskUtils.NoOpTask)
-        .Init(BuildKeys.Clean.In(scope), TaskUtils.NoOpTask)
+        .Init(BuildKeys.Clean.In(key), TaskUtils.NoOpTask)
         .Init(BuildKeys.Build, TaskUtils.NoOpTask)
-        .Init(BuildKeys.Build.In(scope), TaskUtils.NoOpTask)
-        .AddDependencies(BuildKeys.Build, BuildKeys.Build.In(scope))
-        .AddDependencies(BuildKeys.Clean, BuildKeys.Clean.In(scope));
+        .Init(BuildKeys.Build.In(key), TaskUtils.NoOpTask)
+        .AddDependencies(BuildKeys.Build, BuildKeys.Build.In(key))
+        .AddDependencies(BuildKeys.Clean, BuildKeys.Clean.In(key));
     }
   }
 }

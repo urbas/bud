@@ -19,30 +19,29 @@ namespace Bud.Plugins.CSharp {
     private CSharpPlugin() {
     }
 
-    public Settings ApplyTo(Settings settings, Key scope) {
+    public Settings ApplyTo(Settings settings, Key key) {
       return settings
-        .Apply(scope, BuildPlugin.Instance)
-        .Apply(scope, DependenciesPlugin.Instance)
-        .Apply(scope, NuGetPlugin.Instance)
-        .Init(CSharpKeys.Build.In(scope), ctxt => MonoCompiler.CompileProject(ctxt, scope))
-        .Init(CSharpKeys.SourceFiles.In(scope), context => FindSources(context, scope))
-        .Init(CSharpKeys.AssemblyType.In(scope), AssemblyType.Exe)
-        .Init(CSharpKeys.CollectReferencedAssemblies.In(scope), context => CollectAssembliesFromDependencies(context, scope))
-        .Init(CSharpKeys.OutputAssemblyDir.In(scope), context => Path.Combine(context.GetOutputDir(scope), ".net-4.5", "main", "debug", "bin"))
-        .Init(CSharpKeys.OutputAssemblyName.In(scope), context => scope.Id)
-        .Init(CSharpKeys.OutputAssemblyFile.In(scope), context => Path.Combine(context.GetCSharpOutputAssemblyDir(scope), string.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(scope), context.GetAssemblyFileExtension(scope))))
-        .AddDependencies(BuildKeys.Build.In(scope), CSharpKeys.Build.In(scope));
+        .Apply(key, BuildPlugin.Instance)
+        .Apply(key, NuGetPlugin.Instance)
+        .Init(CSharpKeys.Build.In(key), ctxt => MonoCompiler.CompileProject(ctxt, key))
+        .Init(CSharpKeys.SourceFiles.In(key), context => FindSources(context, key))
+        .Init(CSharpKeys.AssemblyType.In(key), AssemblyType.Exe)
+        .Init(CSharpKeys.CollectReferencedAssemblies.In(key), context => CollectAssembliesFromDependencies(context, key))
+        .Init(CSharpKeys.OutputAssemblyDir.In(key), context => Path.Combine(context.GetOutputDir(key), ".net-4.5", "main", "debug", "bin"))
+        .Init(CSharpKeys.OutputAssemblyName.In(key), context => key.Id)
+        .Init(CSharpKeys.OutputAssemblyFile.In(key), context => Path.Combine(context.GetCSharpOutputAssemblyDir(key), string.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(key), context.GetAssemblyFileExtension(key))))
+        .AddDependencies(BuildKeys.Build.In(key), CSharpKeys.Build.In(key));
     }
 
     public static async Task<ImmutableList<string>> CollectAssembliesFromDependencies(EvaluationContext context, Key currentProject) {
-      var scopeDependencies = await CollectScopeDependencies(context, currentProject);
+      var keyDependencies = await CollectKeyDependencies(context, currentProject);
       var nuGetDependencies = await CollectNuGetDependencies(context, currentProject);
       var gacDependencies = ImmutableList.Create<string>("Facades/System.Runtime.dll");
-      return scopeDependencies.AddRange(nuGetDependencies).AddRange(gacDependencies);
+      return keyDependencies.AddRange(nuGetDependencies).AddRange(gacDependencies);
     }
 
-    public IEnumerable<string> FindSources(EvaluationContext context, Key scope) {
-      var sourceDirectory = context.GetCSharpSourceDir(scope);
+    public IEnumerable<string> FindSources(EvaluationContext context, Key key) {
+      var sourceDirectory = context.GetCSharpSourceDir(key);
       if (Directory.Exists(sourceDirectory)) {
         return Directory.EnumerateFiles(sourceDirectory);
       } else {
@@ -50,13 +49,12 @@ namespace Bud.Plugins.CSharp {
       }
     }
 
-    private static async Task<ImmutableList<string>> CollectScopeDependencies(EvaluationContext context, Key currentProject) {
+    private static async Task<ImmutableList<string>> CollectKeyDependencies(EvaluationContext context, Key currentProject) {
       var collectedAssemblies = ImmutableList.CreateBuilder<string>();
-      var resolvedDependencies = await context.ResolveDependencies(currentProject);
-      foreach (var resolvedDependency in resolvedDependencies) {
-        var resolvedScopeDependency = resolvedDependency as ResolvedScopeDependency;
-        if (resolvedScopeDependency != null && context.IsConfigDefined(CSharpKeys.OutputAssemblyFile.In(resolvedScopeDependency.Dependency))) {
-          collectedAssemblies.Add(context.GetCSharpOutputAssemblyFile(resolvedScopeDependency.Dependency));
+      var dependencyProjects = await context.ResolveBuildDependencies(currentProject);
+      foreach (var dependencyProject in dependencyProjects) {
+        if (context.IsConfigDefined(CSharpKeys.OutputAssemblyFile.In(dependencyProject))) {
+          collectedAssemblies.Add(context.GetCSharpOutputAssemblyFile(dependencyProject));
         }
       }
       return collectedAssemblies.ToImmutable();

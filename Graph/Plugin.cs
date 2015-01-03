@@ -6,7 +6,7 @@ namespace Bud {
 
     public readonly SettingsTransform SettingsTransform;
 
-    private Plugin() : this((existingSettings, scope) => existingSettings) {}
+    private Plugin() : this((existingSettings, key) => existingSettings) {}
 
     public Plugin(SettingsTransform settingsTransform) {
       SettingsTransform = settingsTransform;
@@ -16,8 +16,8 @@ namespace Bud {
       return new Plugin(settingApplication);
     }
 
-    public Settings ApplyTo(Settings settings, Key scope) {
-      return SettingsTransform(settings, scope);
+    public Settings ApplyTo(Settings settings, Key key) {
+      return SettingsTransform(settings, key);
     }
 	}
 }
