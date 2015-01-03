@@ -7,7 +7,7 @@ using System;
 namespace Bud {
   public class Key : MarshalByRefObject {
     public static readonly Key Global = new Key("Global", null);
-    public const char KeySeparator = ':';
+    public const char KeySeparator = '/';
     private static readonly char[] KeySplitter = new char[] {KeySeparator};
     public readonly Key Parent;
     public readonly string Id;
@@ -78,11 +78,11 @@ namespace Bud {
     }
 
     public override string ToString() {
-      return IsGlobal ? Id : AppendAsString(new StringBuilder()).ToString();
+      return IsGlobal ? KeySeparator.ToString() : AppendAsString(new StringBuilder()).ToString();
     }
 
     private StringBuilder AppendAsString(StringBuilder stringBuilder) {
-      return IsGlobal ? stringBuilder : Parent.AppendAsString(stringBuilder).Append(':').Append(Id);
+      return IsGlobal ? stringBuilder : Parent.AppendAsString(stringBuilder).Append(KeySeparator).Append(Id);
     }
   }
 }

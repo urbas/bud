@@ -18,6 +18,10 @@ namespace Bud.Plugins.Build {
       return buildConfiguration.Evaluate(BuildDirsKeys.BaseDir.In(project));
     }
 
+    public static string GetBudDir(this IConfiguration buildConfiguration) {
+      return buildConfiguration.GetBudDir(Key.Global);
+    }
+
     public static string GetBudDir(this IConfiguration buildConfiguration, Key project) {
       return buildConfiguration.Evaluate(BuildDirsKeys.BudDir.In(project));
     }

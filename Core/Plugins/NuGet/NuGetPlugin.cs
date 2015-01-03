@@ -15,7 +15,7 @@ namespace Bud.Plugins.NuGet {
     public Settings ApplyTo(Settings settings, Key key) {
       return settings
         .Init(NuGetKeys.KeysWithNuGetDependencies, ImmutableList<Key>.Empty)
-        .Init(NuGetKeys.NuGetRepositoryDir, context => Path.Combine(context.GetBudDir(key), "nuGetRepository"))
+        .Init(NuGetKeys.NuGetRepositoryDir, context => Path.Combine(context.GetBudDir(), "nuGetRepository"))
         .Init(NuGetKeys.ResolveNuGetDependencies, ResolveNuGetDependenciesImpl)
         .Init(NuGetKeys.NuGetDependencies.In(key), ImmutableList<NuGetDependency>.Empty)
         .Modify(NuGetKeys.KeysWithNuGetDependencies, (context, oldValue) => oldValue.Add(key));
