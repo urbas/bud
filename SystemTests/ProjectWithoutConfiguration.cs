@@ -26,7 +26,7 @@ namespace Bud.SystemTests {
     }
 
     static string BuiltAssemblyPath(TemporaryDirBuildCommander buildCommander) {
-      return Path.Combine(buildCommander.TemporaryDirectory.Path, BuildDirs.BudDirName, "output", ".net-4.5", "main", "debug", "bin", Path.GetFileName(buildCommander.TemporaryDirectory.Path) + ".exe");
+      return Path.Combine(buildCommander.TemporaryDirectory.Path, BuildDirs.BudDirName, BuildDirs.OutputDirName, ".net-4.5", "main", "debug", "bin", Path.GetFileName(buildCommander.TemporaryDirectory.Path) + ".exe");
     }
   }
 }

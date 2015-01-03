@@ -6,6 +6,7 @@ namespace Bud.Plugins.Build {
 
   public static class BuildDirs {
     public const string BudDirName = ".bud";
+    public const string OutputDirName = "output";
     public const string BuildConfigCacheDirName = "buildConfigCache";
     public const string PersistentBuildConfigDirName = "persistentBuildConfig";
 
@@ -31,7 +32,7 @@ namespace Bud.Plugins.Build {
     }
 
     public static string GetDefaultOutputDir(this IConfiguration ctxt, Key project) {
-      return Path.Combine(ctxt.GetBudDir(project), "output");
+      return Path.Combine(ctxt.GetBudDir(project), OutputDirName);
     }
 
     /// <returns>The directory where transient data gathered during build configuration is stored (e.g.: downloaded dependencies).</returns>
