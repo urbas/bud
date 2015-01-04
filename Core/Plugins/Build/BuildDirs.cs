@@ -57,8 +57,18 @@ namespace Bud.Plugins.Build {
       return buildConfiguration.Evaluate(BuildDirsKeys.PersistentBuildConfigDir.In(project));
     }
 
+    public static string GetPersistentBuildConfigDir(this IConfiguration buildConfiguration) {
+      return buildConfiguration.GetPersistentBuildConfigDir(Key.Global);
+    }
+
     public static string GetDefaultPersistentBuildConfigDir(this IConfiguration ctxt, Key key) {
       return Path.Combine(ctxt.GetBudDir(key), PersistentBuildConfigDirName);
+    }
+
+    public static string CreatePersistentBuildConfigDir(this IEvaluationContext context) {
+      var persistentConfigDir = context.GetPersistentBuildConfigDir();
+      Directory.CreateDirectory(persistentConfigDir);
+      return persistentConfigDir;
     }
   }
 

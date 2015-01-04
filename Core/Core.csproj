@@ -83,6 +83,7 @@
     <Compile Include="Plugins\NuGet\NuGet.cs" />
     <Compile Include="Commander\BuildCommander.cs" />
     <Compile Include="Plugins\Dependencies\Dependencies.cs" />
+    <Compile Include="Plugins\NuGet\NuGetResolution.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

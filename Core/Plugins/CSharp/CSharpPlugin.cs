@@ -62,14 +62,14 @@ namespace Bud.Plugins.CSharp {
 
     private static async Task<ImmutableList<string>> CollectNuGetDependencies(EvaluationContext context, Key currentProject) {
       var collectedAssemblies = ImmutableList.CreateBuilder<string>();
-      var nuGetDependencies = await context.ResolveNuGetDependencies();
-      var packagePath = context.GetNuGetRepositoryDir();
-      foreach (var package in nuGetDependencies.Values) {
-        foreach (var assembly in package.AssemblyReferences) {
-          var pathToAssembly = Path.Combine(packagePath, package.Id + "." + package.Version, assembly.Path);
-          collectedAssemblies.Add(pathToAssembly);
-        }
-      }
+//      var nuGetDependencies = await context.ResolveNuGetDependencies();
+//      var packagePath = context.GetNuGetRepositoryDir();
+//      foreach (var package in nuGetDependencies.Values) {
+//        foreach (var assembly in package.AssemblyReferences) {
+//          var pathToAssembly = Path.Combine(packagePath, package.Id + "." + package.Version, assembly.Path);
+//          collectedAssemblies.Add(pathToAssembly);
+//        }
+//      }
       return collectedAssemblies.ToImmutable();
     }
   }
