@@ -22,49 +22,52 @@ namespace Bud.Plugins.NuGet {
         .Init(NuGetKeys.NuGetRepositoryDir, context => Path.Combine(context.GetBudDir(), "nuGetRepository"))
         .Init(NuGetKeys.NuGetDependencies.In(key), ImmutableList<NuGetDependency>.Empty)
         .Init(NuGetKeys.Fetch, FetchImpl)
+        .Init(NuGetKeys.NuGetResolvedPackages, NuGetResolvedPackagesImpl)
         .Modify(NuGetKeys.KeysWithNuGetDependencies, (context, oldValue) => oldValue.Add(key));
+    }
+
+    public static NuGetResolution NuGetResolvedPackagesImpl(IConfiguration context) {
+      NuGetResolution resolution;
+      if (TryLoadPersistedResolution(context, out resolution)) {
+        return resolution;
+      } else {
+        return new NuGetResolution(ImmutableDictionary<string, Dictionary<SemanticVersion, IEnumerable<string>>>.Empty);
+      }
     }
 
     public static Task<NuGetResolution> FetchImpl(IEvaluationContext context) {
       return Task.Run(() => {
-        NuGetResolution resolution;
-        if (!TryLoadFetchSnapshot(context, out resolution)) {
-          var fetchedPackages = InstallNuGetPackages(context);
-          resolution = PersistNuGetResolution(context, fetchedPackages);
-        }
-        return resolution;
+        var dependencies = context.GetNuGetDependencies();
+        var packageManager = CreatePackageManager(context);
+        InstallNuGetPackages(packageManager, dependencies.Values.SelectMany(value => value));
+        var installedPackages = packageManager.LocalRepository.GetPackages().GroupBy(package => package.Id);
+        return PersistNuGetResolution(context, installedPackages);
       });
     }
 
-    private static bool TryLoadFetchSnapshot(IEvaluationContext context, out NuGetResolution fetchSnapshot) {
+    private static bool TryLoadPersistedResolution(IConfiguration context, out NuGetResolution persistedResolution) {
       var fetchedPackagesFile = context.GetFetchedPackagesFile();
       if (File.Exists(fetchedPackagesFile)) {
         using (var streamReader = new StreamReader(fetchedPackagesFile))
         using (var jsonStreamReader = new JsonTextReader(streamReader)) {
-          fetchSnapshot = JsonSerializer.CreateDefault().Deserialize<NuGetResolution>(jsonStreamReader);
+          persistedResolution = JsonSerializer.CreateDefault().Deserialize<NuGetResolution>(jsonStreamReader);
           return true;
         }
       }
-      fetchSnapshot = null;
+      persistedResolution = null;
       return false;
     }
 
     static PackageManager CreatePackageManager(IEvaluationContext context) {
       var nuGetRepositoryDir = context.GetNuGetRepositoryDir();
       IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository("http://packages.nuget.org/api/v2");
-      PackageManager packageManager = new PackageManager(repo, nuGetRepositoryDir);
-      return packageManager;
+      return new PackageManager(repo, nuGetRepositoryDir);
     }
 
-    private static IEnumerable<IGrouping<string, IPackage>> InstallNuGetPackages(IEvaluationContext context) {
-      var dependencies = context.GetNuGetDependencies();
-      var packageManager = CreatePackageManager(context);
-      foreach (var dependent2Dependencies in dependencies) {
-        foreach (var dependency in dependent2Dependencies.Value) {
-          packageManager.InstallPackage(dependency.PackageName, dependency.PackageVersion);
-        }
+    private static void InstallNuGetPackages(IPackageManager packageManager, IEnumerable<NuGetDependency> dependencies) {
+      foreach (var dependency in dependencies) {
+        packageManager.InstallPackage(dependency.PackageName, dependency.PackageVersion, false, false);
       }
-      return packageManager.LocalRepository.GetPackages().GroupBy(package => package.Id);
     }
 
     private static NuGetResolution PersistNuGetResolution(IEvaluationContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {

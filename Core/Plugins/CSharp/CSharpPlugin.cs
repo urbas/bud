@@ -35,7 +35,7 @@ namespace Bud.Plugins.CSharp {
 
     public static async Task<ImmutableList<string>> CollectAssembliesFromDependencies(EvaluationContext context, Key currentProject) {
       var keyDependencies = await CollectKeyDependencies(context, currentProject);
-      var nuGetDependencies = await CollectNuGetDependencies(context, currentProject);
+      var nuGetDependencies = CollectNuGetDependencies(context, currentProject);
       var gacDependencies = ImmutableList.Create<string>("Facades/System.Runtime.dll");
       return keyDependencies.AddRange(nuGetDependencies).AddRange(gacDependencies);
     }
@@ -60,17 +60,11 @@ namespace Bud.Plugins.CSharp {
       return collectedAssemblies.ToImmutable();
     }
 
-    private static async Task<ImmutableList<string>> CollectNuGetDependencies(EvaluationContext context, Key currentProject) {
-      var collectedAssemblies = ImmutableList.CreateBuilder<string>();
-//      var nuGetDependencies = await context.ResolveNuGetDependencies();
-//      var packagePath = context.GetNuGetRepositoryDir();
-//      foreach (var package in nuGetDependencies.Values) {
-//        foreach (var assembly in package.AssemblyReferences) {
-//          var pathToAssembly = Path.Combine(packagePath, package.Id + "." + package.Version, assembly.Path);
-//          collectedAssemblies.Add(pathToAssembly);
-//        }
-//      }
-      return collectedAssemblies.ToImmutable();
+    private static ImmutableList<string> CollectNuGetDependencies(IConfiguration context, Key currentProject) {
+      var allNuGetDependencies = context.GetNuGetResolvedPackages();
+      var nuGetDependencies = context.GetNuGetDependencies(currentProject);
+      var nuGetRepositoryPath = context.GetNuGetRepositoryDir();
+      return nuGetDependencies.SelectMany(dependency => allNuGetDependencies.GetPackageAssemblyPaths(dependency).Select(assemblyPath => Path.Combine(nuGetRepositoryPath, dependency.PackageName + "." + dependency.PackageVersion, assemblyPath))).ToImmutableList();
     }
   }
 }

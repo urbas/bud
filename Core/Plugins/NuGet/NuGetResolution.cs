@@ -27,6 +27,10 @@ namespace Bud.Plugins.NuGet {
           )
         );
     }
+
+    public IEnumerable<string> GetPackageAssemblyPaths(NuGetDependency dependency) {
+      return fetchedPackages[dependency.PackageName].First(versionToPaths => versionToPaths.Key >= dependency.PackageVersion).Value;
+    }
 	}
 }
 

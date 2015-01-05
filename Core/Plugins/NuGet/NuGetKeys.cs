@@ -12,6 +12,7 @@ namespace Bud.Plugins.NuGet {
     public static readonly ConfigKey<string> NuGetRepositoryDir = new ConfigKey<string>("NuGetRepositoryDir");
     public static readonly ConfigKey<ImmutableList<NuGetDependency>> NuGetDependencies = new ConfigKey<ImmutableList<NuGetDependency>>("NuGetDependencies");
     public static readonly TaskKey<NuGetResolution> Fetch = new TaskKey<NuGetResolution>("Fetch");
+    public static readonly ConfigKey<NuGetResolution> NuGetResolvedPackages = new ConfigKey<NuGetResolution>("NuGetResolvedPackages");
   }
 }
 
