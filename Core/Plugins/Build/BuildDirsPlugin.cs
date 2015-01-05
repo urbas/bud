@@ -22,7 +22,7 @@ namespace Bud.Plugins.Build {
         .Modify(BuildKeys.Clean.In(key), (ctxt, oldTask) => CleanBuildDirsTask(ctxt, oldTask, key));
     }
 
-    private async static Task<Unit> CleanBuildDirsTask(EvaluationContext context, Func<Task<Unit>> oldCleanTask, Key project) {
+    private async static Task<Unit> CleanBuildDirsTask(IContext context, Func<Task<Unit>> oldCleanTask, Key project) {
       await oldCleanTask();
       Directory.Delete(context.GetOutputDir(project), true);
       return Unit.Instance;

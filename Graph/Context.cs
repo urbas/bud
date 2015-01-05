@@ -8,25 +8,27 @@ using System.Threading.Tasks;
 
 namespace Bud {
 
-  public interface IEvaluationContext : IConfiguration {
+  public interface IContext : IConfig {
     ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions { get; }
     bool IsTaskDefined(Key key);
+    Task Evaluate(TaskKey key);
     Task<T> Evaluate<T>(TaskKey<T> key);
     Task EvaluateTask(Key key);
     Task EvaluateKey(Key key);
+    Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition);
   }
 
   // TODO: Make this class thread-safe.
-  public class EvaluationContext : IEvaluationContext {
-    private readonly IConfiguration configuration;
+  public class Context : IContext {
+    private readonly IConfig configuration;
     private readonly ImmutableDictionary<Key, ITaskDefinition> taskDefinitions;
     private readonly Dictionary<Key, Task> taskValues = new Dictionary<Key, Task>();
     private readonly Dictionary<ITaskDefinition, Task> oldTaskValues = new Dictionary<ITaskDefinition, Task>();
     private readonly Dictionary<Key, object> keyToOutput = new Dictionary<Key, object>();
 
-    private EvaluationContext(ImmutableDictionary<Key, IConfigDefinition> configDefinitions, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) : this(new Configuration(configDefinitions), taskDefinitions) {}
+    private Context(ImmutableDictionary<Key, IConfigDefinition> configDefinitions, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) : this(new Config(configDefinitions), taskDefinitions) {}
 
-    private EvaluationContext(IConfiguration configuration, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) {
+    private Context(IConfig configuration, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) {
       this.configuration = configuration;
       this.taskDefinitions = taskDefinitions;
     }
@@ -77,8 +79,8 @@ namespace Bud {
       }
     }
 
-    public static EvaluationContext FromSettings(Settings settings) {
-      return new EvaluationContext(settings.ConfigDefinitions, settings.TaskDefinitions);
+    public static Context FromSettings(Settings settings) {
+      return new Context(settings.ConfigDefinitions, settings.TaskDefinitions);
     }
 
     public Task EvaluateTask(Key key) {

@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace Bud.SettingsConstruction {
   public class InitializeTask<T> : TaskDefinitionConstructor {
-    public Func<EvaluationContext, Task<T>> InitialValue;
+    public Func<IContext, Task<T>> InitialValue;
 
     public InitializeTask(TaskKey<T> key, T initialValue) : this(key, b => Task.FromResult(initialValue)) {}
 
-    public InitializeTask(TaskKey<T> key, Func<EvaluationContext, Task<T>> initialValue) : base(key) {
+    public InitializeTask(TaskKey<T> key, Func<IContext, Task<T>> initialValue) : base(key) {
       this.InitialValue = initialValue;
     }
 

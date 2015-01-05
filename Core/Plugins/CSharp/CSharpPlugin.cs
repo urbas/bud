@@ -33,14 +33,14 @@ namespace Bud.Plugins.CSharp {
         .AddDependencies(BuildKeys.Build.In(key), CSharpKeys.Build.In(key));
     }
 
-    public static async Task<ImmutableList<string>> CollectAssembliesFromDependencies(EvaluationContext context, Key currentProject) {
-      var keyDependencies = await CollectKeyDependencies(context, currentProject);
+    public static async Task<ImmutableList<string>> CollectAssembliesFromDependencies(IContext context, Key currentProject) {
+      var projectDependencies = await CollectKeyDependencies(context, currentProject);
       var nuGetDependencies = CollectNuGetDependencies(context, currentProject);
       var gacDependencies = ImmutableList.Create<string>("Facades/System.Runtime.dll");
-      return keyDependencies.AddRange(nuGetDependencies).AddRange(gacDependencies);
+      return projectDependencies.AddRange(nuGetDependencies).AddRange(gacDependencies);
     }
 
-    public IEnumerable<string> FindSources(EvaluationContext context, Key key) {
+    public IEnumerable<string> FindSources(IContext context, Key key) {
       var sourceDirectory = context.GetCSharpSourceDir(key);
       if (Directory.Exists(sourceDirectory)) {
         return Directory.EnumerateFiles(sourceDirectory);
@@ -49,7 +49,7 @@ namespace Bud.Plugins.CSharp {
       }
     }
 
-    private static async Task<ImmutableList<string>> CollectKeyDependencies(EvaluationContext context, Key currentProject) {
+    private static async Task<ImmutableList<string>> CollectKeyDependencies(IContext context, Key currentProject) {
       var collectedAssemblies = ImmutableList.CreateBuilder<string>();
       var dependencyProjects = await context.ResolveBuildDependencies(currentProject);
       foreach (var dependencyProject in dependencyProjects) {
@@ -60,7 +60,7 @@ namespace Bud.Plugins.CSharp {
       return collectedAssemblies.ToImmutable();
     }
 
-    private static ImmutableList<string> CollectNuGetDependencies(IConfiguration context, Key currentProject) {
+    private static ImmutableList<string> CollectNuGetDependencies(IConfig context, Key currentProject) {
       var allNuGetDependencies = context.GetNuGetResolvedPackages();
       var nuGetDependencies = context.GetNuGetDependencies(currentProject);
       var nuGetRepositoryPath = context.GetNuGetRepositoryDir();

@@ -26,7 +26,7 @@ namespace Bud.Plugins.NuGet {
         .Modify(NuGetKeys.KeysWithNuGetDependencies, (context, oldValue) => oldValue.Add(key));
     }
 
-    public static NuGetResolution NuGetResolvedPackagesImpl(IConfiguration context) {
+    public static NuGetResolution NuGetResolvedPackagesImpl(IConfig context) {
       NuGetResolution resolution;
       if (TryLoadPersistedResolution(context, out resolution)) {
         return resolution;
@@ -35,7 +35,7 @@ namespace Bud.Plugins.NuGet {
       }
     }
 
-    public static Task<NuGetResolution> FetchImpl(IEvaluationContext context) {
+    public static Task<NuGetResolution> FetchImpl(IContext context) {
       return Task.Run(() => {
         var dependencies = context.GetNuGetDependencies();
         var packageManager = CreatePackageManager(context);
@@ -45,7 +45,7 @@ namespace Bud.Plugins.NuGet {
       });
     }
 
-    private static bool TryLoadPersistedResolution(IConfiguration context, out NuGetResolution persistedResolution) {
+    private static bool TryLoadPersistedResolution(IConfig context, out NuGetResolution persistedResolution) {
       var fetchedPackagesFile = context.GetFetchedPackagesFile();
       if (File.Exists(fetchedPackagesFile)) {
         using (var streamReader = new StreamReader(fetchedPackagesFile))
@@ -58,7 +58,7 @@ namespace Bud.Plugins.NuGet {
       return false;
     }
 
-    static PackageManager CreatePackageManager(IEvaluationContext context) {
+    static PackageManager CreatePackageManager(IContext context) {
       var nuGetRepositoryDir = context.GetNuGetRepositoryDir();
       IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository("http://packages.nuget.org/api/v2");
       return new PackageManager(repo, nuGetRepositoryDir);
@@ -70,7 +70,7 @@ namespace Bud.Plugins.NuGet {
       }
     }
 
-    private static NuGetResolution PersistNuGetResolution(IEvaluationContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
+    private static NuGetResolution PersistNuGetResolution(IContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
       context.CreatePersistentBuildConfigDir();
       var nuGetResolution = new NuGetResolution(fetchedPackages);
       using (var streamWriter = new StreamWriter(context.GetFetchedPackagesFile()))

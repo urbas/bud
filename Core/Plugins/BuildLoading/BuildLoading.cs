@@ -15,15 +15,15 @@ namespace Bud.Plugins.BuildLoading {
         .CSharpProject(projectId, budDir, new BuildLoadingPlugin(dirOfProjectToBeBuilt));
     }
 
-    public static string GetBuildConfigSourceFile(this EvaluationContext context, Key buildLoadingProject) {
+    public static string GetBuildConfigSourceFile(this IContext context, Key buildLoadingProject) {
       return context.Evaluate(BuildLoadingKeys.BuildConfigSourceFile.In(buildLoadingProject));
     }
 
-    public async static Task<IBuildCommander> CreateBuildCommander(this EvaluationContext context, Key buildLoadingProject) {
+    public async static Task<IBuildCommander> CreateBuildCommander(this IContext context, Key buildLoadingProject) {
       return await context.Evaluate(BuildLoadingKeys.CreateBuildCommander.In(buildLoadingProject));
     }
 
-    public static string GetDirOfProjectToBeBuilt(this EvaluationContext context, Key buildLoadingProject) {
+    public static string GetDirOfProjectToBeBuilt(this IContext context, Key buildLoadingProject) {
       return context.Evaluate(BuildLoadingKeys.DirOfProjectToBeBuilt.In(buildLoadingProject));
     }
   }

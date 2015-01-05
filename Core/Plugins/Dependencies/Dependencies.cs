@@ -20,12 +20,12 @@ namespace Bud.Plugins.Dependencies {
         .Modify(dependenciesKey, dependencies => dependencies.Add(dependency));
     }
 
-    public static ImmutableList<TaskKey> GetDependencies(this IEvaluationContext context, Key dependent, Key dependencyType) {
+    public static ImmutableList<TaskKey> GetDependencies(this IContext context, Key dependent, Key dependencyType) {
       var dependenciesKey = GetDependenciesKey(dependent, dependencyType);
       return context.Evaluate(dependenciesKey);
     }
 
-    public async static Task<ImmutableList<TaskKey>> ResolveDependencies(this IEvaluationContext context, Key dependent, Key dependencyType) {
+    public async static Task<ImmutableList<TaskKey>> ResolveDependencies(this IContext context, Key dependent, Key dependencyType) {
       var dependenciesKey = DependenciesKeys.ResolveDependencies.In(GetDependenciesKey(dependent, dependencyType));
       return context.IsTaskDefined(dependenciesKey) ? await context.Evaluate(dependenciesKey) : ImmutableList<TaskKey>.Empty;
     }
@@ -34,13 +34,13 @@ namespace Bud.Plugins.Dependencies {
       return DependenciesKeys.Dependencies.In(dependencyType.In(dependent));
     }
 
-    private static Task<ImmutableList<TaskKey>> ResolveDependenciesImpl(EvaluationContext context, Key dependent, Key dependencyType) {
+    private static Task<ImmutableList<TaskKey>> ResolveDependenciesImpl(IContext context, Key dependent, Key dependencyType) {
       return Task
         .WhenAll(context.GetDependencies(dependent, dependencyType).Select(dependency => ResolveDependency(context, dependency)))
         .ContinueWith<ImmutableList<TaskKey>>(completedTask => ImmutableList.CreateRange(completedTask.Result));
     }
 
-    private async static Task<TaskKey> ResolveDependency(IEvaluationContext context, TaskKey dependency) {
+    private async static Task<TaskKey> ResolveDependency(IContext context, TaskKey dependency) {
       await context.EvaluateTask(dependency);
       return dependency;
     }

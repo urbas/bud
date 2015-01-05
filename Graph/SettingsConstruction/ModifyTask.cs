@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 
 namespace Bud.SettingsConstruction {
   public class ModifyTask<T> : TaskDefinitionConstructor {
-    public Func<EvaluationContext, Func<Task<T>>, Task<T>> TaskModification;
+    public Func<IContext, Func<Task<T>>, Task<T>> TaskModification;
 
-    public ModifyTask(TaskKey<T> key, Func<EvaluationContext, Func<Task<T>>, Task<T>> taskModification) : base(key) {
+    public ModifyTask(TaskKey<T> key, Func<IContext, Func<Task<T>>, Task<T>> taskModification) : base(key) {
       this.TaskModification = taskModification;
     }
 

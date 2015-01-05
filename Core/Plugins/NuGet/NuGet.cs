@@ -15,29 +15,29 @@ namespace Bud.Plugins.NuGet {
       return Plugin.Create((settings, key) => settings.Modify(NuGetKeys.NuGetDependencies.In(key), dependencies => dependencies.Add(new NuGetDependency(packageName, packageVersion))));
     }
 
-    public static string GetNuGetRepositoryDir(this IConfiguration context) {
+    public static string GetNuGetRepositoryDir(this IConfig context) {
       return context.Evaluate(NuGetKeys.NuGetRepositoryDir);
     }
 
-    public static IDictionary<Key, ImmutableList<NuGetDependency>> GetNuGetDependencies(this IEvaluationContext context) {
+    public static IDictionary<Key, ImmutableList<NuGetDependency>> GetNuGetDependencies(this IContext context) {
       var keysWithNuGetDependencies = context.GetKeysWithNuGetDependencies();
       var nuGetDependencies = keysWithNuGetDependencies.ToDictionary(key => key, key => context.GetNuGetDependencies(key));
       return nuGetDependencies;
     }
 
-    public static ImmutableList<NuGetDependency> GetNuGetDependencies(this IConfiguration context, Key key) {
+    public static ImmutableList<NuGetDependency> GetNuGetDependencies(this IConfig context, Key key) {
       return context.Evaluate(NuGetKeys.NuGetDependencies.In(key));
     }
 
-    public static ImmutableList<Key> GetKeysWithNuGetDependencies(this IConfiguration context) {
+    public static ImmutableList<Key> GetKeysWithNuGetDependencies(this IConfig context) {
       return context.Evaluate(NuGetKeys.KeysWithNuGetDependencies);
     }
 
-    public static string GetFetchedPackagesFile(this IConfiguration context) {
+    public static string GetFetchedPackagesFile(this IConfig context) {
       return Path.Combine(BuildDirs.GetPersistentBuildConfigDir(context), FetchedPackagesFileName);
     }
 
-    public static NuGetResolution GetNuGetResolvedPackages(this IConfiguration context) {
+    public static NuGetResolution GetNuGetResolvedPackages(this IConfig context) {
       return context.Evaluate(NuGetKeys.NuGetResolvedPackages);
     }
   }

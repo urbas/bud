@@ -16,7 +16,7 @@ namespace Bud.Commander {
       var buildProjectDir = Path.Combine(path, BuildDirs.BudDirName);
       var buildProjectId = "BuildDefinition";
       var buildProject = GlobalBuild.New(buildProjectDir).BuildProject(buildProjectId, buildProjectDir, path);
-      var evaluationContext = EvaluationContext.FromSettings(buildProject);
+      var evaluationContext = Context.FromSettings(buildProject);
       var buildCommanderTask = evaluationContext.CreateBuildCommander(Project.ProjectKey(buildProjectId));
       buildCommanderTask.Wait();
       return buildCommanderTask.Result;

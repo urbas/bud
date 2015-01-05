@@ -23,8 +23,8 @@ namespace Bud {
       Assert.AreEqual(new []{ "./fooDir" }, projectsBaseDirs);
     }
 
-    private EvaluationContext CreateFakeProject() {
-      return EvaluationContext.FromSettings(GlobalBuild.New().AddProject("foo", "./fooDir"));
+    private IContext CreateFakeProject() {
+      return Context.FromSettings(GlobalBuild.New().AddProject("foo", "./fooDir"));
     }
 
   }

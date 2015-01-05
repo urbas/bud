@@ -33,7 +33,7 @@ namespace Bud.Plugins.BuildLoading {
         .Modify(CSharpKeys.CollectReferencedAssemblies.In(key), async (context, assemblies) => (await assemblies()).AddRange(BudAssemblies.GetBudAssembliesLocations()));
     }
 
-    public async Task<IBuildCommander> CreateBuildCommander(EvaluationContext context, Key key) {
+    public async Task<IBuildCommander> CreateBuildCommander(IContext context, Key key) {
       var buildConfigSourceFile = context.GetBuildConfigSourceFile(key);
       var dirOfProjectToBeBuilt = context.GetDirOfProjectToBeBuilt(key);
       // TODO: Check if the BakedBuild.dll file exists. If it does, just load it.
@@ -45,7 +45,7 @@ namespace Bud.Plugins.BuildLoading {
       }
     }
 
-    public async Task<IEnumerable<string>> AddBuildDefinitionSourceFile(EvaluationContext context, Func<Task<IEnumerable<string>>> previousSourcesTask, Key key) {
+    public async Task<IEnumerable<string>> AddBuildDefinitionSourceFile(IContext context, Func<Task<IEnumerable<string>>> previousSourcesTask, Key key) {
       var previousSources = await previousSourcesTask();
       return previousSources.Concat(new []{ context.GetBuildConfigSourceFile(key) });
     }

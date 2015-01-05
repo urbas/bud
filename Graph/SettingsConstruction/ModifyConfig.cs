@@ -4,9 +4,9 @@ using Bud;
 
 namespace Bud.SettingsConstruction {
   public class ModifyConfig<T> : ConfigDefinitionConstructor {
-    Func<Configuration, T, T> ValueModifier;
+    Func<IConfig, T, T> ValueModifier;
 
-    public ModifyConfig(ConfigKey<T> key, Func<Configuration, T, T> valueModifier) : base(key) {
+    public ModifyConfig(ConfigKey<T> key, Func<IConfig, T, T> valueModifier) : base(key) {
       this.ValueModifier = valueModifier;
     }
 

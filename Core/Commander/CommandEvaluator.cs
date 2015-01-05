@@ -16,7 +16,7 @@ namespace Bud.Commander {
   public static class CommandEvaluator {
     public static object Evaluate(Settings settings, string command) {
       Key keyToEvaluate = Key.Parse(command);
-      var evaluationContext = EvaluationContext.FromSettings(settings);
+      var evaluationContext = Context.FromSettings(settings);
       var evaluationResult = evaluationContext
         .EvaluateKey(keyToEvaluate)
         .ContinueWith(t => evaluationContext.GetOutputOf(keyToEvaluate));

@@ -26,16 +26,16 @@ namespace Bud.Plugins.Projects {
     }
 
     /// <returns>The projects that have been built.</returns>
-    public static async Task<ImmutableList<Key>> ResolveBuildDependencies(this IEvaluationContext context, Key project) {
+    public static async Task<ImmutableList<Key>> ResolveBuildDependencies(this IContext context, Key project) {
       var resolvedBuilds = await context.ResolveDependencies(project, BuildKeys.Build);
       return resolvedBuilds.Select(build => build.Parent).ToImmutableList();
     }
 
-    public static ImmutableDictionary<string, Key> GetAllProjects(this IConfiguration buildConfiguration) {
+    public static ImmutableDictionary<string, Key> GetAllProjects(this IConfig buildConfiguration) {
       return buildConfiguration.Evaluate(ProjectKeys.Projects);
     }
 
-    public static Key GetProject(this IConfiguration context, string id) {
+    public static Key GetProject(this IConfig context, string id) {
       return GetAllProjects(context)[id];
     }
   }

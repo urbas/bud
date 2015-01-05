@@ -3,21 +3,21 @@
 namespace Bud {
 
   public interface IConfigDefinition {
-    object Evaluate(Configuration context);
+    object Evaluate(IConfig context);
   }
 
   public class ConfigDefinition<T> : IConfigDefinition {
-    public readonly Func<Configuration, T> ConfigValue;
+    public readonly Func<IConfig, T> ConfigValue;
 
-    public ConfigDefinition(Func<Configuration, T> configValue) {
+    public ConfigDefinition(Func<IConfig, T> configValue) {
       this.ConfigValue = configValue;
     }
 
-    object IConfigDefinition.Evaluate(Configuration context) {
+    object IConfigDefinition.Evaluate(IConfig context) {
       return Evaluate(context);
     }
 
-    public T Evaluate(Configuration context) {
+    public T Evaluate(IConfig context) {
       return ConfigValue(context);
     }
   }

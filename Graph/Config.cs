@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Bud {
 
-  public interface IConfiguration {
+  public interface IConfig {
     ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions { get; }
     bool IsConfigDefined(Key key);
     T Evaluate<T>(ConfigKey<T> configKey);
@@ -14,11 +14,11 @@ namespace Bud {
   }
 
   // TODO: Make this class thread-safe.
-  public class Configuration : IConfiguration {
+  public class Config : IConfig {
     private readonly ImmutableDictionary<Key, IConfigDefinition> configDefinitions;
     private readonly Dictionary<Key, object> configValues = new Dictionary<Key, object>();
 
-    public Configuration(ImmutableDictionary<Key, IConfigDefinition> configDefinitions) {
+    public Config(ImmutableDictionary<Key, IConfigDefinition> configDefinitions) {
       this.configDefinitions = configDefinitions;
     }
 

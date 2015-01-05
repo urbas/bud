@@ -42,15 +42,15 @@ namespace Bud {
       return Add(new InitializeConfig<T>(key, initialValue));
     }
 
-    public Settings Init<T>(ConfigKey<T> key, Func<Configuration, T> initialValue) {
+    public Settings Init<T>(ConfigKey<T> key, Func<IConfig, T> initialValue) {
       return Add(new InitializeConfig<T>(key, initialValue));
     }
 
-    public Settings Init<T>(TaskKey<T> key, Func<EvaluationContext, T> initialValue) {
+    public Settings Init<T>(TaskKey<T> key, Func<IContext, T> initialValue) {
       return Add(new InitializeTask<T>(key, context => Task.FromResult(initialValue(context))));
     }
 
-    public Settings Init<T>(TaskKey<T> key, Func<EvaluationContext, Task<T>> task) {
+    public Settings Init<T>(TaskKey<T> key, Func<IContext, Task<T>> task) {
       return Add(new InitializeTask<T>(key, task));
     }
 
@@ -58,11 +58,11 @@ namespace Bud {
       return Add(new ModifyConfig<T>(key, (context, previousValue) => modifier(previousValue)));
     }
 
-    public Settings Modify<T>(ConfigKey<T> key, Func<Configuration, T, T> modifier) {
+    public Settings Modify<T>(ConfigKey<T> key, Func<IConfig, T, T> modifier) {
       return Add(new ModifyConfig<T>(key, (context, previousValue) => modifier(context, previousValue)));
     }
 
-    public Settings Modify<T>(TaskKey<T> key, Func<EvaluationContext, Func<Task<T>>, Task<T>> modifier) {
+    public Settings Modify<T>(TaskKey<T> key, Func<IContext, Func<Task<T>>, Task<T>> modifier) {
       return Add(new ModifyTask<T>(key, modifier));
     }
 
