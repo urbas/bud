@@ -1,12 +1,8 @@
 using System;
-using System.Collections.Immutable;
+using Urbas.Example.Foo;
 
-public class Program
-{
-  public static void Main()
-  {
-    var list = ImmutableList<string>.Empty;
-    list.Add ("Foo");
-    Console.WriteLine(list);
+public class Program {
+  public static void Main() {
+    Console.WriteLine(new Foo().Message);
   }
 }

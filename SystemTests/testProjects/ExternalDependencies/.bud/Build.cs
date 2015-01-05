@@ -7,6 +7,6 @@ using System;
 public class Build : IBuild {
   public Settings SetUp(Settings settings, string baseDir) {
     return settings
-      .CSharpProject("Foo", baseDir, NuGet.Dependency("Microsoft.Bcl.Immutable", "1.0.34"));
+      .CSharpProject("Foo", baseDir, NuGet.Dependency("Urbas.Example.Foo", "1.0.0"));
   }
 }
