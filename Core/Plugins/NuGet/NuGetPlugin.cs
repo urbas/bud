@@ -66,7 +66,7 @@ namespace Bud.Plugins.NuGet {
 
     private static void InstallNuGetPackages(IPackageManager packageManager, IEnumerable<NuGetDependency> dependencies) {
       foreach (var dependency in dependencies) {
-        packageManager.InstallPackage(dependency.PackageName, dependency.PackageVersion, false, false);
+        packageManager.InstallPackage(dependency.PackageId, dependency.PackageVersion, false, false);
       }
     }
 

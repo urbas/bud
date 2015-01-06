@@ -10,6 +10,7 @@ using System.IO;
 namespace Bud.Commander {
   public class AssemblyBuildCommander : MarshalByRefObject, IBuildCommander {
     private Settings settings;
+    private IConfig config;
 
     public void LoadBuildConfiguration(string buildConfigurationAssemblyFile, string baseDirectory, TextWriter standardOutputTextWriter, TextWriter standardErrorTextWriter) {
       Console.SetOut(standardOutputTextWriter);
@@ -17,10 +18,12 @@ namespace Bud.Commander {
       var assembly = AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(buildConfigurationAssemblyFile));
       var build = (IBuild)assembly.CreateInstance("Build");
       settings = build.SetUp(GlobalBuild.New(baseDirectory), baseDirectory);
+      config = new Config(settings.ConfigDefinitions);
     }
 
     public object Evaluate(string command) {
-      return CommandEvaluator.Evaluate(settings, command);
+      var context = Context.FromConfig(config, settings.TaskDefinitions);
+      return CommandEvaluator.EvaluateSynchronously(context, command);
     }
 
     public void Dispose() {

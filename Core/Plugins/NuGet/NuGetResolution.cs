@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Collections.Immutable;
+using System;
 
 namespace Bud.Plugins.NuGet {
 
@@ -28,8 +29,31 @@ namespace Bud.Plugins.NuGet {
         );
     }
 
-    public IEnumerable<string> GetPackageAssemblyPaths(NuGetDependency dependency) {
-      return fetchedPackages[dependency.PackageName].First(versionToPaths => versionToPaths.Key >= dependency.PackageVersion).Value;
+    public ResolvedNuGetDependency GetResolvedNuGetDependency(NuGetDependency dependency) {
+      if (dependency.PackageVersion == null) {
+        var packagePaths = fetchedPackages[dependency.PackageId].GetEnumerator();
+        if (packagePaths.MoveNext()) {
+          var bestPackagePaths = packagePaths.Current;
+          while (packagePaths.MoveNext()) {
+            var currentPackagePaths = packagePaths.Current;
+            if (currentPackagePaths.Key > bestPackagePaths.Key) {
+              bestPackagePaths = currentPackagePaths;
+            }
+          }
+          return new ResolvedNuGetDependency(dependency, bestPackagePaths.Key, bestPackagePaths.Value);
+        }
+        throw new Exception(string.Format("Could not find any version of the package '{0}'. Try running '{1}' to download packages.", dependency.PackageId, NuGetKeys.Fetch));
+      }
+
+      var suitablePackages = fetchedPackages[dependency.PackageId]
+        .Where(versionToPaths => versionToPaths.Key >= dependency.PackageVersion)
+        .Select(versionToPaths => new ResolvedNuGetDependency(dependency, versionToPaths.Key, versionToPaths.Value));
+
+      foreach (var suitablePackage in suitablePackages) {
+        return suitablePackage;
+      }
+
+      throw new Exception(string.Format("Could not find the version '{0}' of package '{1}'. Try running '{2}' to download packages.", dependency.PackageId, dependency.PackageVersion, NuGetKeys.Fetch));
     }
 	}
 }

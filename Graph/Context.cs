@@ -16,6 +16,7 @@ namespace Bud {
     Task EvaluateTask(Key key);
     Task EvaluateKey(Key key);
     Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition);
+    object GetOutputOf(Key key);
   }
 
   // TODO: Make this class thread-safe.
@@ -81,6 +82,10 @@ namespace Bud {
 
     public static Context FromSettings(Settings settings) {
       return new Context(settings.ConfigDefinitions, settings.TaskDefinitions);
+    }
+
+    public static Context FromConfig(IConfig config, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) {
+      return new Context(config, taskDefinitions);
     }
 
     public Task EvaluateTask(Key key) {

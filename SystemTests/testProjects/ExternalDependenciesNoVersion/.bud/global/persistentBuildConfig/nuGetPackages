@@ -1,0 +1,9 @@
+{
+  "fetchedPackages": {
+    "Urbas.Example.Foo": {
+      "1.0.1": [
+        "lib/net40/Urbas.Example.Foo.dll"
+      ]
+    }
+  }
+}

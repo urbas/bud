@@ -4,12 +4,12 @@ using NuGet;
 
 namespace Bud.Plugins.NuGet {
   public class NuGetDependency {
-    public readonly string PackageName;
+    public readonly string PackageId;
     public readonly SemanticVersion PackageVersion;
 
-    public NuGetDependency(string packageName, string packageVersion) {
-      this.PackageName = packageName;
-      this.PackageVersion = SemanticVersion.Parse(packageVersion);
+    public NuGetDependency(string packageId, string packageVersion = null) {
+      this.PackageId = packageId;
+      this.PackageVersion = packageVersion == null ? null : SemanticVersion.Parse(packageVersion);
     }
   }
 }

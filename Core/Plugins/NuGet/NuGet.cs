@@ -11,7 +11,7 @@ namespace Bud.Plugins.NuGet {
   public static class NuGet {
     public const string FetchedPackagesFileName = "nuGetPackages";
 
-    public static IPlugin Dependency(string packageName, string packageVersion) {
+    public static IPlugin Dependency(string packageName, string packageVersion = null) {
       return Plugin.Create((settings, key) => settings.Modify(NuGetKeys.NuGetDependencies.In(key), dependencies => dependencies.Add(new NuGetDependency(packageName, packageVersion))));
     }
 

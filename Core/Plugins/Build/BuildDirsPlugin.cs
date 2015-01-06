@@ -24,7 +24,10 @@ namespace Bud.Plugins.Build {
 
     private async static Task<Unit> CleanBuildDirsTask(IContext context, Func<Task<Unit>> oldCleanTask, Key project) {
       await oldCleanTask();
-      Directory.Delete(context.GetOutputDir(project), true);
+      var dir = context.GetOutputDir(project);
+      if (Directory.Exists(dir)) {
+        Directory.Delete(dir, true);
+      }
       return Unit.Instance;
     }
   }

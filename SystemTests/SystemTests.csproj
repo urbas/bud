@@ -46,6 +46,7 @@
     <Compile Include="BuildConfigurationProject.cs" />
     <Compile Include="InterProjectDependencies.cs" />
     <Compile Include="ExternalDependencies.cs" />
+    <Compile Include="ExternalDependenciesNoVersion.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

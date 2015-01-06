@@ -82,7 +82,15 @@ namespace Bud {
     }
 
     private StringBuilder AppendAsString(StringBuilder stringBuilder) {
-      return IsGlobal ? stringBuilder : Parent.AppendAsString(stringBuilder).Append(KeySeparator).Append(Id);
+      if (IsGlobal) {
+        return stringBuilder;
+      }
+
+      if (!Parent.IsGlobal) {
+        Parent.AppendAsString(stringBuilder).Append(KeySeparator);
+      }
+
+      return stringBuilder.Append(Id);
     }
   }
 }

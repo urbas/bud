@@ -89,14 +89,14 @@ namespace Bud {
 
     [Test]
     public void ToString_MUST_return_the_id_of_the_key_WHEN_its_key_is_global() {
-      Assert.AreEqual("/A", keyA.ToString());
+      Assert.AreEqual("A", keyA.ToString());
     }
 
     [Test]
     public void ToString_MUST_return_the_id_and_the_ids_of_keys_WHEN_the_key_is_nested_in_multiple_keys() {
       var deeplyNestedKey = taskKeyA
         .In(new TaskKey<uint>("E").In(new Key("D").In(new Key("foo").In(new ConfigKey<bool>("C").In(configKeyB)))));
-      Assert.AreEqual("/B/C/foo/D/E/A", deeplyNestedKey.ToString());
+      Assert.AreEqual("B/C/foo/D/E/A", deeplyNestedKey.ToString());
     }
 
     [Test]
@@ -183,7 +183,7 @@ namespace Bud {
     public void Parse_MUST_perform_the_inverse_of_ToString() {
       var deeplyNestedKey = taskKeyA.In(new TaskKey<uint>("E").In(new Key("D").In(new Key("foo").In(new ConfigKey<bool>("C").In(configKeyB)))));
       Assert.AreEqual(deeplyNestedKey, Key.Parse(deeplyNestedKey.ToString()));
-      Assert.AreEqual("/B/C/foo/D/E/A", Key.Parse("/B/C/foo/D/E/A").ToString());
+      Assert.AreEqual("B/C/foo/D/E/A", Key.Parse("/B/C/foo/D/E/A").ToString());
     }
   }
 }
