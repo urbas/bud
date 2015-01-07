@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Bud.Plugins.Build;
-using Bud.Plugins.Projects;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Bud.Plugins.Build;
+using Bud.Plugins.Projects;
+using Bud.Plugins.Dependencies;
 
 namespace Bud.Plugins.CSharp {
   public static class CSharp {
@@ -14,12 +15,15 @@ namespace Bud.Plugins.CSharp {
         .AddProject(id, baseDir, CSharpPlugin.Instance.With(plugin));
     }
 
-    public static Settings LibraryProject(this Settings build, string id, string baseDir) {
-      return build.CSharpProject(id, baseDir, Plugin.Create(SetLibraryAssemblyType));
+    public static Settings LibraryProject(this Settings build, string id, string baseDir, IPlugin plugin = null) {
+      return build.CSharpProject(id, baseDir, Plugin.Create(SetLibraryAssemblyType).With(plugin));
     }
 
-    public static Settings SetLibraryAssemblyType(Settings existingSettings, Key key) {
-      return existingSettings.Modify(CSharpKeys.AssemblyType.In(key), assemblyType => AssemblyType.Library);
+    public static IPlugin Dependency(string packageName, string packageVersion = null) {
+      var projectKey = Project.ProjectKey(packageName);
+      var assemblyFileKey = CSharpKeys.OutputAssemblyFile.In(projectKey);
+      var cSharpBuildTask = CSharpKeys.Build.In(projectKey);
+      return Dependencies.Dependencies.AddDependency(CSharpKeys.CSharp, new InternalDependency(projectKey, cSharpBuildTask), new ExternalDependency(packageName, packageVersion), shouldUseInternalDependency: context => context.IsConfigDefined(assemblyFileKey));
     }
 
     public static string GetCSharpSourceDir(this IContext context, Key project) {
@@ -67,6 +71,10 @@ namespace Bud.Plugins.CSharp {
         default:
           throw new ArgumentException("Unsupported assembly type.");
       }
+    }
+
+    private static Settings SetLibraryAssemblyType(Settings existingSettings, Key key) {
+      return existingSettings.Modify(CSharpKeys.AssemblyType.In(key), assemblyType => AssemblyType.Library);
     }
   }
 }

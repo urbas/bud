@@ -51,11 +51,9 @@ namespace Bud.Plugins.CSharp {
 
     private static async Task<ImmutableList<string>> CollectKeyDependencies(IContext context, Key currentProject) {
       var collectedAssemblies = ImmutableList.CreateBuilder<string>();
-      var dependencyProjects = await context.ResolveBuildDependencies(currentProject);
-      foreach (var dependencyProject in dependencyProjects) {
-        if (context.IsConfigDefined(CSharpKeys.OutputAssemblyFile.In(dependencyProject))) {
-          collectedAssemblies.Add(context.GetCSharpOutputAssemblyFile(dependencyProject));
-        }
+      var dependencyProjects = await context.ResolveInternalDependencies(currentProject, CSharpKeys.CSharp);
+      foreach (var dependency in dependencyProjects) {
+        collectedAssemblies.Add(context.GetCSharpOutputAssemblyFile(dependency.Key));
       }
       return collectedAssemblies.ToImmutable();
     }

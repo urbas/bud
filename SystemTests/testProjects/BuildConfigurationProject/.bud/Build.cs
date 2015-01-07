@@ -7,6 +7,6 @@ public class Build : IBuild {
   public Settings SetUp(Settings settings, string baseDir) {
     return settings
       .CSharpProject("Foo", Path.Combine(baseDir, "Foo"))
-      .CSharpProject("Bar", Path.Combine(baseDir, "Bar"), Project.Dependency("Foo"));
+      .CSharpProject("Bar", Path.Combine(baseDir, "Bar"), CSharp.Dependency("Foo"));
   }
 }

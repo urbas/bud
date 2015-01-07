@@ -16,7 +16,7 @@ namespace Bud.SystemTests {
     [Test]
     public void compile_MUST_produce_the_executable() {
       using (var buildCommander = TestProjects.LoadBuildCommander("InterProjectDependencies")) {
-        buildCommander.Evaluate(BuildKeys.Build);
+        buildCommander.Evaluate("Build");
         FileAssertions.AssertFilesExist(new [] {
           BuiltAssemblyPath(buildCommander, "A", ".dll"),
           BuiltAssemblyPath(buildCommander, "B", ".exe")
