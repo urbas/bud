@@ -75,18 +75,15 @@
     <Compile Include="Commander\IBuildCommander.cs" />
     <Compile Include="Commander\CommandEvaluator.cs" />
     <Compile Include="Commander\DefaultBuildCommander.cs" />
-    <Compile Include="Plugins\NuGet\NuGetPlugin.cs" />
-    <Compile Include="Plugins\NuGet\NuGetKeys.cs" />
-    <Compile Include="Plugins\NuGet\NuGetDependency.cs" />
     <Compile Include="Plugins\Build\GlobalBuildPlugin.cs" />
     <Compile Include="Plugins\Build\GlobalBuild.cs" />
-    <Compile Include="Plugins\NuGet\NuGet.cs" />
     <Compile Include="Commander\BuildCommander.cs" />
     <Compile Include="Plugins\Dependencies\Dependencies.cs" />
-    <Compile Include="Plugins\NuGet\NuGetResolution.cs" />
-    <Compile Include="Plugins\NuGet\ResolvedNuGetDependency.cs" />
     <Compile Include="Plugins\Dependencies\ExternalDependency.cs" />
     <Compile Include="Plugins\Dependencies\InternalDependency.cs" />
+    <Compile Include="Plugins\Dependencies\DependenciesPlugin.cs" />
+    <Compile Include="Plugins\Dependencies\NuGetResolution.cs" />
+    <Compile Include="Plugins\Dependencies\ResolvedNuGetDependency.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

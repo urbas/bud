@@ -10,7 +10,6 @@ using System;
 using Bud.Test.Util;
 using Bud.Commander;
 using System.IO;
-using Bud.Plugins.NuGet;
 
 namespace Bud.SystemTests {
   public class ExternalDependencies {

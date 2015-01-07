@@ -1,29 +1,26 @@
-using System.Collections.Immutable;
-using System.Threading.Tasks;
-using NuGet;
-using Bud.Plugins.Build;
-using System.IO;
-using System;
+﻿using System;
 using System.Linq;
-using Newtonsoft.Json;
+using System.Collections.Immutable;
+using System.IO;
+using Bud.Plugins.Build;
 using System.Collections.Generic;
+using NuGet;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
 
-namespace Bud.Plugins.NuGet {
-  public class NuGetPlugin : IPlugin {
+namespace Bud.Plugins.Dependencies {
+  public class DependenciesPlugin : IPlugin {
 
-    public static readonly NuGetPlugin Instance = new NuGetPlugin();
+    public static readonly DependenciesPlugin Instance = new DependenciesPlugin();
 
-    private NuGetPlugin() {
-    }
+    private DependenciesPlugin() {}
 
     public Settings ApplyTo(Settings settings, Key key) {
       return settings
-        .Init(NuGetKeys.KeysWithNuGetDependencies, ImmutableList<Key>.Empty)
-        .Init(NuGetKeys.NuGetRepositoryDir, context => Path.Combine(context.GetBudDir(), "nuGetRepository"))
-        .Init(NuGetKeys.NuGetDependencies.In(key), ImmutableList<NuGetDependency>.Empty)
-        .Init(NuGetKeys.Fetch, FetchImpl)
-        .Init(NuGetKeys.NuGetResolvedPackages, NuGetResolvedPackagesImpl)
-        .Modify(NuGetKeys.KeysWithNuGetDependencies, (context, oldValue) => oldValue.Add(key));
+        .Init(DependenciesKeys.ExternalDependenciesKeys, ImmutableList<ConfigKey<ImmutableList<ExternalDependency>>>.Empty)
+        .Init(DependenciesKeys.NuGetRepositoryDir, context => Path.Combine(context.GetBudDir(), "nuGetRepository"))
+        .Init(DependenciesKeys.Fetch, FetchImpl)
+        .Init(DependenciesKeys.NuGetResolvedPackages, NuGetResolvedPackagesImpl);
     }
 
     public static NuGetResolution NuGetResolvedPackagesImpl(IConfig context) {
@@ -37,9 +34,9 @@ namespace Bud.Plugins.NuGet {
 
     public static Task<NuGetResolution> FetchImpl(IContext context) {
       return Task.Run(() => {
-        var dependencies = context.GetNuGetDependencies();
+        var dependencies = context.GetExternalDependencies();
         var packageManager = CreatePackageManager(context);
-        InstallNuGetPackages(packageManager, dependencies.Values.SelectMany(value => value));
+        InstallNuGetPackages(packageManager, dependencies);
         var installedPackages = packageManager.LocalRepository.GetPackages().GroupBy(package => package.Id);
         return PersistNuGetResolution(context, installedPackages);
       });
@@ -64,9 +61,9 @@ namespace Bud.Plugins.NuGet {
       return new PackageManager(repo, nuGetRepositoryDir);
     }
 
-    private static void InstallNuGetPackages(IPackageManager packageManager, IEnumerable<NuGetDependency> dependencies) {
+    private static void InstallNuGetPackages(IPackageManager packageManager, IEnumerable<ExternalDependency> dependencies) {
       foreach (var dependency in dependencies) {
-        packageManager.InstallPackage(dependency.PackageId, dependency.PackageVersion, false, false);
+        packageManager.InstallPackage(dependency.Id, dependency.Version, false, false);
       }
     }
 

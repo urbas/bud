@@ -9,7 +9,6 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 using System.Linq;
 using System;
-using Bud.Plugins.NuGet;
 
 namespace Bud.Plugins.CSharp {
 
@@ -22,7 +21,7 @@ namespace Bud.Plugins.CSharp {
     public Settings ApplyTo(Settings settings, Key key) {
       return settings
         .Apply(key, BuildPlugin.Instance)
-        .Apply(key, NuGetPlugin.Instance)
+        .Apply(key, DependenciesPlugin.Instance)
         .Init(CSharpKeys.Build.In(key), ctxt => MonoCompiler.CompileProject(ctxt, key))
         .Init(CSharpKeys.SourceFiles.In(key), context => FindSources(context, key))
         .Init(CSharpKeys.AssemblyType.In(key), AssemblyType.Exe)
@@ -34,8 +33,8 @@ namespace Bud.Plugins.CSharp {
     }
 
     public static async Task<ImmutableList<string>> CollectAssembliesFromDependencies(IContext context, Key currentProject) {
-      var projectDependencies = await CollectKeyDependencies(context, currentProject);
-      var nuGetDependencies = CollectNuGetDependencies(context, currentProject);
+      var projectDependencies = await CollectInternalDependencies(context, currentProject);
+      var nuGetDependencies = CollectExternalDependencies(context, currentProject);
       var gacDependencies = ImmutableList.Create<string>("Facades/System.Runtime.dll");
       return projectDependencies.AddRange(nuGetDependencies).AddRange(gacDependencies);
     }
@@ -49,7 +48,7 @@ namespace Bud.Plugins.CSharp {
       }
     }
 
-    private static async Task<ImmutableList<string>> CollectKeyDependencies(IContext context, Key currentProject) {
+    private static async Task<ImmutableList<string>> CollectInternalDependencies(IContext context, Key currentProject) {
       var collectedAssemblies = ImmutableList.CreateBuilder<string>();
       var dependencyProjects = await context.ResolveInternalDependencies(currentProject, CSharpKeys.CSharp);
       foreach (var dependency in dependencyProjects) {
@@ -58,13 +57,13 @@ namespace Bud.Plugins.CSharp {
       return collectedAssemblies.ToImmutable();
     }
 
-    private static ImmutableList<string> CollectNuGetDependencies(IConfig context, Key currentProject) {
+    private static ImmutableList<string> CollectExternalDependencies(IConfig context, Key currentProject) {
       var allNuGetDependencies = context.GetNuGetResolvedPackages();
-      var nuGetDependencies = context.GetNuGetDependencies(currentProject);
+      var nuGetDependencies = context.GetExternalDependencies(currentProject, CSharpKeys.CSharp);
       var nuGetRepositoryPath = context.GetNuGetRepositoryDir();
       return nuGetDependencies
         .Select(dependency => allNuGetDependencies.GetResolvedNuGetDependency(dependency))
-        .SelectMany(dependency => dependency.AssemblyPaths.Select(assemblyPath => Path.Combine(nuGetRepositoryPath, dependency.RequestedDependency.PackageId + "." + dependency.ResolvedVersion, assemblyPath))).ToImmutableList();
+        .SelectMany(dependency => dependency.AssemblyPaths.Select(assemblyPath => Path.Combine(nuGetRepositoryPath, dependency.RequestedDependency.Id + "." + dependency.ResolvedVersion, assemblyPath))).ToImmutableList();
     }
   }
 }

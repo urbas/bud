@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Collections.Immutable;
 using System;
+using Bud.Plugins.Dependencies;
 
-namespace Bud.Plugins.NuGet {
+namespace Bud.Plugins.Dependencies {
 
 	public class NuGetResolution	{
     public readonly IDictionary<string, Dictionary<SemanticVersion, IEnumerable<string>>> fetchedPackages;
@@ -29,9 +30,9 @@ namespace Bud.Plugins.NuGet {
         );
     }
 
-    public ResolvedNuGetDependency GetResolvedNuGetDependency(NuGetDependency dependency) {
-      if (dependency.PackageVersion == null) {
-        var packagePaths = fetchedPackages[dependency.PackageId].GetEnumerator();
+    public ResolvedNuGetDependency GetResolvedNuGetDependency(ExternalDependency dependency) {
+      if (dependency.Version == null) {
+        var packagePaths = fetchedPackages[dependency.Id].GetEnumerator();
         if (packagePaths.MoveNext()) {
           var bestPackagePaths = packagePaths.Current;
           while (packagePaths.MoveNext()) {
@@ -42,18 +43,18 @@ namespace Bud.Plugins.NuGet {
           }
           return new ResolvedNuGetDependency(dependency, bestPackagePaths.Key, bestPackagePaths.Value);
         }
-        throw new Exception(string.Format("Could not find any version of the package '{0}'. Try running '{1}' to download packages.", dependency.PackageId, NuGetKeys.Fetch));
+        throw new Exception(string.Format("Could not find any version of the package '{0}'. Try running '{1}' to download packages.", dependency.Id, DependenciesKeys.Fetch));
       }
 
-      var suitablePackages = fetchedPackages[dependency.PackageId]
-        .Where(versionToPaths => versionToPaths.Key >= dependency.PackageVersion)
+      var suitablePackages = fetchedPackages[dependency.Id]
+        .Where(versionToPaths => versionToPaths.Key >= dependency.Version)
         .Select(versionToPaths => new ResolvedNuGetDependency(dependency, versionToPaths.Key, versionToPaths.Value));
 
       foreach (var suitablePackage in suitablePackages) {
         return suitablePackage;
       }
 
-      throw new Exception(string.Format("Could not find the version '{0}' of package '{1}'. Try running '{2}' to download packages.", dependency.PackageId, dependency.PackageVersion, NuGetKeys.Fetch));
+      throw new Exception(string.Format("Could not find the version '{0}' of package '{1}'. Try running '{2}' to download packages.", dependency.Id, dependency.Version, DependenciesKeys.Fetch));
     }
 	}
 }
