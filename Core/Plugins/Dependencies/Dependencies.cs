@@ -44,11 +44,13 @@ namespace Bud.Plugins.Dependencies {
     }
 
     public static ImmutableList<InternalDependency> GetInternalDependencies(this IConfig config, Key dependent, Key dependencyType) {
-      return config.Evaluate(GetInternalDependenciesKey(dependent, dependencyType));
+      var dependenciesKey = GetInternalDependenciesKey(dependent, dependencyType);
+      return config.IsConfigDefined(dependenciesKey) ? config.Evaluate(dependenciesKey) : ImmutableList<InternalDependency>.Empty;
     }
 
     public static ImmutableList<ExternalDependency> GetExternalDependencies(this IConfig config, Key dependent, Key dependencyType) {
-      return config.Evaluate(GetExternalDependenciesKey(dependent, dependencyType));
+      var dependenciesKey = GetExternalDependenciesKey(dependent, dependencyType);
+      return config.IsConfigDefined(dependenciesKey) ? config.Evaluate(dependenciesKey) : ImmutableList<ExternalDependency>.Empty;
     }
 
     public static ImmutableList<ExternalDependency> GetExternalDependencies(this IConfig context) {

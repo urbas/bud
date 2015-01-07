@@ -1,6 +1,5 @@
 using Bud;
 using Bud.Plugins.CSharp;
-using Bud.Plugins.NuGet;
 using System.IO;
 using System;
 
