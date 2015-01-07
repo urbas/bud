@@ -6,6 +6,14 @@ namespace Bud {
       return otherPlugin == null ? thisPlugin : thisPlugin.With(otherPlugin.ApplyTo);
     }
 
+    public static IPlugin With(this IPlugin thisPlugin, params IPlugin[] otherPlugins) {
+      IPlugin composedPlugin = thisPlugin;
+      foreach (var otherPlugin in otherPlugins) {
+        composedPlugin = composedPlugin.With(otherPlugin);
+      }
+      return composedPlugin;
+    }
+
     public static IPlugin With(this IPlugin thisPlugin, SettingsTransform settingApplication) {
       return new Plugin((existingSettings, key) => settingApplication(thisPlugin.ApplyTo(existingSettings, key), key));
     }

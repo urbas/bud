@@ -10,12 +10,12 @@ using Bud.Plugins.Dependencies;
 
 namespace Bud.Plugins.CSharp {
   public static class CSharp {
-    public static Settings CSharpProject(this Settings build, string id, string baseDir, IPlugin plugin = null) {
-      return build.AddProject(id, baseDir, CSharpPlugin.Instance.With(plugin));
+    public static Settings CSharpProject(this Settings build, string id, string baseDir, params IPlugin[] plugins) {
+      return build.AddProject(id, baseDir, CSharpPlugin.Instance.With(plugins));
     }
 
-    public static Settings LibraryProject(this Settings build, string id, string baseDir, IPlugin plugin = null) {
-      return build.CSharpProject(id, baseDir, Plugin.Create(SetLibraryAssemblyType).With(plugin));
+    public static Settings LibraryProject(this Settings build, string id, string baseDir, params IPlugin[] plugins) {
+      return build.CSharpProject(id, baseDir, Plugin.Create(SetLibraryAssemblyType).With(plugins));
     }
 
     public static IPlugin Dependency(string packageName, string packageVersion = null) {

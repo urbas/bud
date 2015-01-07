@@ -47,6 +47,7 @@
     <Compile Include="InterProjectDependencies.cs" />
     <Compile Include="ExternalDependencies.cs" />
     <Compile Include="ExternalDependenciesNoVersion.cs" />
+    <Compile Include="TransitiveDependencies.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
