@@ -95,7 +95,6 @@
     <Folder Include="Plugins\BuildLoading\" />
     <Folder Include="Plugins\CSharp\" />
     <Folder Include="Commander\" />
-    <Folder Include="Plugins\NuGet\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
