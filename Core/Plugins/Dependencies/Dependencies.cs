@@ -58,15 +58,21 @@ namespace Bud.Plugins.Dependencies {
       return keysWithNuGetDependencies.SelectMany(key => context.Evaluate(key)).ToImmutableList();
     }
 
-    public async static Task<ImmutableList<InternalDependency>> ResolveInternalDependencies(this IContext context, Key dependent, Key dependencyType) {
+    public async static Task<ISet<Key>> ResolveInternalDependencies(this IContext context, Key dependent, Key dependencyType) {
       var resolveDependenciesKey = DependenciesKeys.ResolveInternalDependencies.In(GetInternalDependenciesKey(dependent, dependencyType));
-      return context.IsTaskDefined(resolveDependenciesKey) ? await context.Evaluate(resolveDependenciesKey) : ImmutableList<InternalDependency>.Empty;
+      return context.IsTaskDefined(resolveDependenciesKey) ? await context.Evaluate(resolveDependenciesKey) : ImmutableHashSet<Key>.Empty;
     }
 
-    private static Task<ImmutableList<InternalDependency>> ResolveInternalDependenciesImpl(IContext context, Key dependent, Key dependencyType) {
+    private static Task<ISet<Key>> ResolveInternalDependenciesImpl(IContext context, Key dependent, Key dependencyType) {
       return Task
-        .WhenAll(context.GetInternalDependencies(dependent, dependencyType).Select(dependency => dependency.Resolve(context)))
-        .ContinueWith<ImmutableList<InternalDependency>>(completedTask => completedTask.Result.ToImmutableList());
+        .WhenAll(context.GetInternalDependencies(dependent, dependencyType).Select(dependency => ResolveDependencyImpl(context, dependency, dependencyType)))
+        .ContinueWith<ISet<Key>>(completedTask => completedTask.Result.Aggregate(ImmutableHashSet.CreateBuilder<Key>(), (builder, dependencies) => { builder.UnionWith(dependencies); return builder; }).ToImmutable());
+    }
+
+    private async static Task<IEnumerable<Key>> ResolveDependencyImpl(IContext context, InternalDependency dependency, Key dependencyType) {
+      await dependency.Resolve(context);
+      var transitiveDependencies = await ResolveInternalDependenciesImpl(context, dependency.Key, dependencyType);
+      return System.Linq.Enumerable.Concat(new Key[] {dependency.Key}, transitiveDependencies);
     }
 
     public static string GetNuGetRepositoryDir(this IConfig context) {
@@ -77,7 +83,7 @@ namespace Bud.Plugins.Dependencies {
       return Path.Combine(BuildDirs.GetPersistentBuildConfigDir(context), FetchedPackagesFileName);
     }
 
-    public static NuGetResolution GetNuGetResolvedPackages(this IConfig context) {
+    public static ResolvedExternalDependencies GetNuGetResolvedPackages(this IConfig context) {
       return context.Evaluate(DependenciesKeys.NuGetResolvedPackages);
     }
 

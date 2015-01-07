@@ -82,8 +82,8 @@
     <Compile Include="Plugins\Dependencies\ExternalDependency.cs" />
     <Compile Include="Plugins\Dependencies\InternalDependency.cs" />
     <Compile Include="Plugins\Dependencies\DependenciesPlugin.cs" />
-    <Compile Include="Plugins\Dependencies\NuGetResolution.cs" />
-    <Compile Include="Plugins\Dependencies\ResolvedNuGetDependency.cs" />
+    <Compile Include="Plugins\Dependencies\ResolvedExternalDependencies.cs" />
+    <Compile Include="Plugins\Dependencies\ResolvedExternalDependency.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

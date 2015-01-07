@@ -11,9 +11,8 @@ namespace Bud.Plugins.Dependencies {
       ResolutionTask = resolutionTask;
     }
 
-    public async Task<InternalDependency> Resolve(IContext context) {
+    public async Task Resolve(IContext context) {
       await context.Evaluate(ResolutionTask);
-      return this;
     }
   }
 }

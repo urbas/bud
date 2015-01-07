@@ -12,5 +12,12 @@ namespace Bud.Plugins.Dependencies {
       this.Version = version;
       this.Id = id;
     }
+
+    public override string ToString() {
+      if (Version != null) {
+        return string.Format("{0}@{1}", Id, Version);
+      }
+      return Id;
+    }
 	}
 }

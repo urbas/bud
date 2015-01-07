@@ -33,10 +33,10 @@ namespace Bud.Plugins.CSharp {
     }
 
     public static async Task<ImmutableList<string>> CollectAssembliesFromDependencies(IContext context, Key currentProject) {
-      var projectDependencies = await CollectInternalDependencies(context, currentProject);
-      var nuGetDependencies = CollectExternalDependencies(context, currentProject);
+      var internalDependencies = await CollectInternalDependencies(context, currentProject);
+      var nuGetDependencies = CollectExternalDependencies(context, currentProject, internalDependencies);
       var gacDependencies = ImmutableList.Create<string>("Facades/System.Runtime.dll");
-      return projectDependencies.AddRange(nuGetDependencies).AddRange(gacDependencies);
+      return internalDependencies.AddRange(nuGetDependencies).AddRange(gacDependencies);
     }
 
     public IEnumerable<string> FindSources(IContext context, Key key) {
@@ -52,7 +52,7 @@ namespace Bud.Plugins.CSharp {
       var collectedAssemblies = ImmutableList.CreateBuilder<string>();
       var dependencyProjects = await context.ResolveInternalDependencies(currentProject, CSharpKeys.CSharp);
       foreach (var dependency in dependencyProjects) {
-        collectedAssemblies.Add(context.GetCSharpOutputAssemblyFile(dependency.Key));
+        collectedAssemblies.Add(context.GetCSharpOutputAssemblyFile(dependency));
       }
       return collectedAssemblies.ToImmutable();
     }

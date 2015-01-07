@@ -16,7 +16,6 @@ namespace Bud.SystemTests {
     [Test]
     public void compile_MUST_produce_the_executable() {
       using (var buildCommander = TestProjects.LoadBuildCommander("TransitiveDependencies")) {
-        buildCommander.Evaluate("Fetch");
         buildCommander.Evaluate("Build");
         FileAssertions.AssertFilesExist(new [] {
           BuiltAssemblyPath(buildCommander, "Common", ".dll"),
