@@ -11,8 +11,7 @@ using Bud.Plugins.Dependencies;
 namespace Bud.Plugins.CSharp {
   public static class CSharp {
     public static Settings CSharpProject(this Settings build, string id, string baseDir, IPlugin plugin = null) {
-      return build
-        .AddProject(id, baseDir, CSharpPlugin.Instance.With(plugin));
+      return build.AddProject(id, baseDir, CSharpPlugin.Instance.With(plugin));
     }
 
     public static Settings LibraryProject(this Settings build, string id, string baseDir, IPlugin plugin = null) {
@@ -21,9 +20,12 @@ namespace Bud.Plugins.CSharp {
 
     public static IPlugin Dependency(string packageName, string packageVersion = null) {
       var projectKey = Project.ProjectKey(packageName);
-      var assemblyFileKey = CSharpKeys.OutputAssemblyFile.In(projectKey);
-      var cSharpBuildTask = CSharpKeys.Build.In(projectKey);
-      return Dependencies.Dependencies.AddDependency(CSharpKeys.CSharp, new InternalDependency(projectKey, cSharpBuildTask), new ExternalDependency(packageName, packageVersion), shouldUseInternalDependency: context => context.IsConfigDefined(assemblyFileKey));
+      return Dependencies.Dependencies.AddDependency(
+        CSharpKeys.CSharp,
+        new InternalDependency(projectKey, CSharpKeys.Build.In(projectKey)),
+        new ExternalDependency(packageName, packageVersion),
+        shouldUseInternalDependency: context => context.IsConfigDefined(CSharpKeys.OutputAssemblyFile.In(projectKey))
+      );
     }
 
     public static string GetCSharpSourceDir(this IContext context, Key project) {
