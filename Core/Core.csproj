@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -64,7 +64,7 @@
     <Compile Include="Plugins\CSharp\CSharp.cs" />
     <Compile Include="Plugins\CSharp\CSharpKeys.cs" />
     <Compile Include="Plugins\CSharp\CSharpPlugin.cs" />
-    <Compile Include="Plugins\CSharp\Compiler\MonoCompiler.cs" />
+    <Compile Include="Plugins\CSharp\Compiler\CSharpCompiler.cs" />
     <Compile Include="Plugins\BuildLoading\BuildLoadingKeys.cs" />
     <Compile Include="Plugins\BuildLoading\BuildLoadingPlugin.cs" />
     <Compile Include="Plugins\CSharp\AssemblyType.cs" />
@@ -86,16 +86,7 @@
     <Compile Include="Plugins\Dependencies\ResolvedExternalDependency.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="Cli\" />
-    <Folder Include="Plugins\" />
-    <Folder Include="Plugins\Projects\" />
-    <Folder Include="Plugins\Build\" />
-    <Folder Include="Plugins\Dependencies\" />
-    <Folder Include="Plugins\BuildLoading\" />
-    <Folder Include="Plugins\CSharp\" />
-    <Folder Include="Commander\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

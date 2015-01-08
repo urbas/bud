@@ -7,6 +7,10 @@ obj/
 test-results/
 packages/
 
+# Visual Studio Files
+*.csproj.user
+*.v12.suo
+
 # Editors
 *.swp
 *~

@@ -18,7 +18,7 @@ namespace Bud.SystemTests {
       using (var buildCommander = TestProjects.LoadBuildCommander("TransitiveDependencies")) {
         buildCommander.Evaluate("Build");
         FileAssertions.AssertFilesExist(new [] {
-          BuiltAssemblyPath(buildCommander, "Common", ".dll"),
+          BuiltAssemblyPath(buildCommander, "CommonProject", ".dll"),
           BuiltAssemblyPath(buildCommander, "A", ".dll"),
           BuiltAssemblyPath(buildCommander, "B", ".exe")
         });

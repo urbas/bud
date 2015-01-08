@@ -19,16 +19,16 @@ namespace Bud.Test.Util {
     }
 
     public void Dispose() {
-      Exception tempDirDisposeException = null;
+      Exception buildCommanderDisposeException = null;
       try {
-        TemporaryDirectory.Dispose();
+        buildCommander.Dispose();
       } catch (Exception ex) {
-        tempDirDisposeException = ex;
+        buildCommanderDisposeException = ex;
       }
-      buildCommander.Dispose();
+      TemporaryDirectory.Dispose();
 
-      if (tempDirDisposeException != null) {
-        throw tempDirDisposeException;
+      if (buildCommanderDisposeException != null) {
+        throw buildCommanderDisposeException;
       }
     }
   }

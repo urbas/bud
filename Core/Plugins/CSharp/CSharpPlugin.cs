@@ -22,7 +22,7 @@ namespace Bud.Plugins.CSharp {
       return settings
         .Apply(key, BuildPlugin.Instance)
         .Apply(key, DependenciesPlugin.Instance)
-        .Init(CSharpKeys.Build.In(key), ctxt => MonoCompiler.CompileProject(ctxt, key))
+        .Init(CSharpKeys.Build.In(key), ctxt => CSharpCompiler.CompileProject(ctxt, key))
         .Init(CSharpKeys.SourceFiles.In(key), context => FindSources(context, key))
         .Init(CSharpKeys.AssemblyType.In(key), AssemblyType.Exe)
         .Init(CSharpKeys.CollectReferencedAssemblies.In(key), context => CollectAssembliesFromDependencies(context, key))
@@ -33,10 +33,11 @@ namespace Bud.Plugins.CSharp {
     }
 
     public static async Task<ImmutableList<string>> CollectAssembliesFromDependencies(IContext context, Key currentProject) {
-      var internalDependencies = await CollectInternalDependencies(context, currentProject);
-      var nuGetDependencies = CollectExternalDependencies(context, currentProject, internalDependencies);
-      var gacDependencies = ImmutableList.Create<string>("Facades/System.Runtime.dll");
-      return internalDependencies.AddRange(nuGetDependencies).AddRange(gacDependencies);
+      var internalDependencies = await context.ResolveInternalDependencies(currentProject, CSharpKeys.CSharp);
+      var internalDependencyAssemblyPaths = CollectInternalDependencies(context, internalDependencies);
+      var directNuGetDependencies = CollectExternalDependencies(context, currentProject);
+      var transitiveNuGetDependencies = internalDependencies.SelectMany(dependency => CollectExternalDependencies(context, dependency));
+      return internalDependencyAssemblyPaths.AddRange(directNuGetDependencies).AddRange(transitiveNuGetDependencies);
     }
 
     public IEnumerable<string> FindSources(IContext context, Key key) {
@@ -48,9 +49,8 @@ namespace Bud.Plugins.CSharp {
       }
     }
 
-    private static async Task<ImmutableList<string>> CollectInternalDependencies(IContext context, Key currentProject) {
+    private static ImmutableList<string> CollectInternalDependencies(IContext context, IEnumerable<Key> dependencyProjects) {
       var collectedAssemblies = ImmutableList.CreateBuilder<string>();
-      var dependencyProjects = await context.ResolveInternalDependencies(currentProject, CSharpKeys.CSharp);
       foreach (var dependency in dependencyProjects) {
         collectedAssemblies.Add(context.GetCSharpOutputAssemblyFile(dependency));
       }
