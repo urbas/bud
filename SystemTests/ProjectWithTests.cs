@@ -16,7 +16,7 @@ namespace Bud.SystemTests {
     [Test]
     public void compile_MUST_produce_the_main_and_test_libraries() {
       using (var buildCommander = TestProjects.LoadBuildCommander("ProjectWithTests")) {
-        buildCommander.Evaluate("Test/Build");
+        buildCommander.Evaluate("test/build");
         FileAssertions.AssertFilesExist(new [] {
           BuiltAssemblyPath(buildCommander, "main", "A.dll"),
           BuiltAssemblyPath(buildCommander, "test", "A.Test.dll")

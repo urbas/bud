@@ -7,9 +7,9 @@ using Bud.Commander;
 
 namespace Bud.Plugins.BuildLoading {
   public static class BuildLoadingKeys {
-    public static readonly ConfigKey<string> BuildConfigSourceFile = new ConfigKey<string>("BuildConfigSourceFile");
-    public static readonly ConfigKey<string> DirOfProjectToBeBuilt = new ConfigKey<string>("DirOfProjectToBeBuilt");
-    public static readonly TaskKey<IBuildCommander> CreateBuildCommander = new TaskKey<IBuildCommander>("CreateBuildCommander");
+    public static readonly ConfigKey<string> BuildConfigSourceFile = new ConfigKey<string>("buildConfigSourceFile");
+    public static readonly ConfigKey<string> DirOfProjectToBeBuilt = new ConfigKey<string>("dirOfProjectToBeBuilt");
+    public static readonly TaskKey<IBuildCommander> CreateBuildCommander = new TaskKey<IBuildCommander>("createBuildCommander");
   }
 }
 

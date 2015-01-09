@@ -16,8 +16,8 @@ namespace Bud.SystemTests {
     [Test]
     public void compile_MUST_produce_the_executable() {
       using (var buildCommander = TestProjects.LoadBuildCommander("ExternalDependencies")) {
-        buildCommander.Evaluate("Fetch");
-        buildCommander.Evaluate("Build");
+        buildCommander.Evaluate("fetch");
+        buildCommander.Evaluate("build");
         FileAssertions.AssertFileExists(BuiltAssemblyPath(buildCommander, "Foo", ".exe"));
       }
     }

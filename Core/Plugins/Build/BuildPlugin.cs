@@ -14,8 +14,11 @@ namespace Bud.Plugins.Build {
         .Init(BuildKeys.Clean.In(key), TaskUtils.NoOpTask)
         .Init(BuildKeys.Build, TaskUtils.NoOpTask)
         .Init(BuildKeys.Build.In(key), TaskUtils.NoOpTask)
+        .Init(BuildKeys.Test, TaskUtils.NoOpTask)
+        .Init(BuildKeys.Test.In(key), TaskUtils.NoOpTask)
         .AddDependencies(BuildKeys.Build, BuildKeys.Build.In(key))
-        .AddDependencies(BuildKeys.Clean, BuildKeys.Clean.In(key));
+        .AddDependencies(BuildKeys.Clean, BuildKeys.Clean.In(key))
+        .AddDependencies(BuildKeys.Test, BuildKeys.Test.In(key));
     }
   }
 }

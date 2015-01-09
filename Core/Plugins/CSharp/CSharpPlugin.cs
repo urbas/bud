@@ -19,17 +19,21 @@ namespace Bud.Plugins.CSharp {
     }
 
     public Settings ApplyTo(Settings settings, Key key) {
+      return SetUpBuild(settings, key);
+    }
+
+    private Settings SetUpBuild(Settings settings, Key key) {
       return settings
-        .Apply(key, BuildPlugin.Instance)
-        .Apply(key, DependenciesPlugin.Instance)
-        .Init(CSharpKeys.Build.In(key), ctxt => CSharpCompiler.CompileProject(ctxt, key))
-        .Init(CSharpKeys.SourceFiles.In(key), context => FindSources(context, key))
-        .Init(CSharpKeys.AssemblyType.In(key), AssemblyType.Exe)
-        .Init(CSharpKeys.CollectReferencedAssemblies.In(key), context => CollectAssembliesFromDependencies(context, key))
-        .Init(CSharpKeys.OutputAssemblyDir.In(key), context => Path.Combine(context.GetOutputDir(key), ".net-4.5", "main", "debug", "bin"))
-        .Init(CSharpKeys.OutputAssemblyName.In(key), context => key.Id)
-        .Init(CSharpKeys.OutputAssemblyFile.In(key), context => Path.Combine(context.GetCSharpOutputAssemblyDir(key), string.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(key), context.GetAssemblyFileExtension(key))))
-        .AddDependencies(BuildKeys.Build.In(key), CSharpKeys.Build.In(key));
+              .Apply(key, BuildPlugin.Instance)
+              .Apply(key, DependenciesPlugin.Instance)
+              .Init(CSharpKeys.Build.In(key), ctxt => CSharpCompiler.CompileProject(ctxt, key))
+              .Init(CSharpKeys.SourceFiles.In(key), context => FindSources(context, key))
+              .Init(CSharpKeys.AssemblyType.In(key), AssemblyType.Exe)
+              .Init(CSharpKeys.CollectReferencedAssemblies.In(key), context => CollectAssembliesFromDependencies(context, key))
+              .Init(CSharpKeys.OutputAssemblyDir.In(key), context => Path.Combine(context.GetOutputDir(key), ".net-4.5", "main", "debug", "bin"))
+              .Init(CSharpKeys.OutputAssemblyName.In(key), context => key.Id)
+              .Init(CSharpKeys.OutputAssemblyFile.In(key), context => Path.Combine(context.GetCSharpOutputAssemblyDir(key), string.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(key), context.GetAssemblyFileExtension(key))))
+              .AddDependencies(BuildKeys.Build.In(key), CSharpKeys.Build.In(key));
     }
 
     public static async Task<ImmutableList<string>> CollectAssembliesFromDependencies(IContext context, Key currentProject) {
