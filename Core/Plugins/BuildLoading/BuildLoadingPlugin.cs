@@ -38,7 +38,7 @@ namespace Bud.Plugins.BuildLoading {
       var dirOfProjectToBeBuilt = context.GetDirOfProjectToBeBuilt(key);
       // TODO: Check if the BakedBuild.dll file exists. If it does, just load it.
       if (File.Exists(buildConfigSourceFile)) {
-        await context.BuildAll();
+        await context.Evaluate(BuildKeys.Build);
         return new AppDomainBuildCommander(context.GetCSharpOutputAssemblyFile(key), dirOfProjectToBeBuilt);
       } else {
         return new DefaultBuildCommander(dirOfProjectToBeBuilt);

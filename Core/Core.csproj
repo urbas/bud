@@ -58,7 +58,6 @@
     <Compile Include="Plugins\Build\BuildDirsKeys.cs" />
     <Compile Include="Plugins\Build\BuildDirsPlugin.cs" />
     <Compile Include="Plugins\Build\BuildKeys.cs" />
-    <Compile Include="Plugins\Build\Build.cs" />
     <Compile Include="Plugins\Dependencies\DependenciesKeys.cs" />
     <Compile Include="Plugins\BuildLoading\BuildLoading.cs" />
     <Compile Include="Plugins\CSharp\CSharp.cs" />
