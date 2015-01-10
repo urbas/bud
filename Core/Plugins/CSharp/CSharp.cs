@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Threading.Tasks;
 using Bud.Plugins.Build;
 using Bud.Plugins.Dependencies;
@@ -9,6 +7,8 @@ using Bud.Plugins.Projects;
 
 namespace Bud.Plugins.CSharp {
   public static class CSharp {
+    public readonly static Key MainCSharpDependencyType = CSharpKeys.CSharp.In(BuildKeys.Main);
+
     public static Settings CSharpProject(this Settings build, string id, string baseDir, params IPlugin[] plugins) {
       return build.AddProject(id, baseDir, CSharpPlugin.Instance.With(plugins));
     }
@@ -19,13 +19,13 @@ namespace Bud.Plugins.CSharp {
 
     public static IPlugin Dependency(string packageName, string packageVersion = null) {
       var projectKey = Project.ProjectKey(packageName);
-      var buildKey = BuildUtils.BuildTaskKey(projectKey, BuildKeys.Main, CSharpKeys.CSharp);
+      var buildKey = MainBuildTaskKey(projectKey);
+      var mainBuildTargetKey = MainBuildTargetKey(projectKey);
       return Dependencies.Dependencies.AddDependency(
-        CSharpKeys.CSharp,
+        MainCSharpDependencyType,
         new InternalDependency(projectKey, buildKey),
         new ExternalDependency(packageName, packageVersion),
-        shouldUseInternalDependency: context => context.IsConfigDefined(CSharpKeys.OutputAssemblyFile.In(projectKey))
-        );
+        shouldUseInternalDependency: context => context.IsConfigDefined(CSharpKeys.OutputAssemblyFile.In(mainBuildTargetKey)));
     }
 
     public static Task<IEnumerable<string>> GetCSharpSources(this IContext context, Key project) {
@@ -56,23 +56,17 @@ namespace Bud.Plugins.CSharp {
       return context.Evaluate(BuildUtils.BuildTaskKey(project, BuildKeys.Main, CSharpKeys.CSharp));
     }
 
-    public static string GetAssemblyFileExtension(this IConfig context, Key project) {
-      switch (context.GetCSharpAssemblyType(project)) {
-        case AssemblyType.Exe:
-          return "exe";
-        case AssemblyType.Library:
-          return "dll";
-        case AssemblyType.WinExe:
-          return "exe";
-        case AssemblyType.Module:
-          return "module";
-        default:
-          throw new ArgumentException("Unsupported assembly type.");
-      }
+    public static Key MainBuildTargetKey(Key project) {
+      return BuildUtils.BuildTargetKey(project, BuildKeys.Main, CSharpKeys.CSharp);
     }
 
-    private static Settings SetLibraryAssemblyType(Settings existingSettings, Key key) {
-      return existingSettings.Modify(CSharpKeys.AssemblyType.In(key), assemblyType => AssemblyType.Library);
+    public static TaskKey<Unit> MainBuildTaskKey(Key projectKey) {
+      return BuildUtils.BuildTaskKey(projectKey, BuildKeys.Main, CSharpKeys.CSharp);
+    }
+
+    private static Settings SetLibraryAssemblyType(Settings existingSettings, Key project) {
+      var buildTarget = MainBuildTargetKey(project);
+      return existingSettings.Modify(CSharpKeys.AssemblyType.In(buildTarget), assemblyType => AssemblyType.Library);
     }
   }
 }

@@ -1,13 +1,12 @@
-using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Bud.Plugins.Dependencies {
-	public class InternalDependency {
-    public readonly Key Key;
+  public class InternalDependency {
+    public readonly Key DepdendencyTarget;
     public readonly TaskKey ResolutionTask;
 
-    public InternalDependency(Key key, TaskKey resolutionTask) {
-      Key = key;
+    public InternalDependency(Key depdendencyTarget, TaskKey resolutionTask) {
+      DepdendencyTarget = depdendencyTarget;
       ResolutionTask = resolutionTask;
     }
 
@@ -16,4 +15,3 @@ namespace Bud.Plugins.Dependencies {
     }
   }
 }
-

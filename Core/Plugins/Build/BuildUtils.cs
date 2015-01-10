@@ -1,5 +1,3 @@
-using Bud.Plugins.CSharp;
-
 namespace Bud.Plugins.Build {
   public static class BuildUtils {
     public static Key BuildTargetKey(Key project, Key scope, Key language) {
