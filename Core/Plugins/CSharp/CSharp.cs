@@ -1,12 +1,11 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
+using System.Threading.Tasks;
 using Bud.Plugins.Build;
-using Bud.Plugins.Projects;
 using Bud.Plugins.Dependencies;
+using Bud.Plugins.Projects;
 
 namespace Bud.Plugins.CSharp {
   public static class CSharp {
@@ -20,32 +19,29 @@ namespace Bud.Plugins.CSharp {
 
     public static IPlugin Dependency(string packageName, string packageVersion = null) {
       var projectKey = Project.ProjectKey(packageName);
+      var buildKey = BuildUtils.BuildTaskKey(projectKey, BuildKeys.Main, CSharpKeys.CSharp);
       return Dependencies.Dependencies.AddDependency(
         CSharpKeys.CSharp,
-        new InternalDependency(projectKey, CSharpKeys.Build.In(projectKey)),
+        new InternalDependency(projectKey, buildKey),
         new ExternalDependency(packageName, packageVersion),
         shouldUseInternalDependency: context => context.IsConfigDefined(CSharpKeys.OutputAssemblyFile.In(projectKey))
-      );
-    }
-
-    public static string GetCSharpSourceDir(this IContext context, Key project) {
-      return Path.Combine(context.GetBaseDir(project), "src", "main", "cs");
+        );
     }
 
     public static Task<IEnumerable<string>> GetCSharpSources(this IContext context, Key project) {
       return context.Evaluate(CSharpKeys.SourceFiles.In(project));
     }
 
-    public static string GetCSharpOutputAssemblyDir(this IConfig context, Key project) {
-      return context.Evaluate(CSharpKeys.OutputAssemblyDir.In(project));
+    public static string GetCSharpOutputAssemblyDir(this IConfig context, Key key) {
+      return context.Evaluate(CSharpKeys.OutputAssemblyDir.In(key));
     }
 
-    public static string GetCSharpOutputAssemblyName(this IConfig context, Key project) {
-      return context.Evaluate(CSharpKeys.OutputAssemblyName.In(project));
+    public static string GetCSharpOutputAssemblyName(this IConfig context, Key key) {
+      return context.Evaluate(CSharpKeys.OutputAssemblyName.In(key));
     }
 
-    public static string GetCSharpOutputAssemblyFile(this IConfig context, Key project) {
-      return context.Evaluate(CSharpKeys.OutputAssemblyFile.In(project));
+    public static string GetCSharpOutputAssemblyFile(this IConfig context, Key key) {
+      return context.Evaluate(CSharpKeys.OutputAssemblyFile.In(key));
     }
 
     public static Task<ImmutableList<string>> CollectCSharpReferencedAssemblies(this IContext context, Key project) {
@@ -57,8 +53,8 @@ namespace Bud.Plugins.CSharp {
     }
 
     public static Task CSharpBuild(this IContext context, Key project) {
-      return context.Evaluate(CSharpKeys.Build.In(project));
-     }
+      return context.Evaluate(BuildUtils.BuildTaskKey(project, BuildKeys.Main, CSharpKeys.CSharp));
+    }
 
     public static string GetAssemblyFileExtension(this IConfig context, Key project) {
       switch (context.GetCSharpAssemblyType(project)) {
@@ -80,4 +76,3 @@ namespace Bud.Plugins.CSharp {
     }
   }
 }
-

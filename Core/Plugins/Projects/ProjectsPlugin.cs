@@ -15,11 +15,11 @@ namespace Bud.Plugins.Projects {
       this.id = id;
     }
 
-    public Settings ApplyTo(Settings settings, Key projectKey) {
+    public Settings ApplyTo(Settings settings, Key project) {
       return settings
         .Init(ProjectKeys.Projects, ImmutableDictionary.Create<string, Key>())
-        .Apply(projectKey, new BuildDirsPlugin(baseDir))
-        .Modify(ProjectKeys.Projects, allProjects => allProjects.Add(id, projectKey));
+        .Apply(project, new BuildDirsPlugin(baseDir))
+        .Modify(ProjectKeys.Projects, allProjects => allProjects.Add(id, project));
     }
   }
 }

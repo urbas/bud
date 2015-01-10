@@ -10,7 +10,7 @@ namespace Bud.Plugins.Build {
       this.baseDir = baseDir;
     }
 
-    public Settings ApplyTo(Settings settings, Key key) {
+    public Settings ApplyTo(Settings settings, Key project) {
       return settings
         .Apply(Key.Global, new BuildDirsPlugin(baseDir))
         .Modify(BuildDirsKeys.BudDir, (ctxt, oldValue) => Path.Combine(ctxt.GetBaseDir(), BuildDirs.BudDirName, "global"));

@@ -46,6 +46,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Plugins\Build\BuildKeyDefinitions.cs" />
+    <Compile Include="Plugins\Build\BuildUtils.cs" />
+    <Compile Include="Plugins\CSharp\CSharpBuildPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IO\Directories.cs" />
     <Compile Include="Cli\ProcessBuilder.cs" />

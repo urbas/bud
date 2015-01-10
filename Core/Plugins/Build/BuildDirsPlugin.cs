@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using Bud.Util;
 
 namespace Bud.Plugins.Build {
-
   public class BuildDirsPlugin : IPlugin {
     private readonly string baseDir;
 
@@ -11,18 +11,20 @@ namespace Bud.Plugins.Build {
       this.baseDir = baseDir;
     }
 
-    public Settings ApplyTo(Settings settings, Key key) {
+    public Settings ApplyTo(Settings settings, Key project) {
       return settings
-        .Apply(key, BuildPlugin.Instance)
-        .Init(BuildDirsKeys.BaseDir.In(key), baseDir)
-        .Init(BuildDirsKeys.BudDir.In(key), ctxt => BuildDirs.GetDefaultBudDir(ctxt, key))
-        .Init(BuildDirsKeys.OutputDir.In(key), ctxt => BuildDirs.GetDefaultOutputDir(ctxt, key))
-        .Init(BuildDirsKeys.BuildConfigCacheDir.In(key), ctxt => BuildDirs.GetDefaultBuildConfigCacheDir(ctxt, key))
-        .Init(BuildDirsKeys.PersistentBuildConfigDir.In(key), ctxt => BuildDirs.GetDefaultPersistentBuildConfigDir(ctxt, key))
-        .Modify(BuildKeys.Clean.In(key), (ctxt, oldTask) => CleanBuildDirsTask(ctxt, oldTask, key));
+        .Init(BuildDirsKeys.Clean, TaskUtils.NoOpTask)
+        .Init(BuildDirsKeys.Clean.In(project), TaskUtils.NoOpTask)
+        .Init(BuildDirsKeys.BaseDir.In(project), baseDir)
+        .Init(BuildDirsKeys.BudDir.In(project), ctxt => BuildDirs.GetDefaultBudDir(ctxt, project))
+        .Init(BuildDirsKeys.OutputDir.In(project), ctxt => BuildDirs.GetDefaultOutputDir(ctxt, project))
+        .Init(BuildDirsKeys.BuildConfigCacheDir.In(project), ctxt => BuildDirs.GetDefaultBuildConfigCacheDir(ctxt, project))
+        .Init(BuildDirsKeys.PersistentBuildConfigDir.In(project), ctxt => BuildDirs.GetDefaultPersistentBuildConfigDir(ctxt, project))
+        .AddDependencies(BuildDirsKeys.Clean, BuildDirsKeys.Clean.In(project))
+        .Modify(BuildDirsKeys.Clean.In(project), (ctxt, oldTask) => CleanBuildDirsTask(ctxt, oldTask, project));
     }
 
-    private async static Task<Unit> CleanBuildDirsTask(IContext context, Func<Task<Unit>> oldCleanTask, Key project) {
+    private static async Task<Unit> CleanBuildDirsTask(IContext context, Func<Task<Unit>> oldCleanTask, Key project) {
       await oldCleanTask();
       var dir = context.GetOutputDir(project);
       if (Directory.Exists(dir)) {
@@ -32,4 +34,3 @@ namespace Bud.Plugins.Build {
     }
   }
 }
-

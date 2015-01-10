@@ -12,7 +12,7 @@ namespace Bud.SystemTests {
       using (var buildCommander = TestProjects.LoadBuildCommander("ProjectWithoutConfiguration")) {
         buildCommander.Evaluate(BuildKeys.Build);
         FileAssertions.AssertFileExists(BuiltAssemblyPath(buildCommander));
-        buildCommander.Evaluate(BuildKeys.Clean);
+        buildCommander.Evaluate(BuildDirsKeys.Clean);
         FileAssertions.AssertFileDoesNotExist(BuiltAssemblyPath(buildCommander));
       }
     }

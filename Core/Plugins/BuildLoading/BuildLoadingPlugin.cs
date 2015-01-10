@@ -20,17 +20,18 @@ namespace Bud.Plugins.BuildLoading {
       this.dirOfProjectToBeBuilt = dirOfProjectToBeBuilt;
     }
 
-    public Settings ApplyTo(Settings settings, Key key) {
+    public Settings ApplyTo(Settings settings, Key project) {
+      var buildTarget = BuildUtils.BuildTargetKey(project, BuildKeys.Main, CSharpKeys.CSharp);
       return settings
-        .Apply(key, CSharpPlugin.Instance)
-        .Init(BuildLoadingKeys.BuildConfigSourceFile.In(key), context => Path.Combine(context.GetBaseDir(key), "Build.cs"))
-        .Init(BuildLoadingKeys.DirOfProjectToBeBuilt.In(key), dirOfProjectToBeBuilt)
-        .Modify(CSharpKeys.SourceFiles.In(key), (context, previousTask) => AddBuildDefinitionSourceFile(context, previousTask, key))
-        .Modify(CSharpKeys.OutputAssemblyDir.In(key), (context, previousValue) => context.GetBaseDir(key))
-        .Modify(CSharpKeys.OutputAssemblyName.In(key), (context, previousValue) => "Build")
-        .Init(BuildLoadingKeys.CreateBuildCommander.In(key), context => CreateBuildCommander(context, key))
-        .Modify(CSharpKeys.AssemblyType.In(key), prevValue => AssemblyType.Library)
-        .Modify(CSharpKeys.CollectReferencedAssemblies.In(key), async (context, assemblies) => (await assemblies()).AddRange(BudAssemblies.GetBudAssembliesLocations()));
+        .Apply(project, CSharpPlugin.Instance)
+        .Init(BuildLoadingKeys.CreateBuildCommander.In(project), context => CreateBuildCommander(context, buildTarget))
+        .Init(BuildLoadingKeys.BuildConfigSourceFile.In(buildTarget), context => Path.Combine(context.GetBaseDir(), "Build.cs"))
+        .Init(BuildLoadingKeys.DirOfProjectToBeBuilt.In(buildTarget), dirOfProjectToBeBuilt)
+        .Modify(CSharpKeys.SourceFiles.In(buildTarget), (context, previousTask) => AddBuildDefinitionSourceFile(context, previousTask, buildTarget))
+        .Modify(CSharpKeys.OutputAssemblyDir.In(buildTarget), (context, previousValue) => context.GetBaseDir())
+        .Modify(CSharpKeys.OutputAssemblyName.In(buildTarget), (context, previousValue) => "Build")
+        .Modify(CSharpKeys.AssemblyType.In(buildTarget), prevValue => AssemblyType.Library)
+        .Modify(CSharpKeys.CollectReferencedAssemblies.In(buildTarget), async (context, assemblies) => (await assemblies()).AddRange(BudAssemblies.GetBudAssembliesLocations()));
     }
 
     public async Task<IBuildCommander> CreateBuildCommander(IContext context, Key key) {

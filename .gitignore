@@ -10,6 +10,7 @@ packages/
 # Visual Studio Files
 *.csproj.user
 *.v12.suo
+*.user
 
 # Editors
 *.swp

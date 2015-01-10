@@ -16,8 +16,8 @@ namespace Bud {
       return new Plugin(settingApplication);
     }
 
-    public Settings ApplyTo(Settings settings, Key key) {
-      return SettingsTransform(settings, key);
+    public Settings ApplyTo(Settings settings, Key project) {
+      return SettingsTransform(settings, project);
     }
 	}
 }

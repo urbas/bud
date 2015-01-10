@@ -15,7 +15,7 @@ namespace Bud.Plugins.Dependencies {
 
     private DependenciesPlugin() {}
 
-    public Settings ApplyTo(Settings settings, Key key) {
+    public Settings ApplyTo(Settings settings, Key project) {
       return settings
         .Init(DependenciesKeys.ExternalDependenciesKeys, ImmutableList<ConfigKey<ImmutableList<ExternalDependency>>>.Empty)
         .Init(DependenciesKeys.NuGetRepositoryDir, context => Path.Combine(context.GetBudDir(), "nuGetRepository"))
@@ -23,7 +23,7 @@ namespace Bud.Plugins.Dependencies {
         .Init(DependenciesKeys.NuGetResolvedPackages, NuGetResolvedPackagesImpl);
     }
 
-    public static ResolvedExternalDependencies NuGetResolvedPackagesImpl(IConfig context) {
+    private static ResolvedExternalDependencies NuGetResolvedPackagesImpl(IConfig context) {
       ResolvedExternalDependencies resolution;
       if (TryLoadPersistedResolution(context, out resolution)) {
         return resolution;
@@ -32,7 +32,7 @@ namespace Bud.Plugins.Dependencies {
       }
     }
 
-    public static Task<ResolvedExternalDependencies> FetchImpl(IContext context) {
+    private static Task<ResolvedExternalDependencies> FetchImpl(IContext context) {
       return Task.Run(() => {
         var dependencies = context.GetExternalDependencies();
         var packageManager = CreatePackageManager(context);

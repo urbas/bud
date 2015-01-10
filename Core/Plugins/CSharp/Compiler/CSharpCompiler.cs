@@ -14,11 +14,11 @@ namespace Bud.Plugins.CSharp.Compiler {
     private const string UnixCompilerExecutable = "/usr/bin/mcs";
     private static readonly string[] SystemRuntimeFacadeDll = new[] { "Facades/System.Runtime.dll" };
 
-    public static Task<Unit> CompileProject(IContext context, Key project) {
+    public static Task<Unit> CompileProject(IContext context, Key buildKey) {
       return Task.Run(async () => {
-        var outputFile = context.GetCSharpOutputAssemblyFile(project);
-        var sourceFiles = await context.GetCSharpSources(project);
-        var libraryDependencies = await GetReferencedAssemblies(context, project);
+        var outputFile = context.GetCSharpOutputAssemblyFile(buildKey);
+        var sourceFiles = await context.GetCSharpSources(buildKey);
+        var libraryDependencies = await GetReferencedAssemblies(context, buildKey);
         if (sourceFiles.Any()) {
           Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
           var compilerProcess = ProcessBuilder
@@ -27,7 +27,7 @@ namespace Bud.Plugins.CSharp.Compiler {
           if (libraryDependencies.Any()) {
             compilerProcess = compilerProcess.AddParamArgument("-reference:", libraryDependencies);
           }
-          compilerProcess = compilerProcess.AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(project)));
+          compilerProcess = compilerProcess.AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(buildKey)));
           compilerProcess = compilerProcess.AddArguments(sourceFiles);
           var exitCode = compilerProcess.Start(Console.Out, Console.Error);
           if (exitCode != 0) {
@@ -38,8 +38,8 @@ namespace Bud.Plugins.CSharp.Compiler {
       });
     }
 
-    private static async Task<IEnumerable<string>> GetReferencedAssemblies(IContext context, Key project) {
-      var configuredDependencies = await context.CollectCSharpReferencedAssemblies(project);
+    private static async Task<IEnumerable<string>> GetReferencedAssemblies(IContext context, Key buildKey) {
+      var configuredDependencies = await context.CollectCSharpReferencedAssemblies(buildKey);
       return configuredDependencies.Concat(GetPlatformSpecificAssemblies());
     }
 
