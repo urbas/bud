@@ -19,6 +19,7 @@ namespace Bud.Commander {
       var build = (IBuild)assembly.CreateInstance("Build");
       settings = build.SetUp(GlobalBuild.New(baseDirectory), baseDirectory);
       config = new Config(settings.ConfigDefinitions);
+      Console.WriteLine(Context.FromConfig(config, settings.TaskDefinitions).ToString());
     }
 
     public object Evaluate(string command) {
