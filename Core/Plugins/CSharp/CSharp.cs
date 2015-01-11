@@ -2,30 +2,29 @@
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Bud.Plugins.Build;
-using Bud.Plugins.Dependencies;
+using Bud.Plugins.Deps;
 using Bud.Plugins.Projects;
 
 namespace Bud.Plugins.CSharp {
   public static class CSharp {
-    public readonly static Key MainCSharpDependencyType = CSharpKeys.CSharp.In(BuildKeys.Main);
-
     public static Settings CSharpProject(this Settings build, string id, string baseDir, params IPlugin[] plugins) {
       return build.AddProject(id, baseDir, CSharpPlugin.Instance.With(plugins));
     }
 
     public static Settings LibraryProject(this Settings build, string id, string baseDir, params IPlugin[] plugins) {
-      return build.CSharpProject(id, baseDir, Plugin.Create(SetLibraryAssemblyType).With(plugins));
+      return build.CSharpProject(id, baseDir, PluginUtils.Create(SetLibraryAssemblyType).With(plugins));
     }
 
     public static IPlugin Dependency(string packageName, string packageVersion = null) {
       var projectKey = Project.ProjectKey(packageName);
-      var buildKey = MainBuildTaskKey(projectKey);
-      var mainBuildTargetKey = MainBuildTargetKey(projectKey);
-      return Dependencies.Dependencies.AddDependency(
-        MainCSharpDependencyType,
-        new InternalDependency(projectKey, buildKey),
-        new ExternalDependency(packageName, packageVersion),
-        shouldUseInternalDependency: context => context.IsConfigDefined(CSharpKeys.OutputAssemblyFile.In(mainBuildTargetKey)));
+      var buildTargetKey = MainBuildTargetKey(projectKey);
+      return PluginUtils.ApplyToSubKey(
+        CSharpKeys.CSharp.In(BuildKeys.Main),
+        Dependencies.AddDependency(
+          new InternalDependency(buildTargetKey, MainBuildTaskKey(projectKey)),
+          new ExternalDependency(packageName, packageVersion),
+          shouldUseInternalDependency: context => context.IsConfigDefined(CSharpKeys.OutputAssemblyFile.In(buildTargetKey)))
+        );
     }
 
     public static Task<IEnumerable<string>> GetCSharpSources(this IContext context, Key project) {

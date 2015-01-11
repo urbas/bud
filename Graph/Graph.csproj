@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -43,7 +43,7 @@
     <Compile Include="Unit.cs" />
     <Compile Include="Util\TaskUtils.cs" />
     <Compile Include="IPlugin.cs" />
-    <Compile Include="Plugin.cs" />
+    <Compile Include="SettingsTransformPlugin.cs" />
     <Compile Include="PluginUtils.cs" />
     <Compile Include="SettingsConstruction\AddDependencies.cs" />
     <Compile Include="SettingsConstruction\ConfigDefinitionConstructor.cs" />

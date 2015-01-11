@@ -1,7 +1,7 @@
 using NuGet;
 using System.Collections.Generic;
 
-namespace Bud.Plugins.Dependencies {
+namespace Bud.Plugins.Deps {
   public class ResolvedExternalDependency {
     public readonly ExternalDependency RequestedDependency;
     public readonly SemanticVersion ResolvedVersion;

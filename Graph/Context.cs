@@ -1,13 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
-using Bud.SettingsConstruction;
-using Bud.Util;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Bud {
-
   public interface IContext : IConfig {
     ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions { get; }
     bool IsTaskDefined(Key key);
@@ -34,9 +31,13 @@ namespace Bud {
       this.taskDefinitions = taskDefinitions;
     }
 
-    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions { get { return configuration.ConfigDefinitions; } }
+    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions {
+      get { return configuration.ConfigDefinitions; }
+    }
 
-    public ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions { get { return taskDefinitions; } }
+    public ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions {
+      get { return taskDefinitions; }
+    }
 
     public bool IsConfigDefined(Key key) {
       return configuration.IsConfigDefined(key);
@@ -66,13 +67,13 @@ namespace Bud {
     }
 
     public Task<T> Evaluate<T>(TaskKey<T> key) {
-      return (Task<T>)Evaluate((TaskKey)key);
+      return (Task<T>) Evaluate((TaskKey) key);
     }
 
     public Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition) {
       Task existingEvaluation;
       if (oldTaskValues.TryGetValue(taskDefinition, out existingEvaluation)) {
-        return (Task<T>)existingEvaluation;
+        return (Task<T>) existingEvaluation;
       } else {
         Task<T> freshEvaluation = taskDefinition.Evaluate(this);
         oldTaskValues.Add(taskDefinition, freshEvaluation);

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Linq;
-using Bud.Plugins.BuildLoading;
-using Bud.Plugins.Projects;
-using NUnit.Framework;
-using Bud.Test.Assertions;
-using System.IO;
+﻿using System.IO;
 using Bud.Plugins.Build;
+using Bud.Test.Assertions;
 using Bud.Test.Util;
+using NUnit.Framework;
 
 namespace Bud.SystemTests {
   public class BuildConfigurationProject {
@@ -18,4 +14,3 @@ namespace Bud.SystemTests {
     }
   }
 }
-

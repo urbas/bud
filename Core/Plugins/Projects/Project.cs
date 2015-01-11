@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Immutable;
 using System.Collections.Generic;
 using Bud.Plugins.Build;
-using Bud.Plugins.Dependencies;
+using Bud.Plugins.Deps;
 using System.Threading.Tasks;
 
 namespace Bud.Plugins.Projects {

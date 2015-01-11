@@ -1,11 +1,7 @@
 using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.IO;
 using System.Reflection;
 using Bud.Plugins.Build;
-using Bud.Plugins.BuildLoading;
-using System.IO;
 
 namespace Bud.Commander {
   public class AssemblyBuildCommander : MarshalByRefObject, IBuildCommander {
@@ -16,10 +12,9 @@ namespace Bud.Commander {
       Console.SetOut(standardOutputTextWriter);
       Console.SetError(standardErrorTextWriter);
       var assembly = AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(buildConfigurationAssemblyFile));
-      var build = (IBuild)assembly.CreateInstance("Build");
+      var build = (IBuild) assembly.CreateInstance("Build");
       settings = build.SetUp(GlobalBuild.New(baseDirectory), baseDirectory);
       config = new Config(settings.ConfigDefinitions);
-      Console.WriteLine(Context.FromConfig(config, settings.TaskDefinitions).ToString());
     }
 
     public object Evaluate(string command) {
@@ -27,7 +22,6 @@ namespace Bud.Commander {
       return CommandEvaluator.EvaluateSynchronously(context, command);
     }
 
-    public void Dispose() {
-    }
+    public void Dispose() {}
   }
 }

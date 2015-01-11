@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Bud.Plugins.Dependencies {
+namespace Bud.Plugins.Deps {
   public class InternalDependency {
     public readonly Key DepdendencyTarget;
     public readonly TaskKey ResolutionTask;

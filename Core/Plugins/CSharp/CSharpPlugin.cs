@@ -1,5 +1,5 @@
 using Bud.Plugins.Build;
-using Bud.Plugins.Dependencies;
+using Bud.Plugins.Deps;
 
 namespace Bud.Plugins.CSharp {
   public class CSharpPlugin : IPlugin {
@@ -11,7 +11,9 @@ namespace Bud.Plugins.CSharp {
       return settings
         .Apply(project, DependenciesPlugin.Instance)
         .Apply(project, new CSharpBuildPlugin(BuildKeys.Main))
-        .Apply(project, new CSharpBuildPlugin(BuildKeys.Test));
+        .Apply(project, new CSharpBuildPlugin(BuildKeys.Test,
+          Dependencies.AddDependency(new InternalDependency(CSharp.MainBuildTargetKey(project), CSharp.MainBuildTaskKey(project))))
+        );
     }
   }
 }

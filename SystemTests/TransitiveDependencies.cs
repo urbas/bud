@@ -1,15 +1,7 @@
-using Bud.Test.Assertions;
-using NUnit.Framework;
-using System.Linq;
 using Bud.Plugins.Build;
-using Bud.Plugins.Dependencies;
-using Bud.Plugins.Projects;
-using Bud.Plugins.CSharp;
-using Bud.Plugins.BuildLoading;
-using System;
+using Bud.Test.Assertions;
 using Bud.Test.Util;
-using Bud.Commander;
-using System.IO;
+using NUnit.Framework;
 
 namespace Bud.SystemTests {
   public class TransitiveDependencies {
@@ -17,16 +9,12 @@ namespace Bud.SystemTests {
     public void compile_MUST_produce_the_executable() {
       using (var buildCommander = TestProjects.LoadBuildCommander("TransitiveDependencies")) {
         buildCommander.Evaluate("build");
-        FileAssertions.AssertFilesExist(new [] {
-          BuiltAssemblyPath(buildCommander, "CommonProject", ".dll"),
-          BuiltAssemblyPath(buildCommander, "A", ".dll"),
-          BuiltAssemblyPath(buildCommander, "B", ".exe")
+        FileAssertions.AssertFilesExist(new[] {
+          SystemTestUtils.OutputAssemblyPath(buildCommander, "CommonProject", BuildKeys.Main, "CommonProject.dll"),
+          SystemTestUtils.OutputAssemblyPath(buildCommander, "A", BuildKeys.Main, "A.dll"),
+          SystemTestUtils.OutputAssemblyPath(buildCommander, "B", BuildKeys.Main, "B.exe")
         });
       }
-    }
-
-    static string BuiltAssemblyPath(TemporaryDirBuildCommander buildCommander, string projectName, string extension) {
-      return Path.Combine(buildCommander.TemporaryDirectory.Path, projectName, BuildDirs.BudDirName, BuildDirs.OutputDirName, ".net-4.5", "main", "debug", "bin", projectName + extension);
     }
   }
 }

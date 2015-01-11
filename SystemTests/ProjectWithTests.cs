@@ -1,15 +1,7 @@
-using Bud.Test.Assertions;
-using NUnit.Framework;
-using System.Linq;
 using Bud.Plugins.Build;
-using Bud.Plugins.Dependencies;
-using Bud.Plugins.Projects;
-using Bud.Plugins.CSharp;
-using Bud.Plugins.BuildLoading;
-using System;
+using Bud.Test.Assertions;
 using Bud.Test.Util;
-using Bud.Commander;
-using System.IO;
+using NUnit.Framework;
 
 namespace Bud.SystemTests {
   public class ProjectWithTests {
@@ -17,15 +9,11 @@ namespace Bud.SystemTests {
     public void compile_MUST_produce_the_main_and_test_libraries() {
       using (var buildCommander = TestProjects.LoadBuildCommander("ProjectWithTests")) {
         buildCommander.Evaluate("test/build");
-        FileAssertions.AssertFilesExist(new [] {
-          BuiltAssemblyPath(buildCommander, "main", "A.dll"),
-          BuiltAssemblyPath(buildCommander, "test", "A.Test.dll")
+        FileAssertions.AssertFilesExist(new[] {
+          SystemTestUtils.OutputAssemblyPath(buildCommander, "A", BuildKeys.Main, "A.dll"),
+          SystemTestUtils.OutputAssemblyPath(buildCommander, "A", BuildKeys.Test, "A.Test.dll")
         });
       }
-    }
-
-    static string BuiltAssemblyPath(TemporaryDirBuildCommander buildCommander, string scope, string assemblyFileName) {
-      return Path.Combine(buildCommander.TemporaryDirectory.Path, assemblyFileName, BuildDirs.BudDirName, BuildDirs.OutputDirName, ".net-4.5", scope, "debug", "bin", assemblyFileName);
     }
   }
 }

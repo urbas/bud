@@ -8,7 +8,7 @@ using NuGet;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
-namespace Bud.Plugins.Dependencies {
+namespace Bud.Plugins.Deps {
   public class DependenciesPlugin : IPlugin {
 
     public static readonly DependenciesPlugin Instance = new DependenciesPlugin();

@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.Collections.Generic;
 
-namespace Bud.Plugins.Dependencies {
+namespace Bud.Plugins.Deps {
   public static class DependenciesKeys {
     public static readonly ConfigKey<ImmutableList<InternalDependency>> InternalDependencies = new ConfigKey<ImmutableList<InternalDependency>>("internalDependencies");
     public static readonly ConfigKey<ImmutableList<ExternalDependency>> ExternalDependencies = new ConfigKey<ImmutableList<ExternalDependency>>("externalDependencies");

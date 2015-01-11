@@ -11,9 +11,9 @@ namespace Bud.SystemTests {
     public void compile_MUST_produce_the_executable() {
       using (var buildCommander = TestProjects.LoadBuildCommander("ProjectWithoutConfiguration")) {
         buildCommander.Evaluate(BuildKeys.Build);
-        FileAssertions.AssertFileExists(BuiltAssemblyPath(buildCommander));
+        FileAssertions.AssertFileExists(OutputAssemblyPath(buildCommander));
         buildCommander.Evaluate(BuildDirsKeys.Clean);
-        FileAssertions.AssertFileDoesNotExist(BuiltAssemblyPath(buildCommander));
+        FileAssertions.AssertFileDoesNotExist(OutputAssemblyPath(buildCommander));
       }
     }
 
@@ -21,12 +21,12 @@ namespace Bud.SystemTests {
     public void compile_MUST_produce_no_executable_WHEN_the_project_folder_is_empty() {
       using (var buildCommander = TestProjects.LoadBuildCommander()) {
         buildCommander.Evaluate(BuildKeys.Build);
-        FileAssertions.AssertFileDoesNotExist(BuiltAssemblyPath(buildCommander));
+        FileAssertions.AssertFileDoesNotExist(OutputAssemblyPath(buildCommander));
       }
     }
 
-    static string BuiltAssemblyPath(TemporaryDirBuildCommander buildCommander) {
-      return Path.Combine(buildCommander.TemporaryDirectory.Path, BuildDirs.BudDirName, BuildDirs.OutputDirName, ".net-4.5", "main", "debug", "bin", Path.GetFileName(buildCommander.TemporaryDirectory.Path) + ".exe");
+    private static string OutputAssemblyPath(TemporaryDirBuildCommander buildCommander) {
+      return SystemTestUtils.OutputAssemblyPath(buildCommander, Path.GetFileName(buildCommander.TemporaryDirectory.Path) + ".exe");
     }
   }
 }

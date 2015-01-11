@@ -6,54 +6,54 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bud.Plugins.Build;
 using Bud.Plugins.CSharp.Compiler;
-using Bud.Plugins.Dependencies;
+using Bud.Plugins.Deps;
 
 namespace Bud.Plugins.CSharp {
   public class CSharpBuildPlugin : BuildPlugin {
-    public CSharpBuildPlugin(Key scope) : base(scope, CSharpKeys.CSharp) {}
+    public CSharpBuildPlugin(Key scope, IPlugin plugin = null) : base(scope, CSharpKeys.CSharp, plugin) {}
 
-    public override Settings ApplyTo(Settings settings, Key project) {
-      var buildTarget = BuildTargetKey(project);
-      return base.ApplyTo(settings, project)
-                 .Init(CSharpKeys.SourceFiles.In(buildTarget), context => FindSources(context, project))
-                 .Init(CSharpKeys.AssemblyType.In(buildTarget), AssemblyType.Exe)
-                 .Init(CSharpKeys.CollectReferencedAssemblies.In(buildTarget), context => CollectAssembliesFromDependencies(context, project))
-                 .Init(CSharpKeys.OutputAssemblyDir.In(buildTarget), context => Path.Combine(context.GetOutputDir(project), ".net-4.5", Scope.Id, "debug", "bin"))
-                 .Init(CSharpKeys.OutputAssemblyName.In(buildTarget), context => project.Id)
-                 .Init(CSharpKeys.OutputAssemblyFile.In(buildTarget), context => Path.Combine(context.GetCSharpOutputAssemblyDir(buildTarget), string.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(buildTarget), GetAssemblyFileExtension(context, buildTarget))));
+    protected override Settings BuildTargetSettings(Settings existingsettings, Key buildTarget, Key project) {
+      return existingsettings
+        .Init(CSharpKeys.SourceFiles.In(buildTarget), context => FindSources(context, buildTarget))
+        .Init(CSharpKeys.AssemblyType.In(buildTarget), AssemblyType.Exe)
+        .Init(CSharpKeys.CollectReferencedAssemblies.In(buildTarget), context => CollectAssembliesFromDependencies(context, buildTarget))
+        .Init(CSharpKeys.OutputAssemblyDir.In(buildTarget), context => Path.Combine(context.GetOutputDir(buildTarget), "debug", "bin"))
+        .Init(CSharpKeys.OutputAssemblyName.In(buildTarget), context => project.Id)
+        .Init(CSharpKeys.OutputAssemblyFile.In(buildTarget), context => Path.Combine(context.GetCSharpOutputAssemblyDir(buildTarget), string.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(buildTarget), GetAssemblyFileExtension(context, buildTarget))));
     }
 
-    protected override Task<Unit> Build(IContext context, Key buildKey) {
+    protected override Task<Unit> InvokeCompilerTaskImpl(IContext context, Key buildKey) {
       return CSharpCompiler.CompileProject(context, buildKey);
     }
 
-    private IEnumerable<string> FindSources(IContext context, Key project) {
-      var sourceDirectory = Path.Combine(context.GetBaseDir(project), "src", Scope.Id, CSharpKeys.CSharp.Id);
+    private IEnumerable<string> FindSources(IContext context, Key buildTarget) {
+      var sourceDirectory = Path.Combine(context.GetBaseDir(buildTarget));
       if (Directory.Exists(sourceDirectory)) {
         return Directory.EnumerateFiles(sourceDirectory);
       }
       return ImmutableList<string>.Empty;
     }
 
-    private async Task<ImmutableList<string>> CollectAssembliesFromDependencies(IContext context, Key thisProject) {
-      var internalDependencies = await context.ResolveInternalDependencies(thisProject, CSharp.MainCSharpDependencyType);
+    private async Task<ImmutableList<string>> CollectAssembliesFromDependencies(IContext context, Key buildTarget) {
+      var internalDependencies = await context.ResolveInternalDependencies(buildTarget);
       var internalDependencyAssemblyPaths = CollectInternalDependencies(context, internalDependencies);
-      var directNuGetDependencies = CollectExternalDependencies(context, thisProject);
+      var directNuGetDependencies = CollectExternalDependencies(context, buildTarget);
       var transitiveNuGetDependencies = internalDependencies.SelectMany(dependency => CollectExternalDependencies(context, dependency));
       return internalDependencyAssemblyPaths.AddRange(directNuGetDependencies).AddRange(transitiveNuGetDependencies);
     }
 
-    private ImmutableList<string> CollectInternalDependencies(IContext context, IEnumerable<Key> dependencyProjects) {
+    private ImmutableList<string> CollectInternalDependencies(IContext context, IEnumerable<Key> dependencyBuildTargets) {
       var collectedAssemblies = ImmutableList.CreateBuilder<string>();
-      foreach (var project in dependencyProjects) {
-        collectedAssemblies.Add(context.GetCSharpOutputAssemblyFile(CSharp.MainBuildTargetKey(project)));
+      foreach (var buildTarget in dependencyBuildTargets) {
+        var cSharpOutputAssemblyFile = context.GetCSharpOutputAssemblyFile(buildTarget);
+        collectedAssemblies.Add(cSharpOutputAssemblyFile);
       }
       return collectedAssemblies.ToImmutable();
     }
 
-    private static ImmutableList<string> CollectExternalDependencies(IConfig context, Key thisProject) {
+    private ImmutableList<string> CollectExternalDependencies(IConfig context, Key buildTarget) {
       var allNuGetDependencies = context.GetNuGetResolvedPackages();
-      var nuGetDependencies = context.GetExternalDependencies(thisProject, CSharp.MainCSharpDependencyType);
+      var nuGetDependencies = context.GetExternalDependencies(buildTarget);
       var nuGetRepositoryPath = context.GetNuGetRepositoryDir();
       return nuGetDependencies
         .Select(dependency => allNuGetDependencies.GetResolvedNuGetDependency(dependency))

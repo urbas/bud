@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using System.Collections.Immutable;
 using System;
-using Bud.Plugins.Dependencies;
+using Bud.Plugins.Deps;
 
-namespace Bud.Plugins.Dependencies {
+namespace Bud.Plugins.Deps {
 
 	public class ResolvedExternalDependencies	{
     public readonly IDictionary<string, IDictionary<SemanticVersion, IEnumerable<string>>> fetchedPackages;

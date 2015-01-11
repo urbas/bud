@@ -6,52 +6,51 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bud.Plugins.Build;
 
-namespace Bud.Plugins.Dependencies {
+namespace Bud.Plugins.Deps {
   public static class Dependencies {
     public const string FetchedPackagesFileName = "nuGetPackages";
 
-    public static IPlugin AddDependency(Key dependencyType,
-                                        InternalDependency internalDependency,
+    public static IPlugin AddDependency(InternalDependency internalDependency,
                                         ExternalDependency fallbackExternalDependency,
                                         Predicate<IConfig> shouldUseInternalDependency) {
-      return Plugin.Create((existingSettings, dependent) =>
+      return PluginUtils.Create((existingSettings, dependent) =>
         existingSettings
-          .AddDependency(dependent, dependencyType, internalDependency, shouldUseInternalDependency)
-          .AddDependency(dependent, dependencyType, fallbackExternalDependency, config => !shouldUseInternalDependency(config))
+          .AddDependency(dependent, internalDependency, shouldUseInternalDependency)
+          .AddDependency(dependent, fallbackExternalDependency, config => !shouldUseInternalDependency(config))
         );
     }
 
-    public static IPlugin AddDependency(Key dependencyType, ExternalDependency dependency) {
-      return Plugin.Create((existingSettings, dependent) => existingSettings.AddDependency(dependent, dependencyType, dependency));
+    public static IPlugin AddDependency(ExternalDependency dependency) {
+      return PluginUtils.Create((existingSettings, dependent) => existingSettings.AddDependency(dependent, dependency));
     }
 
-    public static IPlugin AddDependency(Key dependencyType, InternalDependency dependency) {
-      return Plugin.Create((existingSettings, dependent) => existingSettings.AddDependency(dependent, dependencyType, dependency));
+    public static IPlugin AddDependency(InternalDependency dependency) {
+      return PluginUtils.Create((existingSettings, dependent) => existingSettings.AddDependency(dependent, dependency));
     }
 
-    public static Settings AddDependency(this Settings settings, Key dependent, Key dependencyType, InternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
-      var dependenciesKey = GetInternalDependenciesKey(dependent, dependencyType);
+    public static Settings AddDependency(this Settings settings, Key dependent, InternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
+      var dependenciesKey = GetInternalDependenciesKey(dependent);
       return settings
         .Init(dependenciesKey, ImmutableList<InternalDependency>.Empty)
-        .Init(DependenciesKeys.ResolveInternalDependencies.In(dependenciesKey), context => ResolveInternalDependenciesImpl(context, dependent, dependencyType))
+        .Init(DependenciesKeys.ResolveInternalDependencies.In(dependenciesKey), context => ResolveInternalDependenciesImpl(context, dependent))
         .Modify(dependenciesKey, (config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies);
     }
 
-    public static Settings AddDependency(this Settings settings, Key dependent, Key dependencyType, ExternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
-      var dependenciesKey = GetExternalDependenciesKey(dependent, dependencyType);
+    public static Settings AddDependency(this Settings settings, Key dependent, ExternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
+      var dependenciesKey = GetExternalDependenciesKey(dependent);
       return settings
         .Init(dependenciesKey, ImmutableList<ExternalDependency>.Empty)
         .Modify(DependenciesKeys.ExternalDependenciesKeys, (context, oldValue) => oldValue.Add(dependenciesKey))
         .Modify(dependenciesKey, (config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies);
     }
 
-    public static ImmutableList<InternalDependency> GetInternalDependencies(this IConfig config, Key dependent, Key dependencyType) {
-      var dependenciesKey = GetInternalDependenciesKey(dependent, dependencyType);
+    public static ImmutableList<InternalDependency> GetInternalDependencies(this IConfig config, Key dependent) {
+      var dependenciesKey = GetInternalDependenciesKey(dependent);
       return config.IsConfigDefined(dependenciesKey) ? config.Evaluate(dependenciesKey) : ImmutableList<InternalDependency>.Empty;
     }
 
-    public static ImmutableList<ExternalDependency> GetExternalDependencies(this IConfig config, Key dependent, Key dependencyType) {
-      var dependenciesKey = GetExternalDependenciesKey(dependent, dependencyType);
+    public static ImmutableList<ExternalDependency> GetExternalDependencies(this IConfig config, Key dependent) {
+      var dependenciesKey = GetExternalDependenciesKey(dependent);
       return config.IsConfigDefined(dependenciesKey) ? config.Evaluate(dependenciesKey) : ImmutableList<ExternalDependency>.Empty;
     }
 
@@ -60,24 +59,25 @@ namespace Bud.Plugins.Dependencies {
       return keysWithNuGetDependencies.SelectMany(key => context.Evaluate(key)).ToImmutableList();
     }
 
-    public static async Task<ISet<Key>> ResolveInternalDependencies(this IContext context, Key dependent, Key dependencyType) {
-      var resolveDependenciesKey = DependenciesKeys.ResolveInternalDependencies.In(GetInternalDependenciesKey(dependent, dependencyType));
+    public static async Task<ISet<Key>> ResolveInternalDependencies(this IContext context, Key dependent) {
+      var internalDependenciesKey = GetInternalDependenciesKey(dependent);
+      var resolveDependenciesKey = DependenciesKeys.ResolveInternalDependencies.In(internalDependenciesKey);
       return context.IsTaskDefined(resolveDependenciesKey) ? await context.Evaluate(resolveDependenciesKey) : ImmutableHashSet<Key>.Empty;
     }
 
-    private static Task<ISet<Key>> ResolveInternalDependenciesImpl(IContext context, Key dependent, Key dependencyType) {
+    private static Task<ISet<Key>> ResolveInternalDependenciesImpl(IContext context, Key dependent) {
       return Task
-        .WhenAll(context.GetInternalDependencies(dependent, dependencyType).Select(dependency => ResolveDependencyImpl(context, dependency, dependencyType)))
+        .WhenAll(context.GetInternalDependencies(dependent).Select(dependency => ResolveDependencyImpl(context, dependency)))
         .ContinueWith<ISet<Key>>(completedTask => completedTask.Result.Aggregate(ImmutableHashSet.CreateBuilder<Key>(), (builder, dependencies) => {
           builder.UnionWith(dependencies);
           return builder;
         }).ToImmutable());
     }
 
-    private static async Task<IEnumerable<Key>> ResolveDependencyImpl(IContext context, InternalDependency dependency, Key dependencyType) {
+    private static async Task<IEnumerable<Key>> ResolveDependencyImpl(IContext context, InternalDependency dependency) {
       await dependency.Resolve(context);
-      var transitiveDependencies = await ResolveInternalDependenciesImpl(context, dependency.DepdendencyTarget, dependencyType);
-      return System.Linq.Enumerable.Concat(new Key[] {dependency.DepdendencyTarget}, transitiveDependencies);
+      var transitiveDependencies = await ResolveInternalDependenciesImpl(context, dependency.DepdendencyTarget);
+      return Enumerable.Concat(new[] {dependency.DepdendencyTarget}, transitiveDependencies);
     }
 
     public static string GetNuGetRepositoryDir(this IConfig context) {
@@ -92,12 +92,12 @@ namespace Bud.Plugins.Dependencies {
       return context.Evaluate(DependenciesKeys.NuGetResolvedPackages);
     }
 
-    private static ConfigKey<ImmutableList<InternalDependency>> GetInternalDependenciesKey(Key dependent, Key dependencyType) {
-      return DependenciesKeys.InternalDependencies.In(dependencyType.In(dependent));
+    private static ConfigKey<ImmutableList<InternalDependency>> GetInternalDependenciesKey(Key dependent) {
+      return DependenciesKeys.InternalDependencies.In(dependent);
     }
 
-    private static ConfigKey<ImmutableList<ExternalDependency>> GetExternalDependenciesKey(Key dependent, Key dependencyType) {
-      return DependenciesKeys.ExternalDependencies.In(dependencyType.In(dependent));
+    private static ConfigKey<ImmutableList<ExternalDependency>> GetExternalDependenciesKey(Key dependent) {
+      return DependenciesKeys.ExternalDependencies.In(dependent);
     }
 
     private static ImmutableList<ConfigKey<ImmutableList<ExternalDependency>>> GetKeysWithExternalDependencies(this IConfig context) {
