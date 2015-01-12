@@ -3,18 +3,21 @@ using Bud.Plugins.Deps;
 
 namespace Bud.Plugins.CSharp {
   public class CSharpPlugin : IPlugin {
-    public static readonly CSharpPlugin Instance = new CSharpPlugin();
+    public static readonly CSharpPlugin Instance = new CSharpPlugin(true);
+    private readonly bool addTestBuildTarget;
 
-    private CSharpPlugin() {}
+    public CSharpPlugin(bool addTestBuildTarget) {
+      this.addTestBuildTarget = addTestBuildTarget;
+    }
 
     public Settings ApplyTo(Settings settings, Key project) {
-      return settings
-        .Apply(project, new CSharpBuildPlugin(BuildKeys.Main))
-        .Apply(project, new CSharpBuildPlugin(BuildKeys.Test,
-          Dependencies.AddDependency(new InternalDependency(CSharp.MainBuildTargetKey(project), CSharp.MainBuildTaskKey(project))),
-          CSharpBuildPlugin.ConvertBuildTargetToDll
-          )
-        );
+      var mainBuildTarget = settings.Apply(project, new CSharpBuildPlugin(BuildKeys.Main));
+      if (addTestBuildTarget) {
+        return mainBuildTarget.Apply(project, new CSharpBuildPlugin(BuildKeys.Test,
+            Dependencies.AddDependency(new InternalDependency(CSharp.MainBuildTargetKey(project), CSharp.MainBuildTaskKey(project))),
+            CSharpBuildPlugin.ConvertBuildTargetToDll));
+      }
+      return mainBuildTarget;
     }
   }
 }
