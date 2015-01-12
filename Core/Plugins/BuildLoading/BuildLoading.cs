@@ -12,7 +12,7 @@ namespace Bud.Plugins.BuildLoading {
   public static class BuildLoading {
     public static Settings BuildProject(this Settings build, string projectId, string budDir, string dirOfProjectToBeBuilt) {
       return build
-        .CSharpProject(projectId, budDir, new BuildLoadingPlugin(dirOfProjectToBeBuilt));
+        .ExeProject(projectId, budDir, new BuildLoadingPlugin(dirOfProjectToBeBuilt));
     }
 
     public static string GetBuildConfigSourceFile(this IContext context, Key buildLoadingProject) {

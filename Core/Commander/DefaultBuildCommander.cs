@@ -8,7 +8,7 @@ namespace Bud.Commander {
     private readonly Config config;
 
     public DefaultBuildCommander(string dirOfProjectToBeBuilt) {
-      settings = GlobalBuild.New(dirOfProjectToBeBuilt).CSharpProject(Path.GetFileName(dirOfProjectToBeBuilt), dirOfProjectToBeBuilt);
+      settings = GlobalBuild.New(dirOfProjectToBeBuilt).ExeProject(Path.GetFileName(dirOfProjectToBeBuilt), dirOfProjectToBeBuilt);
       config = new Config(settings.ConfigDefinitions);
     }
 

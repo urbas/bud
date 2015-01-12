@@ -12,7 +12,9 @@ namespace Bud.Plugins.CSharp {
         .Apply(project, DependenciesPlugin.Instance)
         .Apply(project, new CSharpBuildPlugin(BuildKeys.Main))
         .Apply(project, new CSharpBuildPlugin(BuildKeys.Test,
-          Dependencies.AddDependency(new InternalDependency(CSharp.MainBuildTargetKey(project), CSharp.MainBuildTaskKey(project))))
+          Dependencies.AddDependency(new InternalDependency(CSharp.MainBuildTargetKey(project), CSharp.MainBuildTaskKey(project))),
+          CSharpBuildPlugin.ConvertBuildTargetToDll
+          )
         );
     }
   }

@@ -7,7 +7,7 @@ using System;
 public class Build : IBuild {
   public Settings SetUp(Settings settings, string baseDir) {
     return settings
-      .LibraryProject("A", Path.Combine(baseDir, "A"))
-      .CSharpProject("B", Path.Combine(baseDir, "B"), CSharp.Dependency("A"));
+      .DllProject("A", Path.Combine(baseDir, "A"))
+      .ExeProject("B", Path.Combine(baseDir, "B"), CSharp.Dependency("A"));
   }
 }

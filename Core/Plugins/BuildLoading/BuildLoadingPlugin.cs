@@ -30,7 +30,7 @@ namespace Bud.Plugins.BuildLoading {
         .Modify(CSharpKeys.SourceFiles.In(buildTarget), (context, previousTask) => AddBuildDefinitionSourceFile(context, previousTask, buildTarget))
         .Modify(CSharpKeys.OutputAssemblyDir.In(buildTarget), (context, previousValue) => context.GetBaseDir())
         .Modify(CSharpKeys.OutputAssemblyName.In(buildTarget), (context, previousValue) => "Build")
-        .Modify(CSharpKeys.AssemblyType.In(buildTarget), prevValue => AssemblyType.Library)
+        .Apply(buildTarget, CSharpBuildPlugin.ConvertBuildTargetToDll)
         .Modify(CSharpKeys.CollectReferencedAssemblies.In(buildTarget), async (context, assemblies) => (await assemblies()).AddRange(BudAssemblies.GetBudAssembliesLocations()));
     }
 

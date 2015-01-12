@@ -6,7 +6,7 @@ using System.IO;
 public class Build : IBuild {
   public Settings SetUp(Settings settings, string baseDir) {
     return settings
-      .CSharpProject("Foo", Path.Combine(baseDir, "Foo"))
-      .CSharpProject("Bar", Path.Combine(baseDir, "Bar"), CSharp.Dependency("Foo"));
+      .ExeProject("Foo", Path.Combine(baseDir, "Foo"))
+      .ExeProject("Bar", Path.Combine(baseDir, "Bar"), CSharp.Dependency("Foo"));
   }
 }

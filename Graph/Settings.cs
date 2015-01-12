@@ -1,16 +1,14 @@
 using System;
-using System.Linq;
-using System.Collections.Immutable;
-using Bud.SettingsConstruction;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Threading.Tasks;
+using Bud.SettingsConstruction;
 
 namespace Bud {
-
   public delegate Settings SettingsTransform(Settings existingSettings, Key key);
 
   public class Settings {
-
     public static readonly Settings Empty = new Settings();
     public readonly ImmutableList<ConfigDefinitionConstructor> ConfigConstructors;
     public readonly ImmutableList<TaskDefinitionConstructor> TaskConstructors;
@@ -36,6 +34,14 @@ namespace Bud {
 
     public Settings Apply(Key key, IPlugin plugin) {
       return plugin.ApplyTo(this, key);
+    }
+
+    public Settings Apply(Key key, IPlugin plugin, params IPlugin[] plugins) {
+      return Apply(key, plugin).Apply(key, plugins);
+    }
+
+    public Settings Apply(Key key, IEnumerable<IPlugin> plugins) {
+      return plugins.Aggregate(this, (settings, plugin) => settings.Apply(key, plugin));
     }
 
     public Settings Init<T>(ConfigKey<T> key, T initialValue) {

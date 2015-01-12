@@ -1,6 +1,4 @@
-﻿using System;
-using Bud.SettingsConstruction;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction {
   public abstract class ConfigDefinitionConstructor {
@@ -13,4 +11,3 @@ namespace Bud.SettingsConstruction {
     public abstract void ApplyTo(ImmutableDictionary<Key, IConfigDefinition>.Builder buildConfigurationBuilder);
   }
 }
-

@@ -7,12 +7,14 @@ using Bud.Plugins.Projects;
 
 namespace Bud.Plugins.CSharp {
   public static class CSharp {
-    public static Settings CSharpProject(this Settings build, string id, string baseDir, params IPlugin[] plugins) {
+    public static readonly IPlugin MainBuildTargetToDll = BuildUtils.ApplyToBuildTarget(BuildKeys.Main, CSharpKeys.CSharp, CSharpBuildPlugin.ConvertBuildTargetToDll);
+
+    public static Settings ExeProject(this Settings build, string id, string baseDir, params IPlugin[] plugins) {
       return build.AddProject(id, baseDir, CSharpPlugin.Instance.With(plugins));
     }
 
-    public static Settings LibraryProject(this Settings build, string id, string baseDir, params IPlugin[] plugins) {
-      return build.CSharpProject(id, baseDir, PluginUtils.Create(SetLibraryAssemblyType).With(plugins));
+    public static Settings DllProject(this Settings build, string id, string baseDir, params IPlugin[] plugins) {
+      return build.ExeProject(id, baseDir, MainBuildTargetToDll.With(plugins));
     }
 
     public static IPlugin Dependency(string packageName, string packageVersion = null) {
@@ -61,11 +63,6 @@ namespace Bud.Plugins.CSharp {
 
     public static TaskKey<Unit> MainBuildTaskKey(Key projectKey) {
       return BuildUtils.BuildTaskKey(projectKey, BuildKeys.Main, CSharpKeys.CSharp);
-    }
-
-    private static Settings SetLibraryAssemblyType(Settings existingSettings, Key project) {
-      var buildTarget = MainBuildTargetKey(project);
-      return existingSettings.Modify(CSharpKeys.AssemblyType.In(buildTarget), assemblyType => AssemblyType.Library);
     }
   }
 }

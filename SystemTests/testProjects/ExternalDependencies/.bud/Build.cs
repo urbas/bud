@@ -6,6 +6,6 @@ using System;
 public class Build : IBuild {
   public Settings SetUp(Settings settings, string baseDir) {
     return settings
-      .CSharpProject("Foo", baseDir, CSharp.Dependency("Urbas.Example.Foo", "1.0.0"));
+      .ExeProject("Foo", baseDir, CSharp.Dependency("Urbas.Example.Foo", "1.0.0"));
   }
 }

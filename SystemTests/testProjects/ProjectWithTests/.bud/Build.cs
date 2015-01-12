@@ -6,6 +6,6 @@ using System;
 public class Build : IBuild {
   public Settings SetUp(Settings settings, string baseDir) {
     return settings
-      .LibraryProject("A", Path.Combine(baseDir, "A"));
+      .DllProject("A", Path.Combine(baseDir, "A"));
   }
 }

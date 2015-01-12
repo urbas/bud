@@ -10,7 +10,9 @@ using Bud.Plugins.Deps;
 
 namespace Bud.Plugins.CSharp {
   public class CSharpBuildPlugin : BuildPlugin {
-    public CSharpBuildPlugin(Key scope, IPlugin plugin = null) : base(scope, CSharpKeys.CSharp, plugin) {}
+    public static readonly IPlugin ConvertBuildTargetToDll = PluginUtils.Create((existingSettings, buildTarget) => existingSettings.Modify(CSharpKeys.AssemblyType.In(buildTarget), assemblyType => AssemblyType.Library));
+
+    public CSharpBuildPlugin(Key scope, params IPlugin[] plugins) : base(scope, CSharpKeys.CSharp, plugins) {}
 
     protected override Settings BuildTargetSettings(Settings existingsettings, Key buildTarget, Key project) {
       return existingsettings
