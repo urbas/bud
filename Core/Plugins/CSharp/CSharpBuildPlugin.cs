@@ -14,14 +14,21 @@ namespace Bud.Plugins.CSharp {
 
     public CSharpBuildPlugin(Key scope, params IPlugin[] plugins) : base(scope, CSharpKeys.CSharp, plugins) {}
 
-    protected override Settings BuildTargetSettings(Settings existingsettings, Key buildTarget, Key project) {
+    protected override Settings ApplyTo(Settings existingsettings, Key buildTarget, Key project) {
       return existingsettings
         .Init(CSharpKeys.SourceFiles.In(buildTarget), context => FindSources(context, buildTarget))
         .Init(CSharpKeys.AssemblyType.In(buildTarget), AssemblyType.Exe)
         .Init(CSharpKeys.CollectReferencedAssemblies.In(buildTarget), context => CollectAssembliesFromDependencies(context, buildTarget))
         .Init(CSharpKeys.OutputAssemblyDir.In(buildTarget), context => Path.Combine(context.GetOutputDir(buildTarget), "debug", "bin"))
-        .Init(CSharpKeys.OutputAssemblyName.In(buildTarget), context => project.Id)
+        .Init(CSharpKeys.OutputAssemblyName.In(buildTarget), context => OutputAssemblyName(project, Scope))
         .Init(CSharpKeys.OutputAssemblyFile.In(buildTarget), context => Path.Combine(context.GetCSharpOutputAssemblyDir(buildTarget), string.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(buildTarget), GetAssemblyFileExtension(context, buildTarget))));
+    }
+
+    private static string OutputAssemblyName(Key project, Key scope) {
+      if (BuildKeys.Main.Equals(scope)) {
+        return project.Id;
+      }
+      return project.Id + "." + scope.Id;
     }
 
     protected override Task<Unit> InvokeCompilerTaskImpl(IContext context, Key buildKey) {

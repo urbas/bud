@@ -31,11 +31,11 @@ namespace Bud.Plugins.Build {
         .AddDependencies(BuildKeys.Build, BuildKeys.Build.In(Scope))
         .AddDependencies(BuildKeys.Build.In(Scope), BuildKeys.Build.In(buildTargetKey))
         .AddDependencies(BuildKeys.Test, BuildKeys.Test.In(project))
-        .Apply(buildTargetKey, PluginUtils.Create((existingsettings, buildTarget) => BuildTargetSettings(existingsettings, buildTarget, project)))
+        .Apply(buildTargetKey, PluginUtils.Create((existingsettings, buildTarget) => ApplyTo(existingsettings, buildTarget, project)))
         .Apply(buildTargetKey, plugins);
     }
 
-    protected abstract Settings BuildTargetSettings(Settings existingsettings, Key project, Key buildTarget);
+    protected abstract Settings ApplyTo(Settings existingsettings, Key project, Key buildTarget);
 
     protected abstract Task<Unit> InvokeCompilerTaskImpl(IContext arg, Key buildKey);
 
