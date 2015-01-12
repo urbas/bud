@@ -1,12 +1,6 @@
-using System;
-using Bud.Plugins;
-using Bud.Plugins.CSharp;
-using System.Collections.Immutable;
-using Bud.Plugins.Projects;
-using System.IO;
 using System.Threading.Tasks;
 using Bud.Commander;
-using Bud.Plugins.Build;
+using Bud.Plugins.CSharp;
 
 namespace Bud.Plugins.BuildLoading {
   public static class BuildLoading {
@@ -19,7 +13,7 @@ namespace Bud.Plugins.BuildLoading {
       return context.Evaluate(BuildLoadingKeys.BuildConfigSourceFile.In(buildLoadingProject));
     }
 
-    public async static Task<IBuildCommander> CreateBuildCommander(this IContext context, Key buildLoadingProject) {
+    public static async Task<IBuildCommander> CreateBuildCommander(this IContext context, Key buildLoadingProject) {
       return await context.Evaluate(BuildLoadingKeys.CreateBuildCommander.In(buildLoadingProject));
     }
 
@@ -28,4 +22,3 @@ namespace Bud.Plugins.BuildLoading {
     }
   }
 }
-

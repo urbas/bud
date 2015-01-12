@@ -16,6 +16,7 @@ namespace Bud.Plugins.CSharp {
 
     protected override Settings ApplyTo(Settings existingsettings, Key buildTarget, Key project) {
       return existingsettings
+        .Apply(buildTarget, DependenciesPlugin.Instance)
         .Init(CSharpKeys.SourceFiles.In(buildTarget), context => FindSources(context, buildTarget))
         .Init(CSharpKeys.AssemblyType.In(buildTarget), AssemblyType.Exe)
         .Init(CSharpKeys.CollectReferencedAssemblies.In(buildTarget), context => CollectAssembliesFromDependencies(context, buildTarget))

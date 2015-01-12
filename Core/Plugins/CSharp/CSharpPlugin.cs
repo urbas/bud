@@ -9,7 +9,6 @@ namespace Bud.Plugins.CSharp {
 
     public Settings ApplyTo(Settings settings, Key project) {
       return settings
-        .Apply(project, DependenciesPlugin.Instance)
         .Apply(project, new CSharpBuildPlugin(BuildKeys.Main))
         .Apply(project, new CSharpBuildPlugin(BuildKeys.Test,
           Dependencies.AddDependency(new InternalDependency(CSharp.MainBuildTargetKey(project), CSharp.MainBuildTaskKey(project))),
