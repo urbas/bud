@@ -39,7 +39,7 @@ namespace Bud.Plugins.CSharp {
     private IEnumerable<string> FindSources(IContext context, Key buildTarget) {
       var sourceDirectory = Path.Combine(context.GetBaseDir(buildTarget));
       if (Directory.Exists(sourceDirectory)) {
-        return Directory.EnumerateFiles(sourceDirectory);
+        return Directory.EnumerateFiles(sourceDirectory, "*", SearchOption.AllDirectories);
       }
       return ImmutableList<string>.Empty;
     }

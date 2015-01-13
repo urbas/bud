@@ -15,3 +15,8 @@ packages/
 # Editors
 *.swp
 *~
+
+# Bud Build
+.bud/global/nuGetRepository
+.bud/global/output
+.bud/Build.dll

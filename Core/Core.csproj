@@ -93,7 +93,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Graph\Graph.csproj">
+    <ProjectReference Include="..\Graph\src\main\cs\Graph.csproj">
       <Project>{626FA4F4-1E1D-4417-A441-03EEAAED817F}</Project>
       <Name>Graph</Name>
     </ProjectReference>

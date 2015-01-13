@@ -50,7 +50,7 @@
       <Project>{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Graph\Graph.csproj">
+    <ProjectReference Include="..\Graph\src\main\cs\Graph.csproj">
       <Project>{626FA4F4-1E1D-4417-A441-03EEAAED817F}</Project>
       <Name>Graph</Name>
     </ProjectReference>

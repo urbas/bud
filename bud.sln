@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemTests", "SystemTests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graph", "Graph\Graph.csproj", "{626FA4F4-1E1D-4417-A441-03EEAAED817F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graph", "Graph\src\main\cs\Graph.csproj", "{626FA4F4-1E1D-4417-A441-03EEAAED817F}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graph.Tests", "Graph.Tests\Graph.Tests.csproj", "{CFFA7A16-FAFD-4985-941F-7228C2A589CA}"
 EndProject

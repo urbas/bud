@@ -1,18 +1,16 @@
-﻿using System.Threading.Tasks;
-using Bud.Plugins.Projects;
-using Bud.Plugins.Build;
-using System.IO;
-using Bud.Cli;
-using System;
-using System.Linq;
-using System.Collections.Immutable;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using Bud.Cli;
 
 namespace Bud.Plugins.CSharp.Compiler {
   public static class CSharpCompiler {
     private const string WindowsCompilerExecutablePath = @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe";
     private const string UnixCompilerExecutable = "/usr/bin/mcs";
-    private static readonly string[] SystemRuntimeFacadeDll = new[] { "Facades/System.Runtime.dll" };
+    private static readonly string[] UnixSystemRuntimeFacadeDll = new[] {"Facades/System.Runtime.dll"};
+    private static readonly string[] WindowsSystemRuntimeFacadeDll = new[] {"System.Runtime.dll"};
 
     public static Task<Unit> CompileProject(IContext context, Key buildKey) {
       return Task.Run(async () => {
@@ -43,12 +41,11 @@ namespace Bud.Plugins.CSharp.Compiler {
       return configuredDependencies.Concat(GetPlatformSpecificAssemblies());
     }
 
-    private static System.Collections.Generic.IEnumerable<string> GetPlatformSpecificAssemblies() {
+    private static IEnumerable<string> GetPlatformSpecificAssemblies() {
       if (Environment.OSVersion.Platform == PlatformID.Unix) {
-        return ImmutableList.Create<string>(SystemRuntimeFacadeDll);
-      } else {
-        return ImmutableList<string>.Empty;
+        return UnixSystemRuntimeFacadeDll;
       }
+      return WindowsSystemRuntimeFacadeDll;
     }
 
     private static string GetCompilerExecutablePath() {
@@ -75,4 +72,3 @@ namespace Bud.Plugins.CSharp.Compiler {
     }
   }
 }
-
