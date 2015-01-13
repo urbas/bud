@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud", "bud\Bud.csproj", "{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}"
@@ -11,8 +13,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemTests", "SystemTests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graph", "Graph\src\main\cs\Graph.csproj", "{626FA4F4-1E1D-4417-A441-03EEAAED817F}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graph.Tests", "Graph.Tests\Graph.Tests.csproj", "{CFFA7A16-FAFD-4985-941F-7228C2A589CA}"
 EndProject
 Global
@@ -21,18 +21,14 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}.Debug|x86.ActiveCfg = Debug|x86
+		{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}.Debug|x86.Build.0 = Debug|x86
+		{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}.Release|x86.ActiveCfg = Release|x86
+		{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}.Release|x86.Build.0 = Release|x86
 		{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}.Debug|x86.Build.0 = Debug|Any CPU
 		{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}.Release|x86.ActiveCfg = Release|Any CPU
 		{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}.Release|x86.Build.0 = Release|Any CPU
-		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Debug|x86.Build.0 = Debug|Any CPU
-		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Release|x86.ActiveCfg = Release|Any CPU
-		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Release|x86.Build.0 = Release|Any CPU
-		{626FA4F4-1E1D-4417-A441-03EEAAED817F}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{626FA4F4-1E1D-4417-A441-03EEAAED817F}.Debug|x86.Build.0 = Debug|Any CPU
-		{626FA4F4-1E1D-4417-A441-03EEAAED817F}.Release|x86.ActiveCfg = Release|Any CPU
-		{626FA4F4-1E1D-4417-A441-03EEAAED817F}.Release|x86.Build.0 = Release|Any CPU
 		{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}.Debug|x86.Build.0 = Debug|Any CPU
 		{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}.Release|x86.ActiveCfg = Release|Any CPU
@@ -41,19 +37,22 @@ Global
 		{8021ED96-0C60-4C9F-926D-FBBD6E08CCAF}.Debug|x86.Build.0 = Debug|Any CPU
 		{8021ED96-0C60-4C9F-926D-FBBD6E08CCAF}.Release|x86.ActiveCfg = Release|Any CPU
 		{8021ED96-0C60-4C9F-926D-FBBD6E08CCAF}.Release|x86.Build.0 = Release|Any CPU
+		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Debug|x86.Build.0 = Debug|Any CPU
+		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Release|x86.ActiveCfg = Release|Any CPU
+		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Release|x86.Build.0 = Release|Any CPU
 		{CFFA7A16-FAFD-4985-941F-7228C2A589CA}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{CFFA7A16-FAFD-4985-941F-7228C2A589CA}.Debug|x86.Build.0 = Debug|Any CPU
 		{CFFA7A16-FAFD-4985-941F-7228C2A589CA}.Release|x86.ActiveCfg = Release|Any CPU
 		{CFFA7A16-FAFD-4985-941F-7228C2A589CA}.Release|x86.Build.0 = Release|Any CPU
-		{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}.Debug|x86.ActiveCfg = Debug|x86
-		{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}.Debug|x86.Build.0 = Debug|x86
-		{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}.Release|x86.ActiveCfg = Release|x86
-		{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = bud\Bud.csproj
 		Policies = $0
-		$0.TextStylePolicy = $1
+		$0.TextStylePolicy = $3
 		$1.FileWidth = 120
 		$1.TabWidth = 2
 		$1.IndentWidth = 2
@@ -81,7 +80,6 @@ Global
 		$2.inheritsSet = Mono
 		$2.inheritsScope = text/x-csharp
 		$2.scope = text/x-csharp
-		$0.TextStylePolicy = $3
 		$3.FileWidth = 120
 		$3.TabWidth = 2
 		$3.IndentWidth = 2

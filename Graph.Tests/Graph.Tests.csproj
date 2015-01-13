@@ -43,16 +43,16 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Graph\src\main\cs\Graph.csproj">
-      <Project>{626FA4F4-1E1D-4417-A441-03EEAAED817F}</Project>
-      <Name>Graph</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="SettingsConstruction\SettingConstructionTest.cs" />
     <Compile Include="ScopeTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\src\main\cs\Core.csproj">
+      <Project>{776511d9-aee0-4a7b-9b5f-4bc8fe0cd1c9}</Project>
+      <Name>Core</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>
