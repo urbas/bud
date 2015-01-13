@@ -1,9 +1,8 @@
-using System;
-using System.Text;
 using System.Collections.Generic;
-using System.IO;
-using System.Diagnostics;
 using System.Collections.Immutable;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
 
 namespace Bud.Cli {
   public class ProcessBuilder {
@@ -19,14 +18,16 @@ namespace Bud.Cli {
 
     public string ExecutablePath { get; private set; }
 
-    public string Arguments { get { return arguments.ToString(); } }
+    public string Arguments {
+      get { return arguments.ToString(); }
+    }
 
     public ProcessBuilder AddArgument(string argument) {
       return AddParamArgument(argument, ImmutableList<string>.Empty);
     }
 
     public ProcessBuilder AddParamArgument(string argumentHead, params string[] argumentParams) {
-      return AddParamArgument(argumentHead, (IEnumerable<string>)argumentParams);
+      return AddParamArgument(argumentHead, (IEnumerable<string>) argumentParams);
     }
 
     public ProcessBuilder AddParamArgument(string argumentHead, IEnumerable<string> argumentParams) {
@@ -46,7 +47,7 @@ namespace Bud.Cli {
     }
 
     public ProcessBuilder AddArguments(params string[] arguments) {
-      return AddArguments((IEnumerable<string>)arguments);
+      return AddArguments((IEnumerable<string>) arguments);
     }
 
     public ProcessBuilder AddArguments(IEnumerable<string> arguments) {
@@ -70,7 +71,6 @@ namespace Bud.Cli {
     public int Start(TextWriter output, TextWriter errorOutput) {
       using (var process = ToProcess()) {
         process.Start();
-        // TODO(urbas): Pipe the outputs using async operations.
         output.WriteLine(process.StandardOutput.ReadToEnd());
         errorOutput.WriteLine(process.StandardError.ReadToEnd());
         process.WaitForExit();
@@ -79,4 +79,3 @@ namespace Bud.Cli {
     }
   }
 }
-
