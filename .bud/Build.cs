@@ -5,8 +5,10 @@ using System.IO;
 public class Build : IBuild {
   public Settings SetUp(Settings settings, string baseDir) {
     return settings
-      .DllProject("Bud.Graph", Path.Combine(baseDir, "Graph"),
-        CSharp.Dependency("Microsoft.Bcl.Immutable")
+      .DllProject("Bud.Core", Path.Combine(baseDir, "Core"),
+        CSharp.Dependency("Microsoft.Bcl.Immutable"),
+        CSharp.Dependency("Newtonsoft.Json"),
+        CSharp.Dependency("Nuget.Core")
       );
   }
 }

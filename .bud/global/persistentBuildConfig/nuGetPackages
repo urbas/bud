@@ -4,6 +4,27 @@
       "1.0.34": [
         "lib\\portable-net45+win8+wp8+wpa81\\System.Collections.Immutable.dll"
       ]
+    },
+    "Microsoft.Web.Xdt": {
+      "2.1.1": [
+        "lib\\net40\\Microsoft.Web.XmlTransform.dll"
+      ]
+    },
+    "Newtonsoft.Json": {
+      "6.0.8": [
+        "lib\\net20\\Newtonsoft.Json.dll",
+        "lib\\net35\\Newtonsoft.Json.dll",
+        "lib\\net40\\Newtonsoft.Json.dll",
+        "lib\\net45\\Newtonsoft.Json.dll",
+        "lib\\netcore45\\Newtonsoft.Json.dll",
+        "lib\\portable-net40+sl5+wp80+win8+wpa81\\Newtonsoft.Json.dll",
+        "lib\\portable-net45+wp80+win8+wpa81+aspnetcore50\\Newtonsoft.Json.dll"
+      ]
+    },
+    "NuGet.Core": {
+      "2.8.3": [
+        "lib\\net40-Client\\NuGet.Core.dll"
+      ]
     }
   }
 }
