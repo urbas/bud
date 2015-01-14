@@ -27,7 +27,7 @@ namespace Bud.Plugins.Deps {
       if (TryLoadPersistedResolution(context, out resolution)) {
         return resolution;
       }
-      return new ResolvedExternalDependencies(ImmutableDictionary<string, DownloadedPackages>.Empty);
+      return new ResolvedExternalDependencies(ImmutableList<PackageVersions>.Empty);
     }
 
     private static Task<ResolvedExternalDependencies> FetchImpl(IContext context) {
@@ -45,7 +45,7 @@ namespace Bud.Plugins.Deps {
       if (File.Exists(fetchedPackagesFile)) {
         using (var streamReader = new StreamReader(fetchedPackagesFile))
         using (var jsonStreamReader = new JsonTextReader(streamReader)) {
-          persistedResolution = ResolvedExternalDependencies.FromJson(jsonStreamReader);
+          persistedResolution = JsonSerializer.CreateDefault().Deserialize<ResolvedExternalDependencies>(jsonStreamReader);
           return true;
         }
       }
@@ -67,13 +67,13 @@ namespace Bud.Plugins.Deps {
 
     private static ResolvedExternalDependencies PersistNuGetResolution(IContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
       context.CreatePersistentBuildConfigDir();
-      var nuGetResolution = new ResolvedExternalDependencies(fetchedPackages);
+      var resolvedExternalDependencies = new ResolvedExternalDependencies(fetchedPackages);
       using (var streamWriter = new StreamWriter(context.GetFetchedPackagesFile()))
       using (var jsonTextWriter = new JsonTextWriter(streamWriter)) {
         jsonTextWriter.Formatting = Formatting.Indented;
-        nuGetResolution.ToJson(jsonTextWriter);
+        JsonSerializer.CreateDefault().Serialize(jsonTextWriter, resolvedExternalDependencies);
       }
-      return nuGetResolution;
+      return resolvedExternalDependencies;
     }
   }
 }

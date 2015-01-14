@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Bud.Test.Assertions;
 using Bud.Test.Util;
 using NUnit.Framework;

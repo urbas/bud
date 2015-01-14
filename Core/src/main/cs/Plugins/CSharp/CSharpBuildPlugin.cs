@@ -67,7 +67,7 @@ namespace Bud.Plugins.CSharp {
       var nuGetRepositoryPath = context.GetNuGetRepositoryDir();
       return nuGetDependencies
         .Select(dependency => allNuGetDependencies.GetResolvedNuGetDependency(dependency))
-        .SelectMany(dependency => dependency.AssemblyPaths.Select(assemblyPath => Path.Combine(nuGetRepositoryPath, dependency.RequestedDependency.Id + "." + dependency.ResolvedVersion, assemblyPath))).ToImmutableList();
+        .SelectMany(dependency => dependency.Package.Assemblies.Select(assemblyReference => assemblyReference.GetAbsolutePath(nuGetRepositoryPath))).ToImmutableList();
     }
 
     private static string GetAssemblyFileExtension(IConfig context, Key project) {

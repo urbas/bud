@@ -47,8 +47,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigKey.cs" />
-    <Compile Include="Plugins\Deps\DownloadedPackage.cs" />
-    <Compile Include="Plugins\Deps\DownloadedPackages.cs" />
+    <Compile Include="IO\Paths.cs" />
+    <Compile Include="Plugins\Deps\AssemblyRereference.cs" />
+    <Compile Include="Plugins\Deps\Package.cs" />
+    <Compile Include="Plugins\Deps\PackageVersions.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TaskKey.cs" />
     <Compile Include="Unit.cs" />

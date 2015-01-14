@@ -1,0 +1,18 @@
+{
+  "Urbas.Example.Bar": [
+    [
+      "1.0.1",
+      [
+        "lib\\net45\\lib\\net45\\Urbas.Example.Bar.dll"
+      ]
+    ]
+  ],
+  "Urbas.Example.Foo": [
+    [
+      "1.0.1",
+      [
+        "lib\\net40\\Urbas.Example.Foo.dll"
+      ]
+    ]
+  ]
+}
