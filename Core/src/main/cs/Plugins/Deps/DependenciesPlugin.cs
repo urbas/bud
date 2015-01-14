@@ -1,12 +1,11 @@
-﻿using System;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using Bud.Plugins.Build;
-using System.Collections.Generic;
-using NuGet;
+using System.Linq;
 using System.Threading.Tasks;
+using Bud.Plugins.Build;
 using Newtonsoft.Json;
+using NuGet;
 
 namespace Bud.Plugins.Deps {
   public class DependenciesPlugin : IPlugin {
@@ -27,9 +26,8 @@ namespace Bud.Plugins.Deps {
       ResolvedExternalDependencies resolution;
       if (TryLoadPersistedResolution(context, out resolution)) {
         return resolution;
-      } else {
-        return new ResolvedExternalDependencies(ImmutableDictionary<string, IDictionary<SemanticVersion, IEnumerable<string>>>.Empty);
       }
+      return new ResolvedExternalDependencies(ImmutableDictionary<string, DownloadedPackages>.Empty);
     }
 
     private static Task<ResolvedExternalDependencies> FetchImpl(IContext context) {
@@ -47,7 +45,7 @@ namespace Bud.Plugins.Deps {
       if (File.Exists(fetchedPackagesFile)) {
         using (var streamReader = new StreamReader(fetchedPackagesFile))
         using (var jsonStreamReader = new JsonTextReader(streamReader)) {
-          persistedResolution = JsonSerializer.CreateDefault().Deserialize<ResolvedExternalDependencies>(jsonStreamReader);
+          persistedResolution = ResolvedExternalDependencies.FromJson(jsonStreamReader);
           return true;
         }
       }
@@ -73,7 +71,7 @@ namespace Bud.Plugins.Deps {
       using (var streamWriter = new StreamWriter(context.GetFetchedPackagesFile()))
       using (var jsonTextWriter = new JsonTextWriter(streamWriter)) {
         jsonTextWriter.Formatting = Formatting.Indented;
-        JsonSerializer.CreateDefault().Serialize(jsonTextWriter, nuGetResolution);
+        nuGetResolution.ToJson(jsonTextWriter);
       }
       return nuGetResolution;
     }

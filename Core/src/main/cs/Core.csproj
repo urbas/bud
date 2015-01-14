@@ -47,6 +47,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConfigKey.cs" />
+    <Compile Include="Plugins\Deps\DownloadedPackage.cs" />
+    <Compile Include="Plugins\Deps\DownloadedPackages.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TaskKey.cs" />
     <Compile Include="Unit.cs" />
@@ -81,7 +83,7 @@
     <Compile Include="Plugins\Build\BuildDirsKeys.cs" />
     <Compile Include="Plugins\Build\BuildDirsPlugin.cs" />
     <Compile Include="Plugins\Build\BuildKeys.cs" />
-    <Compile Include="Plugins\Dependencies\DependenciesKeys.cs" />
+    <Compile Include="Plugins\Deps\DependenciesKeys.cs" />
     <Compile Include="Plugins\BuildLoading\BuildLoading.cs" />
     <Compile Include="Plugins\CSharp\CSharp.cs" />
     <Compile Include="Plugins\CSharp\CSharpKeys.cs" />
@@ -100,12 +102,12 @@
     <Compile Include="Plugins\Build\GlobalBuildPlugin.cs" />
     <Compile Include="Plugins\Build\GlobalBuild.cs" />
     <Compile Include="Commander\BuildCommander.cs" />
-    <Compile Include="Plugins\Dependencies\Dependencies.cs" />
-    <Compile Include="Plugins\Dependencies\ExternalDependency.cs" />
-    <Compile Include="Plugins\Dependencies\InternalDependency.cs" />
-    <Compile Include="Plugins\Dependencies\DependenciesPlugin.cs" />
-    <Compile Include="Plugins\Dependencies\ResolvedExternalDependencies.cs" />
-    <Compile Include="Plugins\Dependencies\ResolvedExternalDependency.cs" />
+    <Compile Include="Plugins\Deps\Dependencies.cs" />
+    <Compile Include="Plugins\Deps\ExternalDependency.cs" />
+    <Compile Include="Plugins\Deps\InternalDependency.cs" />
+    <Compile Include="Plugins\Deps\DependenciesPlugin.cs" />
+    <Compile Include="Plugins\Deps\ResolvedExternalDependencies.cs" />
+    <Compile Include="Plugins\Deps\ResolvedExternalDependency.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

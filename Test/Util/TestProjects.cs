@@ -23,6 +23,11 @@ namespace Bud.Test.Util {
     public static string GetPathOfProject(string projectDirName) {
       return Path.Combine(Directory.GetCurrentDirectory(), "..", "..", "testProjects", projectDirName);
     }
+
+    public static TemporaryDirBuildCommander LoadBuildCommander(object systemTestClassInstance) {
+      var testProjectDirName = systemTestClassInstance.GetType().Name;
+      return LoadBuildCommander(testProjectDirName);
+    }
   }
 }
 

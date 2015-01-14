@@ -1,6 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Collections.Generic;
 
 namespace Bud.Plugins.Deps {
   public static class DependenciesKeys {
@@ -13,4 +12,3 @@ namespace Bud.Plugins.Deps {
     public static readonly ConfigKey<ResolvedExternalDependencies> NuGetResolvedPackages = new ConfigKey<ResolvedExternalDependencies>("nuGetResolvedPackages");
   }
 }
-

@@ -1,5 +1,5 @@
-using NuGet;
 using System.Collections.Generic;
+using NuGet;
 
 namespace Bud.Plugins.Deps {
   public class ResolvedExternalDependency {
@@ -8,9 +8,15 @@ namespace Bud.Plugins.Deps {
     public readonly IEnumerable<string> AssemblyPaths;
 
     public ResolvedExternalDependency(ExternalDependency requestedDependency, SemanticVersion resolvedVersion, IEnumerable<string> assemblyPaths) {
-      this.AssemblyPaths = assemblyPaths;
-      this.ResolvedVersion = resolvedVersion;
-      this.RequestedDependency = requestedDependency;
+      AssemblyPaths = assemblyPaths;
+      ResolvedVersion = resolvedVersion;
+      RequestedDependency = requestedDependency;
+    }
+
+    public ResolvedExternalDependency(ExternalDependency requestedDependency, DownloadedPackage downloadedPackage) {
+      AssemblyPaths = downloadedPackage.AssemblyPaths;
+      ResolvedVersion = downloadedPackage.Version;
+      RequestedDependency = requestedDependency;
     }
   }
 }
