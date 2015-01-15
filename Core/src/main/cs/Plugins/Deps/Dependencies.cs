@@ -88,7 +88,7 @@ namespace Bud.Plugins.Deps {
       return Path.Combine(BuildDirs.GetPersistentBuildConfigDir(context), FetchedPackagesFileName);
     }
 
-    public static ResolvedExternalDependencies GetNuGetResolvedPackages(this IConfig context) {
+    public static NuGetPackages GetNuGetResolvedPackages(this IConfig context) {
       return context.Evaluate(DependenciesKeys.NuGetResolvedPackages);
     }
 

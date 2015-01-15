@@ -71,12 +71,12 @@ namespace Bud.Plugins.CSharp {
         .Select(dependency => dependency.Assemblies.Select(assemblyReference => assemblyReference.GetAbsolutePath(nuGetRepositoryPath)).First());
     }
 
-    private static IEnumerable<Package> CollectDependenciesTransitively(IEnumerable<Package> directDependencies, ResolvedExternalDependencies allExternalDependencies) {
+    private static IEnumerable<Package> CollectDependenciesTransitively(IEnumerable<Package> directDependencies, NuGetPackages allExternalDependencies) {
       return directDependencies.Select(directDependency => allExternalDependencies.GetResolvedNuGetDependency(directDependency.Id, directDependency.Version))
                                .Concat(directDependencies.SelectMany(directDependency => CollectDependenciesTransitively(directDependency.Dependencies, allExternalDependencies)));
     }
 
-    private static IEnumerable<Package> CollectDependenciesTransitively(ImmutableList<PackageInfo> directDependencies, ResolvedExternalDependencies allExternalDependencies) {
+    private static IEnumerable<Package> CollectDependenciesTransitively(ImmutableList<PackageInfo> directDependencies, NuGetPackages allExternalDependencies) {
       return CollectDependenciesTransitively(directDependencies.Select(directDependency => allExternalDependencies.GetResolvedNuGetDependency(directDependency.Id, SemanticVersion.Parse(directDependency.Version))), allExternalDependencies);
     }
 

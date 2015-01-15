@@ -9,8 +9,8 @@ namespace Bud.Plugins.CSharp.Compiler {
   public static class CSharpCompiler {
     private const string WindowsCompilerExecutablePath = @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe";
     private const string UnixCompilerExecutable = "/usr/bin/mcs";
-    private static readonly string[] UnixSystemRuntimeFacadeDll = new[] {"Facades/System.Runtime.dll"};
-    private static readonly string[] WindowsSystemRuntimeFacadeDll = new[] {"System.Runtime.dll"};
+    private static readonly string[] UnixSystemRuntimeFacadeDll = {"Facades/System.Runtime.dll"};
+    private static readonly string[] WindowsSystemRuntimeFacadeDll = {"System.Runtime.dll"};
 
     public static Task<Unit> CompileProject(IContext context, Key buildKey) {
       return Task.Run(async () => {

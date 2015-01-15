@@ -109,7 +109,7 @@
     <Compile Include="Plugins\Deps\ExternalDependency.cs" />
     <Compile Include="Plugins\Deps\InternalDependency.cs" />
     <Compile Include="Plugins\Deps\DependenciesPlugin.cs" />
-    <Compile Include="Plugins\Deps\ResolvedExternalDependencies.cs" />
+    <Compile Include="Plugins\Deps\NuGetPackages.cs" />
     <Compile Include="Plugins\Deps\ResolvedExternalDependency.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

@@ -22,15 +22,15 @@ namespace Bud.Plugins.Deps {
         .Init(DependenciesKeys.NuGetResolvedPackages, NuGetResolvedPackagesImpl);
     }
 
-    private static ResolvedExternalDependencies NuGetResolvedPackagesImpl(IConfig context) {
-      ResolvedExternalDependencies resolution;
+    private static NuGetPackages NuGetResolvedPackagesImpl(IConfig context) {
+      NuGetPackages resolution;
       if (TryLoadPersistedResolution(context, out resolution)) {
         return resolution;
       }
-      return new ResolvedExternalDependencies(ImmutableList<PackageVersions>.Empty);
+      return new NuGetPackages(ImmutableList<PackageVersions>.Empty);
     }
 
-    private static Task<ResolvedExternalDependencies> FetchImpl(IContext context) {
+    private static Task<NuGetPackages> FetchImpl(IContext context) {
       return Task.Run(() => {
         var dependencies = context.GetExternalDependencies();
         var packageManager = CreatePackageManager(context);
@@ -40,12 +40,12 @@ namespace Bud.Plugins.Deps {
       });
     }
 
-    private static bool TryLoadPersistedResolution(IConfig context, out ResolvedExternalDependencies persistedResolution) {
+    private static bool TryLoadPersistedResolution(IConfig context, out NuGetPackages persistedResolution) {
       var fetchedPackagesFile = context.GetFetchedPackagesFile();
       if (File.Exists(fetchedPackagesFile)) {
         using (var streamReader = new StreamReader(fetchedPackagesFile))
         using (var jsonStreamReader = new JsonTextReader(streamReader)) {
-          persistedResolution = JsonSerializer.CreateDefault().Deserialize<ResolvedExternalDependencies>(jsonStreamReader);
+          persistedResolution = JsonSerializer.CreateDefault().Deserialize<NuGetPackages>(jsonStreamReader);
           return true;
         }
       }
@@ -65,9 +65,9 @@ namespace Bud.Plugins.Deps {
       }
     }
 
-    private static ResolvedExternalDependencies PersistNuGetResolution(IContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
+    private static NuGetPackages PersistNuGetResolution(IContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
       context.CreatePersistentBuildConfigDir();
-      var resolvedExternalDependencies = new ResolvedExternalDependencies(fetchedPackages);
+      var resolvedExternalDependencies = new NuGetPackages(fetchedPackages);
       using (var streamWriter = new StreamWriter(context.GetFetchedPackagesFile()))
       using (var jsonTextWriter = new JsonTextWriter(streamWriter)) {
         jsonTextWriter.Formatting = Formatting.Indented;

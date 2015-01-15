@@ -6,17 +6,17 @@ using Newtonsoft.Json;
 using NuGet;
 
 namespace Bud.Plugins.Deps {
-  public class ResolvedExternalDependencies {
+  public class NuGetPackages {
     public readonly ImmutableList<PackageVersions> Packages;
     [JsonIgnore] private readonly Dictionary<string, PackageVersions> packageId2PackageVersions;
 
     [JsonConstructor]
-    public ResolvedExternalDependencies(IEnumerable<PackageVersions> packages) {
+    public NuGetPackages(IEnumerable<PackageVersions> packages) {
       Packages = packages == null ? ImmutableList<PackageVersions>.Empty : packages.ToImmutableList();
       packageId2PackageVersions = Packages.ToDictionary(packageVersions => packageVersions.Id, packageVersions => packageVersions);
     }
 
-    public ResolvedExternalDependencies(IEnumerable<IGrouping<string, IPackage>> fetchedPackages)
+    public NuGetPackages(IEnumerable<IGrouping<string, IPackage>> fetchedPackages)
       : this(fetchedPackages.Select(packageGroup => new PackageVersions(packageGroup.Key, packageGroup))) {}
 
     public Package GetResolvedNuGetDependency(ExternalDependency dependency) {
@@ -29,7 +29,7 @@ namespace Bud.Plugins.Deps {
         if (mostCurrentVersion != null) {
           return mostCurrentVersion;
         }
-        throw new Exception(string.Format("Could not find any version of the package '{0}'. Try running '{1}' to download packages.", dependencyId, DependenciesKeys.Fetch));
+        throw new Exception(PackageNotFoundMessage(dependencyId));
       }
 
       var bestSuitedVersion = GetAllVersionsForPackage(dependencyId).GetBestSuitedVersion(lowerBoundVersion);
@@ -40,7 +40,15 @@ namespace Bud.Plugins.Deps {
     }
 
     private PackageVersions GetAllVersionsForPackage(string id) {
-      return packageId2PackageVersions[id];
+      try {
+        return packageId2PackageVersions[id];
+      } catch (Exception e) {
+        throw new ArgumentException(PackageNotFoundMessage(id), e);
+      }
+    }
+
+    private static string PackageNotFoundMessage(string dependencyId) {
+      return string.Format("Could not find any version of the package '{0}'. Try running '{1}' to download packages.", dependencyId, DependenciesKeys.Fetch);
     }
   }
 }
