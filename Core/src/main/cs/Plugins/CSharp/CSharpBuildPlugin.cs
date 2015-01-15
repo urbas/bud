@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Bud.Plugins.Build;
 using Bud.Plugins.CSharp.Compiler;
 using Bud.Plugins.Deps;
+using NuGet;
 
 namespace Bud.Plugins.CSharp {
   public class CSharpBuildPlugin : BuildPlugin {
@@ -63,11 +64,21 @@ namespace Bud.Plugins.CSharp {
 
     private ImmutableList<string> CollectExternalDependencies(IConfig context, Key buildTarget) {
       var allNuGetDependencies = context.GetNuGetResolvedPackages();
-      var nuGetDependencies = context.GetExternalDependencies(buildTarget);
+      var allExternalDependencies = context.GetNuGetResolvedPackages();
+      var directExternalDependencies = context.GetExternalDependencies(buildTarget);
       var nuGetRepositoryPath = context.GetNuGetRepositoryDir();
-      return nuGetDependencies
-        .Select(dependency => allNuGetDependencies.GetResolvedNuGetDependency(dependency))
-        .SelectMany(dependency => dependency.Package.Assemblies.Select(assemblyReference => assemblyReference.GetAbsolutePath(nuGetRepositoryPath))).ToImmutableList();
+      return CollectDependenciesTransitively(directExternalDependencies.Select(dependency => allNuGetDependencies.GetResolvedNuGetDependency(dependency)),
+                                             allExternalDependencies)
+        .SelectMany(dependency => dependency.Assemblies.Select(assemblyReference => assemblyReference.GetAbsolutePath(nuGetRepositoryPath))).ToImmutableList();
+    }
+
+    private static IEnumerable<Package> CollectDependenciesTransitively(IEnumerable<Package> directDependencies, ResolvedExternalDependencies allExternalDependencies) {
+      return directDependencies.Select(directDependency => allExternalDependencies.GetResolvedNuGetDependency(directDependency.Id, directDependency.Version))
+                               .Concat(directDependencies.SelectMany(directDependency => CollectDependenciesTransitively(directDependency.Dependencies, allExternalDependencies)));
+    }
+
+    private static IEnumerable<Package> CollectDependenciesTransitively(ImmutableList<PackageInfo> directDependencies, ResolvedExternalDependencies allExternalDependencies) {
+      return CollectDependenciesTransitively(directDependencies.Select(directDependency => allExternalDependencies.GetResolvedNuGetDependency(directDependency.Id, SemanticVersion.Parse(directDependency.Version))), allExternalDependencies);
     }
 
     private static string GetAssemblyFileExtension(IConfig context, Key project) {

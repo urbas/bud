@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using NuGet;
-
 namespace Bud.Plugins.Deps {
   public class ResolvedExternalDependency {
     public readonly ExternalDependency RequestedDependency;

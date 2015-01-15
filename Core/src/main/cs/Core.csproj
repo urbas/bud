@@ -50,6 +50,7 @@
     <Compile Include="IO\Paths.cs" />
     <Compile Include="Plugins\Deps\AssemblyRereference.cs" />
     <Compile Include="Plugins\Deps\Package.cs" />
+    <Compile Include="Plugins\Deps\PackageInfo.cs" />
     <Compile Include="Plugins\Deps\PackageVersions.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TaskKey.cs" />

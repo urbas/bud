@@ -11,7 +11,7 @@ namespace Bud.SystemTests {
       using (var buildCommander = TestProjects.LoadBuildCommander(this)) {
         buildCommander.Evaluate("build");
         FileAssertions.AssertFilesExist(new[] {
-          SystemTestUtils.OutputAssemblyPath(buildCommander, "A", BuildKeys.Main, "A.dll")
+          SystemTestUtils.OutputAssemblyPath(buildCommander, BuildKeys.Main, "A.dll")
         });
       }
     }

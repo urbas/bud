@@ -19,20 +19,24 @@ namespace Bud.Plugins.Deps {
     public ResolvedExternalDependencies(IEnumerable<IGrouping<string, IPackage>> fetchedPackages)
       : this(fetchedPackages.Select(packageGroup => new PackageVersions(packageGroup.Key, packageGroup))) {}
 
-    public ResolvedExternalDependency GetResolvedNuGetDependency(ExternalDependency dependency) {
-      if (dependency.Version == null) {
-        var mostCurrentVersion = GetAllVersionsForPackage(dependency.Id).GetMostCurrentVersion();
+    public Package GetResolvedNuGetDependency(ExternalDependency dependency) {
+      return GetResolvedNuGetDependency(dependency.Id, dependency.Version);
+    }
+
+    public Package GetResolvedNuGetDependency(string dependencyId, SemanticVersion lowerBoundVersion) {
+      if (lowerBoundVersion == null) {
+        var mostCurrentVersion = GetAllVersionsForPackage(dependencyId).GetMostCurrentVersion();
         if (mostCurrentVersion != null) {
-          return new ResolvedExternalDependency(dependency, mostCurrentVersion);
+          return mostCurrentVersion;
         }
-        throw new Exception(string.Format("Could not find any version of the package '{0}'. Try running '{1}' to download packages.", dependency.Id, DependenciesKeys.Fetch));
+        throw new Exception(string.Format("Could not find any version of the package '{0}'. Try running '{1}' to download packages.", dependencyId, DependenciesKeys.Fetch));
       }
 
-      var bestSuitedVersion = GetAllVersionsForPackage(dependency.Id).GetBestSuitedVersion(dependency.Version);
+      var bestSuitedVersion = GetAllVersionsForPackage(dependencyId).GetBestSuitedVersion(lowerBoundVersion);
       if (bestSuitedVersion != null) {
-        return new ResolvedExternalDependency(dependency, bestSuitedVersion);
+        return bestSuitedVersion;
       }
-      throw new Exception(string.Format("Could not find the version '{0}' of package '{1}'. Try running '{2}' to download packages.", dependency.Id, dependency.Version, DependenciesKeys.Fetch));
+      throw new Exception(string.Format("Could not find the version '{0}' of package '{1}'. Try running '{2}' to download packages.", dependencyId, lowerBoundVersion, DependenciesKeys.Fetch));
     }
 
     private PackageVersions GetAllVersionsForPackage(string id) {
