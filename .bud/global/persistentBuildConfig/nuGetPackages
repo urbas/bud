@@ -1,30 +1,94 @@
 {
-  "fetchedPackages": {
-    "Microsoft.Bcl.Immutable": {
-      "1.0.34": [
-        "lib\\portable-net45+win8+wp8+wpa81\\System.Collections.Immutable.dll"
+  "Packages": [
+    {
+      "Id": "Microsoft.Bcl.Immutable",
+      "Versions": [
+        {
+          "Version": "1.0.34",
+          "Assemblies": [
+            {
+              "Path": "lib/portable-net45+win8+wp8+wpa81/System.Collections.Immutable.dll",
+              "Framework": ".NETPortable,Version=v0.0,Profile=net45+win8+wp8+wpa81"
+            }
+          ],
+          "Dependencies": []
+        }
       ]
     },
-    "Microsoft.Web.Xdt": {
-      "2.1.1": [
-        "lib\\net40\\Microsoft.Web.XmlTransform.dll"
+    {
+      "Id": "Microsoft.Web.Xdt",
+      "Versions": [
+        {
+          "Version": "2.1.1",
+          "Assemblies": [
+            {
+              "Path": "lib/net40/Microsoft.Web.XmlTransform.dll",
+              "Framework": ".NETFramework,Version=v4.0"
+            }
+          ],
+          "Dependencies": []
+        }
       ]
     },
-    "Newtonsoft.Json": {
-      "6.0.8": [
-        "lib\\net20\\Newtonsoft.Json.dll",
-        "lib\\net35\\Newtonsoft.Json.dll",
-        "lib\\net40\\Newtonsoft.Json.dll",
-        "lib\\net45\\Newtonsoft.Json.dll",
-        "lib\\netcore45\\Newtonsoft.Json.dll",
-        "lib\\portable-net40+sl5+wp80+win8+wpa81\\Newtonsoft.Json.dll",
-        "lib\\portable-net45+wp80+win8+wpa81+aspnetcore50\\Newtonsoft.Json.dll"
+    {
+      "Id": "Newtonsoft.Json",
+      "Versions": [
+        {
+          "Version": "6.0.8",
+          "Assemblies": [
+            {
+              "Path": "lib/net20/Newtonsoft.Json.dll",
+              "Framework": ".NETFramework,Version=v2.0"
+            },
+            {
+              "Path": "lib/net35/Newtonsoft.Json.dll",
+              "Framework": ".NETFramework,Version=v3.5"
+            },
+            {
+              "Path": "lib/net40/Newtonsoft.Json.dll",
+              "Framework": ".NETFramework,Version=v4.0"
+            },
+            {
+              "Path": "lib/net45/Newtonsoft.Json.dll",
+              "Framework": ".NETFramework,Version=v4.5"
+            },
+            {
+              "Path": "lib/netcore45/Newtonsoft.Json.dll",
+              "Framework": ".NETCore,Version=v4.5"
+            },
+            {
+              "Path": "lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft.Json.dll",
+              "Framework": ".NETPortable,Version=v0.0,Profile=net40+sl5+wp80+win8+wpa81"
+            },
+            {
+              "Path": "lib/portable-net45+wp80+win8+wpa81+aspnetcore50/Newtonsoft.Json.dll",
+              "Framework": ".NETPortable,Version=v0.0,Profile=net45+wp80+win8+wpa81+aspnetcore50"
+            }
+          ],
+          "Dependencies": []
+        }
       ]
     },
-    "NuGet.Core": {
-      "2.8.3": [
-        "lib\\net40-Client\\NuGet.Core.dll"
+    {
+      "Id": "NuGet.Core",
+      "Versions": [
+        {
+          "Version": "2.8.3",
+          "Assemblies": [
+            {
+              "Path": "lib/net40-Client/NuGet.Core.dll",
+              "Framework": ".NETFramework,Version=v4.0,Profile=Client"
+            }
+          ],
+          "Dependencies": [
+            {
+              "Id": "Microsoft.Web.Xdt",
+              "Version": "2.1.0",
+              "Framework": null
+            }
+          ]
+        }
       ]
     }
-  }
+  ]
 }

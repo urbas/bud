@@ -40,7 +40,7 @@ namespace Bud.Plugins.CSharp {
     private IEnumerable<string> FindSources(IContext context, Key buildTarget) {
       var sourceDirectory = Path.Combine(context.GetBaseDir(buildTarget));
       if (Directory.Exists(sourceDirectory)) {
-        return Directory.EnumerateFiles(sourceDirectory, "*", SearchOption.AllDirectories);
+        return Directory.EnumerateFiles(sourceDirectory, "*.cs", SearchOption.AllDirectories);
       }
       return ImmutableList<string>.Empty;
     }
@@ -62,13 +62,13 @@ namespace Bud.Plugins.CSharp {
       return collectedAssemblies.ToImmutable();
     }
 
-    private ImmutableList<string> CollectExternalDependencies(IConfig context, Key buildTarget) {
+    private IEnumerable<string> CollectExternalDependencies(IConfig context, Key buildTarget) {
       var allNuGetDependencies = context.GetNuGetResolvedPackages();
       var directExternalDependencies = context.GetExternalDependencies(buildTarget);
       var nuGetRepositoryPath = context.GetNuGetRepositoryDir();
       return CollectDependenciesTransitively(directExternalDependencies.Select(dependency => allNuGetDependencies.GetResolvedNuGetDependency(dependency)),
                                              allNuGetDependencies)
-        .SelectMany(dependency => dependency.Assemblies.Select(assemblyReference => assemblyReference.GetAbsolutePath(nuGetRepositoryPath))).ToImmutableList();
+        .Select(dependency => dependency.Assemblies.Select(assemblyReference => assemblyReference.GetAbsolutePath(nuGetRepositoryPath)).First());
     }
 
     private static IEnumerable<Package> CollectDependenciesTransitively(IEnumerable<Package> directDependencies, ResolvedExternalDependencies allExternalDependencies) {
