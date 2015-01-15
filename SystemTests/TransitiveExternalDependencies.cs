@@ -9,8 +9,6 @@ namespace Bud.SystemTests {
     [Test]
     public void compile_MUST_produce_the_executable() {
       using (var buildCommander = TestProjects.LoadBuildCommander(this)) {
-        buildCommander.Evaluate("fetch");
-        Process.Start(buildCommander.TemporaryDirectory.Path);
         buildCommander.Evaluate("build");
         FileAssertions.AssertFilesExist(new[] {
           SystemTestUtils.OutputAssemblyPath(buildCommander, "A", BuildKeys.Main, "A.dll")

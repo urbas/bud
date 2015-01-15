@@ -1,18 +1,40 @@
 {
-  "Urbas.Example.Bar": [
-    [
-      "1.0.1",
-      [
-        "lib\\net45\\lib\\net45\\Urbas.Example.Bar.dll"
+  "Packages": [
+    {
+      "Id": "Urbas.Example.Bar",
+      "Versions": [
+        {
+          "Version": "1.0.1",
+          "Assemblies": [
+            {
+              "Path": "lib/net45/lib/net45/Urbas.Example.Bar.dll",
+              "Framework": ".NETFramework,Version=v4.5"
+            }
+          ],
+          "Dependencies": [
+            {
+              "Id": "Urbas.Example.Foo",
+              "Version": "1.0.1",
+              "Framework": null
+            }
+          ]
+        }
       ]
-    ]
-  ],
-  "Urbas.Example.Foo": [
-    [
-      "1.0.1",
-      [
-        "lib\\net40\\Urbas.Example.Foo.dll"
+    },
+    {
+      "Id": "Urbas.Example.Foo",
+      "Versions": [
+        {
+          "Version": "1.0.1",
+          "Assemblies": [
+            {
+              "Path": "lib/net40/Urbas.Example.Foo.dll",
+              "Framework": ".NETFramework,Version=v4.0"
+            }
+          ],
+          "Dependencies": []
+        }
       ]
-    ]
+    }
   ]
 }

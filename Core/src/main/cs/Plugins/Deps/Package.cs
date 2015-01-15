@@ -8,15 +8,19 @@ namespace Bud.Plugins.Deps {
   public class Package {
     public readonly SemanticVersion Version;
     public readonly ImmutableList<AssemblyRereference> Assemblies;
+    public readonly ImmutableList<PackageInfo> Dependencies;
 
     [JsonConstructor]
-    public Package(SemanticVersion version, IEnumerable<AssemblyRereference> assemblies) {
-      Assemblies = assemblies.Select(assemblyReference => assemblyReference.WithHostPackage(this)).ToImmutableList();
+    public Package(SemanticVersion version, IEnumerable<AssemblyRereference> assemblies, IEnumerable<PackageInfo> dependencies) {
       Version = version;
+      Assemblies = assemblies.Select(assemblyReference => assemblyReference.WithHostPackage(this)).ToImmutableList();
+      Dependencies = dependencies.ToImmutableList();
     }
 
-    public Package(IPackage package) : this(package.Version, package.AssemblyReferences.Select(assemblyReference => new AssemblyRereference(assemblyReference))) {
-    }
+    public Package(IPackage package) :
+      this(package.Version,
+           package.AssemblyReferences.Select(assemblyReference => new AssemblyRereference(assemblyReference)),
+           package.DependencySets.SelectMany(dependencySet => dependencySet.Dependencies.Select(dependency => new PackageInfo(dependency, dependencySet.TargetFramework)))) {}
 
     [JsonIgnore]
     public string Id { get; internal set; }
