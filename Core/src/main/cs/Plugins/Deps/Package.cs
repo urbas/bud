@@ -13,8 +13,8 @@ namespace Bud.Plugins.Deps {
     [JsonConstructor]
     public Package(SemanticVersion version, IEnumerable<AssemblyRereference> assemblies, IEnumerable<PackageInfo> dependencies) {
       Version = version;
-      Assemblies = assemblies.Select(assemblyReference => assemblyReference.WithHostPackage(this)).ToImmutableList();
-      Dependencies = dependencies.ToImmutableList();
+      Assemblies = assemblies == null ? ImmutableList<AssemblyRereference>.Empty : assemblies.Select(assemblyReference => assemblyReference.WithHostPackage(this)).ToImmutableList();
+      Dependencies = dependencies == null ? ImmutableList<PackageInfo>.Empty : dependencies.ToImmutableList();
     }
 
     public Package(IPackage package) :

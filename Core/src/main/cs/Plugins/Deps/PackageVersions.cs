@@ -12,8 +12,9 @@ namespace Bud.Plugins.Deps {
     [JsonConstructor]
     public PackageVersions(string id, IEnumerable<Package> versions) {
       Id = id;
-      Versions = versions.Select(package => package.WithId(Id)).ToImmutableList();
-      Versions.Sort();
+      Versions = versions == null ? ImmutableList<Package>.Empty : versions.Select(package => package.WithId(Id))
+                                                                           .OrderByDescending(package => package.Version)
+                                                                           .ToImmutableList();
     }
 
     public PackageVersions(string id, IEnumerable<IPackage> downloadedPackages) : this(id, downloadedPackages.Select(package => new Package(package))) {}

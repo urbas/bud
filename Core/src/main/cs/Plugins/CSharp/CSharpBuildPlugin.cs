@@ -64,11 +64,10 @@ namespace Bud.Plugins.CSharp {
 
     private ImmutableList<string> CollectExternalDependencies(IConfig context, Key buildTarget) {
       var allNuGetDependencies = context.GetNuGetResolvedPackages();
-      var allExternalDependencies = context.GetNuGetResolvedPackages();
       var directExternalDependencies = context.GetExternalDependencies(buildTarget);
       var nuGetRepositoryPath = context.GetNuGetRepositoryDir();
       return CollectDependenciesTransitively(directExternalDependencies.Select(dependency => allNuGetDependencies.GetResolvedNuGetDependency(dependency)),
-                                             allExternalDependencies)
+                                             allNuGetDependencies)
         .SelectMany(dependency => dependency.Assemblies.Select(assemblyReference => assemblyReference.GetAbsolutePath(nuGetRepositoryPath))).ToImmutableList();
     }
 

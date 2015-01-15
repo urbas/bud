@@ -12,7 +12,7 @@ namespace Bud.Plugins.Deps {
 
     [JsonConstructor]
     public ResolvedExternalDependencies(IEnumerable<PackageVersions> packages) {
-      Packages = packages.ToImmutableList();
+      Packages = packages == null ? ImmutableList<PackageVersions>.Empty : packages.ToImmutableList();
       packageId2PackageVersions = Packages.ToDictionary(packageVersions => packageVersions.Id, packageVersions => packageVersions);
     }
 
