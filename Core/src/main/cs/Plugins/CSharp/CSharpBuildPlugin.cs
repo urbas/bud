@@ -30,7 +30,7 @@ namespace Bud.Plugins.CSharp {
       if (BuildKeys.Main.Equals(scope)) {
         return project.Id;
       }
-      return project.Id + "." + scope.Id;
+      return project.Id + "." + Bud.Util.StringUtils.Capitalize(scope.Id);
     }
 
     protected override Task<Unit> InvokeCompilerTaskImpl(IContext context, Key buildKey) {

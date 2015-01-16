@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="ConfigKey.cs" />
     <Compile Include="IO\Paths.cs" />
+    <Compile Include="Plugins\CSharp\StringUtils.cs" />
     <Compile Include="Plugins\Deps\AssemblyRereference.cs" />
     <Compile Include="Plugins\Deps\Package.cs" />
     <Compile Include="Plugins\Deps\PackageInfo.cs" />
