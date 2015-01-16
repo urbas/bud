@@ -14,11 +14,11 @@ namespace Bud.Plugins.Deps {
     private AssemblyRereference(string path, string framework) {
       Path = path;
       Framework = framework;
-      FrameworkName = new FrameworkName(framework);
+      FrameworkName = framework == null ? null : new FrameworkName(framework);
     }
 
     public AssemblyRereference(IPackageAssemblyReference assemblyReference)
-      : this(Paths.ToAgnosticPath(assemblyReference.Path), assemblyReference.TargetFramework.FullName) {}
+      : this(Paths.ToAgnosticPath(assemblyReference.Path), assemblyReference.TargetFramework == null ? null : assemblyReference.TargetFramework.FullName) {}
 
     public string GetAbsolutePath(string nuGetRepositoryPath) {
       return System.IO.Path.Combine(nuGetRepositoryPath, HostPackage.Id + "." + HostPackage.Version, Path);

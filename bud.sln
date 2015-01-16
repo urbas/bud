@@ -11,9 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\src\main\cs\Co
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SystemTests", "SystemTests\SystemTests.csproj", "{8021ED96-0C60-4C9F-926D-FBBD6E08CCAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Graph.Tests", "Graph.Tests\Graph.Tests.csproj", "{CFFA7A16-FAFD-4985-941F-7228C2A589CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Tests", "Core\src\test\cs\Core.Tests.csproj", "{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +39,6 @@ Global
 		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Debug|x86.Build.0 = Debug|Any CPU
 		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Release|x86.ActiveCfg = Release|Any CPU
 		{196FD0F7-93BC-40A6-A4E4-7EB3E41B27CF}.Release|x86.Build.0 = Release|Any CPU
-		{CFFA7A16-FAFD-4985-941F-7228C2A589CA}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{CFFA7A16-FAFD-4985-941F-7228C2A589CA}.Debug|x86.Build.0 = Debug|Any CPU
-		{CFFA7A16-FAFD-4985-941F-7228C2A589CA}.Release|x86.ActiveCfg = Release|Any CPU
-		{CFFA7A16-FAFD-4985-941F-7228C2A589CA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

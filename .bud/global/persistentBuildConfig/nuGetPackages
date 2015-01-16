@@ -89,6 +89,21 @@
           ]
         }
       ]
+    },
+    {
+      "Id": "NUnit",
+      "Versions": [
+        {
+          "Version": "2.6.4",
+          "Assemblies": [
+            {
+              "Path": "lib/nunit.framework.dll",
+              "Framework": null
+            }
+          ],
+          "Dependencies": []
+        }
+      ]
     }
   ]
 }

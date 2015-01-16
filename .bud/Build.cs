@@ -8,7 +8,8 @@ public class Build : IBuild {
       .DllProject("Bud.Core", Path.Combine(baseDir, "Core"),
         CSharp.Dependency("Microsoft.Bcl.Immutable"),
         CSharp.Dependency("Newtonsoft.Json"),
-        CSharp.Dependency("NuGet.Core")
+        CSharp.Dependency("NuGet.Core"),
+        CSharp.Dependency("NUnit", "2.6.4", target: "test")
       );
   }
 }
