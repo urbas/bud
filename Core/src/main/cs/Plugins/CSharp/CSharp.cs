@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Bud.Plugins.Build;
@@ -21,11 +22,11 @@ namespace Bud.Plugins.CSharp {
       return build.ExeProject(id, baseDir, MainBuildTargetToDll.With(plugins));
     }
 
-    public static IPlugin Dependency(string packageName, string packageVersion = null) {
+    public static IPlugin Dependency(string packageName, string packageVersion = null, string target = null) {
       var projectKey = Project.ProjectKey(packageName);
       var buildTargetKey = MainBuildTargetKey(projectKey);
       return PluginUtils.ApplyToSubKey(
-        CSharpKeys.CSharp.In(BuildKeys.Main),
+        CSharpKeys.CSharp.In(target == null ? BuildKeys.Main : Key.Parse(target)),
         Dependencies.AddDependency(
           new InternalDependency(buildTargetKey, MainBuildTaskKey(projectKey)),
           new ExternalDependency(packageName, packageVersion),

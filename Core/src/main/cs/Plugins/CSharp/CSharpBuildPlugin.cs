@@ -57,7 +57,9 @@ namespace Bud.Plugins.CSharp {
       var collectedAssemblies = ImmutableList.CreateBuilder<string>();
       foreach (var buildTarget in dependencyBuildTargets) {
         var cSharpOutputAssemblyFile = context.GetCSharpOutputAssemblyFile(buildTarget);
-        collectedAssemblies.Add(cSharpOutputAssemblyFile);
+        if (File.Exists(cSharpOutputAssemblyFile)) {
+          collectedAssemblies.Add(cSharpOutputAssemblyFile);
+        }
       }
       return collectedAssemblies.ToImmutable();
     }
