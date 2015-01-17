@@ -10,6 +10,10 @@ public class Build : IBuild {
         CSharp.Dependency("Newtonsoft.Json"),
         CSharp.Dependency("NuGet.Core"),
         CSharp.Dependency("NUnit", "2.6.4", target: "test")
+      )
+      .DllProject("Bud.Test", Path.Combine(baseDir, "Test"),
+        CSharp.Dependency("Bud.Core"),
+        CSharp.Dependency("NUnit", "2.6.4")
       );
   }
 }

@@ -31,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
   </ItemGroup>
@@ -42,11 +42,11 @@
     <Compile Include="Util\TemporaryDirBuildCommander.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\src\main\cs\Core.csproj">
+    <ProjectReference Include="..\..\..\..\Core\src\main\cs\Core.csproj">
       <Project>{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\bud\Bud.csproj">
+    <ProjectReference Include="..\..\..\..\bud\Bud.csproj">
       <Project>{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}</Project>
       <Name>Bud</Name>
     </ProjectReference>

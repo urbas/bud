@@ -63,7 +63,7 @@
       <Project>{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}</Project>
       <Name>Bud</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Test\Test.csproj">
+    <ProjectReference Include="..\Test\src\main\cs\Test.csproj">
       <Project>{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}</Project>
       <Name>Test</Name>
     </ProjectReference>

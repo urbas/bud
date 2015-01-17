@@ -50,7 +50,7 @@
       <Project>{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\Test\Test.csproj">
+    <ProjectReference Include="..\..\..\..\Test\src\main\cs\Test.csproj">
       <Project>{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}</Project>
       <Name>Test</Name>
     </ProjectReference>
