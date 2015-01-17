@@ -1,6 +1,4 @@
-using System;
 using System.IO;
-using Bud.Test.Util;
 
 namespace Bud.Test.Util {
   public static class TestProjects {
@@ -30,4 +28,3 @@ namespace Bud.Test.Util {
     }
   }
 }
-

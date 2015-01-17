@@ -59,7 +59,7 @@
       <Project>{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\..\bud\Bud.csproj">
+    <ProjectReference Include="..\..\..\..\bud\src\main\cs\Bud.csproj">
       <Project>{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}</Project>
       <Name>Bud</Name>
     </ProjectReference>
@@ -71,10 +71,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="..\budProjects\BuildConfigurationProject" />
-    <Folder Include="..\budProjects\InterProjectDependencies" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
