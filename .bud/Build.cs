@@ -16,9 +16,7 @@ public class Build : IBuild {
         CSharp.Dependency("NUnit", "2.6.4")
       )
       .DllProject("Bud.SystemTests", Path.Combine(baseDir, "SystemTests"),
-        CSharp.Dependency("Bud.Core"),
-        CSharp.Dependency("Bud.Test"),
-        CSharp.Dependency("NUnit", "2.6.4")
+        CSharp.Dependency("Bud.Test")
       );
   }
 }
