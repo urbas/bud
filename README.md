@@ -16,10 +16,6 @@ Optional:
 
 - Bud must generate sln and csproj files from the build definition.
 
-## Todo
-
-- Use slashes in paths in the nuGetPackages file.
-
 ## Build structure
 
 ### Projects

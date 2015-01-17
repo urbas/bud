@@ -1,19 +1,21 @@
+using System;
 using System.IO;
 using Bud.Commander;
 
 namespace Bud {
   public static class BudCli {
+    private static readonly string[] DefaultCommandsToExecute = {"build"};
+
     public static void Main(string[] args) {
       var buildCommander = BuildCommander.Load(Directory.GetCurrentDirectory());
-      buildCommander.Evaluate(GetCommandToExecute(args));
+      var commandsToExecute = args.Length == 0 ? DefaultCommandsToExecute : args;
+      ExecuteCommands(commandsToExecute, buildCommander);
     }
 
-    private static string GetCommandToExecute(string[] args) {
-      var commandToExecute = "build";
-      if (args.Length > 0) {
-        commandToExecute = args[0];
+    private static void ExecuteCommands(string[] commandsToExecute, IBuildCommander buildCommander) {
+      foreach (var command in commandsToExecute) {
+        buildCommander.Evaluate(command);
       }
-      return commandToExecute;
     }
   }
 }
