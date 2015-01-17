@@ -23,6 +23,7 @@ namespace Bud.Plugins.CSharp {
         .Init(CSharpKeys.CollectReferencedAssemblies.In(buildTarget), context => CollectAssembliesFromDependencies(context, buildTarget))
         .Init(CSharpKeys.OutputAssemblyDir.In(buildTarget), context => Path.Combine(context.GetOutputDir(buildTarget), "debug", "bin"))
         .Init(CSharpKeys.OutputAssemblyName.In(buildTarget), context => OutputAssemblyName(project, Scope))
+        .Init(CSharpKeys.Dist.In(buildTarget), context => CreateDistributablePackage(context, buildTarget))
         .Init(CSharpKeys.OutputAssemblyFile.In(buildTarget), context => Path.Combine(context.GetCSharpOutputAssemblyDir(buildTarget), string.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(buildTarget), GetAssemblyFileExtension(context, buildTarget))));
     }
 
@@ -95,6 +96,21 @@ namespace Bud.Plugins.CSharp {
         default:
           throw new ArgumentException("Unsupported assembly type.");
       }
+    }
+
+    private async Task<Unit> CreateDistributablePackage(IContext context, Key buildTarget) {
+      var referencedAssemblies = await context.CollectCSharpReferencedAssemblies(buildTarget);
+      var targetDir = Path.Combine(context.GetOutputDir(buildTarget), "dist");
+      Directory.CreateDirectory(targetDir);
+      foreach (var referencedAssembly in referencedAssemblies) {
+        CopyFile(referencedAssembly, targetDir);
+      }
+      CopyFile(context.GetCSharpOutputAssemblyFile(buildTarget), targetDir);
+      return Unit.Instance;
+    }
+
+    private static void CopyFile(string referencedAssembly, string targetDir) {
+      File.Copy(referencedAssembly, Path.Combine(targetDir, Path.GetFileName(referencedAssembly)));
     }
   }
 }

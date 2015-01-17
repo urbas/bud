@@ -1,9 +1,6 @@
 using System.IO;
-using System.Collections.Immutable;
-using Bud.SettingsConstruction;
 
 namespace Bud.Plugins.Build {
-
   public static class BuildDirs {
     public const string BudDirName = ".bud";
     public const string OutputDirName = "output";
@@ -31,15 +28,18 @@ namespace Bud.Plugins.Build {
     }
 
     /// <returns>The directory where build output (such as compiled assemblies) are stored.</returns>
-    public static string GetOutputDir(this IConfig buildConfiguration, Key project) {
-      return buildConfiguration.Evaluate(BuildDirsKeys.OutputDir.In(project));
+    public static string GetOutputDir(this IConfig buildConfiguration, Key key) {
+      return buildConfiguration.Evaluate(BuildDirsKeys.OutputDir.In(key));
     }
 
-    public static string GetDefaultOutputDir(this IConfig ctxt, Key project) {
-      return Path.Combine(ctxt.GetBudDir(project), OutputDirName);
+    public static string GetDefaultOutputDir(this IConfig ctxt, Key key) {
+      return Path.Combine(ctxt.GetBudDir(key), OutputDirName);
     }
 
-    /// <returns>The directory where transient data gathered during build configuration is stored (e.g.: downloaded dependencies).</returns>
+    /// <returns>
+    ///   The directory where transient data gathered during build configuration is stored (e.g.: downloaded
+    ///   dependencies).
+    /// </returns>
     public static string GetBuildConfigCacheDir(this IConfig buildConfiguration, Key project) {
       return buildConfiguration.Evaluate(BuildDirsKeys.BuildConfigCacheDir.In(project));
     }
@@ -49,9 +49,9 @@ namespace Bud.Plugins.Build {
     }
 
     /// <returns>
-    /// The directory where persistent data gathered during build configuration is stored (e.g.: locked version of downloaded dependencies).
-    /// 
-    /// This directoy should be committed to the VCS.
+    ///   The directory where persistent data gathered during build configuration is stored (e.g.: locked version of downloaded
+    ///   dependencies).
+    ///   This directoy should be committed to the VCS.
     /// </returns>
     public static string GetPersistentBuildConfigDir(this IConfig buildConfiguration, Key project) {
       return buildConfiguration.Evaluate(BuildDirsKeys.PersistentBuildConfigDir.In(project));
@@ -71,6 +71,4 @@ namespace Bud.Plugins.Build {
       return persistentConfigDir;
     }
   }
-
 }
-

@@ -1,6 +1,4 @@
-﻿using System;
-using Bud.Plugins.Build;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Bud.Plugins.CSharp {
@@ -12,6 +10,6 @@ namespace Bud.Plugins.CSharp {
     public static readonly ConfigKey<string> OutputAssemblyFile = new ConfigKey<string>("outputAssemblyFile");
     public static readonly TaskKey<IEnumerable<string>> SourceFiles = new TaskKey<IEnumerable<string>>("sourceFiles");
     public static readonly TaskKey<ImmutableList<string>> CollectReferencedAssemblies = new TaskKey<ImmutableList<string>>("collectReferencedAssemblies");
+    public static readonly TaskKey<Unit> Dist = new TaskKey<Unit>("dist");
   }
 }
-
