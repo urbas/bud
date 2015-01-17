@@ -31,14 +31,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
+      <HintPath>..\..\..\..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable">
-      <HintPath>..\packages\Microsoft.Bcl.Immutable.1.0.34\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+      <HintPath>..\..\..\..\packages\Microsoft.Bcl.Immutable.1.0.34\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.7\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\..\..\packages\Newtonsoft.Json.6.0.7\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -55,15 +55,15 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <ProjectReference Include="..\Core\src\main\cs\Core.csproj">
+    <ProjectReference Include="..\..\..\..\Core\src\main\cs\Core.csproj">
       <Project>{776511D9-AEE0-4A7B-9B5F-4BC8FE0CD1C9}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\bud\Bud.csproj">
+    <ProjectReference Include="..\..\..\..\bud\Bud.csproj">
       <Project>{E4279B6D-1472-472A-8D5A-313CCDC9A9CD}</Project>
       <Name>Bud</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Test\src\main\cs\Test.csproj">
+    <ProjectReference Include="..\..\..\..\Test\src\main\cs\Test.csproj">
       <Project>{014E010C-E4C3-40A3-9AEE-0ECAB1C38F38}</Project>
       <Name>Test</Name>
     </ProjectReference>
@@ -72,8 +72,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="testProjects\BuildConfigurationProject\.bud\" />
-    <Folder Include="testProjects\InterProjectDependencies\.bud\bud\" />
+    <Folder Include="..\budProjects\BuildConfigurationProject" />
+    <Folder Include="..\budProjects\InterProjectDependencies" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
