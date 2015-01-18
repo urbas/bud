@@ -19,4 +19,5 @@ packages/
 # Bud Build
 .bud/global/nuGetRepository
 .bud/global/output
+**/.bud/output/
 .bud/Build.dll
