@@ -8,7 +8,7 @@ using Bud.Plugins.Build;
 
 namespace Bud.Plugins.Deps {
   public static class Dependencies {
-    public const string FetchedPackagesFileName = "nuGetPackages";
+    public const string FetchedPackagesFileName = "nuGetPackages.json";
 
     public static IPlugin AddDependency(InternalDependency internalDependency,
                                         ExternalDependency fallbackExternalDependency,
