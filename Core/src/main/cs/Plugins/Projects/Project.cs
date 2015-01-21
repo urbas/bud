@@ -1,15 +1,7 @@
-using System.IO;
-using System.Linq;
 using System.Collections.Immutable;
-using System.Collections.Generic;
-using Bud.Plugins.Build;
-using Bud.Plugins.Deps;
-using System.Threading.Tasks;
 
 namespace Bud.Plugins.Projects {
-
   public static class Project {
-
     public static Settings AddProject(this Settings build, string id, string baseDir, IPlugin plugin = null) {
       var projectKey = ProjectKey(id);
       return build
@@ -28,6 +20,4 @@ namespace Bud.Plugins.Projects {
       return GetAllProjects(context)[id];
     }
   }
-
 }
-
