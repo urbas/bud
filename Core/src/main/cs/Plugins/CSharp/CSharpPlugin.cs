@@ -11,11 +11,13 @@ namespace Bud.Plugins.CSharp {
     }
 
     public Settings ApplyTo(Settings settings, Key project) {
-      var mainBuildTarget = settings.Apply(project, new CSharpBuildPlugin(BuildKeys.Main));
+      var mainBuildTarget = settings.Apply(project, new CSharpBuildTargetPlugin(BuildKeys.Main));
       if (addTestBuildTarget) {
-        return mainBuildTarget.Apply(project, new CSharpBuildPlugin(BuildKeys.Test,
-            Dependencies.AddDependency(new InternalDependency(CSharp.MainBuildTargetKey(project), CSharp.MainBuildTaskKey(project))),
-            CSharpBuildPlugin.ConvertBuildTargetToDll));
+        return mainBuildTarget.Apply(
+          project,
+          new CSharpBuildTargetPlugin(BuildKeys.Test,
+                                Dependencies.AddDependency(new InternalDependency(CSharp.MainBuildTargetKey(project), CSharp.MainBuildTaskKey(project))),
+                                CSharpBuildTargetPlugin.ConvertBuildTargetToDll));
       }
       return mainBuildTarget;
     }

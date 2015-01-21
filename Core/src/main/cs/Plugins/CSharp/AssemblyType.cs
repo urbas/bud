@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Bud {
+﻿namespace Bud {
   public enum AssemblyType {
     Exe,
     Library,
@@ -8,4 +6,3 @@ namespace Bud {
     Module
   }
 }
-

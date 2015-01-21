@@ -12,7 +12,7 @@ public class Build : IBuild {
         CSharp.Dependency("Microsoft.Bcl.Immutable"),
         CSharp.Dependency("Newtonsoft.Json"),
         CSharp.Dependency("NuGet.Core"),
-        CSharp.Dependency("NUnit", "2.6.4", target: "test")
+        CSharp.Dependency("NUnit", "2.6.4", scope: "test")
       )
       .DllProject("Bud.Test", Path.Combine(baseDir, "Test"),
         CSharp.Dependency("Bud.Core"),

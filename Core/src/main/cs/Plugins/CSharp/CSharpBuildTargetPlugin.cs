@@ -7,18 +7,20 @@ using System.Threading.Tasks;
 using Bud.Plugins.Build;
 using Bud.Plugins.CSharp.Compiler;
 using Bud.Plugins.Deps;
+using Bud.Util;
 using NuGet;
 
 namespace Bud.Plugins.CSharp {
-  public class CSharpBuildPlugin : BuildPlugin {
+  public class CSharpBuildTargetPlugin : BuildTargetPlugin {
     public static readonly IPlugin ConvertBuildTargetToDll = PluginUtils.Create((existingSettings, buildTarget) => existingSettings.Modify(CSharpKeys.AssemblyType.In(buildTarget), assemblyType => AssemblyType.Library));
 
-    public CSharpBuildPlugin(Key scope, params IPlugin[] plugins) : base(scope, CSharpKeys.CSharp, plugins) {}
+    public CSharpBuildTargetPlugin(Key scope, params IPlugin[] plugins) : base(scope, CSharpKeys.CSharp, plugins) {}
 
     protected override Settings ApplyTo(Settings existingsettings, Key buildTarget, Key project) {
       return existingsettings
         .Apply(buildTarget, DependenciesPlugin.Instance)
         .Init(CSharpKeys.SourceFiles.In(buildTarget), context => FindSources(context, buildTarget))
+        .Init(CSharpKeys.TargetFramework.In(buildTarget), Framework.Net45)
         .Init(CSharpKeys.AssemblyType.In(buildTarget), AssemblyType.Exe)
         .Init(CSharpKeys.CollectReferencedAssemblies.In(buildTarget), context => CollectAssembliesFromDependencies(context, buildTarget))
         .Init(CSharpKeys.OutputAssemblyDir.In(buildTarget), context => Path.Combine(context.GetOutputDir(buildTarget), "debug", "bin"))
@@ -31,7 +33,7 @@ namespace Bud.Plugins.CSharp {
       if (BuildKeys.Main.Equals(scope)) {
         return project.Id;
       }
-      return project.Id + "." + Bud.Util.StringUtils.Capitalize(scope.Id);
+      return project.Id + "." + StringUtils.Capitalize(scope.Id);
     }
 
     protected override Task<Unit> InvokeCompilerTaskImpl(IContext context, Key buildKey) {
@@ -99,6 +101,7 @@ namespace Bud.Plugins.CSharp {
     }
 
     private async Task<Unit> CreateDistributablePackage(IContext context, Key buildTarget) {
+      await context.Evaluate(BuildKeys.Build.In(buildTarget));
       var referencedAssemblies = await context.CollectCSharpReferencedAssemblies(buildTarget);
       var targetDir = Path.Combine(context.GetOutputDir(buildTarget), "dist");
       Directory.CreateDirectory(targetDir);
@@ -110,7 +113,7 @@ namespace Bud.Plugins.CSharp {
     }
 
     private static void CopyFile(string referencedAssembly, string targetDir) {
-      File.Copy(referencedAssembly, Path.Combine(targetDir, Path.GetFileName(referencedAssembly)));
+      File.Copy(referencedAssembly, Path.Combine(targetDir, Path.GetFileName(referencedAssembly)), true);
     }
   }
 }

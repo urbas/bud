@@ -1,18 +1,16 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Bud.Util;
 
 namespace Bud.Plugins.Build {
-  public abstract class BuildPlugin : IPlugin {
+  public abstract class BuildTargetPlugin : IPlugin {
     protected readonly Key Scope;
     protected readonly Key Language;
     private readonly IEnumerable<IPlugin> plugins;
 
-    protected BuildPlugin(Key scope, Key language, IEnumerable<IPlugin> plugins) {
+    protected BuildTargetPlugin(Key scope, Key language, IEnumerable<IPlugin> plugins) {
       Scope = scope;
       Language = language;
       this.plugins = plugins ?? ImmutableList<IPlugin>.Empty;
