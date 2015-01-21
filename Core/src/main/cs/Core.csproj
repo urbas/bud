@@ -48,10 +48,9 @@
   <ItemGroup>
     <Compile Include="ConfigKey.cs" />
     <Compile Include="IO\Paths.cs" />
-    <Compile Include="Plugins\CSharp\CSharpPluginConfig.cs" />
-    <Compile Include="Plugins\CSharp\CSharpPluginSettings.cs" />
+    <Compile Include="Plugins\CSharp\CSharpConfig.cs" />
+    <Compile Include="Plugins\CSharp\CSharpSettings.cs" />
     <Compile Include="Plugins\CSharp\Framework.cs" />
-    <Compile Include="Plugins\CSharp\StringUtils.cs" />
     <Compile Include="Plugins\Deps\AssemblyRereference.cs" />
     <Compile Include="Plugins\Deps\Package.cs" />
     <Compile Include="Plugins\Deps\PackageInfo.cs" />
@@ -59,6 +58,7 @@
     <Compile Include="Settings.cs" />
     <Compile Include="TaskKey.cs" />
     <Compile Include="Unit.cs" />
+    <Compile Include="Util\StringUtils.cs" />
     <Compile Include="Util\TaskUtils.cs" />
     <Compile Include="IPlugin.cs" />
     <Compile Include="SettingsTransformPlugin.cs" />

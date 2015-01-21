@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Bud.Plugins.Build;
 
 namespace Bud.Plugins.CSharp {
-  public static class CSharpPluginConfig {
+  public static class CSharpConfig {
     public static Task<IEnumerable<string>> GetCSharpSources(this IContext context, Key project) {
       return context.Evaluate(CSharpKeys.SourceFiles.In(project));
     }

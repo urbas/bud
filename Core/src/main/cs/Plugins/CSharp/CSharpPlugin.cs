@@ -16,7 +16,7 @@ namespace Bud.Plugins.CSharp {
         return mainBuildTarget.Apply(
           project,
           new CSharpBuildTargetPlugin(BuildKeys.Test,
-                                Dependencies.AddDependency(new InternalDependency(CSharp.MainBuildTargetKey(project), CSharp.MainBuildTaskKey(project))),
+                                Dependencies.AddDependency(new InternalDependency(CSharpBuildTargetPlugin.MainBuildTargetKey(project), CSharpBuildTargetPlugin.MainBuildTaskKey(project))),
                                 CSharpBuildTargetPlugin.ConvertBuildTargetToDll));
       }
       return mainBuildTarget;

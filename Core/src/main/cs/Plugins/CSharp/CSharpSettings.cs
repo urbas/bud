@@ -2,7 +2,7 @@ using Bud.Plugins.Build;
 using Bud.Plugins.Projects;
 
 namespace Bud.Plugins.CSharp {
-  public static class CSharpPluginSettings {
+  public static class CSharpSettings {
     public static readonly IPlugin MainBuildTargetToDll = BuildUtils.ApplyToBuildTarget(BuildKeys.Main, CSharpKeys.CSharp, CSharpBuildTargetPlugin.ConvertBuildTargetToDll);
 
     public static Settings DllProjectWithoutTests(this Settings build, string id, string baseDir, params IPlugin[] plugins) {

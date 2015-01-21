@@ -26,7 +26,7 @@ namespace Bud.Plugins.CSharp {
         .Init(CSharpKeys.OutputAssemblyDir.In(buildTarget), context => Path.Combine(context.GetOutputDir(buildTarget), "debug", "bin"))
         .Init(CSharpKeys.OutputAssemblyName.In(buildTarget), context => OutputAssemblyName(project, Scope))
         .Init(CSharpKeys.Dist.In(buildTarget), context => CreateDistributablePackage(context, buildTarget))
-        .Init(CSharpKeys.OutputAssemblyFile.In(buildTarget), context => Path.Combine(context.GetCSharpOutputAssemblyDir(buildTarget), string.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(buildTarget), GetAssemblyFileExtension(context, buildTarget))));
+        .Init(CSharpKeys.OutputAssemblyFile.In(buildTarget), context => Path.Combine(context.GetCSharpOutputAssemblyDir(buildTarget), String.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(buildTarget), GetAssemblyFileExtension(context, buildTarget))));
     }
 
     private static string OutputAssemblyName(Key project, Key scope) {
@@ -114,6 +114,14 @@ namespace Bud.Plugins.CSharp {
 
     private static void CopyFile(string referencedAssembly, string targetDir) {
       File.Copy(referencedAssembly, Path.Combine(targetDir, Path.GetFileName(referencedAssembly)), true);
+    }
+
+    public static Key MainBuildTargetKey(Key project) {
+      return BuildUtils.BuildTargetKey(project, BuildKeys.Main, CSharpKeys.CSharp);
+    }
+
+    public static TaskKey<Unit> MainBuildTaskKey(Key projectKey) {
+      return BuildUtils.BuildTaskKey(projectKey, BuildKeys.Main, CSharpKeys.CSharp);
     }
   }
 }
