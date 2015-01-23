@@ -1,7 +1,5 @@
-# Build
+# MsBuild
 bud.userprefs
-bin/
-obj/
 
 # MonoDevelop
 test-results/

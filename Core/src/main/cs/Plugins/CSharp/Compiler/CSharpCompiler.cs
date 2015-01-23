@@ -24,6 +24,7 @@ namespace Bud.Plugins.CSharp.Compiler {
           }
           compilerProcess = compilerProcess.AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(buildKey)));
           compilerProcess = compilerProcess.AddArguments(sourceFiles);
+          Console.WriteLine(compilerProcess.ExecutablePath + " " + compilerProcess.Arguments);
           var exitCode = compilerProcess.Start(Console.Out, Console.Error);
           if (exitCode != 0) {
             throw new Exception("Compilation failed.");

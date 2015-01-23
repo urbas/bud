@@ -16,8 +16,8 @@ namespace Bud {
     public Settings() : this(ImmutableList<ConfigDefinitionConstructor>.Empty, ImmutableList<TaskDefinitionConstructor>.Empty) {}
 
     public Settings(ImmutableList<ConfigDefinitionConstructor> configConstructors, ImmutableList<TaskDefinitionConstructor> taskConstructors) {
-      this.ConfigConstructors = configConstructors;
-      this.TaskConstructors = taskConstructors;
+      ConfigConstructors = configConstructors;
+      TaskConstructors = taskConstructors;
     }
 
     public Settings Add(ConfigDefinitionConstructor configConstructor) {
