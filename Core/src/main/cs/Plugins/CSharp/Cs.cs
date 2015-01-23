@@ -30,13 +30,9 @@ namespace Bud.Plugins.CSharp {
     }
 
     private static Settings AddMainBuildTargetAsDependency(Settings settings, Key buildTarget) {
-      var mainBuildTarget = CSharpBuildTargetPlugin.ToMainBuildTarget(buildTarget);
-      var mainBuildTask = CSharpBuildTargetPlugin.ToMainBuildTask(buildTarget);
+      var mainBuildTarget = CSharpBuildTargetPlugin.FindSiblingMainBuildTarget(buildTarget);
+      var mainBuildTask = CSharpBuildTargetPlugin.FindSiblingMainBuildTask(buildTarget);
       return settings.AddDependency(buildTarget, new InternalDependency(mainBuildTarget, mainBuildTask), config => IsMainBuildTargetDefined(config, mainBuildTarget));
-    }
-
-    public static IPlugin TargetFramework(Framework framework, string scope = null) {
-      return ApplyTo(scope, (settings, buildTarget) => settings.Modify(CSharpKeys.TargetFramework.In(buildTarget), config => framework));
     }
 
     private static IPlugin ApplyTo(string scope, SettingsTransform settingsTransform) {

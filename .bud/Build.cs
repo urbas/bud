@@ -13,14 +13,14 @@ public class Build : IBuild {
         Cs.Dependency("Microsoft.Bcl.Immutable"),
         Cs.Dependency("Newtonsoft.Json"),
         Cs.Dependency("NuGet.Core")
-      ), CSharp.Test(
+      ), Cs.Test(
         Cs.Dependency("NUnit", "2.6.4")
       ))
       .Project("Bud.Test", Path.Combine(baseDir, "Test"), Cs.Dll(
         Cs.Dependency("Bud.Core"),
         Cs.Dependency("NUnit", "2.6.4")
       ))
-      .Project("Bud.SystemTests", Path.Combine(baseDir, "SystemTests"), CSharp.Test(
+      .Project("Bud.SystemTests", Path.Combine(baseDir, "SystemTests"), Cs.Test(
         Cs.Dependency("Bud.Test")
       ));
   }

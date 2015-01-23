@@ -22,14 +22,13 @@ namespace Bud.Plugins.BuildLoading {
     public Settings ApplyTo(Settings settings, Key project) {
       var buildTarget = BuildUtils.BuildTargetKey(project, BuildKeys.Main, CSharpKeys.CSharp);
       return settings
-        .Apply(project, CSharpPlugin.Instance)
+        .Apply(project, Cs.Dll())
         .Init(BuildLoadingKeys.CreateBuildCommander.In(project), context => CreateBuildCommander(context, buildTarget))
         .Init(BuildLoadingKeys.BuildConfigSourceFile.In(buildTarget), context => Path.Combine(context.GetBaseDir(), "Build.cs"))
         .Init(BuildLoadingKeys.DirOfProjectToBeBuilt.In(buildTarget), dirOfProjectToBeBuilt)
         .Modify(CSharpKeys.SourceFiles.In(buildTarget), (context, previousTask) => AddBuildDefinitionSourceFile(context, previousTask, buildTarget))
         .Modify(CSharpKeys.OutputAssemblyDir.In(buildTarget), (context, previousValue) => context.GetBaseDir())
         .Modify(CSharpKeys.OutputAssemblyName.In(buildTarget), (context, previousValue) => "Build")
-        .Apply(buildTarget, CSharpBuildTargetPlugin.ConvertBuildTargetToDll)
         .Modify(CSharpKeys.CollectReferencedAssemblies.In(buildTarget), async (context, assemblies) => (await assemblies()).AddRange(BudAssemblies.GetBudAssembliesLocations()));
     }
 
