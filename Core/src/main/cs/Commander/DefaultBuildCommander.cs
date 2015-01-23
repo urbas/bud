@@ -1,6 +1,7 @@
-using Bud.Plugins.CSharp;
 using System.IO;
 using Bud.Plugins.Build;
+using Bud.Plugins.CSharp;
+using Bud.Plugins.Projects;
 
 namespace Bud.Commander {
   public class DefaultBuildCommander : IBuildCommander {
@@ -8,7 +9,8 @@ namespace Bud.Commander {
     private readonly Config config;
 
     public DefaultBuildCommander(string dirOfProjectToBeBuilt) {
-      settings = GlobalBuild.New(dirOfProjectToBeBuilt).ExeProject(Path.GetFileName(dirOfProjectToBeBuilt), dirOfProjectToBeBuilt);
+      settings = GlobalBuild.New(dirOfProjectToBeBuilt)
+                            .Project(Path.GetFileName(dirOfProjectToBeBuilt), dirOfProjectToBeBuilt, Cs.Exe(), Cs.Test());
       config = new Config(settings.ConfigDefinitions);
     }
 
@@ -17,8 +19,6 @@ namespace Bud.Commander {
       return CommandEvaluator.EvaluateSynchronously(context, command);
     }
 
-    public void Dispose() {
-    }
-
+    public void Dispose() {}
   }
 }

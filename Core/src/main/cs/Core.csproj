@@ -51,7 +51,6 @@
     <Compile Include="ConfigKey.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="Plugins\CSharp\CSharpConfig.cs" />
-    <Compile Include="Plugins\CSharp\CSharpSettings.cs" />
     <Compile Include="Plugins\CSharp\Framework.cs" />
     <Compile Include="Plugins\Deps\AssemblyRereference.cs" />
     <Compile Include="Plugins\Deps\Package.cs" />
@@ -97,7 +96,6 @@
     <Compile Include="Plugins\BuildLoading\BuildLoading.cs" />
     <Compile Include="Plugins\CSharp\Cs.cs" />
     <Compile Include="Plugins\CSharp\CSharpKeys.cs" />
-    <Compile Include="Plugins\CSharp\CSharpPlugin.cs" />
     <Compile Include="Plugins\CSharp\Compiler\CSharpCompiler.cs" />
     <Compile Include="Plugins\BuildLoading\BuildLoadingKeys.cs" />
     <Compile Include="Plugins\BuildLoading\BuildLoadingPlugin.cs" />

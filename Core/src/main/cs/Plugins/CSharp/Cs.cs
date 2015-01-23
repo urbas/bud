@@ -13,10 +13,6 @@ namespace Bud.Plugins.CSharp {
         shouldUseInternalDependency: context => IsMainBuildTargetDefined(context, dependencyBuildTargetKey));
     }
 
-    private static bool IsMainBuildTargetDefined(IConfig context, Key dependencyBuildTargetKey) {
-      return context.IsConfigDefined(CSharpKeys.OutputAssemblyFile.In(dependencyBuildTargetKey));
-    }
-
     public static IPlugin Exe(params IPlugin[] plugins) {
       return new CSharpBuildTargetPlugin(BuildKeys.Main, plugins);
     }
@@ -35,16 +31,8 @@ namespace Bud.Plugins.CSharp {
       return settings.AddDependency(buildTarget, new InternalDependency(mainBuildTarget, mainBuildTask), config => IsMainBuildTargetDefined(config, mainBuildTarget));
     }
 
-    private static IPlugin ApplyTo(string scope, SettingsTransform settingsTransform) {
-      return ApplyTo(scope, PluginUtils.Create(settingsTransform));
-    }
-
-    private static IPlugin ApplyTo(string scope, IPlugin addDependency) {
-      return PluginUtils.ApplyToSubKey(GetBuildTargetOrMain(scope), addDependency);
-    }
-
-    private static Key GetBuildTargetOrMain(string target) {
-      return CSharpKeys.CSharp.In(target == null ? BuildKeys.Main : Key.Parse(target));
+    private static bool IsMainBuildTargetDefined(IConfig context, Key dependencyBuildTargetKey) {
+      return context.IsConfigDefined(CSharpKeys.OutputAssemblyFile.In(dependencyBuildTargetKey));
     }
   }
 }
