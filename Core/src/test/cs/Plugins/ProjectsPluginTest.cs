@@ -24,7 +24,7 @@ namespace Bud {
     }
 
     private IContext CreateFakeProject() {
-      return Context.FromSettings(GlobalBuild.New().AddProject("foo", "./fooDir"));
+      return Context.FromSettings(GlobalBuild.New().Project("foo", "./fooDir"));
     }
 
   }

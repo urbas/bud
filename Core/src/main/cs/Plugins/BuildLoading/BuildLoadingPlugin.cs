@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using Bud.Plugins;
 using System.Collections.Immutable;
-using Bud.Plugins.Projects;
 using Bud.Plugins.CSharp;
 using Bud.Plugins.Build;
 using System.IO;

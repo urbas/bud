@@ -116,6 +116,10 @@ namespace Bud.Plugins.CSharp {
       File.Copy(referencedAssembly, Path.Combine(targetDir, Path.GetFileName(referencedAssembly)), true);
     }
 
+    public static Key ToMainBuildTarget(Key buildTarget) {
+      return BuildUtils.BuildTargetKey(buildTarget.Parent.Parent, BuildKeys.Main, CSharpKeys.CSharp);
+    }
+
     public static Key MainBuildTargetKey(Key project) {
       return BuildUtils.BuildTargetKey(project, BuildKeys.Main, CSharpKeys.CSharp);
     }
@@ -123,5 +127,9 @@ namespace Bud.Plugins.CSharp {
     public static TaskKey<Unit> MainBuildTaskKey(Key projectKey) {
       return BuildUtils.BuildTaskKey(projectKey, BuildKeys.Main, CSharpKeys.CSharp);
     }
+
+    public static TaskKey<Unit> ToMainBuildTask(Key buildTarget) {
+      return MainBuildTaskKey(buildTarget.Parent.Parent);
+   }
   }
 }

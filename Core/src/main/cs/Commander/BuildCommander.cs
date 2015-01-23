@@ -10,7 +10,7 @@ namespace Bud.Commander {
       const string buildProjectId = "BuildDefinition";
       var buildProject = GlobalBuild.New(buildProjectDir).BuildProject(buildProjectId, buildProjectDir, path);
       var evaluationContext = Context.FromSettings(buildProject);
-      var buildCommanderTask = evaluationContext.CreateBuildCommander(Project.ProjectKey(buildProjectId));
+      var buildCommanderTask = evaluationContext.CreateBuildCommander(ProjectsSettings.ProjectKey(buildProjectId));
       buildCommanderTask.Wait();
       return buildCommanderTask.Result;
     }

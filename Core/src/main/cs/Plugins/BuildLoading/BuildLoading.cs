@@ -1,12 +1,13 @@
 using System.Threading.Tasks;
 using Bud.Commander;
 using Bud.Plugins.CSharp;
+using Bud.Plugins.Projects;
 
 namespace Bud.Plugins.BuildLoading {
   public static class BuildLoading {
     public static Settings BuildProject(this Settings build, string projectId, string budDir, string dirOfProjectToBeBuilt) {
       return build
-        .DllProjectWithoutTests(projectId, budDir, new BuildLoadingPlugin(dirOfProjectToBeBuilt));
+        .Project(projectId, budDir, Cs.Dll(), new BuildLoadingPlugin(dirOfProjectToBeBuilt));
     }
 
     public static string GetBuildConfigSourceFile(this IContext context, Key buildLoadingProject) {

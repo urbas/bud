@@ -13,7 +13,7 @@ namespace Bud.Commander {
       Console.SetError(standardErrorTextWriter);
       var assembly = AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(buildConfigurationAssemblyFile));
       var build = (IBuild) assembly.CreateInstance("Build");
-      settings = build.SetUp(GlobalBuild.New(baseDirectory), baseDirectory);
+      settings = build.Setup(GlobalBuild.New(baseDirectory), baseDirectory);
       config = new Config(settings.ConfigDefinitions);
     }
 

@@ -57,6 +57,7 @@
     <Compile Include="Plugins\Deps\Package.cs" />
     <Compile Include="Plugins\Deps\PackageInfo.cs" />
     <Compile Include="Plugins\Deps\PackageVersions.cs" />
+    <Compile Include="Plugins\Projects\ProjectsConfig.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TaskKey.cs" />
     <Compile Include="Unit.cs" />
@@ -84,7 +85,7 @@
     <Compile Include="IO\Directories.cs" />
     <Compile Include="Cli\ProcessBuilder.cs" />
     <Compile Include="IO\TemporaryDirectory.cs" />
-    <Compile Include="Plugins\Projects\Project.cs" />
+    <Compile Include="Plugins\Projects\ProjectsSettings.cs" />
     <Compile Include="Plugins\Projects\ProjectKeys.cs" />
     <Compile Include="Plugins\Projects\ProjectsPlugin.cs" />
     <Compile Include="Plugins\Build\BuildTargetPlugin.cs" />
@@ -94,7 +95,7 @@
     <Compile Include="Plugins\Build\BuildKeys.cs" />
     <Compile Include="Plugins\Deps\DependenciesKeys.cs" />
     <Compile Include="Plugins\BuildLoading\BuildLoading.cs" />
-    <Compile Include="Plugins\CSharp\CSharp.cs" />
+    <Compile Include="Plugins\CSharp\Cs.cs" />
     <Compile Include="Plugins\CSharp\CSharpKeys.cs" />
     <Compile Include="Plugins\CSharp\CSharpPlugin.cs" />
     <Compile Include="Plugins\CSharp\Compiler\CSharpCompiler.cs" />

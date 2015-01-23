@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Bud.Plugins.Build;
 using Bud.Test.Assertions;
 using Bud.Test.Util;

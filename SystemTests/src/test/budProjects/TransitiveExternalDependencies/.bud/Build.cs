@@ -1,11 +1,11 @@
 using Bud;
 using Bud.Plugins.CSharp;
+using Bud.Plugins.Projects;
 using System.IO;
-using System;
 
 public class Build : IBuild {
-  public Settings SetUp(Settings settings, string baseDir) {
+  public Settings Setup(Settings settings, string baseDir) {
     return settings
-      .DllProject("A", baseDir, CSharp.Dependency("Urbas.Example.Bar", "1.0.1"));
+      .Project("A", baseDir, Cs.Dll(Cs.Dependency("Urbas.Example.Bar", "1.0.1")));
   }
 }

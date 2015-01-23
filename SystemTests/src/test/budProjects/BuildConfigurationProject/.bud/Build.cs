@@ -4,9 +4,11 @@ using Bud.Plugins.Projects;
 using System.IO;
 
 public class Build : IBuild {
-  public Settings SetUp(Settings settings, string baseDir) {
+  public Settings Setup(Settings settings, string baseDir) {
     return settings
-      .ExeProject("Foo", Path.Combine(baseDir, "Foo"))
-      .ExeProject("Bar", Path.Combine(baseDir, "Bar"), CSharp.Dependency("Foo"));
+      .Project("Foo", Path.Combine(baseDir, "Foo"), Cs.Exe())
+      .Project("Bar", Path.Combine(baseDir, "Bar"), Cs.Exe(
+        Cs.Dependency("Foo")
+      ));
   }
 }

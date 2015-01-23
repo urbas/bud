@@ -1,13 +1,12 @@
 using Bud;
-using Bud.Plugins.Projects;
 using Bud.Plugins.CSharp;
+using Bud.Plugins.Projects;
 using System.IO;
-using System;
 
 public class Build : IBuild {
-  public Settings SetUp(Settings settings, string baseDir) {
+  public Settings Setup(Settings settings, string baseDir) {
     return settings
-      .DllProject("A", Path.Combine(baseDir, "A"))
-      .ExeProject("B", Path.Combine(baseDir, "B"), CSharp.Dependency("A"));
+      .Project("A", Path.Combine(baseDir, "A"), Cs.Dll())
+      .Project("B", Path.Combine(baseDir, "B"), Cs.Exe(Cs.Dependency("A")));
   }
 }

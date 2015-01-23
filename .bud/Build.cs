@@ -1,25 +1,27 @@
 using Bud;
 using Bud.Plugins.CSharp;
+using Bud.Plugins.Projects;
 using System.IO;
 
 public class Build : IBuild {
-  public Settings SetUp(Settings settings, string baseDir) {
+  public Settings Setup(Settings settings, string baseDir) {
     return settings
-      .ExeProject("bud", Path.Combine(baseDir, "bud"),
-        CSharp.Dependency("Bud.Core")
-      )
-      .DllProject("Bud.Core", Path.Combine(baseDir, "Core"),
-        CSharp.Dependency("Microsoft.Bcl.Immutable"),
-        CSharp.Dependency("Newtonsoft.Json"),
-        CSharp.Dependency("NuGet.Core"),
-        CSharp.Dependency("NUnit", "2.6.4", scope: "test")
-      )
-      .DllProject("Bud.Test", Path.Combine(baseDir, "Test"),
-        CSharp.Dependency("Bud.Core"),
-        CSharp.Dependency("NUnit", "2.6.4")
-      )
-      .DllProject("Bud.SystemTests", Path.Combine(baseDir, "SystemTests"),
-        CSharp.Dependency("Bud.Test")
-      );
+      .Project("bud", Path.Combine(baseDir, "bud"), Cs.Exe(
+        Cs.Dependency("Bud.Core")
+      ))
+      .Project("Bud.Core", Path.Combine(baseDir, "Core"), Cs.Dll(
+        Cs.Dependency("Microsoft.Bcl.Immutable"),
+        Cs.Dependency("Newtonsoft.Json"),
+        Cs.Dependency("NuGet.Core")
+      ), CSharp.Test(
+        Cs.Dependency("NUnit", "2.6.4")
+      ))
+      .Project("Bud.Test", Path.Combine(baseDir, "Test"), Cs.Dll(
+        Cs.Dependency("Bud.Core"),
+        Cs.Dependency("NUnit", "2.6.4")
+      ))
+      .Project("Bud.SystemTests", Path.Combine(baseDir, "SystemTests"), CSharp.Test(
+        Cs.Dependency("Bud.Test")
+      ));
   }
 }
