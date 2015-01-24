@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Immutable;
-using System.IO;
-using System.Threading.Tasks;
+﻿using System.Collections.Immutable;
 using Bud.Plugins.Build;
 
 namespace Bud.Plugins.Projects {
-
   public class ProjectPlugin : IPlugin {
     private readonly string id;
     private readonly string baseDir;
@@ -17,10 +13,11 @@ namespace Bud.Plugins.Projects {
 
     public Settings ApplyTo(Settings settings, Key project) {
       return settings
-        .Init(ProjectKeys.Projects, ImmutableDictionary.Create<string, Key>())
         .Apply(project, new BuildDirsPlugin(baseDir))
-        .Modify(ProjectKeys.Projects, allProjects => allProjects.Add(id, project));
+        .In(Key.Global,
+            ProjectKeys.Projects.Init(ImmutableDictionary<string, Key>.Empty),
+            ProjectKeys.Projects.Modify(allProjects => allProjects.Add(id, project))
+        );
     }
   }
 }
-
