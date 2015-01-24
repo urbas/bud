@@ -23,13 +23,17 @@ namespace Bud.Plugins.BuildLoading {
       var buildTarget = BuildUtils.BuildTargetKey(project, BuildKeys.Main, CSharpKeys.CSharp);
       return settings
         .Apply(project, Cs.Dll())
-        .Init(BuildLoadingKeys.CreateBuildCommander.In(project), context => CreateBuildCommander(context, buildTarget))
-        .Init(BuildLoadingKeys.BuildConfigSourceFile.In(buildTarget), context => Path.Combine(context.GetBaseDir(), "Build.cs"))
-        .Init(BuildLoadingKeys.DirOfProjectToBeBuilt.In(buildTarget), dirOfProjectToBeBuilt)
-        .Modify(CSharpKeys.SourceFiles.In(buildTarget), (context, previousTask) => AddBuildDefinitionSourceFile(context, previousTask, buildTarget))
-        .Modify(CSharpKeys.OutputAssemblyDir.In(buildTarget), (context, previousValue) => context.GetBaseDir())
-        .Modify(CSharpKeys.OutputAssemblyName.In(buildTarget), (context, previousValue) => "Build")
-        .Modify(CSharpKeys.CollectReferencedAssemblies.In(buildTarget), async (context, assemblies) => (await assemblies()).AddRange(BudAssemblies.GetBudAssembliesLocations()));
+        .In(project,
+            BuildLoadingKeys.CreateBuildCommander.Init(context => CreateBuildCommander(context, buildTarget))
+        )
+        .In(buildTarget,
+            BuildLoadingKeys.BuildConfigSourceFile.Init(context => Path.Combine(context.GetBaseDir(), "Build.cs")),
+            BuildLoadingKeys.DirOfProjectToBeBuilt.Init(dirOfProjectToBeBuilt),
+            CSharpKeys.SourceFiles.Modify(AddBuildDefinitionSourceFile),
+            CSharpKeys.OutputAssemblyDir.Modify(BuildDirs.GetBaseDir),
+            CSharpKeys.OutputAssemblyName.Modify("Build"),
+            CSharpKeys.CollectReferencedAssemblies.Modify(AddBudAssemblies)
+        );
     }
 
     public async Task<IBuildCommander> CreateBuildCommander(IContext context, Key key) {
@@ -47,6 +51,10 @@ namespace Bud.Plugins.BuildLoading {
     public async Task<IEnumerable<string>> AddBuildDefinitionSourceFile(IContext context, Func<Task<IEnumerable<string>>> previousSourcesTask, Key key) {
       var previousSources = await previousSourcesTask();
       return previousSources.Concat(new []{ context.GetBuildConfigSourceFile(key) });
+    }
+
+    private static async Task<ImmutableList<string>> AddBudAssemblies(IContext context, Func<Task<ImmutableList<string>>> existingAssemblies) {
+      return (await existingAssemblies()).AddRange(BudAssemblies.GetBudAssembliesLocations());
     }
   }
 

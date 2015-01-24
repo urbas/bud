@@ -19,14 +19,16 @@ namespace Bud.Plugins.CSharp {
     protected override Settings ApplyTo(Settings existingsettings, Key buildTarget, Key project) {
       return existingsettings
         .Apply(buildTarget, DependenciesPlugin.Instance)
-        .Init(CSharpKeys.SourceFiles.In(buildTarget), context => FindSources(context, buildTarget))
-        .Init(CSharpKeys.TargetFramework.In(buildTarget), Framework.Net45)
-        .Init(CSharpKeys.AssemblyType.In(buildTarget), AssemblyType.Exe)
-        .Init(CSharpKeys.CollectReferencedAssemblies.In(buildTarget), context => CollectAssembliesFromDependencies(context, buildTarget))
-        .Init(CSharpKeys.OutputAssemblyDir.In(buildTarget), context => Path.Combine(context.GetOutputDir(buildTarget), "debug", "bin"))
-        .Init(CSharpKeys.OutputAssemblyName.In(buildTarget), context => OutputAssemblyName(project, Scope))
-        .Init(CSharpKeys.Dist.In(buildTarget), context => CreateDistributablePackage(context, buildTarget))
-        .Init(CSharpKeys.OutputAssemblyFile.In(buildTarget), context => Path.Combine(context.GetCSharpOutputAssemblyDir(buildTarget), String.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(buildTarget), GetAssemblyFileExtension(context, buildTarget))));
+        .In(buildTarget,
+            CSharpKeys.SourceFiles.Init(FindSources),
+            CSharpKeys.TargetFramework.Init(Framework.Net45),
+            CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
+            CSharpKeys.CollectReferencedAssemblies.Init(CollectAssembliesFromDependencies),
+            CSharpKeys.OutputAssemblyDir.Init(context => Path.Combine(context.GetOutputDir(buildTarget), "debug", "bin")),
+            CSharpKeys.OutputAssemblyName.Init(context => OutputAssemblyName(project, Scope)),
+            CSharpKeys.Dist.Init(CreateDistributablePackage),
+            CSharpKeys.OutputAssemblyFile.Init(context => Path.Combine(context.GetCSharpOutputAssemblyDir(buildTarget), String.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(buildTarget), GetAssemblyFileExtension(context, buildTarget))))
+        );
     }
 
     private static string OutputAssemblyName(Key project, Key scope) {
@@ -40,7 +42,7 @@ namespace Bud.Plugins.CSharp {
       return CSharpCompiler.CompileProject(context, buildKey);
     }
 
-    private IEnumerable<string> FindSources(IContext context, Key buildTarget) {
+    private async Task<IEnumerable<string>> FindSources(IContext context, Key buildTarget) {
       var sourceDirectory = Path.Combine(context.GetBaseDir(buildTarget));
       if (Directory.Exists(sourceDirectory)) {
         return Directory.EnumerateFiles(sourceDirectory, "*.cs", SearchOption.AllDirectories);
@@ -130,6 +132,6 @@ namespace Bud.Plugins.CSharp {
 
     public static TaskKey<Unit> FindSiblingMainBuildTask(Key buildTarget) {
       return MainBuildTaskKey(buildTarget.Parent.Parent);
-   }
+    }
   }
 }

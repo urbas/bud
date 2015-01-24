@@ -27,8 +27,28 @@ namespace Bud {
       return settings => settings.Add(new InitializeConfig<T>(In(settings.Scope), configValue));
     }
 
+    public Func<Settings, Settings> Init(Func<IConfig, T> configValue) {
+      return settings => settings.Add(new InitializeConfig<T>(In(settings.Scope), configValue));
+    }
+
     public Func<Settings, Settings> Init(Func<IConfig, Key, T> configValue) {
       return settings => settings.Add(new InitializeConfig<T>(In(settings.Scope), ctxt => configValue(ctxt, settings.Scope)));
+    }
+
+    public Func<Settings, Settings> Modify(T newConfigValue) {
+      return settings => settings.Add(new ModifyConfig<T>(In(settings.Scope), (ctxt, oldValue) => newConfigValue));
+    }
+
+    public Func<Settings, Settings> Modify(Func<T, T> configValueMutation) {
+      return settings => settings.Add(new ModifyConfig<T>(In(settings.Scope), (ctxt, oldValue) => configValueMutation(oldValue)));
+    }
+
+    public Func<Settings, Settings> Modify(Func<IConfig, T> configValueMutation) {
+      return settings => settings.Add(new ModifyConfig<T>(In(settings.Scope), (ctxt, oldValue) => configValueMutation(ctxt)));
+    }
+
+    public Func<Settings, Settings> Modify(Func<IConfig, T, T> configValueMutation) {
+      return settings => settings.Add(new ModifyConfig<T>(In(settings.Scope), configValueMutation));
     }
   }
 }

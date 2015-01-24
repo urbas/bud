@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Bud.SettingsConstruction;
 
@@ -40,6 +41,14 @@ namespace Bud {
 
     public Func<Settings, Settings> Init(Func<IContext, Task<T>> taskDefinition) {
       return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), taskDefinition));
+    }
+
+    public Func<Settings, Settings> Init(Func<IContext, Key, Task<T>> taskDefinition) {
+      return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => taskDefinition(ctxt, settings.Scope)));
+    }
+
+    public Func<Settings, Settings> Modify(Func<IContext, Func<Task<T>>, Task<T>> taskDefinition) {
+      return settings => settings.Add(new ModifyTask<T>(In(settings.Scope), taskDefinition));
     }
 
     public Func<Settings, Settings> Modify(Func<IContext, Func<Task<T>>, Key, Task<T>> newTaskDefinition) {
