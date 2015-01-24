@@ -29,19 +29,21 @@ namespace Bud.Plugins.Deps {
     }
 
     public static Settings AddDependency(this Settings settings, Key dependent, InternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
-      var dependenciesKey = GetInternalDependenciesKey(dependent);
-      return settings
-        .Init(dependenciesKey, ImmutableList<InternalDependency>.Empty)
-        .Init(DependenciesKeys.ResolveInternalDependencies.In(dependenciesKey), context => ResolveInternalDependenciesImpl(context, dependent))
-        .Modify(dependenciesKey, (config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies);
+      return settings.In(dependent,
+          DependenciesKeys.InternalDependencies.Init(ImmutableList<InternalDependency>.Empty),
+          DependenciesKeys.InternalDependencies.Modify((config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies),
+          DependenciesKeys.ResolveInternalDependencies.In(DependenciesKeys.InternalDependencies).Init(context => ResolveInternalDependenciesImpl(context, dependent))
+        );
     }
 
     public static Settings AddDependency(this Settings settings, Key dependent, ExternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
-      var dependenciesKey = GetExternalDependenciesKey(dependent);
-      return settings
-        .Init(dependenciesKey, ImmutableList<ExternalDependency>.Empty)
-        .Modify(DependenciesKeys.ExternalDependenciesKeys, (context, oldValue) => oldValue.Add(dependenciesKey))
-        .Modify(dependenciesKey, (config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies);
+      return settings.In(dependent,
+          DependenciesKeys.ExternalDependencies.Init(ImmutableList<ExternalDependency>.Empty),
+          DependenciesKeys.ExternalDependencies.Modify((config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies),
+          DependenciesKeys.ResolveInternalDependencies.In(DependenciesKeys.ExternalDependencies).Init(context => ResolveInternalDependenciesImpl(context, dependent))
+        ).In(Key.Global,
+          DependenciesKeys.ExternalDependenciesKeys.Modify(oldValue => oldValue.Add(DependenciesKeys.ExternalDependencies.In(dependent)))
+        );
     }
 
     public static ImmutableList<InternalDependency> GetInternalDependencies(this IConfig config, Key dependent) {
@@ -100,7 +102,7 @@ namespace Bud.Plugins.Deps {
       return DependenciesKeys.ExternalDependencies.In(dependent);
     }
 
-    private static ImmutableList<ConfigKey<ImmutableList<ExternalDependency>>> GetKeysWithExternalDependencies(this IConfig context) {
+    private static ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>> GetKeysWithExternalDependencies(this IConfig context) {
       return context.Evaluate(DependenciesKeys.ExternalDependenciesKeys);
     }
   }

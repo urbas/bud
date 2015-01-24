@@ -1,8 +1,7 @@
-using System.Threading.Tasks;
 using NuGet;
 
 namespace Bud.Plugins.Deps {
-  public class ExternalDependency	{
+  public class ExternalDependency {
     public readonly string Id;
     public readonly SemanticVersion Version;
 
@@ -19,5 +18,5 @@ namespace Bud.Plugins.Deps {
       }
       return Id;
     }
-	}
+  }
 }
