@@ -63,14 +63,6 @@ namespace Bud {
       return plugins.Aggregate(this, (settings, plugin) => settings.Apply(scope, plugin));
     }
 
-    public Settings Modify<T>(ConfigKey<T> key, Func<T, T> modifier) {
-      return Add(new ModifyConfig<T>(key.In(Scope), (context, previousValue) => modifier(previousValue)));
-    }
-
-    public Settings Modify<T>(ConfigKey<T> key, Func<IConfig, T, T> modifier) {
-      return Add(new ModifyConfig<T>(key.In(Scope), (context, previousValue) => modifier(context, previousValue)));
-    }
-
     public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions {
       get {
         var configDefinitions = ImmutableDictionary.CreateBuilder<Key, IConfigDefinition>();

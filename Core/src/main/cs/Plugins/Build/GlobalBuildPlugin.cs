@@ -1,8 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace Bud.Plugins.Build {
-
   public class GlobalBuildPlugin : IPlugin {
     private readonly string baseDir;
 
@@ -13,8 +11,9 @@ namespace Bud.Plugins.Build {
     public Settings ApplyTo(Settings settings, Key project) {
       return settings
         .Apply(Key.Global, new BuildDirsPlugin(baseDir))
-        .Modify(BuildDirsKeys.BudDir, (ctxt, oldValue) => Path.Combine(ctxt.GetBaseDir(), BuildDirs.BudDirName, "global"));
+        .In(Key.Global,
+            BuildDirsKeys.BudDir.Modify(ctxt => Path.Combine(ctxt.GetBaseDir(), BuildDirs.BudDirName, "global"))
+        );
     }
   }
 }
-
