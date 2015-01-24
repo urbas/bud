@@ -39,6 +39,10 @@ namespace Bud {
       return new TaskKey<T>(Id, Concat(parent, Parent));
     }
 
+    public Func<Settings, Settings> Init(Func<Task<T>> taskDefinition) {
+      return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => taskDefinition()));
+    }
+
     public Func<Settings, Settings> Init(Func<IContext, Task<T>> taskDefinition) {
       return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), taskDefinition));
     }

@@ -25,8 +25,19 @@ namespace Bud {
     }
 
     public Settings In(Key newScope, params Func<Settings, Settings>[] settingsTransforms) {
-      var scopedSettings = In(newScope);
-      return settingsTransforms.Aggregate(scopedSettings, (oldSettings, settingsTransform) => settingsTransform(oldSettings)).In(Scope);
+      return In(newScope).Do(settingsTransforms).In(Scope);
+    }
+
+    public Settings Do(params Func<Settings, Settings>[] settingsTransformations) {
+      return settingsTransformations.Aggregate(this, (oldSettings, settingsTransform) => settingsTransform(oldSettings)).In(Scope);
+    }
+
+    public static Settings Create(params Func<Settings, Settings>[] settingTransformations) {
+      return Empty.Do(settingTransformations);
+    }
+
+    public static Settings Create(Key scope, params Func<Settings, Settings>[] settingTransformations) {
+      return Empty.In(scope, settingTransformations);
     }
 
     public Settings Add(ConfigDefinitionConstructor configConstructor) {
@@ -53,16 +64,8 @@ namespace Bud {
       return plugins.Aggregate(this, (settings, plugin) => settings.Apply(scope, plugin));
     }
 
-    public Settings Init<T>(ConfigKey<T> key, T initialValue) {
-      return Add(new InitializeConfig<T>(key.In(Scope), initialValue));
-    }
-
     public Settings Init<T>(ConfigKey<T> key, Func<IConfig, T> initialValue) {
       return Add(new InitializeConfig<T>(key.In(Scope), initialValue));
-    }
-
-    public Settings Init<T>(TaskKey<T> key, Func<IContext, T> initialValue) {
-      return Add(new InitializeTask<T>(key.In(Scope), context => Task.FromResult(initialValue(context))));
     }
 
     public Settings Init<T>(TaskKey<T> key, Func<IContext, Task<T>> task) {
@@ -75,10 +78,6 @@ namespace Bud {
 
     public Settings Modify<T>(ConfigKey<T> key, Func<IConfig, T, T> modifier) {
       return Add(new ModifyConfig<T>(key.In(Scope), (context, previousValue) => modifier(context, previousValue)));
-    }
-
-    public Settings Modify<T>(TaskKey<T> key, Func<IContext, Func<Task<T>>, Task<T>> modifier) {
-      return Add(new ModifyTask<T>(key.In(Scope), modifier));
     }
 
     public Settings AddDependencies(TaskKey key, params TaskKey[] dependencies) {
@@ -106,7 +105,7 @@ namespace Bud {
     }
 
     private Settings In(Key newScope) {
-      return new Settings(ConfigConstructors, TaskConstructors, newScope);
+      return newScope.Equals(Scope) ? this : new Settings(ConfigConstructors, TaskConstructors, newScope);
     }
   }
 }
