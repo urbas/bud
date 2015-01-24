@@ -1,8 +1,5 @@
-﻿using System;
-
-namespace Bud {
+﻿namespace Bud {
   public interface IPlugin {
     Settings ApplyTo(Settings settings, Key project);
   }
 }
-

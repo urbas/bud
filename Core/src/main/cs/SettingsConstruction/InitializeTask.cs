@@ -18,5 +18,19 @@ namespace Bud.SettingsConstruction {
       }
     }
   }
+
+  public class InitializeTask : TaskDefinitionConstructor {
+    public Func<IContext, Task> TaskDefinition;
+
+    public InitializeTask(TaskKey key, Func<IContext, Task> taskDefinition) : base(key) {
+      TaskDefinition = taskDefinition;
+    }
+
+    public override void ApplyTo(ImmutableDictionary<Key, ITaskDefinition>.Builder buildConfigurationBuilder) {
+      if (!buildConfigurationBuilder.ContainsKey(Key)) {
+        buildConfigurationBuilder[Key] = new TaskDefinition(TaskDefinition);
+      }
+    }
+  }
 }
 
