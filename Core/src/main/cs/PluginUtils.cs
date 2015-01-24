@@ -13,15 +13,15 @@
     }
 
     public static IPlugin With(this IPlugin thisPlugin, SettingsTransform settingApplication) {
-      return new SettingsTransformPlugin((existingSettings, key) => settingApplication(thisPlugin.ApplyTo(existingSettings, key), key));
+      return new SettingsTransformPlugin(existingSettings => settingApplication(thisPlugin.ApplyTo(existingSettings)));
     }
 
     public static IPlugin ApplyTo(Key key, IPlugin plugin) {
-      return Create((context, oldKey) => plugin.ApplyTo(context, key));
+      return Create(settings => settings.In(key, plugin.ApplyTo));
     }
 
     public static IPlugin ApplyToSubKey(Key subKey, IPlugin plugin) {
-      return Create((context, key) => plugin.ApplyTo(context, subKey.In(key)));
+      return Create(context => context.In(subKey.In(context.Scope), plugin.ApplyTo));
     }
 
     public static IPlugin Create(SettingsTransform settingApplication) {

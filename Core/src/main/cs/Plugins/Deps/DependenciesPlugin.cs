@@ -13,13 +13,12 @@ namespace Bud.Plugins.Deps {
 
     private DependenciesPlugin() {}
 
-    public Settings ApplyTo(Settings settings, Key project) {
+    public Settings ApplyTo(Settings settings) {
       return settings.In(Key.Global,
                          DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
                          DependenciesKeys.NuGetRepositoryDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),
                          DependenciesKeys.Fetch.Init(FetchImpl),
-                         DependenciesKeys.NuGetResolvedPackages.Init(NuGetResolvedPackagesImpl)
-        );
+                         DependenciesKeys.NuGetResolvedPackages.Init(NuGetResolvedPackagesImpl));
     }
 
     private static NuGetPackages NuGetResolvedPackagesImpl(IConfig context) {

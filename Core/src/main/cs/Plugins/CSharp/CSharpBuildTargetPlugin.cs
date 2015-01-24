@@ -12,7 +12,7 @@ using NuGet;
 
 namespace Bud.Plugins.CSharp {
   public class CSharpBuildTargetPlugin : BuildTargetPlugin {
-    public static readonly IPlugin ConvertBuildTargetToDll = PluginUtils.Create((existingSettings, buildTarget) => existingSettings.In(buildTarget, CSharpKeys.AssemblyType.Modify(AssemblyType.Library)));
+    public static readonly IPlugin ConvertBuildTargetToDll = PluginUtils.Create(existingSettings => existingSettings.Do(CSharpKeys.AssemblyType.Modify(AssemblyType.Library)));
 
     public CSharpBuildTargetPlugin(Key scope, params IPlugin[] plugins) : base(scope, CSharpKeys.CSharp, plugins) {}
 

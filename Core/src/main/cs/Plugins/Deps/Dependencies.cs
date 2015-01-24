@@ -13,36 +13,36 @@ namespace Bud.Plugins.Deps {
     public static IPlugin AddDependency(InternalDependency internalDependency,
                                         ExternalDependency fallbackExternalDependency,
                                         Predicate<IConfig> shouldUseInternalDependency) {
-      return PluginUtils.Create((existingSettings, dependent) =>
+      return PluginUtils.Create(existingSettings =>
         existingSettings
-          .AddDependency(dependent, internalDependency, shouldUseInternalDependency)
-          .AddDependency(dependent, fallbackExternalDependency, config => !shouldUseInternalDependency(config))
+          .AddDependency(internalDependency, shouldUseInternalDependency)
+          .AddDependency(fallbackExternalDependency, config => !shouldUseInternalDependency(config))
         );
     }
 
     public static IPlugin AddDependency(ExternalDependency dependency) {
-      return PluginUtils.Create((existingSettings, dependent) => existingSettings.AddDependency(dependent, dependency));
+      return PluginUtils.Create(existingSettings => existingSettings.AddDependency(dependency));
     }
 
     public static IPlugin AddDependency(InternalDependency dependency) {
-      return PluginUtils.Create((existingSettings, dependent) => existingSettings.AddDependency(dependent, dependency));
+      return PluginUtils.Create(existingSettings => existingSettings.AddDependency(dependency));
     }
 
-    public static Settings AddDependency(this Settings settings, Key dependent, InternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
-      return settings.In(dependent,
+    public static Settings AddDependency(this Settings settings, InternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
+      return settings.Do(
           DependenciesKeys.InternalDependencies.Init(ImmutableList<InternalDependency>.Empty),
           DependenciesKeys.InternalDependencies.Modify((config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies),
-          DependenciesKeys.ResolveInternalDependencies.In(DependenciesKeys.InternalDependencies).Init(context => ResolveInternalDependenciesImpl(context, dependent))
+          DependenciesKeys.ResolveInternalDependencies.In(DependenciesKeys.InternalDependencies).Init(context => ResolveInternalDependenciesImpl(context, settings.Scope))
         );
     }
 
-    public static Settings AddDependency(this Settings settings, Key dependent, ExternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
-      return settings.In(dependent,
+    public static Settings AddDependency(this Settings settings, ExternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
+      return settings.Do(
           DependenciesKeys.ExternalDependencies.Init(ImmutableList<ExternalDependency>.Empty),
           DependenciesKeys.ExternalDependencies.Modify((config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies),
-          DependenciesKeys.ResolveInternalDependencies.In(DependenciesKeys.ExternalDependencies).Init(context => ResolveInternalDependenciesImpl(context, dependent))
+          DependenciesKeys.ResolveInternalDependencies.In(DependenciesKeys.ExternalDependencies).Init(context => ResolveInternalDependenciesImpl(context, settings.Scope))
         ).In(Key.Global,
-          DependenciesKeys.ExternalDependenciesKeys.Modify(oldValue => oldValue.Add(DependenciesKeys.ExternalDependencies.In(dependent)))
+          DependenciesKeys.ExternalDependenciesKeys.Modify(oldValue => oldValue.Add(DependenciesKeys.ExternalDependencies.In(settings.Scope)))
         );
     }
 

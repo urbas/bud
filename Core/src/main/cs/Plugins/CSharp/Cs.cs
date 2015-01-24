@@ -25,10 +25,11 @@ namespace Bud.Plugins.CSharp {
       return new CSharpBuildTargetPlugin(BuildKeys.Test, CSharpBuildTargetPlugin.ConvertBuildTargetToDll.With(plugins).With(AddMainBuildTargetAsDependency));
     }
 
-    private static Settings AddMainBuildTargetAsDependency(Settings settings, Key buildTarget) {
+    private static Settings AddMainBuildTargetAsDependency(Settings settings) {
+      var buildTarget = settings.Scope;
       var mainBuildTarget = CSharpBuildTargetPlugin.FindSiblingMainBuildTarget(buildTarget);
       var mainBuildTask = CSharpBuildTargetPlugin.FindSiblingMainBuildTask(buildTarget);
-      return settings.AddDependency(buildTarget, new InternalDependency(mainBuildTarget, mainBuildTask), config => IsMainBuildTargetDefined(config, mainBuildTarget));
+      return settings.AddDependency(new InternalDependency(mainBuildTarget, mainBuildTask), config => IsMainBuildTargetDefined(config, mainBuildTarget));
     }
 
     private static bool IsMainBuildTargetDefined(IConfig context, Key dependencyBuildTargetKey) {

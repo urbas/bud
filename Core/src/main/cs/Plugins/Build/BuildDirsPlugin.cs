@@ -11,20 +11,20 @@ namespace Bud.Plugins.Build {
       this.baseDir = baseDir;
     }
 
-    public Settings ApplyTo(Settings settings, Key project) {
+    public Settings ApplyTo(Settings settings) {
       return settings
-        .In(project,
-            BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
-            BuildDirsKeys.BaseDir.Init(baseDir),
-            BuildDirsKeys.BudDir.Init(BuildDirs.GetDefaultBudDir),
-            BuildDirsKeys.OutputDir.Init(BuildDirs.GetDefaultOutputDir),
-            BuildDirsKeys.BuildConfigCacheDir.Init(BuildDirs.GetDefaultBuildConfigCacheDir),
-            BuildDirsKeys.PersistentBuildConfigDir.Init(BuildDirs.GetDefaultPersistentBuildConfigDir),
-            BuildDirsKeys.Clean.Modify(CleanBuildDirsTask)
+        .Do(
+          BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
+          BuildDirsKeys.BaseDir.Init(baseDir),
+          BuildDirsKeys.BudDir.Init(BuildDirs.GetDefaultBudDir),
+          BuildDirsKeys.OutputDir.Init(BuildDirs.GetDefaultOutputDir),
+          BuildDirsKeys.BuildConfigCacheDir.Init(BuildDirs.GetDefaultBuildConfigCacheDir),
+          BuildDirsKeys.PersistentBuildConfigDir.Init(BuildDirs.GetDefaultPersistentBuildConfigDir),
+          BuildDirsKeys.Clean.Modify(CleanBuildDirsTask)
         )
         .In(Key.Global,
             BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
-            BuildDirsKeys.Clean.DependsOn(BuildDirsKeys.Clean.In(project))
+            BuildDirsKeys.Clean.DependsOn(BuildDirsKeys.Clean.In(settings.Scope))
         );
     }
 

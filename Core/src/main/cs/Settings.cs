@@ -5,7 +5,7 @@ using System.Linq;
 using Bud.SettingsConstruction;
 
 namespace Bud {
-  public delegate Settings SettingsTransform(Settings existingSettings, Key key);
+  public delegate Settings SettingsTransform(Settings existingSettings);
 
   public class Settings {
     public static readonly Settings Empty = new Settings();
@@ -52,7 +52,7 @@ namespace Bud {
     }
 
     public Settings Apply(Key scope, IPlugin plugin) {
-      return plugin.ApplyTo(this, scope);
+      return In(scope, plugin.ApplyTo);
     }
 
     public Settings Apply(Key scope, IPlugin plugin, params IPlugin[] plugins) {

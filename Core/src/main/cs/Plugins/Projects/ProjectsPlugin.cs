@@ -11,7 +11,8 @@ namespace Bud.Plugins.Projects {
       this.id = id;
     }
 
-    public Settings ApplyTo(Settings settings, Key project) {
+    public Settings ApplyTo(Settings settings) {
+      var project = settings.Scope;
       return settings
         .Apply(project, new BuildDirsPlugin(baseDir))
         .In(Key.Global,

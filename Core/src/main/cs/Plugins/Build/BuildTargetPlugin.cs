@@ -16,11 +16,12 @@ namespace Bud.Plugins.Build {
       this.plugins = plugins ?? ImmutableList<IPlugin>.Empty;
     }
 
-    public Settings ApplyTo(Settings settings, Key project) {
+    public Settings ApplyTo(Settings settings) {
+      var project = settings.Scope;
       var buildTargetKey = BuildTargetKey(project);
       return settings
-        .In(project,
-            BuildKeys.Test.Init(TaskUtils.NoOpTask)
+        .Do(
+          BuildKeys.Test.Init(TaskUtils.NoOpTask)
         ).In(buildTargetKey,
              BuildDirsKeys.BaseDir.Init(context => Path.Combine(context.GetBaseDir(project), "src", Scope.Id, Language.Id)),
              BuildDirsKeys.OutputDir.Init(context => Path.Combine(context.GetOutputDir(project), Scope.Id, Language.Id)),
@@ -33,7 +34,7 @@ namespace Bud.Plugins.Build {
              BuildKeys.Build.In(Scope).Init(TaskUtils.NoOpTask),
              BuildKeys.Build.In(Scope).DependsOn(BuildKeys.Build.In(buildTargetKey))
         )
-        .Apply(buildTargetKey, PluginUtils.Create((existingsettings, buildTarget) => ApplyTo(existingsettings, buildTarget, project)))
+        .Apply(buildTargetKey, PluginUtils.Create(existingsettings => ApplyTo(existingsettings, buildTargetKey, project)))
         .Apply(buildTargetKey, plugins);
     }
 

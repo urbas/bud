@@ -19,12 +19,13 @@ namespace Bud.Plugins.BuildLoading {
       this.dirOfProjectToBeBuilt = dirOfProjectToBeBuilt;
     }
 
-    public Settings ApplyTo(Settings settings, Key project) {
+    public Settings ApplyTo(Settings settings) {
+      var project = settings.Scope;
       var buildTarget = BuildUtils.BuildTargetKey(project, BuildKeys.Main, CSharpKeys.CSharp);
       return settings
         .Apply(project, Cs.Dll())
-        .In(project,
-            BuildLoadingKeys.CreateBuildCommander.Init(context => CreateBuildCommander(context, buildTarget))
+        .Do(
+          BuildLoadingKeys.CreateBuildCommander.Init(context => CreateBuildCommander(context, buildTarget))
         )
         .In(buildTarget,
             BuildLoadingKeys.BuildConfigSourceFile.Init(context => Path.Combine(context.GetBaseDir(), "Build.cs")),

@@ -8,7 +8,7 @@ namespace Bud.Plugins.Build {
       this.baseDir = baseDir;
     }
 
-    public Settings ApplyTo(Settings settings, Key project) {
+    public Settings ApplyTo(Settings settings) {
       return settings
         .Apply(Key.Global, new BuildDirsPlugin(baseDir))
         .In(Key.Global,
