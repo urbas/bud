@@ -19,16 +19,20 @@ namespace Bud.Plugins.Build {
     public Settings ApplyTo(Settings settings, Key project) {
       var buildTargetKey = BuildTargetKey(project);
       return settings
-        .Init(BuildDirsKeys.BaseDir.In(buildTargetKey), context => Path.Combine(context.GetBaseDir(project), "src", Scope.Id, Language.Id))
-        .Init(BuildDirsKeys.OutputDir.In(buildTargetKey), context => Path.Combine(context.GetOutputDir(project), Scope.Id, Language.Id))
-        .Init(BuildKeys.Build, TaskUtils.NoOpTask)
-        .Init(BuildKeys.Build.In(Scope), TaskUtils.NoOpTask)
-        .Init(BuildKeys.Build.In(buildTargetKey), context => InvokeCompilerTaskImpl(context, buildTargetKey))
-        .Init(BuildKeys.Test, TaskUtils.NoOpTask)
-        .Init(BuildKeys.Test.In(project), TaskUtils.NoOpTask)
-        .AddDependencies(BuildKeys.Build, BuildKeys.Build.In(Scope))
-        .AddDependencies(BuildKeys.Build.In(Scope), BuildKeys.Build.In(buildTargetKey))
-        .AddDependencies(BuildKeys.Test, BuildKeys.Test.In(project))
+        .In(project,
+            BuildKeys.Test.Init(TaskUtils.NoOpTask)
+        ).In(buildTargetKey,
+             BuildDirsKeys.BaseDir.Init(context => Path.Combine(context.GetBaseDir(project), "src", Scope.Id, Language.Id)),
+             BuildDirsKeys.OutputDir.Init(context => Path.Combine(context.GetOutputDir(project), Scope.Id, Language.Id)),
+             BuildKeys.Build.Init(InvokeCompilerTaskImpl)
+        ).In(Key.Global,
+             BuildKeys.Test.Init(TaskUtils.NoOpTask),
+             BuildKeys.Test.DependsOn(BuildKeys.Test.In(project)),
+             BuildKeys.Build.Init(TaskUtils.NoOpTask),
+             BuildKeys.Build.DependsOn(BuildKeys.Build.In(Scope)),
+             BuildKeys.Build.In(Scope).Init(TaskUtils.NoOpTask),
+             BuildKeys.Build.In(Scope).DependsOn(BuildKeys.Build.In(buildTargetKey))
+        )
         .Apply(buildTargetKey, PluginUtils.Create((existingsettings, buildTarget) => ApplyTo(existingsettings, buildTarget, project)))
         .Apply(buildTargetKey, plugins);
     }

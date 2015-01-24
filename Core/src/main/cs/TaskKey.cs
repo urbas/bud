@@ -39,8 +39,24 @@ namespace Bud {
       return new TaskKey<T>(Id, Concat(parent, Parent));
     }
 
+    public Func<Settings, Settings> InitSync(Func<T> taskDefinition) {
+      return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => Task.FromResult(taskDefinition())));
+    }
+
     public Func<Settings, Settings> Init(Func<Task<T>> taskDefinition) {
       return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => taskDefinition()));
+    }
+
+    public Func<Settings, Settings> InitSync(Func<IContext, T> taskDefinition) {
+      return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => Task.FromResult(taskDefinition(ctxt))));
+    }
+
+    public Func<Settings, Settings> InitSync(T taskDefinition) {
+      return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => Task.FromResult(taskDefinition)));
+    }
+
+    public Func<Settings, Settings> InitSync(Func<IContext, Key, T> taskDefinition) {
+      return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => Task.FromResult(taskDefinition(ctxt, settings.Scope))));
     }
 
     public Func<Settings, Settings> Init(Func<IContext, Task<T>> taskDefinition) {
@@ -57,6 +73,10 @@ namespace Bud {
 
     public Func<Settings, Settings> Modify(Func<IContext, Func<Task<T>>, Key, Task<T>> newTaskDefinition) {
       return settings => settings.Add(new ModifyTask<T>(In(settings.Scope), (ctxt, oldTaskDef) => newTaskDefinition(ctxt, oldTaskDef, settings.Scope)));
+    }
+
+    public Func<Settings, Settings> Modify(Func<Func<Task<T>>, Task<T>> newTaskDefinition) {
+      return settings => settings.Add(new ModifyTask<T>(In(settings.Scope), (ctxt, oldTaskDef) => newTaskDefinition(oldTaskDef)));
     }
   }
 }

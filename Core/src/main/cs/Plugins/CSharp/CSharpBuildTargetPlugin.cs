@@ -20,7 +20,7 @@ namespace Bud.Plugins.CSharp {
       return existingsettings
         .Apply(buildTarget, DependenciesPlugin.Instance)
         .In(buildTarget,
-            CSharpKeys.SourceFiles.Init(FindSources),
+            CSharpKeys.SourceFiles.InitSync(FindSources),
             CSharpKeys.TargetFramework.Init(Framework.Net45),
             CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
             CSharpKeys.CollectReferencedAssemblies.Init(CollectAssembliesFromDependencies),
@@ -42,7 +42,7 @@ namespace Bud.Plugins.CSharp {
       return CSharpCompiler.CompileProject(context, buildKey);
     }
 
-    private async Task<IEnumerable<string>> FindSources(IContext context, Key buildTarget) {
+    private IEnumerable<string> FindSources(IContext context, Key buildTarget) {
       var sourceDirectory = Path.Combine(context.GetBaseDir(buildTarget));
       if (Directory.Exists(sourceDirectory)) {
         return Directory.EnumerateFiles(sourceDirectory, "*.cs", SearchOption.AllDirectories);

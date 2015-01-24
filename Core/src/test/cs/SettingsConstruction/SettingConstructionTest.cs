@@ -39,31 +39,31 @@ namespace Bud {
 
     [Test]
     public async void Evaluating_an_initialized_task_MUST_invoke_the_task_of_initialization() {
-      var settings = Settings.Create(TestTaskKey.Init(async () => "foo"));
+      var settings = Settings.Create(TestTaskKey.InitSync("foo"));
       Assert.AreEqual("foo", await Context.FromSettings(settings).Evaluate(TestTaskKey));
     }
 
     [Test]
     public async void Init_MUST_keep_the_value_of_the_first_initialization() {
-      var settings = Settings.Create(TestTaskKey.Init(async context => "boo"), TestTaskKey.Init(async context => "foo"));
+      var settings = Settings.Create(TestTaskKey.InitSync("boo"), TestTaskKey.InitSync("foo"));
       Assert.AreEqual("boo", await Context.FromSettings(settings).Evaluate(TestTaskKey));
     }
 
     [Test]
     public async void Init_MUST_keep_the_value_of_the_first_ensure_initialization() {
-      var settings = Settings.Create(TestTaskKey.Init(async context => "boo"), TestTaskKey.Init(async context => "foo"));
+      var settings = Settings.Create(TestTaskKey.InitSync("boo"), TestTaskKey.InitSync("foo"));
       Assert.AreEqual("boo", await Context.FromSettings(settings).Evaluate(TestTaskKey));
     }
 
     [Test]
     public async void Init_MUST_set_the_value() {
-      var settings = Settings.Create(TestTaskKey.Init(async context => "foo"));
+      var settings = Settings.Create(TestTaskKey.InitSync("foo"));
       Assert.AreEqual("foo", await Context.FromSettings(settings).Evaluate(TestTaskKey));
     }
 
     [Test]
     public async void Modifying_MUST_change_the_task() {
-      var settings = Settings.Create(TestTaskKey.Init(async context => "foo"), TestTaskKey.Modify(async (b, prevTask) => await prevTask() + "bar"));
+      var settings = Settings.Create(TestTaskKey.InitSync("foo"), TestTaskKey.Modify(async (b, prevTask) => await prevTask() + "bar"));
       Assert.AreEqual("foobar", await Context.FromSettings(settings).Evaluate(TestTaskKey));
     }
 
@@ -71,8 +71,8 @@ namespace Bud {
     public void AddDependencies_MUST_invoke_the_dependent_tasks() {
       bool wasDependentInvoked = false;
       var settings = Settings.Create(
-        TestTaskKey.Init(async context => "foo"),
-        TestTaskKey2.Init(async context => {
+        TestTaskKey.InitSync("foo"),
+        TestTaskKey2.InitSync(context => {
           wasDependentInvoked = true;
           return "bar";
         }),
@@ -85,13 +85,13 @@ namespace Bud {
     public void AddDependencies_MUST_invoke_the_dependent_task_only_once() {
       int numberOfTimesDependentInvoked = 0;
       var settings = Settings.Create(
-        TestTaskKey.Init(async context => {
+        TestTaskKey.InitSync(context => {
           ++numberOfTimesDependentInvoked;
           return "foo";
         }),
-        TestTaskKey2.Init(async context => "bar"),
+        TestTaskKey2.InitSync("bar"),
         TestTaskKey2.DependsOn(TestTaskKey),
-        TestTaskKey3.Init(async context => "zar"),
+        TestTaskKey3.InitSync("zar"),
         TestTaskKey3.DependsOn(TestTaskKey2, TestTaskKey));
       Context.FromSettings(settings).Evaluate(TestTaskKey3);
       Assert.AreEqual(1, numberOfTimesDependentInvoked);
@@ -101,7 +101,7 @@ namespace Bud {
     public async void AddDependencies_MUST_invoke_the_dependent_task_only_once_WHEN_tasks_are_also_evaluated_in_the_tasks_body() {
       int numberOfTimesDependentInvoked = 0;
       var settings = Settings.Create(
-        TestTaskKey.Init(async context => {
+        TestTaskKey.InitSync(() => {
           ++numberOfTimesDependentInvoked;
           return "foo";
         }),
@@ -119,11 +119,11 @@ namespace Bud {
       int numberOfTimesDependentInvoked = 0;
 
       var settings = Settings.Create(
-        TestTaskKey.Init(async context => {
+        TestTaskKey.InitSync(() => {
           ++numberOfTimesDependentInvoked;
           return "foo";
         }),
-        TestTaskKey.Modify(async (context, previousTask) => await previousTask() + await previousTask()));
+        TestTaskKey.Modify(async previousTask => await previousTask() + await previousTask()));
 
       var evaluatedValue = await Context.FromSettings(
         settings

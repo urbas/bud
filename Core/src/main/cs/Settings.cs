@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Threading.Tasks;
 using Bud.SettingsConstruction;
 
 namespace Bud {
@@ -64,24 +63,12 @@ namespace Bud {
       return plugins.Aggregate(this, (settings, plugin) => settings.Apply(scope, plugin));
     }
 
-    public Settings Init<T>(ConfigKey<T> key, Func<IConfig, T> initialValue) {
-      return Add(new InitializeConfig<T>(key.In(Scope), initialValue));
-    }
-
-    public Settings Init<T>(TaskKey<T> key, Func<IContext, Task<T>> task) {
-      return Add(new InitializeTask<T>(key, task));
-    }
-
     public Settings Modify<T>(ConfigKey<T> key, Func<T, T> modifier) {
       return Add(new ModifyConfig<T>(key.In(Scope), (context, previousValue) => modifier(previousValue)));
     }
 
     public Settings Modify<T>(ConfigKey<T> key, Func<IConfig, T, T> modifier) {
       return Add(new ModifyConfig<T>(key.In(Scope), (context, previousValue) => modifier(context, previousValue)));
-    }
-
-    public Settings AddDependencies(TaskKey key, params TaskKey[] dependencies) {
-      return Add(new AddDependencies(key.In(Scope), dependencies));
     }
 
     public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions {
