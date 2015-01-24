@@ -1,14 +1,11 @@
-using System.IO;
-using System.Collections.Immutable;
-using Bud.SettingsConstruction;
-using System.Text;
 using System;
+using System.Text;
 
 namespace Bud {
   public class Key : MarshalByRefObject {
     public static readonly Key Global = new Key("Global", null);
     public const char KeySeparator = '/';
-    private static readonly char[] KeySplitter = new char[] {KeySeparator};
+    private static readonly char[] KeySplitter = {KeySeparator};
     public readonly Key Parent;
     public readonly string Id;
     private readonly int depth;
@@ -34,11 +31,11 @@ namespace Bud {
     public static Key Concat(Key parentKey, Key childKey) {
       if (parentKey.IsGlobal) {
         return childKey;
-      } else if (childKey.IsGlobal) {
-        return parentKey;
-      } else {
-        return new Key(childKey.Id, Concat(parentKey, childKey.Parent));
       }
+      if (childKey.IsGlobal) {
+        return parentKey;
+      }
+      return new Key(childKey.Id, Concat(parentKey, childKey.Parent));
     }
 
     public static Key Parse(string key) {
