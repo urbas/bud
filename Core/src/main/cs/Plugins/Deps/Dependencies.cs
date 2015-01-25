@@ -18,14 +18,6 @@ namespace Bud.Plugins.Deps {
           .AddDependency(fallbackExternalDependency, config => !shouldUseInternalDependency(config));
     }
 
-    public static IPlugin AddDependency(ExternalDependency dependency) {
-      return PluginUtils.Create(existingSettings => existingSettings.AddDependency(dependency));
-    }
-
-    public static IPlugin AddDependency(InternalDependency dependency) {
-      return PluginUtils.Create(existingSettings => existingSettings.AddDependency(dependency));
-    }
-
     public static Settings AddDependency(this Settings settings, InternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
       return settings.Do(
           DependenciesKeys.InternalDependencies.Init(ImmutableList<InternalDependency>.Empty),

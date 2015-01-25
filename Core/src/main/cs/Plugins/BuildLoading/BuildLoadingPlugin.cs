@@ -10,7 +10,7 @@ using Bud.Plugins.CSharp;
 
 namespace Bud.Plugins.BuildLoading {
   public class BuildLoadingPlugin {
-    public static Func<Settings, Settings> ApplyTo(string dirOfProjectToBeBuilt) {
+    public static Func<Settings, Settings> Init(string dirOfProjectToBeBuilt) {
       return settings => settings
         .Do(
           Cs.Dll(),

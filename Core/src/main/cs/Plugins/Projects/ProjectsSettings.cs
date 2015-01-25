@@ -2,10 +2,8 @@ using System;
 
 namespace Bud.Plugins.Projects {
   public static class ProjectsSettings {
-    public static Settings Project(this Settings build, string id, string baseDir, params Func<Settings, Settings>[] plugins) {
-      var projectKey = ProjectKey(id);
-      return build
-        .In(projectKey, new ProjectPlugin(id, baseDir).ApplyTo, plugins);
+    public static Settings Project(this Settings settings, string id, string baseDir, params Func<Settings, Settings>[] plugins) {
+      return settings.Do(ProjectPlugin.Init(id, baseDir, plugins));
     }
 
     public static Key ProjectKey(string id) {

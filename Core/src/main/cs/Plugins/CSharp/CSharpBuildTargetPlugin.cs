@@ -12,22 +12,20 @@ using NuGet;
 
 namespace Bud.Plugins.CSharp {
   public class CSharpBuildTargetPlugin : BuildTargetPlugin {
-    public static readonly Func<Settings, Settings> ConvertBuildTargetToDll = existingSettings => existingSettings.Do(CSharpKeys.AssemblyType.Modify(AssemblyType.Library));
-
     public CSharpBuildTargetPlugin(Key scope, params Func<Settings, Settings>[] plugins) : base(scope, CSharpKeys.CSharp, plugins) {}
 
-    protected override Settings ApplyTo(Settings existingsettings, Key buildTarget, Key project) {
-      return existingsettings
+    protected override Settings ApplyTo(Settings settings, Key project) {
+      return settings
         .Do(
             DependenciesPlugin.Apply,
             CSharpKeys.SourceFiles.InitSync(FindSources),
             CSharpKeys.TargetFramework.Init(Framework.Net45),
             CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
             CSharpKeys.CollectReferencedAssemblies.Init(CollectAssembliesFromDependencies),
-            CSharpKeys.OutputAssemblyDir.Init(context => Path.Combine(context.GetOutputDir(buildTarget), "debug", "bin")),
+            CSharpKeys.OutputAssemblyDir.Init(context => Path.Combine(context.GetOutputDir(settings.Scope), "debug", "bin")),
             CSharpKeys.OutputAssemblyName.Init(context => OutputAssemblyName(project, Scope)),
             CSharpKeys.Dist.Init(CreateDistributablePackage),
-            CSharpKeys.OutputAssemblyFile.Init(context => Path.Combine(context.GetCSharpOutputAssemblyDir(buildTarget), String.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(buildTarget), GetAssemblyFileExtension(context, buildTarget))))
+            CSharpKeys.OutputAssemblyFile.Init(context => Path.Combine(context.GetCSharpOutputAssemblyDir(settings.Scope), String.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(settings.Scope), GetAssemblyFileExtension(context, settings.Scope))))
         );
     }
 

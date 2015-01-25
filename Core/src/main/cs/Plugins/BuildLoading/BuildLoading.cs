@@ -6,8 +6,7 @@ using Bud.Plugins.Projects;
 namespace Bud.Plugins.BuildLoading {
   public static class BuildLoading {
     public static Settings BuildProject(this Settings build, string projectId, string budDir, string dirOfProjectToBeBuilt) {
-      return build
-        .Project(projectId, budDir, Cs.Dll(), BuildLoadingPlugin.ApplyTo(dirOfProjectToBeBuilt));
+      return build.Project(projectId, budDir, Cs.Dll(), BuildLoadingPlugin.Init(dirOfProjectToBeBuilt));
     }
 
     public static string GetBuildConfigSourceFile(this IContext context, Key buildLoadingProject) {

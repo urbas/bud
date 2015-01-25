@@ -62,9 +62,6 @@
     <Compile Include="Unit.cs" />
     <Compile Include="Util\StringUtils.cs" />
     <Compile Include="Util\TaskUtils.cs" />
-    <Compile Include="IPlugin.cs" />
-    <Compile Include="SettingsTransformPlugin.cs" />
-    <Compile Include="PluginUtils.cs" />
     <Compile Include="SettingsConstruction\AddDependencies.cs" />
     <Compile Include="SettingsConstruction\ConfigDefinitionConstructor.cs" />
     <Compile Include="SettingsConstruction\InitializeConfig.cs" />

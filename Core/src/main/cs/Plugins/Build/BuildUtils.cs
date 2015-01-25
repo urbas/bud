@@ -1,5 +1,3 @@
-using System;
-
 namespace Bud.Plugins.Build {
   public static class BuildUtils {
     /// <returns>
@@ -18,10 +16,6 @@ namespace Bud.Plugins.Build {
 
     public static Key BuildTargetSubKey(Key buildScope, Key language) {
       return language.In(buildScope);
-    }
-
-    public static IPlugin ApplyToBuildTarget(Key buildScope, Key language, IPlugin plugin) {
-      return PluginUtils.ApplyToSubKey(BuildTargetSubKey(buildScope, language), plugin);
     }
   }
 }

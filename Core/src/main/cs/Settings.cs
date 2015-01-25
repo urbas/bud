@@ -61,18 +61,6 @@ namespace Bud {
       return new Settings(ConfigConstructors.AddRange(settings.ConfigConstructors), TaskConstructors.AddRange(settings.TaskConstructors), Scope);
     }
 
-    public Settings Apply(Key scope, IPlugin plugin) {
-      return In(scope, plugin.ApplyTo);
-    }
-
-    public Settings Apply(Key scope, IPlugin plugin, params IPlugin[] plugins) {
-      return Apply(scope, plugin).Apply(scope, plugins);
-    }
-
-    public Settings Apply(Key scope, IEnumerable<IPlugin> plugins) {
-      return plugins.Aggregate(this, (settings, plugin) => settings.Apply(scope, plugin));
-    }
-
     public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions {
       get {
         var configDefinitions = ImmutableDictionary.CreateBuilder<Key, IConfigDefinition>();

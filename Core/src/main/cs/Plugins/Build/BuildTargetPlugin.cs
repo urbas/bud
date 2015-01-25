@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Bud.Util;
 
 namespace Bud.Plugins.Build {
-  public abstract class BuildTargetPlugin : IPlugin {
+  public abstract class BuildTargetPlugin {
     protected readonly Key Scope;
     protected readonly Key Language;
     private readonly IEnumerable<Func<Settings, Settings>> plugins;
@@ -27,7 +27,8 @@ namespace Bud.Plugins.Build {
         ).In(buildTargetKey,
              BuildDirsKeys.BaseDir.Init(context => Path.Combine(context.GetBaseDir(project), "src", Scope.Id, Language.Id)),
              BuildDirsKeys.OutputDir.Init(context => Path.Combine(context.GetOutputDir(project), Scope.Id, Language.Id)),
-             BuildKeys.Build.Init(InvokeCompilerTaskImpl)
+             BuildKeys.Build.Init(InvokeCompilerTaskImpl),
+             existingsettings => ApplyTo(existingsettings, project)
         ).In(Key.Global,
              BuildKeys.Test.Init(TaskUtils.NoOpTask),
              BuildKeys.Test.DependsOn(BuildKeys.Test.In(project)),
@@ -36,11 +37,10 @@ namespace Bud.Plugins.Build {
              BuildKeys.Build.In(Scope).Init(TaskUtils.NoOpTask),
              BuildKeys.Build.In(Scope).DependsOn(BuildKeys.Build.In(buildTargetKey))
         )
-        .Apply(buildTargetKey, PluginUtils.Create(existingsettings => ApplyTo(existingsettings, buildTargetKey, project)))
         .In(buildTargetKey, plugins.ToArray());
     }
 
-    protected abstract Settings ApplyTo(Settings existingsettings, Key project, Key buildTarget);
+    protected abstract Settings ApplyTo(Settings existingsettings, Key project);
 
     protected abstract Task<Unit> InvokeCompilerTaskImpl(IContext arg, Key buildKey);
 

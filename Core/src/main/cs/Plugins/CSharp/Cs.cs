@@ -19,11 +19,11 @@ namespace Bud.Plugins.CSharp {
     }
 
     public static Func<Settings, Settings> Dll(params Func<Settings, Settings>[] plugins) {
-      return CSharpBuildTargetPlugin.Init(BuildKeys.Main, CSharpBuildTargetPlugin.ConvertBuildTargetToDll, plugins.ToSettingsTransform());
+      return CSharpBuildTargetPlugin.Init(BuildKeys.Main, CSharpKeys.AssemblyType.Modify(AssemblyType.Library), plugins.ToSettingsTransform());
     }
 
     public static Func<Settings, Settings> Test(params Func<Settings, Settings>[] plugins) {
-      return CSharpBuildTargetPlugin.Init(BuildKeys.Test, CSharpBuildTargetPlugin.ConvertBuildTargetToDll, plugins.ToSettingsTransform(), AddMainBuildTargetAsDependency);
+      return CSharpBuildTargetPlugin.Init(BuildKeys.Test, CSharpKeys.AssemblyType.Modify(AssemblyType.Library), plugins.ToSettingsTransform(), AddMainBuildTargetAsDependency);
     }
 
     private static Settings AddMainBuildTargetAsDependency(Settings settings) {
