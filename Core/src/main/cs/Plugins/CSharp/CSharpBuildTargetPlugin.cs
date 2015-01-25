@@ -12,25 +12,31 @@ using NuGet;
 
 namespace Bud.Plugins.CSharp {
   public class CSharpBuildTargetPlugin : BuildTargetPlugin {
-    public CSharpBuildTargetPlugin(Key scope, params Func<Settings, Settings>[] plugins) : base(scope, CSharpKeys.CSharp, plugins) {}
+    public CSharpBuildTargetPlugin(Key buildScope, params Setup[] setups) : base(buildScope, CSharpKeys.CSharp, setups) {}
 
-    protected override Settings ApplyTo(Settings settings, Key project) {
-      return settings
-        .Do(
-            DependenciesPlugin.Apply,
-            CSharpKeys.SourceFiles.InitSync(FindSources),
-            CSharpKeys.TargetFramework.Init(Framework.Net45),
-            CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
-            CSharpKeys.CollectReferencedAssemblies.Init(CollectAssembliesFromDependencies),
-            CSharpKeys.OutputAssemblyDir.Init(context => Path.Combine(context.GetOutputDir(settings.Scope), "debug", "bin")),
-            CSharpKeys.OutputAssemblyName.Init(context => OutputAssemblyName(project, Scope)),
-            CSharpKeys.Dist.Init(CreateDistributablePackage),
-            CSharpKeys.OutputAssemblyFile.Init(context => Path.Combine(context.GetCSharpOutputAssemblyDir(settings.Scope), String.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(settings.Scope), GetAssemblyFileExtension(context, settings.Scope))))
-        );
+    public static Setup Init(Key project, params Setup[] setups) {
+      return new CSharpBuildTargetPlugin(project, setups).Setup;
     }
 
-    public static Func<Settings, Settings> Init(Key project, params Func<Settings, Settings>[] settingsTransforms) {
-      return new CSharpBuildTargetPlugin(project, settingsTransforms).ApplyTo;
+    protected override Settings Setup(Settings settings, Key project) {
+      return settings.Do(
+        DependenciesPlugin.Apply,
+        CSharpKeys.SourceFiles.InitSync(FindSources),
+        CSharpKeys.TargetFramework.Init(Framework.Net45),
+        CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
+        CSharpKeys.CollectReferencedAssemblies.Init(CollectAssembliesFromDependencies),
+        CSharpKeys.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
+        CSharpKeys.OutputAssemblyName.Init(context => OutputAssemblyName(project, BuildScope)),
+        CSharpKeys.Dist.Init(CreateDistributablePackage),
+        CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile));
+    }
+
+    protected override Task BuildTaskImpl(IContext context, Key buildTarget) {
+      return CSharpCompiler.CompileBuildTarget(context, buildTarget);
+    }
+
+    private static string GetDefaultOutputAssemblyDir(IConfig context, Key buildTarget) {
+      return Path.Combine(context.GetOutputDir(buildTarget), "debug", "bin");
     }
 
     private static string OutputAssemblyName(Key project, Key scope) {
@@ -40,8 +46,8 @@ namespace Bud.Plugins.CSharp {
       return project.Id + "." + StringUtils.Capitalize(scope.Id);
     }
 
-    protected override Task<Unit> InvokeCompilerTaskImpl(IContext context, Key buildKey) {
-      return CSharpCompiler.CompileProject(context, buildKey);
+    private static string GetDefaultOutputAssemblyFile(IConfig context, Key buildTarget) {
+      return Path.Combine(context.GetCSharpOutputAssemblyDir(buildTarget), String.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(buildTarget), GetAssemblyFileExtension(context, buildTarget)));
     }
 
     private IEnumerable<string> FindSources(IContext context, Key buildTarget) {
@@ -104,7 +110,7 @@ namespace Bud.Plugins.CSharp {
       }
     }
 
-    private async Task<Unit> CreateDistributablePackage(IContext context, Key buildTarget) {
+    private async Task CreateDistributablePackage(IContext context, Key buildTarget) {
       await context.Evaluate(BuildKeys.Build.In(buildTarget));
       var referencedAssemblies = await context.CollectCSharpReferencedAssemblies(buildTarget);
       var targetDir = Path.Combine(context.GetOutputDir(buildTarget), "dist");
@@ -113,7 +119,6 @@ namespace Bud.Plugins.CSharp {
         CopyFile(referencedAssembly, targetDir);
       }
       CopyFile(context.GetCSharpOutputAssemblyFile(buildTarget), targetDir);
-      return Unit.Instance;
     }
 
     private static void CopyFile(string referencedAssembly, string targetDir) {
@@ -128,11 +133,11 @@ namespace Bud.Plugins.CSharp {
       return BuildUtils.BuildTargetKey(project, BuildKeys.Main, CSharpKeys.CSharp);
     }
 
-    public static TaskKey<Unit> MainBuildTaskKey(Key projectKey) {
+    public static TaskKey MainBuildTaskKey(Key projectKey) {
       return BuildUtils.BuildTaskKey(projectKey, BuildKeys.Main, CSharpKeys.CSharp);
     }
 
-    public static TaskKey<Unit> FindSiblingMainBuildTask(Key buildTarget) {
+    public static TaskKey FindSiblingMainBuildTask(Key buildTarget) {
       return MainBuildTaskKey(buildTarget.Parent.Parent);
     }
   }

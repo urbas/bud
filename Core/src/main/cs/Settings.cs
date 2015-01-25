@@ -1,18 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Bud.SettingsConstruction;
 
 namespace Bud {
-  public delegate Settings SettingsTransform(Settings existingSettings);
-
-  public static class SettingsUtils {
-    public static Func<Settings, Settings> ToSettingsTransform(this IEnumerable<Func<Settings, Settings>> settingsTransforms) {
-      return settings => settingsTransforms.Aggregate(settings, (oldSettings, settingsTransform) => settingsTransform(oldSettings));
-    }
-  }
-
   public class Settings {
     public static readonly Settings Empty = new Settings();
     public readonly Key Scope;
@@ -29,24 +19,24 @@ namespace Bud {
       Scope = scope;
     }
 
-    public Settings In(Key newScope, params Func<Settings, Settings>[] settingsTransforms) {
-      return In(newScope).Do(settingsTransforms).In(Scope);
+    public Settings In(Key newScope, params Setup[] setups) {
+      return In(newScope).Do(setups).In(Scope);
     }
 
-    public Settings In(Key newScope, Func<Settings, Settings> settingsTransform, Func<Settings, Settings>[] settingsTransforms) {
-      return In(newScope, settingsTransform).In(newScope, settingsTransforms);
+    public Settings In(Key newScope, Setup setup, Setup[] setups) {
+      return In(newScope, setup).In(newScope, setups);
     }
 
-    public Settings Do(params Func<Settings, Settings>[] settingsTransformations) {
-      return settingsTransformations.Aggregate(this, (oldSettings, settingsTransform) => settingsTransform(oldSettings)).In(Scope);
+    public Settings Do(params Setup[] setups) {
+      return setups.Aggregate(this, (oldSettings, plugin) => plugin(oldSettings)).In(Scope);
     }
 
-    public static Settings Create(params Func<Settings, Settings>[] settingTransformations) {
-      return Empty.Do(settingTransformations);
+    public static Settings Create(params Setup[] setups) {
+      return Empty.Do(setups);
     }
 
-    public static Settings Create(Key scope, params Func<Settings, Settings>[] settingTransformations) {
-      return Empty.In(scope, settingTransformations);
+    public static Settings Create(Key scope, params Setup[] setups) {
+      return Empty.In(scope, setups);
     }
 
     public Settings Add(ConfigDefinitionConstructor configConstructor) {

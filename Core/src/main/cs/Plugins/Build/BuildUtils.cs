@@ -10,7 +10,7 @@ namespace Bud.Plugins.Build {
     /// <returns>
     ///   key corresponds to the task that builds the sources in the folder '[project]/src/[scope]/[language]'.
     /// </returns>
-    public static TaskKey<Unit> BuildTaskKey(Key project, Key scope, Key language) {
+    public static TaskKey BuildTaskKey(Key project, Key scope, Key language) {
       return BuildKeys.Build.In(BuildTargetKey(project, scope, language));
     }
 

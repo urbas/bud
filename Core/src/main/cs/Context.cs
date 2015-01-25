@@ -13,6 +13,7 @@ namespace Bud {
     Task EvaluateTask(Key key);
     Task EvaluateKey(Key key);
     Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition);
+    Task Evaluate(ITaskDefinition taskDefinition);
     object GetOutputOf(Key key);
   }
 
@@ -71,14 +72,17 @@ namespace Bud {
     }
 
     public Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition) {
+      return (Task<T>) Evaluate((ITaskDefinition) taskDefinition);
+    }
+
+    public Task Evaluate(ITaskDefinition taskDefinition) {
       Task existingEvaluation;
       if (oldTaskValues.TryGetValue(taskDefinition, out existingEvaluation)) {
-        return (Task<T>) existingEvaluation;
-      } else {
-        Task<T> freshEvaluation = taskDefinition.Evaluate(this);
-        oldTaskValues.Add(taskDefinition, freshEvaluation);
-        return freshEvaluation;
+        return existingEvaluation;
       }
+      Task freshEvaluation = taskDefinition.Evaluate(this);
+      oldTaskValues.Add(taskDefinition, freshEvaluation);
+      return freshEvaluation;
     }
 
     public static Context FromSettings(Settings settings) {

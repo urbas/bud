@@ -1,11 +1,10 @@
-﻿using System;
-using Bud.Plugins.Build;
+﻿using Bud.Plugins.Build;
 using Bud.Plugins.Deps;
 using Bud.Plugins.Projects;
 
 namespace Bud.Plugins.CSharp {
   public static class Cs {
-    public static Func<Settings, Settings> Dependency(string packageName, string packageVersion = null, string scope = null) {
+    public static Setup Dependency(string packageName, string packageVersion = null, string scope = null) {
       var dependencyProjectKey = ProjectsSettings.ProjectKey(packageName);
       var dependencyBuildTargetKey = CSharpBuildTargetPlugin.MainBuildTargetKey(dependencyProjectKey);
       return Dependencies.AddDependency(
@@ -14,16 +13,16 @@ namespace Bud.Plugins.CSharp {
         shouldUseInternalDependency: context => IsMainBuildTargetDefined(context, dependencyBuildTargetKey));
     }
 
-    public static Func<Settings, Settings> Exe(params Func<Settings, Settings>[] plugins) {
-      return CSharpBuildTargetPlugin.Init(BuildKeys.Main, plugins);
+    public static Setup Exe(params Setup[] setups) {
+      return CSharpBuildTargetPlugin.Init(BuildKeys.Main, setups);
     }
 
-    public static Func<Settings, Settings> Dll(params Func<Settings, Settings>[] plugins) {
-      return CSharpBuildTargetPlugin.Init(BuildKeys.Main, CSharpKeys.AssemblyType.Modify(AssemblyType.Library), plugins.ToSettingsTransform());
+    public static Setup Dll(params Setup[] setups) {
+      return CSharpBuildTargetPlugin.Init(BuildKeys.Main, CSharpKeys.AssemblyType.Modify(AssemblyType.Library), setups.ToPlugin());
     }
 
-    public static Func<Settings, Settings> Test(params Func<Settings, Settings>[] plugins) {
-      return CSharpBuildTargetPlugin.Init(BuildKeys.Test, CSharpKeys.AssemblyType.Modify(AssemblyType.Library), plugins.ToSettingsTransform(), AddMainBuildTargetAsDependency);
+    public static Setup Test(params Setup[] setups) {
+      return CSharpBuildTargetPlugin.Init(BuildKeys.Test, CSharpKeys.AssemblyType.Modify(AssemblyType.Library), setups.ToPlugin(), AddMainBuildTargetAsDependency);
     }
 
     private static Settings AddMainBuildTargetAsDependency(Settings settings) {

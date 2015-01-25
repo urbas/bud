@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace Bud.Util {
   public static class TaskUtils {
-    public static readonly Task<Unit> UnitTask = Task.FromResult(Unit.Instance);
-    public static readonly Func<IContext, Task<Unit>> NoOpTask = context => UnitTask;
+    public static readonly Func<IContext, Task> NoOpTask = context => NullAsyncResult;
+    public static readonly Task<object> NullAsyncResult = Task.FromResult<object>(null);
   }
 }
 

@@ -1,7 +1,4 @@
 using System;
-using System.IO;
-using Bud.Test.Util;
-using Bud.Plugins.BuildLoading;
 using Bud.Commander;
 
 namespace Bud.Test.Util {
@@ -10,8 +7,8 @@ namespace Bud.Test.Util {
     private readonly IBuildCommander buildCommander;
 
     public TemporaryDirBuildCommander(TemporaryDirectory temporaryDirectory) {
-      this.TemporaryDirectory = temporaryDirectory;
-      this.buildCommander = BuildCommander.Load(TemporaryDirectory.Path);
+      TemporaryDirectory = temporaryDirectory;
+      buildCommander = BuildCommander.Load(TemporaryDirectory.Path);
     }
 
     public object Evaluate(string command) {
@@ -33,4 +30,3 @@ namespace Bud.Test.Util {
     }
   }
 }
-

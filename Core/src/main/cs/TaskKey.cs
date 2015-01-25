@@ -1,18 +1,59 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Bud.SettingsConstruction;
+using Bud.Util;
 
 namespace Bud {
   public class TaskKey : Key {
-    protected TaskKey(string id) : base(id) {}
-    protected TaskKey(string id, Key parent) : base(id, parent) {}
+    public TaskKey(string id) : base(id) {}
+    public TaskKey(string id, Key parent) : base(id, parent) {}
 
-    public Func<Settings, Settings> Init(Func<IContext, Task> taskDefinition) {
+    public Setup Init(Func<IContext, Task> taskDefinition) {
       return settings => settings.Add(new InitializeTask(In(settings.Scope), taskDefinition));
     }
 
-    public Func<Settings, Settings> DependsOn(params TaskKey[] dependents) {
+    public Setup InitSync(Action taskDefinition) {
+      return settings => settings.Add(new InitializeTask(In(settings.Scope), ctxt => {
+        taskDefinition();
+        return TaskUtils.NullAsyncResult;
+      }));
+    }
+
+    public Setup InitSync(Action<IContext> taskDefinition) {
+      return settings => settings.Add(new InitializeTask(In(settings.Scope), ctxt => {
+        taskDefinition(ctxt);
+        return TaskUtils.NullAsyncResult;
+      }));
+    }
+
+    public Setup InitSync(Action<IContext, Key> taskDefinition) {
+      return settings => settings.Add(new InitializeTask(In(settings.Scope), ctxt => {
+        taskDefinition(ctxt, settings.Scope);
+        return TaskUtils.NullAsyncResult;
+      }));
+    }
+
+    public Setup Init(Func<Task> taskDefinition) {
+      return settings => settings.Add(new InitializeTask(In(settings.Scope), ctxt => taskDefinition()));
+    }
+
+    public Setup Init(Func<IContext, Key, Task> taskDefinition) {
+      return settings => settings.Add(new InitializeTask(In(settings.Scope), ctxt => taskDefinition(ctxt, settings.Scope)));
+    }
+
+    public Setup Modify(Func<IContext, Func<Task>, Task> taskDefinition) {
+      return settings => settings.Add(new ModifyTask(In(settings.Scope), taskDefinition));
+    }
+
+    public Setup Modify(Func<IContext, Func<Task>, Key, Task> newTaskDefinition) {
+      return settings => settings.Add(new ModifyTask(In(settings.Scope), (ctxt, oldTaskDef) => newTaskDefinition(ctxt, oldTaskDef, settings.Scope)));
+    }
+
+    public Setup Modify(Func<Func<Task>, Task> newTaskDefinition) {
+      return settings => settings.Add(new ModifyTask(In(settings.Scope), (ctxt, oldTaskDef) => newTaskDefinition(oldTaskDef)));
+    }
+
+    public Setup DependsOn(params TaskKey[] dependents) {
       return settings => settings.Add(new AddDependencies(In(settings.Scope), dependents));
     }
 
@@ -39,43 +80,43 @@ namespace Bud {
       return new TaskKey<T>(Id, Concat(parent, Parent));
     }
 
-    public Func<Settings, Settings> InitSync(Func<T> taskDefinition) {
+    public Setup InitSync(Func<T> taskDefinition) {
       return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => Task.FromResult(taskDefinition())));
     }
 
-    public Func<Settings, Settings> Init(Func<Task<T>> taskDefinition) {
-      return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => taskDefinition()));
-    }
-
-    public Func<Settings, Settings> InitSync(Func<IContext, T> taskDefinition) {
+    public Setup InitSync(Func<IContext, T> taskDefinition) {
       return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => Task.FromResult(taskDefinition(ctxt))));
     }
 
-    public Func<Settings, Settings> InitSync(T taskDefinition) {
+    public Setup InitSync(T taskDefinition) {
       return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => Task.FromResult(taskDefinition)));
     }
 
-    public Func<Settings, Settings> InitSync(Func<IContext, Key, T> taskDefinition) {
+    public Setup InitSync(Func<IContext, Key, T> taskDefinition) {
       return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => Task.FromResult(taskDefinition(ctxt, settings.Scope))));
     }
 
-    public Func<Settings, Settings> Init(Func<IContext, Task<T>> taskDefinition) {
+    public Setup Init(Func<Task<T>> taskDefinition) {
+      return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => taskDefinition()));
+    }
+
+    public Setup Init(Func<IContext, Task<T>> taskDefinition) {
       return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), taskDefinition));
     }
 
-    public Func<Settings, Settings> Init(Func<IContext, Key, Task<T>> taskDefinition) {
+    public Setup Init(Func<IContext, Key, Task<T>> taskDefinition) {
       return settings => settings.Add(new InitializeTask<T>(In(settings.Scope), ctxt => taskDefinition(ctxt, settings.Scope)));
     }
 
-    public Func<Settings, Settings> Modify(Func<IContext, Func<Task<T>>, Task<T>> taskDefinition) {
+    public Setup Modify(Func<IContext, Func<Task<T>>, Task<T>> taskDefinition) {
       return settings => settings.Add(new ModifyTask<T>(In(settings.Scope), taskDefinition));
     }
 
-    public Func<Settings, Settings> Modify(Func<IContext, Func<Task<T>>, Key, Task<T>> newTaskDefinition) {
+    public Setup Modify(Func<IContext, Func<Task<T>>, Key, Task<T>> newTaskDefinition) {
       return settings => settings.Add(new ModifyTask<T>(In(settings.Scope), (ctxt, oldTaskDef) => newTaskDefinition(ctxt, oldTaskDef, settings.Scope)));
     }
 
-    public Func<Settings, Settings> Modify(Func<Func<Task<T>>, Task<T>> newTaskDefinition) {
+    public Setup Modify(Func<Func<Task<T>>, Task<T>> newTaskDefinition) {
       return settings => settings.Add(new ModifyTask<T>(In(settings.Scope), (ctxt, oldTaskDef) => newTaskDefinition(oldTaskDef)));
     }
   }

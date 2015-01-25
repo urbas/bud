@@ -1,4 +1,7 @@
+using System;
 using System.IO;
+using System.Threading.Tasks;
+using Bud.Util;
 
 namespace Bud.Plugins.Build {
   public static class BuildDirs {
@@ -6,6 +9,23 @@ namespace Bud.Plugins.Build {
     public const string OutputDirName = "output";
     public const string BuildConfigCacheDirName = "buildConfigCache";
     public const string PersistentBuildConfigDirName = "persistentBuildConfig";
+
+    public static Setup Init(string baseDir) {
+      return settings => settings
+        .Do(
+          BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
+          BuildDirsKeys.BaseDir.Init(baseDir),
+          BuildDirsKeys.BudDir.Init(GetDefaultBudDir),
+          BuildDirsKeys.OutputDir.Init(GetDefaultOutputDir),
+          BuildDirsKeys.BuildConfigCacheDir.Init(GetDefaultBuildConfigCacheDir),
+          BuildDirsKeys.PersistentBuildConfigDir.Init(GetDefaultPersistentBuildConfigDir),
+          BuildDirsKeys.Clean.Modify(CleanBuildDirsTask)
+        )
+        .In(Key.Global,
+            BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
+            BuildDirsKeys.Clean.DependsOn(BuildDirsKeys.Clean.In(settings.Scope))
+        );
+    }
 
     public static string GetBaseDir(this IConfig buildConfiguration) {
       return buildConfiguration.GetBaseDir(Key.Global);
@@ -69,6 +89,14 @@ namespace Bud.Plugins.Build {
       var persistentConfigDir = context.GetPersistentBuildConfigDir();
       Directory.CreateDirectory(persistentConfigDir);
       return persistentConfigDir;
+    }
+
+    private static async Task CleanBuildDirsTask(IContext context, Func<Task> oldCleanTask, Key project) {
+      await oldCleanTask();
+      var dir = context.GetOutputDir(project);
+      if (Directory.Exists(dir)) {
+        Directory.Delete(dir, true);
+      }
     }
   }
 }

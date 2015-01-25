@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="ConfigKey.cs" />
     <Compile Include="IO\Paths.cs" />
+    <Compile Include="Setup.cs" />
     <Compile Include="Plugins\CSharp\CSharpConfig.cs" />
     <Compile Include="Plugins\CSharp\Framework.cs" />
     <Compile Include="Plugins\Deps\AssemblyRereference.cs" />
@@ -58,8 +59,8 @@
     <Compile Include="Plugins\Deps\PackageVersions.cs" />
     <Compile Include="Plugins\Projects\ProjectsConfig.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="SettingsUtils.cs" />
     <Compile Include="TaskKey.cs" />
-    <Compile Include="Unit.cs" />
     <Compile Include="Util\StringUtils.cs" />
     <Compile Include="Util\TaskUtils.cs" />
     <Compile Include="SettingsConstruction\AddDependencies.cs" />
@@ -74,7 +75,6 @@
     <Compile Include="Key.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="Plugins\Build\BuildKeyDefinitions.cs" />
     <Compile Include="Plugins\Build\BuildUtils.cs" />
     <Compile Include="Plugins\CSharp\CSharpBuildTargetPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -87,7 +87,6 @@
     <Compile Include="Plugins\Build\BuildTargetPlugin.cs" />
     <Compile Include="Plugins\Build\BuildDirs.cs" />
     <Compile Include="Plugins\Build\BuildDirsKeys.cs" />
-    <Compile Include="Plugins\Build\BuildDirsPlugin.cs" />
     <Compile Include="Plugins\Build\BuildKeys.cs" />
     <Compile Include="Plugins\Deps\DependenciesKeys.cs" />
     <Compile Include="Plugins\BuildLoading\BuildLoading.cs" />
@@ -104,7 +103,6 @@
     <Compile Include="Commander\IBuildCommander.cs" />
     <Compile Include="Commander\CommandEvaluator.cs" />
     <Compile Include="Commander\DefaultBuildCommander.cs" />
-    <Compile Include="Plugins\Build\GlobalBuildPlugin.cs" />
     <Compile Include="Plugins\Build\GlobalBuild.cs" />
     <Compile Include="Commander\BuildCommander.cs" />
     <Compile Include="Plugins\Deps\Dependencies.cs" />

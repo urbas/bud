@@ -7,12 +7,12 @@ using Bud.Cli;
 
 namespace Bud.Plugins.CSharp.Compiler {
   public static class CSharpCompiler {
-    public static Task<Unit> CompileProject(IContext context, Key buildKey) {
+    public static Task CompileBuildTarget(IContext context, Key buildTarget) {
       return Task.Run(async () => {
-        var outputFile = context.GetCSharpOutputAssemblyFile(buildKey);
-        var framework = context.GetTargetFramework(buildKey);
-        var sourceFiles = await context.GetCSharpSources(buildKey);
-        var libraryDependencies = await GetReferencedAssemblies(context, buildKey);
+        var outputFile = context.GetCSharpOutputAssemblyFile(buildTarget);
+        var framework = context.GetTargetFramework(buildTarget);
+        var sourceFiles = await context.GetCSharpSources(buildTarget);
+        var libraryDependencies = await GetReferencedAssemblies(context, buildTarget);
         var frameworkAssemblies = framework.RuntimeAssemblies;
         if (sourceFiles.Any()) {
           Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
@@ -22,7 +22,7 @@ namespace Bud.Plugins.CSharp.Compiler {
           if (libraryDependencies.Any()) {
             compilerProcess = compilerProcess.AddParamArgument("-reference:", libraryDependencies.Concat(frameworkAssemblies));
           }
-          compilerProcess = compilerProcess.AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(buildKey)));
+          compilerProcess = compilerProcess.AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(buildTarget)));
           compilerProcess = compilerProcess.AddArguments(sourceFiles);
           Console.WriteLine(compilerProcess.ExecutablePath + " " + compilerProcess.Arguments);
           var exitCode = compilerProcess.Start(Console.Out, Console.Error);
@@ -30,7 +30,6 @@ namespace Bud.Plugins.CSharp.Compiler {
             throw new Exception("Compilation failed.");
           }
         }
-        return Unit.Instance;
       });
     }
 
