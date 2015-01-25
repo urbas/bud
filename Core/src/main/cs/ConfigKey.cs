@@ -46,5 +46,9 @@ namespace Bud {
     public Setup Modify(Func<IConfig, T, T> configValueMutation) {
       return settings => settings.Add(new ModifyConfig<T>(In(settings.Scope), configValueMutation));
     }
+
+    public Setup Modify(Func<IConfig, T, Key, T> configValueMutation) {
+      return settings => settings.Add(new ModifyConfig<T>(In(settings.Scope), (ctxt, oldTaskDef) => configValueMutation(ctxt, oldTaskDef, settings.Scope)));
+    }
   }
 }

@@ -65,6 +65,7 @@
     <Compile Include="CSharp\CSharpKeys.cs" />
     <Compile Include="CSharp\Framework.cs" />
     <Compile Include="Dependencies\AssemblyRereference.cs" />
+    <Compile Include="Dependencies\DependenciesConfig.cs" />
     <Compile Include="Dependencies\DependenciesKeys.cs" />
     <Compile Include="Dependencies\DependenciesPlugin.cs" />
     <Compile Include="Dependencies\DependenciesSettings.cs" />

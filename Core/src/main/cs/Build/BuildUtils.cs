@@ -13,9 +13,5 @@ namespace Bud.Build {
     public static TaskKey BuildTaskKey(Key project, Key scope, Key language) {
       return BuildKeys.Build.In(BuildTarget(project, scope, language));
     }
-
-    public static Key BuildTargetSubKey(Key buildScope, Key language) {
-      return language.In(buildScope);
-    }
   }
 }

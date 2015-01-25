@@ -19,8 +19,7 @@ namespace Bud.CSharp {
     }
 
     protected override Settings Setup(Settings settings, Key project) {
-      return settings.Do(DependenciesPlugin.Init,
-                         CSharpKeys.SourceFiles.InitSync(FindSources),
+      return settings.Do(CSharpKeys.SourceFiles.InitSync(FindSources),
                          CSharpKeys.TargetFramework.Init(Framework.Net45),
                          CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
                          CSharpKeys.CollectReferencedAssemblies.Init(CollectAssembliesFromDependencies),
@@ -122,22 +121,6 @@ namespace Bud.CSharp {
 
     private static void CopyFile(string referencedAssembly, string targetDir) {
       File.Copy(referencedAssembly, Path.Combine(targetDir, Path.GetFileName(referencedAssembly)), true);
-    }
-
-    public static Key FindSiblingMainBuildTarget(Key buildTarget) {
-      return BuildUtils.BuildTarget(buildTarget.Parent.Parent, BuildKeys.Main, CSharpKeys.CSharp);
-    }
-
-    public static Key MainBuildTargetKey(Key project) {
-      return BuildUtils.BuildTarget(project, BuildKeys.Main, CSharpKeys.CSharp);
-    }
-
-    public static TaskKey MainBuildTaskKey(Key projectKey) {
-      return BuildUtils.BuildTaskKey(projectKey, BuildKeys.Main, CSharpKeys.CSharp);
-    }
-
-    public static TaskKey FindSiblingMainBuildTask(Key buildTarget) {
-      return MainBuildTaskKey(buildTarget.Parent.Parent);
     }
   }
 }

@@ -10,5 +10,13 @@ namespace Bud.Dependencies {
     public static readonly ConfigKey<ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>> ExternalDependenciesKeys = new ConfigKey<ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>>("externalDependenciesKeys");
     public static readonly ConfigKey<string> NuGetRepositoryDir = new ConfigKey<string>("nuGetRepositoryDir");
     public static readonly ConfigKey<NuGetPackages> NuGetResolvedPackages = new ConfigKey<NuGetPackages>("nuGetResolvedPackages");
+
+    public static ConfigKey<ImmutableList<ExternalDependency>> GetExternalDependenciesKey(Key dependent) {
+      return DependenciesKeys.ExternalDependencies.In(dependent);
+    }
+
+    public static ConfigKey<ImmutableList<InternalDependency>> GetInternalDependenciesKey(Key dependent) {
+      return DependenciesKeys.InternalDependencies.In(dependent);
+    }
   }
 }
