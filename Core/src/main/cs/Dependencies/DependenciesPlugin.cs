@@ -9,7 +9,7 @@ using NuGet;
 
 namespace Bud.Dependencies {
   public class DependenciesPlugin {
-    public static Settings Apply(Settings settings) {
+    public static Settings Init(Settings settings) {
       return settings.In(Key.Global,
                          DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
                          DependenciesKeys.NuGetRepositoryDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),

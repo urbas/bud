@@ -4,8 +4,8 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Bud.CSharp.Compiler;
 using Bud.Build;
+using Bud.CSharp.Compiler;
 using Bud.Dependencies;
 using Bud.Util;
 using NuGet;
@@ -19,16 +19,15 @@ namespace Bud.CSharp {
     }
 
     protected override Settings Setup(Settings settings, Key project) {
-      return settings.Do(
-        DependenciesPlugin.Apply,
-        CSharpKeys.SourceFiles.InitSync(FindSources),
-        CSharpKeys.TargetFramework.Init(Framework.Net45),
-        CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
-        CSharpKeys.CollectReferencedAssemblies.Init(CollectAssembliesFromDependencies),
-        CSharpKeys.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
-        CSharpKeys.OutputAssemblyName.Init(context => OutputAssemblyName(project, BuildScope)),
-        CSharpKeys.Dist.Init(CreateDistributablePackage),
-        CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile));
+      return settings.Do(DependenciesPlugin.Init,
+                         CSharpKeys.SourceFiles.InitSync(FindSources),
+                         CSharpKeys.TargetFramework.Init(Framework.Net45),
+                         CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
+                         CSharpKeys.CollectReferencedAssemblies.Init(CollectAssembliesFromDependencies),
+                         CSharpKeys.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
+                         CSharpKeys.OutputAssemblyName.Init(context => OutputAssemblyName(project, BuildScope)),
+                         CSharpKeys.Dist.Init(CreateDistributablePackage),
+                         CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile));
     }
 
     protected override Task BuildTaskImpl(IContext context, Key buildTarget) {
