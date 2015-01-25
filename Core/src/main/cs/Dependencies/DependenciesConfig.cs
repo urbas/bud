@@ -8,12 +8,12 @@ using Bud.Build;
 namespace Bud.Dependencies {
   public static class DependenciesConfig {
     public static ImmutableList<InternalDependency> GetInternalDependencies(this IConfig config, Key dependent) {
-      var dependenciesKey = DependenciesKeys.GetInternalDependenciesKey(dependent);
+      var dependenciesKey = DependenciesKeys.InternalDependencies.In(dependent);
       return config.IsConfigDefined(dependenciesKey) ? config.Evaluate(dependenciesKey) : ImmutableList<InternalDependency>.Empty;
     }
 
     public static ImmutableList<ExternalDependency> GetExternalDependencies(this IConfig config, Key dependent) {
-      var dependenciesKey = DependenciesKeys.GetExternalDependenciesKey(dependent);
+      var dependenciesKey = DependenciesKeys.ExternalDependencies.In(dependent);
       return config.IsConfigDefined(dependenciesKey) ? config.Evaluate(dependenciesKey) : ImmutableList<ExternalDependency>.Empty;
     }
 
@@ -27,7 +27,7 @@ namespace Bud.Dependencies {
     }
 
     public static async Task<ISet<Key>> ResolveInternalDependencies(this IContext context, Key dependent) {
-      var internalDependenciesKey = DependenciesKeys.GetInternalDependenciesKey(dependent);
+      var internalDependenciesKey = DependenciesKeys.InternalDependencies.In(dependent);
       var resolveDependenciesKey = DependenciesKeys.ResolveInternalDependencies.In(internalDependenciesKey);
       return context.IsTaskDefined(resolveDependenciesKey) ? await context.Evaluate(resolveDependenciesKey) : ImmutableHashSet<Key>.Empty;
     }
