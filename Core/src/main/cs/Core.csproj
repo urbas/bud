@@ -48,6 +48,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commander\BuildCommander.cs" />
+    <Compile Include="Commander\BuildCommanderKeys.cs" />
     <Compile Include="ConfigKey.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="Setup.cs" />
@@ -90,11 +92,9 @@
     <Compile Include="Plugins\Build\BuildDirsKeys.cs" />
     <Compile Include="Plugins\Build\BuildKeys.cs" />
     <Compile Include="Plugins\Deps\DependenciesKeys.cs" />
-    <Compile Include="Plugins\BuildLoading\BuildLoading.cs" />
     <Compile Include="Plugins\CSharp\Cs.cs" />
     <Compile Include="Plugins\CSharp\CSharpKeys.cs" />
     <Compile Include="Plugins\CSharp\Compiler\CSharpCompiler.cs" />
-    <Compile Include="Plugins\BuildLoading\BuildLoadingKeys.cs" />
     <Compile Include="Plugins\CSharp\AssemblyType.cs" />
     <Compile Include="IBuild.cs" />
     <Compile Include="BudAssemblies.cs" />
@@ -104,7 +104,6 @@
     <Compile Include="Commander\CommandEvaluator.cs" />
     <Compile Include="Commander\DefaultBuildCommander.cs" />
     <Compile Include="Plugins\Build\GlobalBuild.cs" />
-    <Compile Include="Commander\BuildCommander.cs" />
     <Compile Include="Plugins\Deps\Dependencies.cs" />
     <Compile Include="Plugins\Deps\ExternalDependency.cs" />
     <Compile Include="Plugins\Deps\InternalDependency.cs" />
@@ -113,7 +112,10 @@
     <Compile Include="Plugins\Deps\ResolvedExternalDependency.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Plugins\BuildCommander\" />
+    <Folder Include="Plugins\BuildLoading\" />
+  </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
