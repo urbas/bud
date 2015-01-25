@@ -4,15 +4,9 @@ using System.Threading.Tasks;
 using Bud.Util;
 
 namespace Bud.Plugins.Build {
-  public class BuildDirsPlugin : IPlugin {
-    private readonly string baseDir;
-
-    public BuildDirsPlugin(string baseDir) {
-      this.baseDir = baseDir;
-    }
-
-    public Settings ApplyTo(Settings settings) {
-      return settings
+  public class BuildDirsPlugin {
+    public static Func<Settings, Settings> Init(string baseDir) {
+      return settings => settings
         .Do(
           BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
           BuildDirsKeys.BaseDir.Init(baseDir),

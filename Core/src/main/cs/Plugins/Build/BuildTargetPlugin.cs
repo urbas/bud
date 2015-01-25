@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Bud.Util;
 
@@ -8,12 +10,12 @@ namespace Bud.Plugins.Build {
   public abstract class BuildTargetPlugin : IPlugin {
     protected readonly Key Scope;
     protected readonly Key Language;
-    private readonly IEnumerable<IPlugin> plugins;
+    private readonly IEnumerable<Func<Settings, Settings>> plugins;
 
-    protected BuildTargetPlugin(Key scope, Key language, IEnumerable<IPlugin> plugins) {
+    protected BuildTargetPlugin(Key scope, Key language, IEnumerable<Func<Settings, Settings>> plugins) {
       Scope = scope;
       Language = language;
-      this.plugins = plugins ?? ImmutableList<IPlugin>.Empty;
+      this.plugins = plugins ?? ImmutableList<Func<Settings, Settings>>.Empty;
     }
 
     public Settings ApplyTo(Settings settings) {
@@ -35,7 +37,7 @@ namespace Bud.Plugins.Build {
              BuildKeys.Build.In(Scope).DependsOn(BuildKeys.Build.In(buildTargetKey))
         )
         .Apply(buildTargetKey, PluginUtils.Create(existingsettings => ApplyTo(existingsettings, buildTargetKey, project)))
-        .Apply(buildTargetKey, plugins);
+        .In(buildTargetKey, plugins.ToArray());
     }
 
     protected abstract Settings ApplyTo(Settings existingsettings, Key project, Key buildTarget);

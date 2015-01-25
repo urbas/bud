@@ -8,12 +8,8 @@ using Newtonsoft.Json;
 using NuGet;
 
 namespace Bud.Plugins.Deps {
-  public class DependenciesPlugin : IPlugin {
-    public static readonly DependenciesPlugin Instance = new DependenciesPlugin();
-
-    private DependenciesPlugin() {}
-
-    public Settings ApplyTo(Settings settings) {
+  public class DependenciesPlugin {
+    public static Settings Apply(Settings settings) {
       return settings.In(Key.Global,
                          DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
                          DependenciesKeys.NuGetRepositoryDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),

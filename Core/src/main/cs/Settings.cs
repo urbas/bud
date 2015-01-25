@@ -7,6 +7,12 @@ using Bud.SettingsConstruction;
 namespace Bud {
   public delegate Settings SettingsTransform(Settings existingSettings);
 
+  public static class SettingsUtils {
+    public static Func<Settings, Settings> ToSettingsTransform(this IEnumerable<Func<Settings, Settings>> settingsTransforms) {
+      return settings => settingsTransforms.Aggregate(settings, (oldSettings, settingsTransform) => settingsTransform(oldSettings));
+    }
+  }
+
   public class Settings {
     public static readonly Settings Empty = new Settings();
     public readonly Key Scope;
@@ -25,6 +31,10 @@ namespace Bud {
 
     public Settings In(Key newScope, params Func<Settings, Settings>[] settingsTransforms) {
       return In(newScope).Do(settingsTransforms).In(Scope);
+    }
+
+    public Settings In(Key newScope, Func<Settings, Settings> settingsTransform, Func<Settings, Settings>[] settingsTransforms) {
+      return In(newScope, settingsTransform).In(newScope, settingsTransforms);
     }
 
     public Settings Do(params Func<Settings, Settings>[] settingsTransformations) {

@@ -7,7 +7,7 @@ namespace Bud.Plugins.BuildLoading {
   public static class BuildLoading {
     public static Settings BuildProject(this Settings build, string projectId, string budDir, string dirOfProjectToBeBuilt) {
       return build
-        .Project(projectId, budDir, Cs.Dll(), new BuildLoadingPlugin(dirOfProjectToBeBuilt));
+        .Project(projectId, budDir, Cs.Dll(), BuildLoadingPlugin.ApplyTo(dirOfProjectToBeBuilt));
     }
 
     public static string GetBuildConfigSourceFile(this IContext context, Key buildLoadingProject) {

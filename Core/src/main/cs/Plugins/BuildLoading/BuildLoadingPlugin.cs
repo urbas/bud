@@ -1,33 +1,22 @@
 using System;
-using System.Linq;
-using Bud.Plugins;
-using System.Collections.Immutable;
-using Bud.Plugins.CSharp;
-using Bud.Plugins.Build;
-using System.IO;
 using System.Collections.Generic;
-using Bud;
+using System.Collections.Immutable;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using System.Reflection;
 using Bud.Commander;
+using Bud.Plugins.Build;
+using Bud.Plugins.CSharp;
 
 namespace Bud.Plugins.BuildLoading {
-  public class BuildLoadingPlugin : IPlugin {
-    private readonly string dirOfProjectToBeBuilt;
-
-    public BuildLoadingPlugin(string dirOfProjectToBeBuilt) {
-      this.dirOfProjectToBeBuilt = dirOfProjectToBeBuilt;
-    }
-
-    public Settings ApplyTo(Settings settings) {
-      var project = settings.Scope;
-      var buildTarget = BuildUtils.BuildTargetKey(project, BuildKeys.Main, CSharpKeys.CSharp);
-      return settings
-        .Apply(project, Cs.Dll())
+  public class BuildLoadingPlugin {
+    public static Func<Settings, Settings> ApplyTo(string dirOfProjectToBeBuilt) {
+      return settings => settings
         .Do(
-          BuildLoadingKeys.CreateBuildCommander.Init(context => CreateBuildCommander(context, buildTarget))
+          Cs.Dll(),
+          BuildLoadingKeys.CreateBuildCommander.Init(context => CreateBuildCommander(context, BuildUtils.BuildTargetKey(settings.Scope, BuildKeys.Main, CSharpKeys.CSharp)))
         )
-        .In(buildTarget,
+        .In(BuildUtils.BuildTargetKey(settings.Scope, BuildKeys.Main, CSharpKeys.CSharp),
             BuildLoadingKeys.BuildConfigSourceFile.Init(context => Path.Combine(context.GetBaseDir(), "Build.cs")),
             BuildLoadingKeys.DirOfProjectToBeBuilt.Init(dirOfProjectToBeBuilt),
             CSharpKeys.SourceFiles.Modify(AddBuildDefinitionSourceFile),
@@ -37,7 +26,7 @@ namespace Bud.Plugins.BuildLoading {
         );
     }
 
-    public async Task<IBuildCommander> CreateBuildCommander(IContext context, Key key) {
+    public static async Task<IBuildCommander> CreateBuildCommander(IContext context, Key key) {
       var buildConfigSourceFile = context.GetBuildConfigSourceFile(key);
       var dirOfProjectToBeBuilt = context.GetDirOfProjectToBeBuilt(key);
       // TODO: Check if the BakedBuild.dll file exists. If it does, just load it.
@@ -49,15 +38,13 @@ namespace Bud.Plugins.BuildLoading {
       }
     }
 
-    public async Task<IEnumerable<string>> AddBuildDefinitionSourceFile(IContext context, Func<Task<IEnumerable<string>>> previousSourcesTask, Key key) {
+    public static async Task<IEnumerable<string>> AddBuildDefinitionSourceFile(IContext context, Func<Task<IEnumerable<string>>> previousSourcesTask, Key key) {
       var previousSources = await previousSourcesTask();
-      return previousSources.Concat(new []{ context.GetBuildConfigSourceFile(key) });
+      return previousSources.Concat(new[] {context.GetBuildConfigSourceFile(key)});
     }
 
     private static async Task<ImmutableList<string>> AddBudAssemblies(IContext context, Func<Task<ImmutableList<string>>> existingAssemblies) {
       return (await existingAssemblies()).AddRange(BudAssemblies.GetBudAssembliesLocations());
     }
   }
-
 }
-

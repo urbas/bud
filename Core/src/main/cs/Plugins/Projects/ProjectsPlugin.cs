@@ -14,7 +14,7 @@ namespace Bud.Plugins.Projects {
     public Settings ApplyTo(Settings settings) {
       var project = settings.Scope;
       return settings
-        .Apply(project, new BuildDirsPlugin(baseDir))
+        .In(project, BuildDirsPlugin.Init(baseDir))
         .In(Key.Global,
             ProjectKeys.Projects.Init(ImmutableDictionary<string, Key>.Empty),
             ProjectKeys.Projects.Modify(allProjects => allProjects.Add(id, project))

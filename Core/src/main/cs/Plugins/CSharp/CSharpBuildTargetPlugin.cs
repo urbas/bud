@@ -12,14 +12,14 @@ using NuGet;
 
 namespace Bud.Plugins.CSharp {
   public class CSharpBuildTargetPlugin : BuildTargetPlugin {
-    public static readonly IPlugin ConvertBuildTargetToDll = PluginUtils.Create(existingSettings => existingSettings.Do(CSharpKeys.AssemblyType.Modify(AssemblyType.Library)));
+    public static readonly Func<Settings, Settings> ConvertBuildTargetToDll = existingSettings => existingSettings.Do(CSharpKeys.AssemblyType.Modify(AssemblyType.Library));
 
-    public CSharpBuildTargetPlugin(Key scope, params IPlugin[] plugins) : base(scope, CSharpKeys.CSharp, plugins) {}
+    public CSharpBuildTargetPlugin(Key scope, params Func<Settings, Settings>[] plugins) : base(scope, CSharpKeys.CSharp, plugins) {}
 
     protected override Settings ApplyTo(Settings existingsettings, Key buildTarget, Key project) {
       return existingsettings
-        .Apply(buildTarget, DependenciesPlugin.Instance)
-        .In(buildTarget,
+        .Do(
+            DependenciesPlugin.Apply,
             CSharpKeys.SourceFiles.InitSync(FindSources),
             CSharpKeys.TargetFramework.Init(Framework.Net45),
             CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
@@ -29,6 +29,10 @@ namespace Bud.Plugins.CSharp {
             CSharpKeys.Dist.Init(CreateDistributablePackage),
             CSharpKeys.OutputAssemblyFile.Init(context => Path.Combine(context.GetCSharpOutputAssemblyDir(buildTarget), String.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(buildTarget), GetAssemblyFileExtension(context, buildTarget))))
         );
+    }
+
+    public static Func<Settings, Settings> Init(Key project, params Func<Settings, Settings>[] settingsTransforms) {
+      return new CSharpBuildTargetPlugin(project, settingsTransforms).ApplyTo;
     }
 
     private static string OutputAssemblyName(Key project, Key scope) {

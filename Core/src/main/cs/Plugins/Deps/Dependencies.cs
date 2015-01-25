@@ -10,14 +10,12 @@ namespace Bud.Plugins.Deps {
   public static class Dependencies {
     public const string FetchedPackagesFileName = "nuGetPackages.json";
 
-    public static IPlugin AddDependency(InternalDependency internalDependency,
+    public static Func<Settings, Settings> AddDependency(InternalDependency internalDependency,
                                         ExternalDependency fallbackExternalDependency,
                                         Predicate<IConfig> shouldUseInternalDependency) {
-      return PluginUtils.Create(existingSettings =>
-        existingSettings
+      return existingSettings => existingSettings
           .AddDependency(internalDependency, shouldUseInternalDependency)
-          .AddDependency(fallbackExternalDependency, config => !shouldUseInternalDependency(config))
-        );
+          .AddDependency(fallbackExternalDependency, config => !shouldUseInternalDependency(config));
     }
 
     public static IPlugin AddDependency(ExternalDependency dependency) {
