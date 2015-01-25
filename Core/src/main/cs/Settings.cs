@@ -23,10 +23,6 @@ namespace Bud {
       return In(newScope).Do(setups).In(Scope);
     }
 
-    public Settings In(Key newScope, Setup setup, Setup[] setups) {
-      return In(newScope, setup).In(newScope, setups);
-    }
-
     public Settings Do(params Setup[] setups) {
       return setups.Aggregate(this, (oldSettings, plugin) => plugin(oldSettings)).In(Scope);
     }
