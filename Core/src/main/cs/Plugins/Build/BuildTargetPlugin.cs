@@ -43,7 +43,7 @@ namespace Bud.Plugins.Build {
     protected abstract Task BuildTaskImpl(IContext arg, Key buildTarget);
 
     protected Key BuildTargetKey(Key project) {
-      return BuildUtils.BuildTargetKey(project, BuildScope, Language);
+      return BuildUtils.BuildTarget(project, BuildScope, Language);
     }
   }
 }

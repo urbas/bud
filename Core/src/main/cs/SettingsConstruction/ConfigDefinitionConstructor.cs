@@ -4,7 +4,7 @@ namespace Bud.SettingsConstruction {
   public abstract class ConfigDefinitionConstructor {
     public readonly ConfigKey Key;
 
-    public ConfigDefinitionConstructor(ConfigKey key) {
+    protected ConfigDefinitionConstructor(ConfigKey key) {
       Key = key;
     }
 

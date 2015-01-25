@@ -16,10 +16,7 @@ namespace Bud {
     private ConfigKey(string id, Key parent) : base(id, parent) {}
 
     public new ConfigKey<T> In(Key parent) {
-      if (parent.IsGlobal) {
-        return this;
-      }
-      return new ConfigKey<T>(Id, Concat(parent, Parent));
+      return parent.IsGlobal ? this : new ConfigKey<T>(Id, Concat(parent, Parent));
     }
 
     public Setup Init(T configValue) {

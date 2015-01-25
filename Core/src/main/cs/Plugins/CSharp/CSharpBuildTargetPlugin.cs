@@ -126,11 +126,11 @@ namespace Bud.Plugins.CSharp {
     }
 
     public static Key FindSiblingMainBuildTarget(Key buildTarget) {
-      return BuildUtils.BuildTargetKey(buildTarget.Parent.Parent, BuildKeys.Main, CSharpKeys.CSharp);
+      return BuildUtils.BuildTarget(buildTarget.Parent.Parent, BuildKeys.Main, CSharpKeys.CSharp);
     }
 
     public static Key MainBuildTargetKey(Key project) {
-      return BuildUtils.BuildTargetKey(project, BuildKeys.Main, CSharpKeys.CSharp);
+      return BuildUtils.BuildTarget(project, BuildKeys.Main, CSharpKeys.CSharp);
     }
 
     public static TaskKey MainBuildTaskKey(Key projectKey) {

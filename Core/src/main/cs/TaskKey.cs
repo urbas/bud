@@ -58,10 +58,7 @@ namespace Bud {
     }
 
     public new TaskKey In(Key parent) {
-      if (parent.IsGlobal) {
-        return this;
-      }
-      return new TaskKey(Id, Concat(parent, Parent));
+      return parent.IsGlobal ? this : new TaskKey(Id, Concat(parent, Parent));
     }
   }
 
@@ -74,10 +71,7 @@ namespace Bud {
     private TaskKey(string id, Key parent) : base(id, parent) {}
 
     public new TaskKey<T> In(Key parent) {
-      if (parent.IsGlobal) {
-        return this;
-      }
-      return new TaskKey<T>(Id, Concat(parent, Parent));
+      return parent.IsGlobal ? this : new TaskKey<T>(Id, Concat(parent, Parent));
     }
 
     public Setup InitSync(Func<T> taskDefinition) {

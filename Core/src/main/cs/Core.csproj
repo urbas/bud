@@ -60,6 +60,7 @@
     <Compile Include="Plugins\Projects\ProjectsConfig.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsUtils.cs" />
+    <Compile Include="TaskDependencies.cs" />
     <Compile Include="TaskKey.cs" />
     <Compile Include="Util\StringUtils.cs" />
     <Compile Include="Util\TaskUtils.cs" />
@@ -94,7 +95,6 @@
     <Compile Include="Plugins\CSharp\CSharpKeys.cs" />
     <Compile Include="Plugins\CSharp\Compiler\CSharpCompiler.cs" />
     <Compile Include="Plugins\BuildLoading\BuildLoadingKeys.cs" />
-    <Compile Include="Plugins\BuildLoading\BuildLoadingPlugin.cs" />
     <Compile Include="Plugins\CSharp\AssemblyType.cs" />
     <Compile Include="IBuild.cs" />
     <Compile Include="BudAssemblies.cs" />

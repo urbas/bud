@@ -39,6 +39,10 @@ namespace Bud {
       return Empty.In(scope, setups);
     }
 
+    public static Setup Modify(params Setup[] setups) {
+      return settings => settings.Do(setups);
+    }
+
     public Settings Add(ConfigDefinitionConstructor configConstructor) {
       return new Settings(ConfigConstructors.Add(configConstructor), TaskConstructors, Scope);
     }
