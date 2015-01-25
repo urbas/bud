@@ -48,18 +48,38 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Build\BuildDirs.cs" />
+    <Compile Include="Build\BuildDirsKeys.cs" />
+    <Compile Include="Build\BuildKeys.cs" />
+    <Compile Include="Build\BuildTargetPlugin.cs" />
+    <Compile Include="Build\BuildUtils.cs" />
+    <Compile Include="Build\GlobalBuild.cs" />
     <Compile Include="Commander\BuildCommander.cs" />
     <Compile Include="Commander\BuildCommanderKeys.cs" />
     <Compile Include="ConfigKey.cs" />
+    <Compile Include="CSharp\AssemblyType.cs" />
+    <Compile Include="CSharp\Compiler\CSharpCompiler.cs" />
+    <Compile Include="CSharp\Cs.cs" />
+    <Compile Include="CSharp\CSharpBuildTargetPlugin.cs" />
+    <Compile Include="CSharp\CSharpConfig.cs" />
+    <Compile Include="CSharp\CSharpKeys.cs" />
+    <Compile Include="CSharp\Framework.cs" />
+    <Compile Include="Dependencies\AssemblyRereference.cs" />
+    <Compile Include="Dependencies\DependenciesKeys.cs" />
+    <Compile Include="Dependencies\DependenciesPlugin.cs" />
+    <Compile Include="Dependencies\DependenciesSettings.cs" />
+    <Compile Include="Dependencies\ExternalDependency.cs" />
+    <Compile Include="Dependencies\InternalDependency.cs" />
+    <Compile Include="Dependencies\NuGetPackages.cs" />
+    <Compile Include="Dependencies\Package.cs" />
+    <Compile Include="Dependencies\PackageInfo.cs" />
+    <Compile Include="Dependencies\PackageVersions.cs" />
+    <Compile Include="Dependencies\ResolvedExternalDependency.cs" />
     <Compile Include="IO\Paths.cs" />
+    <Compile Include="Projects\ProjectKeys.cs" />
+    <Compile Include="Projects\ProjectsConfig.cs" />
+    <Compile Include="Projects\ProjectsSettings.cs" />
     <Compile Include="Setup.cs" />
-    <Compile Include="Plugins\CSharp\CSharpConfig.cs" />
-    <Compile Include="Plugins\CSharp\Framework.cs" />
-    <Compile Include="Plugins\Deps\AssemblyRereference.cs" />
-    <Compile Include="Plugins\Deps\Package.cs" />
-    <Compile Include="Plugins\Deps\PackageInfo.cs" />
-    <Compile Include="Plugins\Deps\PackageVersions.cs" />
-    <Compile Include="Plugins\Projects\ProjectsConfig.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsUtils.cs" />
     <Compile Include="TaskDependencies.cs" />
@@ -78,24 +98,10 @@
     <Compile Include="Key.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Config.cs" />
-    <Compile Include="Plugins\Build\BuildUtils.cs" />
-    <Compile Include="Plugins\CSharp\CSharpBuildTargetPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IO\Directories.cs" />
     <Compile Include="Cli\ProcessBuilder.cs" />
     <Compile Include="IO\TemporaryDirectory.cs" />
-    <Compile Include="Plugins\Projects\ProjectsSettings.cs" />
-    <Compile Include="Plugins\Projects\ProjectKeys.cs" />
-    <Compile Include="Plugins\Projects\ProjectsPlugin.cs" />
-    <Compile Include="Plugins\Build\BuildTargetPlugin.cs" />
-    <Compile Include="Plugins\Build\BuildDirs.cs" />
-    <Compile Include="Plugins\Build\BuildDirsKeys.cs" />
-    <Compile Include="Plugins\Build\BuildKeys.cs" />
-    <Compile Include="Plugins\Deps\DependenciesKeys.cs" />
-    <Compile Include="Plugins\CSharp\Cs.cs" />
-    <Compile Include="Plugins\CSharp\CSharpKeys.cs" />
-    <Compile Include="Plugins\CSharp\Compiler\CSharpCompiler.cs" />
-    <Compile Include="Plugins\CSharp\AssemblyType.cs" />
     <Compile Include="IBuild.cs" />
     <Compile Include="BudAssemblies.cs" />
     <Compile Include="Commander\AppDomainBuildCommander.cs" />
@@ -103,19 +109,9 @@
     <Compile Include="Commander\IBuildCommander.cs" />
     <Compile Include="Commander\CommandEvaluator.cs" />
     <Compile Include="Commander\DefaultBuildCommander.cs" />
-    <Compile Include="Plugins\Build\GlobalBuild.cs" />
-    <Compile Include="Plugins\Deps\Dependencies.cs" />
-    <Compile Include="Plugins\Deps\ExternalDependency.cs" />
-    <Compile Include="Plugins\Deps\InternalDependency.cs" />
-    <Compile Include="Plugins\Deps\DependenciesPlugin.cs" />
-    <Compile Include="Plugins\Deps\NuGetPackages.cs" />
-    <Compile Include="Plugins\Deps\ResolvedExternalDependency.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="Plugins\BuildCommander\" />
-    <Folder Include="Plugins\BuildLoading\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

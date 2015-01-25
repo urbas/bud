@@ -4,9 +4,9 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Bud.Plugins.Build;
-using Bud.Plugins.CSharp;
-using Bud.Plugins.Projects;
+using Bud.Build;
+using Bud.CSharp;
+using Bud.Projects;
 
 namespace Bud.Commander {
   public static class BuildCommander {

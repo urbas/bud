@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Bud.SettingsConstruction;
 using System.Collections.Immutable;
-using System.Text;
 
 namespace Bud {
-
   public interface IConfig {
     ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions { get; }
     bool IsConfigDefined(Key key);
@@ -22,7 +19,9 @@ namespace Bud {
       this.configDefinitions = configDefinitions;
     }
 
-    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions { get { return configDefinitions; } }
+    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions {
+      get { return configDefinitions; }
+    }
 
     public bool IsConfigDefined(Key key) {
       return configDefinitions.ContainsKey(key);
@@ -33,7 +32,7 @@ namespace Bud {
     }
 
     public T Evaluate<T>(ConfigKey<T> configKey) {
-      return (T)Evaluate((ConfigKey)configKey);
+      return (T) Evaluate((ConfigKey) configKey);
     }
 
     public object EvaluateConfig(Key key) {

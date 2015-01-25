@@ -1,6 +1,6 @@
 using Bud.Commander;
 using Bud.Test.Util;
-using Bud.Plugins.Build;
+using Bud.Build;
 using Bud.Test.Assertions;
 using System.IO;
 using NUnit.Framework;

@@ -1,6 +1,6 @@
 using Bud;
-using Bud.Plugins.CSharp;
-using Bud.Plugins.Projects;
+using Bud.CSharp;
+using Bud.Projects;
 
 public class Build : IBuild {
   public Settings Setup(Settings settings, string baseDir) {

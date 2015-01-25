@@ -1,6 +1,6 @@
 using System.IO;
-using Bud.Plugins.Build;
-using Bud.Plugins.CSharp;
+using Bud.Build;
+using Bud.CSharp;
 using Bud.Test.Util;
 
 namespace Bud {

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using Bud.Plugins.Build;
-using Bud.Plugins.Projects;
+using Bud.Build;
+using Bud.Projects;
 using NUnit.Framework;
 
 namespace Bud {

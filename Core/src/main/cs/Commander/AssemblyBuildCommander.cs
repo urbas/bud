@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
-using Bud.Plugins.Build;
+using Bud.Build;
 
 namespace Bud.Commander {
   public class AssemblyBuildCommander : MarshalByRefObject, IBuildCommander {

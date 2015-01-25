@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using Bud.Plugins.Build;
+using Bud.Build;
 using Bud.Test.Assertions;
 using Bud.Test.Util;
 using NUnit.Framework;

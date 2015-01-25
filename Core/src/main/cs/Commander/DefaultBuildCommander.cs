@@ -1,7 +1,7 @@
 using System.IO;
-using Bud.Plugins.Build;
-using Bud.Plugins.CSharp;
-using Bud.Plugins.Projects;
+using Bud.Build;
+using Bud.CSharp;
+using Bud.Projects;
 
 namespace Bud.Commander {
   public class DefaultBuildCommander : IBuildCommander {

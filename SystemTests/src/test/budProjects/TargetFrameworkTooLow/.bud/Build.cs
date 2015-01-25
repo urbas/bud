@@ -1,6 +1,6 @@
 using Bud;
-using Bud.Plugins.CSharp;
-using Bud.Plugins.Projects;
+using Bud.CSharp;
+using Bud.Projects;
 using System.IO;
 using System;
 
