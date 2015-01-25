@@ -18,14 +18,13 @@ namespace Bud.Dependencies {
     public static Setup AddDependency(InternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
       return Settings.Modify(DependenciesKeys.InternalDependencies.Init(ImmutableList<InternalDependency>.Empty),
                              DependenciesKeys.InternalDependencies.Modify((config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies),
-                             DependenciesKeys.ResolveInternalDependencies.In(DependenciesKeys.InternalDependencies).Init(ResolveInternalDependenciesImpl));
+                             DependenciesKeys.ResolveInternalDependencies.Init(ResolveInternalDependenciesImpl));
     }
 
     public static Setup AddDependency(ExternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
       return settings => settings
         .Do(DependenciesKeys.ExternalDependencies.Init(ImmutableList<ExternalDependency>.Empty),
-            DependenciesKeys.ExternalDependencies.Modify((config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies),
-            DependenciesKeys.ResolveInternalDependencies.In(DependenciesKeys.ExternalDependencies).Init(ResolveInternalDependenciesImpl))
+            DependenciesKeys.ExternalDependencies.Modify((config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies))
         .In(Key.Global,
             DependenciesKeys.ExternalDependenciesKeys.Modify((ctxt, oldValue) => oldValue.Add(DependenciesKeys.ExternalDependencies.In(settings.Scope))));
     }

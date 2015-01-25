@@ -5,10 +5,10 @@ using Bud.Projects;
 namespace Bud.CSharp {
   public static class Cs {
     public static Setup Dependency(string packageName, string packageVersion = null, string scope = null) {
-      var dependencyProjectKey = ProjectsSettings.ProjectKey(packageName);
-      var dependencyBuildTargetKey = BuildUtils.BuildTarget(dependencyProjectKey, BuildKeys.Main, CSharpKeys.CSharp);
+      var dependencyProject = ProjectsSettings.ProjectKey(packageName);
+      var dependencyBuildTargetKey = BuildUtils.BuildTarget(dependencyProject, BuildKeys.Main, CSharpKeys.CSharp);
       return DependenciesSettings.AddDependency(
-        new InternalDependency(dependencyBuildTargetKey, BuildUtils.BuildTaskKey(dependencyProjectKey, BuildKeys.Main, CSharpKeys.CSharp)),
+        new InternalDependency(dependencyBuildTargetKey, BuildUtils.BuildTaskKey(dependencyProject, BuildKeys.Main, CSharpKeys.CSharp)),
         new ExternalDependency(packageName, packageVersion),
         shouldUseInternalDependency: context => IsMainBuildTargetDefined(context, dependencyBuildTargetKey));
     }

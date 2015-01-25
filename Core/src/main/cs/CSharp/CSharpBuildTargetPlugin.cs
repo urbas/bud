@@ -22,11 +22,11 @@ namespace Bud.CSharp {
       return settings.Do(CSharpKeys.SourceFiles.InitSync(FindSources),
                          CSharpKeys.TargetFramework.Init(Framework.Net45),
                          CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
-                         CSharpKeys.CollectReferencedAssemblies.Init(CollectAssembliesFromDependencies),
+                         CSharpKeys.CollectReferencedAssemblies.Init(CollectReferencedAssembliesImpl),
                          CSharpKeys.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
                          CSharpKeys.OutputAssemblyName.Init(context => OutputAssemblyName(project, BuildScope)),
-                         CSharpKeys.Dist.Init(CreateDistributablePackage),
-                         CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile));
+                         CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile),
+                         CSharpKeys.Dist.Init(CreateDistributablePackage));
     }
 
     protected override Task BuildTaskImpl(IContext context, Key buildTarget) {
@@ -56,7 +56,7 @@ namespace Bud.CSharp {
       return ImmutableList<string>.Empty;
     }
 
-    private async Task<ImmutableList<string>> CollectAssembliesFromDependencies(IContext context, Key buildTarget) {
+    private async Task<ImmutableList<string>> CollectReferencedAssembliesImpl(IContext context, Key buildTarget) {
       var internalDependencies = await context.ResolveInternalDependencies(buildTarget);
       var internalDependencyAssemblyPaths = CollectInternalDependencies(context, internalDependencies);
       var directNuGetDependencies = CollectExternalDependencies(context, buildTarget);

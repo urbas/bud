@@ -26,9 +26,14 @@ namespace Bud.Dependencies {
       return context.Evaluate(DependenciesKeys.ExternalDependenciesKeys);
     }
 
+    /// <summary>
+    /// Invokes the tasks on all internal dependencies and returns
+    /// </summary>
+    /// <param name="context"></param>
+    /// <param name="dependent"></param>
+    /// <returns></returns>
     public static async Task<ISet<Key>> ResolveInternalDependencies(this IContext context, Key dependent) {
-      var internalDependenciesKey = DependenciesKeys.InternalDependencies.In(dependent);
-      var resolveDependenciesKey = DependenciesKeys.ResolveInternalDependencies.In(internalDependenciesKey);
+      var resolveDependenciesKey = DependenciesKeys.ResolveInternalDependencies.In(dependent);
       return context.IsTaskDefined(resolveDependenciesKey) ? await context.Evaluate(resolveDependenciesKey) : ImmutableHashSet<Key>.Empty;
     }
 
