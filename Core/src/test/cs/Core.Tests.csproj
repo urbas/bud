@@ -61,7 +61,7 @@
     <Compile Include="IO\PathsTest.cs" />
     <Compile Include="Plugins\ProjectsPluginTest.cs" />
     <Compile Include="SettingsConstruction\SettingConstructionTest.cs" />
-    <Compile Include="ScopeTest.cs" />
+    <Compile Include="KeyTest.cs" />
     <Compile Include="Util\StringUtilsTest.cs" />
   </ItemGroup>
   <ItemGroup>

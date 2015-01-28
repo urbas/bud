@@ -24,7 +24,7 @@ namespace Bud {
     }
 
     public bool IsConfigDefined(Key key) {
-      return configDefinitions.ContainsKey(key);
+      return configDefinitions.ContainsKey(key.In(Key.Root));
     }
 
     public object Evaluate(ConfigKey key) {
@@ -37,16 +37,17 @@ namespace Bud {
 
     public object EvaluateConfig(Key key) {
       object value;
-      if (configValues.TryGetValue(key, out value)) {
+      var absoluteKey = key.In(Key.Root);
+      if (configValues.TryGetValue(absoluteKey, out value)) {
         return value;
       }
       IConfigDefinition configDefinition;
-      if (configDefinitions.TryGetValue(key, out configDefinition)) {
+      if (configDefinitions.TryGetValue(absoluteKey, out configDefinition)) {
         value = configDefinition.Evaluate(this);
-        configValues.Add(key, value);
+        configValues.Add(absoluteKey, value);
         return value;
       }
-      throw new ArgumentException(string.Format("Could not evaluate configuration '{0}'. The value for this configuration was not defined.", key));
+      throw new ArgumentException(string.Format("Could not evaluate configuration '{0}'. The value for this configuration was not defined.", absoluteKey));
     }
   }
 }

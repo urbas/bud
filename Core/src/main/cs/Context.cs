@@ -57,10 +57,11 @@ namespace Bud {
     }
 
     public Task EvaluateKey(Key key) {
-      if (IsTaskDefined(key)) {
-        return EvaluateTask(key);
+      var absoluteKey = key.In(Key.Root);
+      if (IsTaskDefined(absoluteKey)) {
+        return EvaluateTask(absoluteKey);
       }
-      return Task.FromResult(configuration.EvaluateConfig(key));
+      return Task.FromResult(configuration.EvaluateConfig(absoluteKey));
     }
 
     public Task Evaluate(TaskKey key) {
@@ -95,21 +96,22 @@ namespace Bud {
 
     public Task EvaluateTask(Key key) {
       Task value;
-      if (taskValues.TryGetValue(key, out value)) {
+      var absoluteKey = key.In(Key.Root);
+      if (taskValues.TryGetValue(absoluteKey, out value)) {
         return value;
       }
       ITaskDefinition taskDefinition;
-      if (taskDefinitions.TryGetValue(key, out taskDefinition)) {
+      if (taskDefinitions.TryGetValue(absoluteKey, out taskDefinition)) {
         value = taskDefinition.Evaluate(this);
-        taskValues.Add(key, value);
+        taskValues.Add(absoluteKey, value);
         return value;
       }
-      throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. The value for this task was not defined.", key));
+      throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. The value for this task was not defined.", absoluteKey));
     }
 
     public object GetOutputOf(Key key) {
       object evaluationOutput;
-      if (keyToOutput.TryGetValue(key, out evaluationOutput)) {
+      if (keyToOutput.TryGetValue(key.In(Key.Root), out evaluationOutput)) {
         return evaluationOutput;
       }
       return null;

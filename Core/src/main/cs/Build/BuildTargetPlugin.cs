@@ -20,22 +20,19 @@ namespace Bud.Build {
       var project = settings.Scope;
       var buildTargetKey = BuildTargetKey(project);
       return settings
-        .Do(
-          BuildKeys.Test.Init(TaskUtils.NoOpTask)
-        ).In(buildTargetKey,
-             BuildDirsKeys.BaseDir.Init(context => Path.Combine(context.GetBaseDir(project), "src", BuildScope.Id, Language.Id)),
-             BuildDirsKeys.OutputDir.Init(context => Path.Combine(context.GetOutputDir(project), BuildScope.Id, Language.Id)),
-             BuildKeys.Build.Init(BuildTaskImpl),
-             existingsettings => Setup(existingsettings, project),
-             setups.ToPlugin()
-        ).In(Key.Global,
-             BuildKeys.Test.Init(TaskUtils.NoOpTask),
-             BuildKeys.Test.DependsOn(BuildKeys.Test.In(project)),
-             BuildKeys.Build.Init(TaskUtils.NoOpTask),
-             BuildKeys.Build.DependsOn(BuildKeys.Build.In(BuildScope)),
-             BuildKeys.Build.In(BuildScope).Init(TaskUtils.NoOpTask),
-             BuildKeys.Build.In(BuildScope).DependsOn(BuildKeys.Build.In(buildTargetKey))
-        );
+        .Do(BuildKeys.Test.Init(TaskUtils.NoOpTask))
+        .In(buildTargetKey,
+            BuildDirsKeys.BaseDir.Init(context => Path.Combine(context.GetBaseDir(project), "src", BuildScope.Id, Language.Id)),
+            BuildDirsKeys.OutputDir.Init(context => Path.Combine(context.GetOutputDir(project), BuildScope.Id, Language.Id)),
+            BuildKeys.Build.Init(BuildTaskImpl),
+            existingsettings => Setup(existingsettings, project),
+            setups.ToPlugin())
+        .Globally(BuildKeys.Test.Init(TaskUtils.NoOpTask),
+                  BuildKeys.Test.DependsOn(BuildKeys.Test.In(project)),
+                  BuildKeys.Build.Init(TaskUtils.NoOpTask),
+                  BuildKeys.Build.DependsOn(BuildKeys.Build.In(BuildScope)),
+                  BuildKeys.Build.In(BuildScope).Init(TaskUtils.NoOpTask),
+                  BuildKeys.Build.In(BuildScope).DependsOn(BuildKeys.Build.In(buildTargetKey)));
     }
 
     protected abstract Settings Setup(Settings existingsettings, Key project);

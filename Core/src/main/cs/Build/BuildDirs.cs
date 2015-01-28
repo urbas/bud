@@ -21,14 +21,12 @@ namespace Bud.Build {
           BuildDirsKeys.PersistentBuildConfigDir.Init(GetDefaultPersistentBuildConfigDir),
           BuildDirsKeys.Clean.Modify(CleanBuildDirsTask)
         )
-        .In(Key.Global,
-            BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
-            BuildDirsKeys.Clean.DependsOn(BuildDirsKeys.Clean.In(settings.Scope))
-        );
+        .Globally(BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
+                  BuildDirsKeys.Clean.DependsOn(BuildDirsKeys.Clean.In(settings.Scope)));
     }
 
     public static string GetBaseDir(this IConfig buildConfiguration) {
-      return buildConfiguration.GetBaseDir(Key.Global);
+      return buildConfiguration.GetBaseDir(Key.Root);
     }
 
     public static string GetBaseDir(this IConfig buildConfiguration, Key project) {
@@ -36,7 +34,7 @@ namespace Bud.Build {
     }
 
     public static string GetBudDir(this IConfig buildConfiguration) {
-      return buildConfiguration.GetBudDir(Key.Global);
+      return buildConfiguration.GetBudDir(Key.Root);
     }
 
     public static string GetBudDir(this IConfig buildConfiguration, Key project) {
@@ -78,7 +76,7 @@ namespace Bud.Build {
     }
 
     public static string GetPersistentBuildConfigDir(this IConfig buildConfiguration) {
-      return buildConfiguration.GetPersistentBuildConfigDir(Key.Global);
+      return buildConfiguration.GetPersistentBuildConfigDir(Key.Root);
     }
 
     public static string GetDefaultPersistentBuildConfigDir(this IConfig ctxt, Key key) {

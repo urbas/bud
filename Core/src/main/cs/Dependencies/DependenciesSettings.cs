@@ -22,11 +22,9 @@ namespace Bud.Dependencies {
     }
 
     public static Setup AddDependency(ExternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
-      return settings => settings
-        .Do(DependenciesKeys.ExternalDependencies.Init(ImmutableList<ExternalDependency>.Empty),
-            DependenciesKeys.ExternalDependencies.Modify((config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies))
-        .In(Key.Global,
-            DependenciesKeys.ExternalDependenciesKeys.Modify((ctxt, oldValue) => oldValue.Add(DependenciesKeys.ExternalDependencies.In(settings.Scope))));
+      return settings => settings.Do(DependenciesKeys.ExternalDependencies.Init(ImmutableList<ExternalDependency>.Empty),
+                                     DependenciesKeys.ExternalDependencies.Modify((config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies))
+                                 .Globally(DependenciesKeys.ExternalDependenciesKeys.Modify((ctxt, oldValue) => oldValue.Add(DependenciesKeys.ExternalDependencies.In(settings.Scope))));
     }
 
     private static Task<ISet<Key>> ResolveInternalDependenciesImpl(IContext context, Key dependent) {

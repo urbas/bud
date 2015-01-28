@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Bud {
   public class Key : MarshalByRefObject {
-    public static readonly Key Global = new Key("Global", null, "The root scope. There can be only one!");
+    public static readonly Key Root = new Key("Root", null, "The root scope. There can be only one!");
     public const char KeySeparator = '/';
     private static readonly char[] KeySplitter = {KeySeparator};
     public readonly Key Parent;
@@ -12,10 +12,10 @@ namespace Bud {
     private readonly int depth;
     private readonly int hash;
 
-    public Key(string id, string description = null) : this(id, Global, description) {}
+    public Key(string id, string description = null) : this(id, null, description) {}
 
     public Key(string id, Key parent, string description = null) {
-      Parent = parent ?? this;
+      Parent = parent;
       Id = id;
       Description = description ?? string.Empty;
       depth = parent == null ? 1 : (parent.depth + 1);
@@ -24,20 +24,32 @@ namespace Bud {
       }
     }
 
-    public bool IsRoot { get { return this == Parent; } }
+    public bool IsRoot {
+      get { return Equals(this, Root); }
+    }
+
+    public bool IsAbsolute {
+      get { return Equals(this, Root) || (Parent != null && Parent.IsAbsolute); }
+    }
 
     public Key In(Key parent) {
       return Concat(parent, this);
     }
 
     public static Key Concat(Key parentKey, Key childKey) {
+      if (parentKey == null) {
+        return childKey;
+      }
+      if (childKey == null) {
+        return parentKey;
+      }
+      if (!childKey.IsAbsolute) {
+        return new Key(childKey.Id, Concat(parentKey, childKey.Parent), childKey.Description);
+      }
       if (parentKey.IsRoot) {
         return childKey;
       }
-      if (childKey.IsRoot) {
-        return parentKey;
-      }
-      return new Key(childKey.Id, Concat(parentKey, childKey.Parent));
+      throw new ArgumentException("Cannot add a parent to an absolute key.");
     }
 
     public static Key Parse(string key) {
@@ -45,21 +57,25 @@ namespace Bud {
         throw new ArgumentException("Could not parse an empty string. An empty string is not a valid key.");
       }
       var keyIdChain = key.Split(KeySplitter, StringSplitOptions.RemoveEmptyEntries);
-      Key parsedKey = Global;
-      foreach (var keyId in keyIdChain) {
-        parsedKey = new Key(keyId, parsedKey);
+      Key parsedKey = key[0] == KeySeparator ? Root : null;
+      for (int index = 0; index < keyIdChain.Length; index++) {
+        parsedKey = new Key(keyIdChain[index], parsedKey);
       }
       return parsedKey;
     }
 
     public bool Equals(Key otherKey) {
-      if (ReferenceEquals(this, otherKey)) {
+      return Equals(this, otherKey);
+    }
+
+    public static bool Equals(Key thisKey, Key otherKey) {
+      if (ReferenceEquals(thisKey, otherKey)) {
         return true;
       }
-      if (depth != otherKey.depth) {
+      if (thisKey.depth != otherKey.depth) {
         return false;
       }
-      return Id.Equals(otherKey.Id) && Parent.Equals(otherKey.Parent);
+      return thisKey.Id.Equals(otherKey.Id) && Equals(thisKey.Parent, otherKey.Parent);
     }
 
     public override bool Equals(object other) {
@@ -69,7 +85,7 @@ namespace Bud {
       if (!(other is Key)) {
         return false;
       }
-      return Equals((Key)other);
+      return Equals((Key) other);
     }
 
     public override int GetHashCode() {
@@ -77,20 +93,15 @@ namespace Bud {
     }
 
     public override string ToString() {
-      return IsRoot ? KeySeparator.ToString() : AppendAsString(new StringBuilder()).ToString();
+      return IsRoot ? KeySeparator.ToString() : PrependAsString(new StringBuilder(), Parent).Append(Id).ToString();
     }
 
-    private StringBuilder AppendAsString(StringBuilder stringBuilder) {
-      if (IsRoot) {
+    private static StringBuilder PrependAsString(StringBuilder stringBuilder, Key parent) {
+      if (parent == null) {
         return stringBuilder;
       }
-
-      if (!Parent.IsRoot) {
-        Parent.AppendAsString(stringBuilder).Append(KeySeparator);
-      }
-
-      return stringBuilder.Append(Id);
+      var prepended = parent.IsRoot ? stringBuilder : PrependAsString(stringBuilder, parent.Parent).Append(parent.Id);
+      return prepended.Append(KeySeparator);
     }
   }
 }
-

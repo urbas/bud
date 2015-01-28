@@ -13,10 +13,10 @@ namespace Bud {
   public class ConfigKey<T> : ConfigKey {
     public ConfigKey(string id, string description = null) : base(id, description) {}
 
-    private ConfigKey(string id, Key parent, string description = null) : base(id, parent, description) {}
+    public ConfigKey(string id, Key parent, string description = null) : base(id, parent, description) {}
 
     public new ConfigKey<T> In(Key parent) {
-      return parent.IsRoot ? this : new ConfigKey<T>(Id, Concat(parent, Parent));
+      return new ConfigKey<T>(Id, Concat(parent, Parent), Description);
     }
 
     public Setup Init(T configValue) {

@@ -9,7 +9,7 @@ namespace Bud {
     public readonly ImmutableList<ConfigDefinitionConstructor> ConfigConstructors;
     public readonly ImmutableList<TaskDefinitionConstructor> TaskConstructors;
 
-    public Settings() : this(Key.Global) {}
+    public Settings() : this(Key.Root) {}
 
     public Settings(Key scope) : this(ImmutableList<ConfigDefinitionConstructor>.Empty, ImmutableList<TaskDefinitionConstructor>.Empty, scope) {}
 
@@ -25,6 +25,10 @@ namespace Bud {
 
     public Settings Do(params Setup[] setups) {
       return setups.Aggregate(this, (oldSettings, plugin) => plugin(oldSettings)).In(Scope);
+    }
+
+    public Settings Globally(params Setup [] setups) {
+      return In(Key.Root).Do(setups).In(Scope);
     }
 
     public static Settings Create(params Setup[] setups) {
@@ -72,7 +76,13 @@ namespace Bud {
     }
 
     private Settings In(Key newScope) {
-      return newScope.Equals(Scope) ? this : new Settings(ConfigConstructors, TaskConstructors, newScope);
+      if (newScope.Equals(Scope)) {
+        return this;
+      } else if (newScope.IsAbsolute) {
+        return new Settings(ConfigConstructors, TaskConstructors, newScope);
+      } else {
+        return new Settings(ConfigConstructors, TaskConstructors, newScope.In(Scope));
+      }
     }
   }
 }

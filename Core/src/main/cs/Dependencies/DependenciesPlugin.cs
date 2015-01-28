@@ -11,11 +11,10 @@ using NuGet;
 namespace Bud.Dependencies {
   public class DependenciesPlugin {
     public static Settings Init(Settings settings) {
-      return settings.In(Key.Global,
-                         DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
-                         DependenciesKeys.NuGetRepositoryDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),
-                         DependenciesKeys.Fetch.Init(FetchImpl),
-                         DependenciesKeys.NuGetFetchedPackages.Init(NuGetResolvedPackagesImpl));
+      return settings.Globally(DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
+                               DependenciesKeys.NuGetRepositoryDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),
+                               DependenciesKeys.Fetch.Init(FetchImpl),
+                               DependenciesKeys.NuGetFetchedPackages.Init(NuGetResolvedPackagesImpl));
     }
 
     private static NuGetPackages NuGetResolvedPackagesImpl(IConfig context) {
@@ -58,7 +57,12 @@ namespace Bud.Dependencies {
 
     private static void InstallNuGetPackages(IPackageManager packageManager, IEnumerable<ExternalDependency> dependencies) {
       foreach (var dependency in dependencies) {
-        var foundPackage = packageManager.SourceRepository.FindPackage(dependency.Id, dependency.Version, allowPrereleaseVersions: false, allowUnlisted: false);
+        IPackage foundPackage;
+        try {
+          foundPackage = packageManager.SourceRepository.FindPackage(dependency.Id, dependency.Version, allowPrereleaseVersions: false, allowUnlisted: false);
+        } catch (Exception) {
+          foundPackage = packageManager.LocalRepository.FindPackage(dependency.Id, dependency.Version, allowPrereleaseVersions: false, allowUnlisted: false);
+        }
         if (foundPackage == null) {
           throw new Exception(string.Format("Could not download dependency '{0}'. Please verify your build configuration.", dependency));
         }

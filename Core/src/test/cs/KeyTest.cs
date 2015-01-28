@@ -107,13 +107,14 @@ namespace Bud {
     }
 
     [Test]
-    public void Concat_MUST_not_change_the_key_WHEN_the_parent_is_global() {
-      Assert.AreEqual(keyA, Key.Concat(Key.Global, keyA));
+    public void Concat_MUST_parent_the_key_to_root_WHEN_the_key_is_relative() {
+      Assert.AreEqual(keyB.In(Key.Root), Key.Concat(Key.Root, keyB));
     }
 
     [Test]
-    public void Concat_MUST_not_change_the_key_WHEN_the_child_is_global() {
-      Assert.AreEqual(keyB, Key.Concat(keyB, Key.Global));
+    [ExpectedException(typeof(ArgumentException))]
+    public void Concat_MUST_throw_an_exception_WHEN_trying_to_add_a_parent_to_roor() {
+      Key.Concat(keyB, Key.Root);
     }
 
     [Test]
@@ -152,11 +153,11 @@ namespace Bud {
     [Test]
     public void Parse_MUST_return_the_global_key() {
       var parsedKey = Key.Parse("/");
-      Assert.AreEqual(Key.Global, parsedKey);
+      Assert.AreEqual(Key.Root, parsedKey);
     }
 
     [Test]
-    public void Parse_MUST_a_child_key_of_the_global_key() {
+    public void Parse_MUST_return_a_key() {
       var parsedKey = Key.Parse("child");
       Assert.AreEqual(new Key("child"), parsedKey);
     }
@@ -164,7 +165,7 @@ namespace Bud {
     [Test]
     public void Parse_MUST_a_child_key_of_the_global_key_WHEN_prefixed_with_the_global_colon() {
       var parsedKey = Key.Parse("/child");
-      Assert.AreEqual(new Key("child"), parsedKey);
+      Assert.AreEqual(new Key("child", Key.Root), parsedKey);
     }
 
     [Test]
@@ -176,14 +177,25 @@ namespace Bud {
     [Test]
     public void Parse_MUST_return_a_chain_of_keys_WHEN_prefixed_with_the_global_colon() {
       var parsedKey = Key.Parse("/parent/child");
-      Assert.AreEqual(new Key("child").In(new Key("parent")), parsedKey);
+      Assert.AreEqual(new Key("child").In(new Key("parent")).In(Key.Root), parsedKey);
     }
 
     [Test]
     public void Parse_MUST_perform_the_inverse_of_ToString() {
       var deeplyNestedKey = taskKeyA.In(new TaskKey<uint>("E").In(new Key("D").In(new Key("foo").In(new ConfigKey<bool>("C").In(configKeyB)))));
       Assert.AreEqual(deeplyNestedKey, Key.Parse(deeplyNestedKey.ToString()));
-      Assert.AreEqual("B/C/foo/D/E/A", Key.Parse("/B/C/foo/D/E/A").ToString());
+      Assert.AreEqual("B/C/foo/D/E/A", Key.Parse("B/C/foo/D/E/A").ToString());
+      Assert.AreEqual("/B/C/foo/D/E/A", Key.Parse("/B/C/foo/D/E/A").ToString());
+    }
+
+    [Test]
+    public void IsAbsolute_MUST_return_false_WHEN_creating_a_simple_key() {
+      Assert.IsFalse(taskKeyA.IsAbsolute);
+    }
+
+    [Test]
+    public void IsAbsolute_MUST_return_true_WHEN_parented_to_global() {
+      Assert.IsTrue(taskKeyA.In(Key.Root).IsAbsolute);
     }
   }
 }

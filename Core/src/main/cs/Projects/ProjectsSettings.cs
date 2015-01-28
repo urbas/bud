@@ -13,14 +13,13 @@ namespace Bud.Projects {
     }
 
     private static Setup Init(string projectId, string baseDir, IEnumerable<Setup> setups) {
-      var projectKey = ProjectKey(projectId);
+      var project = ProjectKey(projectId);
       return settings => settings
-        .In(projectKey,
+        .Globally(ProjectKeys.Projects.Init(ImmutableDictionary<string, Key>.Empty),
+                  ProjectKeys.Projects.Modify(allProjects => allProjects.Add(projectId, project)))
+        .In(project,
             BuildDirs.Init(baseDir),
-            setups.ToPlugin())
-        .In(Key.Global,
-            ProjectKeys.Projects.Init(ImmutableDictionary<string, Key>.Empty),
-            ProjectKeys.Projects.Modify(allProjects => allProjects.Add(projectId, projectKey)));
+            setups.ToPlugin());
     }
   }
 }
