@@ -3,36 +3,38 @@ using System.Text;
 
 namespace Bud {
   public class Key : MarshalByRefObject {
-    public static readonly Key Global = new Key("Global", null);
+    public static readonly Key Global = new Key("Global", null, "The root scope. There can be only one!");
     public const char KeySeparator = '/';
     private static readonly char[] KeySplitter = {KeySeparator};
     public readonly Key Parent;
     public readonly string Id;
+    public readonly string Description;
     private readonly int depth;
     private readonly int hash;
 
-    public Key(string id) : this(id, Global) {}
+    public Key(string id, string description = null) : this(id, Global, description) {}
 
-    public Key(string id, Key parent) {
+    public Key(string id, Key parent, string description = null) {
       Parent = parent ?? this;
       Id = id;
+      Description = description ?? string.Empty;
       depth = parent == null ? 1 : (parent.depth + 1);
       unchecked {
         hash = (parent == null ? -1498327287 : parent.hash) ^ Id.GetHashCode();
       }
     }
 
-    public bool IsGlobal { get { return this == Parent; } }
+    public bool IsRoot { get { return this == Parent; } }
 
     public Key In(Key parent) {
       return Concat(parent, this);
     }
 
     public static Key Concat(Key parentKey, Key childKey) {
-      if (parentKey.IsGlobal) {
+      if (parentKey.IsRoot) {
         return childKey;
       }
-      if (childKey.IsGlobal) {
+      if (childKey.IsRoot) {
         return parentKey;
       }
       return new Key(childKey.Id, Concat(parentKey, childKey.Parent));
@@ -75,15 +77,15 @@ namespace Bud {
     }
 
     public override string ToString() {
-      return IsGlobal ? KeySeparator.ToString() : AppendAsString(new StringBuilder()).ToString();
+      return IsRoot ? KeySeparator.ToString() : AppendAsString(new StringBuilder()).ToString();
     }
 
     private StringBuilder AppendAsString(StringBuilder stringBuilder) {
-      if (IsGlobal) {
+      if (IsRoot) {
         return stringBuilder;
       }
 
-      if (!Parent.IsGlobal) {
+      if (!Parent.IsRoot) {
         Parent.AppendAsString(stringBuilder).Append(KeySeparator);
       }
 

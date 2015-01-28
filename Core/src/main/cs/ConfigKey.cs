@@ -3,20 +3,20 @@ using Bud.SettingsConstruction;
 
 namespace Bud {
   public abstract class ConfigKey : Key {
-    protected ConfigKey(string id) : base(id) {}
-    protected ConfigKey(string id, Key parent) : base(id, parent) {}
+    protected ConfigKey(string id, string description = null) : base(id, description) {}
+    protected ConfigKey(string id, Key parent, string description = null) : base(id, parent, description) {}
   }
 
   /// <summary>
   ///   Values of this key are evaluated once only per settings compilation.
   /// </summary>
   public class ConfigKey<T> : ConfigKey {
-    public ConfigKey(string id) : base(id) {}
+    public ConfigKey(string id, string description = null) : base(id, description) {}
 
-    private ConfigKey(string id, Key parent) : base(id, parent) {}
+    private ConfigKey(string id, Key parent, string description = null) : base(id, parent, description) {}
 
     public new ConfigKey<T> In(Key parent) {
-      return parent.IsGlobal ? this : new ConfigKey<T>(Id, Concat(parent, Parent));
+      return parent.IsRoot ? this : new ConfigKey<T>(Id, Concat(parent, Parent));
     }
 
     public Setup Init(T configValue) {

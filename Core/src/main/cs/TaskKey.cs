@@ -5,8 +5,9 @@ using Bud.Util;
 
 namespace Bud {
   public class TaskKey : Key {
-    public TaskKey(string id) : base(id) {}
-    public TaskKey(string id, Key parent) : base(id, parent) {}
+    public TaskKey(string id, string description = null) : base(id, description) {}
+
+    protected TaskKey(string id, Key parent, string description = null) : base(id, parent, description) {}
 
     public Setup Init(Func<IContext, Task> taskDefinition) {
       return settings => settings.Add(new InitializeTask(In(settings.Scope), taskDefinition));
@@ -58,7 +59,7 @@ namespace Bud {
     }
 
     public new TaskKey In(Key parent) {
-      return parent.IsGlobal ? this : new TaskKey(Id, Concat(parent, Parent));
+      return parent.IsRoot ? this : new TaskKey(Id, Concat(parent, Parent));
     }
   }
 
@@ -66,12 +67,12 @@ namespace Bud {
   ///   Values of this key are evaluated once per evaluation context.
   /// </summary>
   public class TaskKey<T> : TaskKey {
-    public TaskKey(string id) : base(id) {}
+    public TaskKey(string id, string description = null) : base(id, description) {}
 
-    private TaskKey(string id, Key parent) : base(id, parent) {}
+    private TaskKey(string id, Key parent, string description = null) : base(id, parent, description) {}
 
     public new TaskKey<T> In(Key parent) {
-      return parent.IsGlobal ? this : new TaskKey<T>(Id, Concat(parent, Parent));
+      return parent.IsRoot ? this : new TaskKey<T>(Id, Concat(parent, Parent));
     }
 
     public Setup InitSync(Func<T> taskDefinition) {
