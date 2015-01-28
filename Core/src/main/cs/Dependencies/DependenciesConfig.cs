@@ -42,7 +42,7 @@ namespace Bud.Dependencies {
       return Path.Combine(context.GetPersistentBuildConfigDir(), DependenciesSettings.FetchedPackagesFileName);
     }
 
-    public static NuGetPackages GetNuGetResolvedPackages(this IConfig context) {
+    public static BudExternalPackageRepository GetNuGetResolvedPackages(this IConfig context) {
       return context.Evaluate(DependenciesKeys.NuGetFetchedPackages);
     }
   }

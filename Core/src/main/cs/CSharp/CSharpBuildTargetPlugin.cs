@@ -79,18 +79,18 @@ namespace Bud.CSharp {
       var allNuGetDependencies = context.GetNuGetResolvedPackages();
       var directExternalDependencies = context.GetExternalDependencies(buildTarget);
       var nuGetRepositoryPath = context.GetNuGetRepositoryDir();
-      return CollectDependenciesTransitively(directExternalDependencies.Select(dependency => allNuGetDependencies.GetResolvedNuGetDependency(dependency)),
+      return CollectDependenciesTransitively(directExternalDependencies.Select(dependency => allNuGetDependencies.GetPackage(dependency)),
                                              allNuGetDependencies)
         .Select(dependency => dependency.Assemblies.Select(assemblyReference => assemblyReference.GetAbsolutePath(nuGetRepositoryPath)).First());
     }
 
-    private static IEnumerable<Package> CollectDependenciesTransitively(IEnumerable<Package> directDependencies, NuGetPackages allExternalDependencies) {
-      return directDependencies.Select(directDependency => allExternalDependencies.GetResolvedNuGetDependency(directDependency.Id, new VersionSpec(directDependency.Version)))
+    private static IEnumerable<Package> CollectDependenciesTransitively(IEnumerable<Package> directDependencies, BudExternalPackageRepository allExternalDependencies) {
+      return directDependencies.Select(directDependency => allExternalDependencies.GetPackage(directDependency.Id, new VersionSpec(directDependency.Version)))
                                .Concat(directDependencies.SelectMany(directDependency => CollectDependenciesTransitively(directDependency.Dependencies, allExternalDependencies)));
     }
 
-    private static IEnumerable<Package> CollectDependenciesTransitively(ImmutableList<PackageInfo> directDependencies, NuGetPackages allExternalDependencies) {
-      return CollectDependenciesTransitively(directDependencies.Select(directDependency => allExternalDependencies.GetResolvedNuGetDependency(directDependency.Id, VersionUtility.ParseVersionSpec(directDependency.Version))), allExternalDependencies);
+    private static IEnumerable<Package> CollectDependenciesTransitively(ImmutableList<PackageInfo> directDependencies, BudExternalPackageRepository allExternalDependencies) {
+      return CollectDependenciesTransitively(directDependencies.Select(directDependency => allExternalDependencies.GetPackage(directDependency.Id, VersionUtility.ParseVersionSpec(directDependency.Version))), allExternalDependencies);
     }
 
     private static string GetAssemblyFileExtension(IConfig context, Key project) {

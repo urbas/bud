@@ -6,6 +6,7 @@ namespace Bud.Dependencies {
   public class PackageInfo {
     public readonly string Id;
     public readonly string Version;
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public readonly string Framework;
     [JsonIgnore] public readonly FrameworkName FrameworkName;
     [JsonIgnore] public readonly IVersionSpec VersionSpec;

@@ -6,6 +6,7 @@ using NuGet;
 namespace Bud.Dependencies {
   public class AssemblyRereference {
     public readonly string Path;
+    [JsonProperty(NullValueHandling = NullValueHandling.Ignore)]
     public readonly string Framework;
     [JsonIgnore] public readonly FrameworkName FrameworkName;
     [JsonIgnore] internal Package HostPackage;

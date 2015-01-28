@@ -17,15 +17,15 @@ namespace Bud.Dependencies {
                                DependenciesKeys.NuGetFetchedPackages.Init(NuGetResolvedPackagesImpl));
     }
 
-    private static NuGetPackages NuGetResolvedPackagesImpl(IConfig context) {
-      NuGetPackages resolution;
+    private static BudExternalPackageRepository NuGetResolvedPackagesImpl(IConfig context) {
+      BudExternalPackageRepository resolution;
       if (TryLoadPersistedResolution(context, out resolution)) {
         return resolution;
       }
-      return new NuGetPackages(ImmutableList<PackageVersions>.Empty);
+      return new BudExternalPackageRepository(ImmutableList<PackageVersions>.Empty);
     }
 
-    private static Task<NuGetPackages> FetchImpl(IContext context) {
+    private static Task<BudExternalPackageRepository> FetchImpl(IContext context) {
       return Task.Run(() => {
         var dependencies = context.GetExternalDependencies();
         var packageManager = CreatePackageManager(context);
@@ -35,12 +35,12 @@ namespace Bud.Dependencies {
       });
     }
 
-    private static bool TryLoadPersistedResolution(IConfig context, out NuGetPackages persistedResolution) {
+    private static bool TryLoadPersistedResolution(IConfig context, out BudExternalPackageRepository persistedResolution) {
       var fetchedPackagesFile = context.GetFetchedPackagesFile();
       if (File.Exists(fetchedPackagesFile)) {
         using (var streamReader = new StreamReader(fetchedPackagesFile)) {
           using (var jsonStreamReader = new JsonTextReader(streamReader)) {
-            persistedResolution = JsonSerializer.CreateDefault().Deserialize<NuGetPackages>(jsonStreamReader);
+            persistedResolution = JsonSerializer.CreateDefault().Deserialize<BudExternalPackageRepository>(jsonStreamReader);
             return true;
           }
         }
@@ -60,19 +60,19 @@ namespace Bud.Dependencies {
         IPackage foundPackage;
         try {
           foundPackage = packageManager.SourceRepository.FindPackage(dependency.Id, dependency.Version, allowPrereleaseVersions: false, allowUnlisted: false);
+          packageManager.InstallPackage(foundPackage, ignoreDependencies: false, allowPrereleaseVersions: false);
         } catch (Exception) {
           foundPackage = packageManager.LocalRepository.FindPackage(dependency.Id, dependency.Version, allowPrereleaseVersions: false, allowUnlisted: false);
         }
         if (foundPackage == null) {
           throw new Exception(string.Format("Could not download dependency '{0}'. Please verify your build configuration.", dependency));
         }
-        packageManager.InstallPackage(foundPackage, ignoreDependencies: false, allowPrereleaseVersions: false);
       }
     }
 
-    private static NuGetPackages PersistNuGetResolution(IContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
+    private static BudExternalPackageRepository PersistNuGetResolution(IContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
       context.CreatePersistentBuildConfigDir();
-      var resolvedExternalDependencies = new NuGetPackages(fetchedPackages);
+      var resolvedExternalDependencies = new BudExternalPackageRepository(fetchedPackages);
       using (var streamWriter = new StreamWriter(context.GetFetchedPackagesFile())) {
         using (var jsonTextWriter = new JsonTextWriter(streamWriter)) {
           jsonTextWriter.Formatting = Formatting.Indented;

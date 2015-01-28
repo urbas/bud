@@ -6,37 +6,41 @@ using Newtonsoft.Json;
 using NuGet;
 
 namespace Bud.Dependencies {
-  public class NuGetPackages {
+  public class BudExternalPackageRepository {
     public readonly ImmutableList<PackageVersions> Packages;
     [JsonIgnore] private readonly Dictionary<string, PackageVersions> packageId2PackageVersions;
 
     [JsonConstructor]
-    public NuGetPackages(IEnumerable<PackageVersions> packages) {
+    public BudExternalPackageRepository(IEnumerable<PackageVersions> packages) {
       Packages = packages == null ? ImmutableList<PackageVersions>.Empty : packages.ToImmutableList();
       packageId2PackageVersions = Packages.ToDictionary(packageVersions => packageVersions.Id, packageVersions => packageVersions);
     }
 
-    public NuGetPackages(IEnumerable<IGrouping<string, IPackage>> fetchedPackages)
+    public BudExternalPackageRepository(IEnumerable<IGrouping<string, IPackage>> fetchedPackages)
       : this(fetchedPackages.Select(packageGroup => new PackageVersions(packageGroup.Key, packageGroup))) {}
 
-    public Package GetResolvedNuGetDependency(ExternalDependency dependency) {
-      return GetResolvedNuGetDependency(dependency.Id, dependency.Version);
+    public Package GetPackage(ExternalDependency dependency) {
+      return GetPackage(dependency.Id, dependency.Version);
     }
 
-    public Package GetResolvedNuGetDependency(string dependencyId, IVersionSpec versionRange) {
-      if (versionRange == null) {
-        var mostCurrentVersion = GetAllVersionsForPackage(dependencyId).GetMostCurrentVersion();
-        if (mostCurrentVersion != null) {
-          return mostCurrentVersion;
-        }
-        throw new Exception(PackageNotFoundMessage(dependencyId));
-      }
+    public Package GetPackage(string dependencyId, IVersionSpec versionRange) {
+      return versionRange == null ? GetMostCurrentVersion(dependencyId) : GetBestSuitedVersion(dependencyId, versionRange);
+    }
 
+    private Package GetBestSuitedVersion(string dependencyId, IVersionSpec versionRange) {
       var bestSuitedVersion = GetAllVersionsForPackage(dependencyId).GetBestSuitedVersion(versionRange);
       if (bestSuitedVersion != null) {
         return bestSuitedVersion;
       }
       throw new Exception(string.Format("Could not find the version '{0}' of package '{1}'. Try running '{2}' to download packages.", dependencyId, versionRange, DependenciesKeys.Fetch));
+    }
+
+    private Package GetMostCurrentVersion(string dependencyId) {
+      var mostCurrentVersion = GetAllVersionsForPackage(dependencyId).GetMostCurrentVersion();
+      if (mostCurrentVersion != null) {
+        return mostCurrentVersion;
+      }
+      throw new Exception(PackageNotFoundMessage(dependencyId));
     }
 
     private PackageVersions GetAllVersionsForPackage(string id) {

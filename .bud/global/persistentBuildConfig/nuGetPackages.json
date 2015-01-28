@@ -10,8 +10,7 @@
               "Path": "lib/portable-net45+win8+wp8+wpa81/System.Collections.Immutable.dll",
               "Framework": ".NETPortable,Version=v0.0,Profile=net45+win8+wp8+wpa81"
             }
-          ],
-          "Dependencies": []
+          ]
         }
       ]
     },
@@ -25,8 +24,7 @@
               "Path": "lib/net40/Microsoft.Web.XmlTransform.dll",
               "Framework": ".NETFramework,Version=v4.0"
             }
-          ],
-          "Dependencies": []
+          ]
         }
       ]
     },
@@ -64,8 +62,7 @@
               "Path": "lib/portable-net45+wp80+win8+wpa81+aspnetcore50/Newtonsoft.Json.dll",
               "Framework": ".NETPortable,Version=v0.0,Profile=net45+wp80+win8+wpa81+aspnetcore50"
             }
-          ],
-          "Dependencies": []
+          ]
         }
       ]
     },
@@ -83,8 +80,7 @@
           "Dependencies": [
             {
               "Id": "Microsoft.Web.Xdt",
-              "Version": "2.1.0",
-              "Framework": null
+              "Version": "2.1.0"
             }
           ]
         }
@@ -97,11 +93,9 @@
           "Version": "2.6.4",
           "Assemblies": [
             {
-              "Path": "lib/nunit.framework.dll",
-              "Framework": null
+              "Path": "lib/nunit.framework.dll"
             }
-          ],
-          "Dependencies": []
+          ]
         }
       ]
     }

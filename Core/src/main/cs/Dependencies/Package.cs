@@ -8,13 +8,18 @@ namespace Bud.Dependencies {
   public class Package {
     public readonly SemanticVersion Version;
     public readonly ImmutableList<AssemblyRereference> Assemblies;
-    public readonly ImmutableList<PackageInfo> Dependencies;
+    [JsonProperty(PropertyName = "Dependencies", NullValueHandling = NullValueHandling.Ignore)] private readonly ImmutableList<PackageInfo> dependencies;
+
+    [JsonIgnore]
+    public ImmutableList<PackageInfo> Dependencies {
+      get { return dependencies ?? ImmutableList<PackageInfo>.Empty; }
+    }
 
     [JsonConstructor]
     public Package(SemanticVersion version, IEnumerable<AssemblyRereference> assemblies, IEnumerable<PackageInfo> dependencies) {
-      Version = version;
+      Version = version;  
       Assemblies = assemblies == null ? ImmutableList<AssemblyRereference>.Empty : assemblies.Select(assemblyReference => assemblyReference.WithHostPackage(this)).ToImmutableList();
-      Dependencies = dependencies == null ? ImmutableList<PackageInfo>.Empty : dependencies.ToImmutableList();
+      this.dependencies = dependencies == null || dependencies.IsEmpty() ? null : dependencies.ToImmutableList();
     }
 
     public Package(IPackage package) :
