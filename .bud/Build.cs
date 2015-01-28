@@ -14,11 +14,11 @@ public class Build : IBuild {
         Cs.Dependency("Newtonsoft.Json"),
         Cs.Dependency("NuGet.Core")
       ), Cs.Test(
-        Cs.Dependency("NUnit", "2.6.4")
+        Cs.Dependency("NUnit")
       ))
       .Project("Bud.Test", Path.Combine(baseDir, "Test"), Cs.Dll(
         Cs.Dependency("Bud.Core"),
-        Cs.Dependency("NUnit", "2.6.4")
+        Cs.Dependency("NUnit")
       ))
       .Project("Bud.SystemTests", Path.Combine(baseDir, "SystemTests"), Cs.Test(
         Cs.Dependency("Bud.Test")

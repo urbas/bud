@@ -28,5 +28,9 @@ namespace Bud.Test.Util {
         throw buildCommanderDisposeException;
       }
     }
+
+    public override string ToString() {
+      return TemporaryDirectory.ToString();
+    }
   }
 }

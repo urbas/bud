@@ -19,11 +19,8 @@ namespace Bud.Dependencies {
 
     public PackageVersions(string id, IEnumerable<IPackage> downloadedPackages) : this(id, downloadedPackages.Select(package => new Package(package))) {}
 
-    public Package GetBestSuitedVersion(SemanticVersion lowerBoundVersion) {
-      if (Versions.Count > 0 && Versions[0].Version >= lowerBoundVersion) {
-        return Versions[0];
-      }
-      return null;
+    public Package GetBestSuitedVersion(IVersionSpec versionRange) {
+      return Versions.Count > 0 ? Versions.Find(package => versionRange.Satisfies(package.Version)) : null;
     }
 
     public Package GetMostCurrentVersion() {

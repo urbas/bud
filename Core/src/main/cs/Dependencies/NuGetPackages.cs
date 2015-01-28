@@ -23,8 +23,8 @@ namespace Bud.Dependencies {
       return GetResolvedNuGetDependency(dependency.Id, dependency.Version);
     }
 
-    public Package GetResolvedNuGetDependency(string dependencyId, SemanticVersion lowerBoundVersion) {
-      if (lowerBoundVersion == null) {
+    public Package GetResolvedNuGetDependency(string dependencyId, IVersionSpec versionRange) {
+      if (versionRange == null) {
         var mostCurrentVersion = GetAllVersionsForPackage(dependencyId).GetMostCurrentVersion();
         if (mostCurrentVersion != null) {
           return mostCurrentVersion;
@@ -32,11 +32,11 @@ namespace Bud.Dependencies {
         throw new Exception(PackageNotFoundMessage(dependencyId));
       }
 
-      var bestSuitedVersion = GetAllVersionsForPackage(dependencyId).GetBestSuitedVersion(lowerBoundVersion);
+      var bestSuitedVersion = GetAllVersionsForPackage(dependencyId).GetBestSuitedVersion(versionRange);
       if (bestSuitedVersion != null) {
         return bestSuitedVersion;
       }
-      throw new Exception(string.Format("Could not find the version '{0}' of package '{1}'. Try running '{2}' to download packages.", dependencyId, lowerBoundVersion, DependenciesKeys.Fetch));
+      throw new Exception(string.Format("Could not find the version '{0}' of package '{1}'. Try running '{2}' to download packages.", dependencyId, versionRange, DependenciesKeys.Fetch));
     }
 
     private PackageVersions GetAllVersionsForPackage(string id) {

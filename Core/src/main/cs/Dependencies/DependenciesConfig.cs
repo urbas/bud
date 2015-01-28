@@ -27,11 +27,8 @@ namespace Bud.Dependencies {
     }
 
     /// <summary>
-    /// Invokes the tasks on all internal dependencies and returns
+    /// Invokes the tasks on all internal dependencies transitively and returns their keys.
     /// </summary>
-    /// <param name="context"></param>
-    /// <param name="dependent"></param>
-    /// <returns></returns>
     public static async Task<ISet<Key>> ResolveInternalDependencies(this IContext context, Key dependent) {
       var resolveDependenciesKey = DependenciesKeys.ResolveInternalDependencies.In(dependent);
       return context.IsTaskDefined(resolveDependenciesKey) ? await context.Evaluate(resolveDependenciesKey) : ImmutableHashSet<Key>.Empty;
@@ -46,7 +43,7 @@ namespace Bud.Dependencies {
     }
 
     public static NuGetPackages GetNuGetResolvedPackages(this IConfig context) {
-      return context.Evaluate(DependenciesKeys.NuGetResolvedPackages);
+      return context.Evaluate(DependenciesKeys.NuGetFetchedPackages);
     }
   }
 }

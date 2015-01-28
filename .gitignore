@@ -7,8 +7,9 @@ packages/
 
 # Visual Studio Files
 *.csproj.user
-*.v12.suo
+*.suo
 *.user
+bud.sln.ide/
 
 # Editors
 *.swp

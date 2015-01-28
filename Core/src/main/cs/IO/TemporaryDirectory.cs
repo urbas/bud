@@ -26,5 +26,9 @@ namespace Bud.Test.Util {
     public void Dispose() {
       Directory.Delete(temporaryDirectory, true);
     }
+
+    public override string ToString() {
+      return Path;
+    }
   }
 }

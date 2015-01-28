@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Bud.Dependencies {
                          DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
                          DependenciesKeys.NuGetRepositoryDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),
                          DependenciesKeys.Fetch.Init(FetchImpl),
-                         DependenciesKeys.NuGetResolvedPackages.Init(NuGetResolvedPackagesImpl));
+                         DependenciesKeys.NuGetFetchedPackages.Init(NuGetResolvedPackagesImpl));
     }
 
     private static NuGetPackages NuGetResolvedPackagesImpl(IConfig context) {
@@ -57,7 +58,11 @@ namespace Bud.Dependencies {
 
     private static void InstallNuGetPackages(IPackageManager packageManager, IEnumerable<ExternalDependency> dependencies) {
       foreach (var dependency in dependencies) {
-        packageManager.InstallPackage(dependency.Id, dependency.Version, false, false);
+        var foundPackage = packageManager.SourceRepository.FindPackage(dependency.Id, dependency.Version, allowPrereleaseVersions: false, allowUnlisted: false);
+        if (foundPackage == null) {
+          throw new Exception(string.Format("Could not download dependency '{0}'. Please verify your build configuration.", dependency));
+        }
+        packageManager.InstallPackage(foundPackage, ignoreDependencies: false, allowPrereleaseVersions: false);
       }
     }
 

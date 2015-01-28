@@ -9,6 +9,7 @@ namespace Bud.Dependencies {
     public static readonly TaskKey<ISet<Key>> ResolveInternalDependencies = new TaskKey<ISet<Key>>("resolveInternalDependencies");
     public static readonly ConfigKey<ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>> ExternalDependenciesKeys = new ConfigKey<ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>>("externalDependenciesKeys");
     public static readonly ConfigKey<string> NuGetRepositoryDir = new ConfigKey<string>("nuGetRepositoryDir");
-    public static readonly ConfigKey<NuGetPackages> NuGetResolvedPackages = new ConfigKey<NuGetPackages>("nuGetResolvedPackages");
+    public static readonly ConfigKey<NuGetPackages> NuGetFetchedPackages = new ConfigKey<NuGetPackages>("nuGetFetchedPackages");
+    public static readonly ConfigKey<ImmutableHashSet<IDependency>> Dependencies = new ConfigKey<ImmutableHashSet<IDependency>> ("dependencies");
   }
 }
