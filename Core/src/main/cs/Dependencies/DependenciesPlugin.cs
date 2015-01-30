@@ -12,22 +12,22 @@ namespace Bud.Dependencies {
   public class DependenciesPlugin {
     public static Settings Init(Settings settings) {
       return settings.Globally(DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
-                               DependenciesKeys.NuGetRepositoryDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),
-                               DependenciesKeys.PersistedPackagesListFile.Init(PersistedPackagesListFileImpl),
-                               DependenciesKeys.Fetch.Init(FetchImpl),
-                               DependenciesKeys.CleanDependencies.InitSync(CleanDependenciesImpl),
-                               DependenciesKeys.NuGetFetchedPackages.Init(NuGetResolvedPackagesImpl));
+                               DependenciesKeys.DependenciesRepositoryDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),
+                               DependenciesKeys.FetchedDependenciesFile.Init(PersistedPackagesListFileImpl),
+                               DependenciesKeys.FetchDependencies.Init(FetchImpl),
+                               DependenciesKeys.DependenciesClean.InitSync(CleanDependenciesImpl),
+                               DependenciesKeys.FetchedDependencies.Init(NuGetResolvedPackagesImpl));
     }
 
-    private static BudExternalPackageRepository NuGetResolvedPackagesImpl(IConfig context) {
-      BudExternalPackageRepository resolution;
+    private static FetchedDependencies NuGetResolvedPackagesImpl(IConfig context) {
+      FetchedDependencies resolution;
       if (TryLoadPersistedResolution(context, out resolution)) {
         return resolution;
       }
-      return new BudExternalPackageRepository(ImmutableList<PackageVersions>.Empty);
+      return new FetchedDependencies(ImmutableList<PackageVersions>.Empty);
     }
 
-    private static Task<BudExternalPackageRepository> FetchImpl(IContext context) {
+    private static Task<FetchedDependencies> FetchImpl(IContext context) {
       return Task.Run(() => {
         var dependencies = context.GetExternalDependencies();
         var packageManager = CreatePackageManager(context);
@@ -42,12 +42,12 @@ namespace Bud.Dependencies {
       Directory.Delete(nuGetRepositoryDir, true);
     }
 
-    private static bool TryLoadPersistedResolution(IConfig context, out BudExternalPackageRepository persistedResolution) {
+    private static bool TryLoadPersistedResolution(IConfig context, out FetchedDependencies persistedResolution) {
       var fetchedPackagesFile = context.GetPersistedPackagesListFile();
       if (File.Exists(fetchedPackagesFile)) {
         using (var streamReader = new StreamReader(fetchedPackagesFile)) {
           using (var jsonStreamReader = new JsonTextReader(streamReader)) {
-            persistedResolution = JsonSerializer.CreateDefault().Deserialize<BudExternalPackageRepository>(jsonStreamReader);
+            persistedResolution = JsonSerializer.CreateDefault().Deserialize<FetchedDependencies>(jsonStreamReader);
             return true;
           }
         }
@@ -77,9 +77,9 @@ namespace Bud.Dependencies {
       }
     }
 
-    private static BudExternalPackageRepository PersistNuGetResolution(IContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
+    private static FetchedDependencies PersistNuGetResolution(IContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
       context.CreatePersistentBuildConfigDir();
-      var resolvedExternalDependencies = new BudExternalPackageRepository(fetchedPackages);
+      var resolvedExternalDependencies = new FetchedDependencies(fetchedPackages);
       using (var streamWriter = new StreamWriter(context.GetPersistedPackagesListFile())) {
         using (var jsonTextWriter = new JsonTextWriter(streamWriter)) {
           jsonTextWriter.Formatting = Formatting.Indented;

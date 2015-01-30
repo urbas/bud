@@ -72,7 +72,7 @@
     <Compile Include="Dependencies\ExternalDependency.cs" />
     <Compile Include="Dependencies\IDependency.cs" />
     <Compile Include="Dependencies\InternalDependency.cs" />
-    <Compile Include="Dependencies\BudExternalPackageRepository.cs" />
+    <Compile Include="Dependencies\FetchedDependencies.cs" />
     <Compile Include="Dependencies\Package.cs" />
     <Compile Include="Dependencies\PackageInfo.cs" />
     <Compile Include="Dependencies\PackageVersions.cs" />

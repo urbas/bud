@@ -35,15 +35,15 @@ namespace Bud.Dependencies {
     }
 
     public static string GetNuGetRepositoryDir(this IConfig context) {
-      return context.Evaluate(DependenciesKeys.NuGetRepositoryDir);
+      return context.Evaluate(DependenciesKeys.DependenciesRepositoryDir);
     }
 
     public static string GetPersistedPackagesListFile(this IConfig context) {
-      return context.Evaluate(DependenciesKeys.PersistedPackagesListFile);
+      return context.Evaluate(DependenciesKeys.FetchedDependenciesFile);
     }
 
-    public static BudExternalPackageRepository GetNuGetResolvedPackages(this IConfig context) {
-      return context.Evaluate(DependenciesKeys.NuGetFetchedPackages);
+    public static FetchedDependencies GetNuGetResolvedPackages(this IConfig context) {
+      return context.Evaluate(DependenciesKeys.FetchedDependencies);
     }
   }
 }

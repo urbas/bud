@@ -14,7 +14,6 @@ namespace Bud {
     Task EvaluateKey(Key key);
     Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition);
     Task Evaluate(ITaskDefinition taskDefinition);
-    object GetOutputOf(Key key);
   }
 
   // TODO: Make this class thread-safe.
@@ -23,7 +22,6 @@ namespace Bud {
     private readonly ImmutableDictionary<Key, ITaskDefinition> taskDefinitions;
     private readonly Dictionary<Key, Task> taskValues = new Dictionary<Key, Task>();
     private readonly Dictionary<ITaskDefinition, Task> oldTaskValues = new Dictionary<ITaskDefinition, Task>();
-    private readonly Dictionary<Key, object> keyToOutput = new Dictionary<Key, object>();
 
     private Context(ImmutableDictionary<Key, IConfigDefinition> configDefinitions, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) : this(new Config(configDefinitions), taskDefinitions) {}
 
@@ -107,14 +105,6 @@ namespace Bud {
         return value;
       }
       throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. The value for this task was not defined.", absoluteKey));
-    }
-
-    public object GetOutputOf(Key key) {
-      object evaluationOutput;
-      if (keyToOutput.TryGetValue(key.In(Key.Root), out evaluationOutput)) {
-        return evaluationOutput;
-      }
-      return null;
     }
 
     public override string ToString() {

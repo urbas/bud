@@ -9,10 +9,10 @@ namespace Bud.SystemTests {
     [Test]
     public void compile_MUST_produce_the_executable() {
       using (var buildCommander = TestProjects.LoadBuildCommander(this)) {
-        FileAssertions.DirectoryExists(buildCommander.Evaluate(DependenciesKeys.NuGetRepositoryDir) as string);
-        buildCommander.Evaluate(DependenciesKeys.CleanDependencies);
-        FileAssertions.DirectoryDoesNotExist(buildCommander.Evaluate(DependenciesKeys.NuGetRepositoryDir) as string);
-        FileAssertions.FileExists(buildCommander.Evaluate(DependenciesKeys.PersistedPackagesListFile) as string);
+        FileAssertions.DirectoryExists(buildCommander.Evaluate(DependenciesKeys.DependenciesRepositoryDir) as string);
+        buildCommander.Evaluate(DependenciesKeys.DependenciesClean);
+        FileAssertions.DirectoryDoesNotExist(buildCommander.Evaluate(DependenciesKeys.DependenciesRepositoryDir) as string);
+        FileAssertions.FileExists(buildCommander.Evaluate(DependenciesKeys.FetchedDependenciesFile) as string);
       }
     }
   }
