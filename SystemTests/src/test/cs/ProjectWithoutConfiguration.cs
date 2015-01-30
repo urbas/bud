@@ -9,7 +9,7 @@ namespace Bud.SystemTests {
   public class ProjectWithoutConfiguration {
     [Test]
     public void compile_MUST_produce_the_executable() {
-      using (var buildCommander = TestProjects.LoadBuildCommander("ProjectWithoutConfiguration")) {
+      using (var buildCommander = TestProjects.LoadBuildCommander(this)) {
         buildCommander.Evaluate("build");
         FileAssertions.FileExists(OutputAssemblyPath(buildCommander));
         buildCommander.Evaluate("clean");

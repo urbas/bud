@@ -7,7 +7,7 @@ namespace Bud.SystemTests {
   public class InterProjectDependencies {
     [Test]
     public void compile_MUST_produce_the_executable() {
-      using (var buildCommander = TestProjects.LoadBuildCommander("InterProjectDependencies")) {
+      using (var buildCommander = TestProjects.LoadBuildCommander(this)) {
         buildCommander.Evaluate("build");
         FileAssertions.FilesExist(
           SystemTestUtils.OutputAssemblyPath(buildCommander, "A", BuildKeys.Main, "A.dll"),
