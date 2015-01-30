@@ -38,8 +38,8 @@ namespace Bud.Dependencies {
       return context.Evaluate(DependenciesKeys.NuGetRepositoryDir);
     }
 
-    public static string GetFetchedPackagesFile(this IConfig context) {
-      return Path.Combine(context.GetPersistentBuildConfigDir(), DependenciesSettings.FetchedPackagesFileName);
+    public static string GetPersistedPackagesListFile(this IConfig context) {
+      return context.Evaluate(DependenciesKeys.PersistedPackagesListFile);
     }
 
     public static BudExternalPackageRepository GetNuGetResolvedPackages(this IConfig context) {

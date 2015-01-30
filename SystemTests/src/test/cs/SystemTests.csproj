@@ -44,10 +44,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CleanExternalDependenciesTest.cs" />
     <Compile Include="ProjectWithoutConfiguration.cs" />
     <Compile Include="BuildConfigurationProject.cs" />
     <Compile Include="InterProjectDependencies.cs" />
-    <Compile Include="ExternalDependencies.cs" />
+    <Compile Include="ExternalDependenciesTest.cs" />
     <Compile Include="ExternalDependenciesNoVersion.cs" />
     <Compile Include="ProjectWithTests.cs" />
     <Compile Include="SystemTestUtils.cs" />

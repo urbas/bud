@@ -13,10 +13,16 @@ namespace Bud.Commander {
       }
     }
 
-    public static async Task<object> Evaluate(IContext context, string command) {
+    public static Task<object> Evaluate(IContext context, string command) {
       Key keyToEvaluate = Key.Parse(command);
-      await context.EvaluateKey(keyToEvaluate);
-      return context.GetOutputOf(keyToEvaluate);
+      return context.EvaluateKey(keyToEvaluate)
+                    .ContinueWith(task => {
+                      var resultTask = task as Task<object>;
+                      if (resultTask != null) {
+                        return resultTask.Result;
+                      }
+                      return null;
+                    });
     }
   }
 }

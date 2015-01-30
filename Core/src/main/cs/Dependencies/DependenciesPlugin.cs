@@ -13,7 +13,9 @@ namespace Bud.Dependencies {
     public static Settings Init(Settings settings) {
       return settings.Globally(DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
                                DependenciesKeys.NuGetRepositoryDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),
+                               DependenciesKeys.PersistedPackagesListFile.Init(PersistedPackagesListFileImpl),
                                DependenciesKeys.Fetch.Init(FetchImpl),
+                               DependenciesKeys.CleanDependencies.InitSync(CleanDependenciesImpl),
                                DependenciesKeys.NuGetFetchedPackages.Init(NuGetResolvedPackagesImpl));
     }
 
@@ -35,8 +37,13 @@ namespace Bud.Dependencies {
       });
     }
 
+    private static void CleanDependenciesImpl(IContext context) {
+      var nuGetRepositoryDir = context.GetNuGetRepositoryDir();
+      Directory.Delete(nuGetRepositoryDir, true);
+    }
+
     private static bool TryLoadPersistedResolution(IConfig context, out BudExternalPackageRepository persistedResolution) {
-      var fetchedPackagesFile = context.GetFetchedPackagesFile();
+      var fetchedPackagesFile = context.GetPersistedPackagesListFile();
       if (File.Exists(fetchedPackagesFile)) {
         using (var streamReader = new StreamReader(fetchedPackagesFile)) {
           using (var jsonStreamReader = new JsonTextReader(streamReader)) {
@@ -65,7 +72,7 @@ namespace Bud.Dependencies {
           foundPackage = packageManager.LocalRepository.FindPackage(dependency.Id, dependency.Version, allowPrereleaseVersions: false, allowUnlisted: false);
         }
         if (foundPackage == null) {
-          throw new Exception(string.Format("Could not download dependency '{0}'. Please verify your build configuration.", dependency));
+          throw new Exception(String.Format("Could not download dependency '{0}'. Please verify your build configuration.", dependency));
         }
       }
     }
@@ -73,13 +80,17 @@ namespace Bud.Dependencies {
     private static BudExternalPackageRepository PersistNuGetResolution(IContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
       context.CreatePersistentBuildConfigDir();
       var resolvedExternalDependencies = new BudExternalPackageRepository(fetchedPackages);
-      using (var streamWriter = new StreamWriter(context.GetFetchedPackagesFile())) {
+      using (var streamWriter = new StreamWriter(context.GetPersistedPackagesListFile())) {
         using (var jsonTextWriter = new JsonTextWriter(streamWriter)) {
           jsonTextWriter.Formatting = Formatting.Indented;
           JsonSerializer.CreateDefault().Serialize(jsonTextWriter, resolvedExternalDependencies);
         }
       }
       return resolvedExternalDependencies;
+    }
+
+    private static string PersistedPackagesListFileImpl(IConfig context) {
+      return Path.Combine(context.GetPersistentBuildConfigDir(), DependenciesSettings.FetchedPackagesFileName);
     }
   }
 }
