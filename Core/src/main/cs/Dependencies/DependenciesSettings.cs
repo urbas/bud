@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using NuGet;
 
 namespace Bud.Dependencies {
   public static class DependenciesSettings {
@@ -48,12 +49,16 @@ namespace Bud.Dependencies {
       var internalDependencies = config.GetInternalDependencies(project);
       var transitiveDependencies = internalDependencies.SelectMany(dependency => config.GetDependencies(project));
       var externalDependencies = config.GetExternalDependencies(project);
-
-      var id2packages = (from dependency in internalDependencies.Concat(transitiveDependencies)
-                         let package = dependency.AsPackage(config)
-                         group package by package.Id).ToDictionary(group => group.Key, group => group.ToList());
-
+      var fetchedDependencies = config.GetFetchedDependencies();
+      var internalId2packages = GroupById2Packages(config, internalDependencies);
+      var transitiveId2packages = GroupById2Packages(config, transitiveDependencies);
       return ImmutableList<IDependency>.Empty;
+    }
+
+    private static Dictionary<string, List<IPackage>> GroupById2Packages(IConfig config, IEnumerable<IDependency> dependencies) {
+      return (from dependency in dependencies
+              let package = dependency.AsPackage(config)
+              group package by package.Id).ToDictionary(group => group.Key, group => group.ToList());
     }
   }
 }

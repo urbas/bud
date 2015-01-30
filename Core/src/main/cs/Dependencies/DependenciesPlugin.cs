@@ -12,8 +12,8 @@ namespace Bud.Dependencies {
   public class DependenciesPlugin {
     public static Settings Init(Settings settings) {
       return settings.Globally(DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
-                               DependenciesKeys.DependenciesRepositoryDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),
-                               DependenciesKeys.FetchedDependenciesFile.Init(FetchedDependenciesFileImpl),
+                               DependenciesKeys.FetchedDependenciesDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),
+                               DependenciesKeys.FetchedDependenciesListFile.Init(FetchedDependenciesFileImpl),
                                DependenciesKeys.FetchDependencies.Init(FetchImpl),
                                DependenciesKeys.CleanDependencies.InitSync(CleanDependenciesImpl),
                                DependenciesKeys.FetchedDependencies.Init(FetchedDependenciesImpl));
@@ -38,7 +38,7 @@ namespace Bud.Dependencies {
     }
 
     private static void CleanDependenciesImpl(IContext context) {
-      var nuGetRepositoryDir = context.GetNuGetRepositoryDir();
+      var nuGetRepositoryDir = context.GetFetchedDependenciesDir();
       Directory.Delete(nuGetRepositoryDir, true);
     }
 
@@ -57,7 +57,7 @@ namespace Bud.Dependencies {
     }
 
     private static PackageManager CreatePackageManager(IContext context) {
-      var nuGetRepositoryDir = context.GetNuGetRepositoryDir();
+      var nuGetRepositoryDir = context.GetFetchedDependenciesDir();
       IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository("http://packages.nuget.org/api/v2");
       return new PackageManager(repo, nuGetRepositoryDir);
     }

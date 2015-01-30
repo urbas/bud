@@ -6,6 +6,7 @@ using System.IO;
 public class Build : IBuild {
   public Settings Setup(Settings settings, string baseDir) {
     return settings
+      .Version("0.0.1")
       .Project("bud", Path.Combine(baseDir, "bud"), Cs.Exe(
         Cs.Dependency("Bud.Core")
       ))

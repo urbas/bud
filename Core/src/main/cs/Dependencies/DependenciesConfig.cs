@@ -29,20 +29,20 @@ namespace Bud.Dependencies {
     /// <summary>
     /// Invokes the tasks on all internal dependencies transitively and returns their keys.
     /// </summary>
-    public static async Task<ISet<Key>> ResolveInternalDependencies(this IContext context, Key dependent) {
+    public static async Task<ISet<Key>> EvaluateInternalDependencies(this IContext context, Key dependent) {
       var resolveDependenciesKey = DependenciesKeys.EvaluateInternalDependencies.In(dependent);
       return context.IsTaskDefined(resolveDependenciesKey) ? await context.Evaluate(resolveDependenciesKey) : ImmutableHashSet<Key>.Empty;
     }
 
-    public static string GetNuGetRepositoryDir(this IConfig context) {
-      return context.Evaluate(DependenciesKeys.DependenciesRepositoryDir);
+    public static string GetFetchedDependenciesDir(this IConfig context) {
+      return context.Evaluate(DependenciesKeys.FetchedDependenciesDir);
     }
 
-    public static string GetPersistedPackagesListFile(this IConfig context) {
-      return context.Evaluate(DependenciesKeys.FetchedDependenciesFile);
+    public static string GetFetchedDependenciesListFile(this IConfig context) {
+      return context.Evaluate(DependenciesKeys.FetchedDependenciesListFile);
     }
 
-    public static FetchedDependencies GetNuGetResolvedPackages(this IConfig context) {
+    public static FetchedDependencies GetFetchedDependencies(this IConfig context) {
       return context.Evaluate(DependenciesKeys.FetchedDependencies);
     }
 

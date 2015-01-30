@@ -9,8 +9,8 @@ namespace Bud.Projects {
       return settings.Do(Init(id, baseDir, setups));
     }
 
-    public static Setup Version(string version) {
-      return Settings.Modify(ProjectKeys.Version.Init(SemanticVersion.Parse(version)));
+    public static Settings Version(this Settings settings, string version) {
+      return settings.Do(ProjectKeys.Version.Modify(SemanticVersion.Parse(version)));
     }
 
     public static Key ProjectKey(string projectId) {
@@ -24,8 +24,15 @@ namespace Bud.Projects {
                   ProjectKeys.Projects.Modify(allProjects => allProjects.Add(projectId, project)))
         .In(project,
             BuildDirs.Init(baseDir),
-            ProjectKeys.Version.Init(SemanticVersion.Parse("0.0.1")),
+            ProjectKeys.Version.Init(VersionImpl),
             setups.ToPlugin());
+    }
+
+    private static SemanticVersion VersionImpl(IConfig config) {
+      if (config.IsConfigDefined(ProjectKeys.Version)) {
+        return config.Evaluate(ProjectKeys.Version);
+      }
+      return SemanticVersion.Parse("0.0.1");
     }
   }
 }

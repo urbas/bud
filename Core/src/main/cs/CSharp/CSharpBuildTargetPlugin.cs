@@ -76,9 +76,9 @@ namespace Bud.CSharp {
     }
 
     private IEnumerable<string> CollectExternalDependencies(IConfig context, Key buildTarget) {
-      var allNuGetDependencies = context.GetNuGetResolvedPackages();
+      var allNuGetDependencies = context.GetFetchedDependencies();
       var directExternalDependencies = context.GetExternalDependencies(buildTarget);
-      var nuGetRepositoryPath = context.GetNuGetRepositoryDir();
+      var nuGetRepositoryPath = context.GetFetchedDependenciesDir();
       return CollectDependenciesTransitively(directExternalDependencies.Select(dependency => allNuGetDependencies.GetPackage(dependency)),
                                              allNuGetDependencies)
         .Select(dependency => dependency.Assemblies.Select(assemblyReference => assemblyReference.GetAbsolutePath(nuGetRepositoryPath)).First());
