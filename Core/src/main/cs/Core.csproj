@@ -60,9 +60,11 @@
     <Compile Include="CSharp\AssemblyType.cs" />
     <Compile Include="CSharp\Compiler\CSharpCompiler.cs" />
     <Compile Include="CSharp\Cs.cs" />
+    <Compile Include="CSharp\CSharpBuildTargetPackage.cs" />
     <Compile Include="CSharp\CSharpBuildTargetPlugin.cs" />
     <Compile Include="CSharp\CSharpConfig.cs" />
     <Compile Include="CSharp\CSharpKeys.cs" />
+    <Compile Include="CSharp\CSharpInternalDependency.cs" />
     <Compile Include="CSharp\Framework.cs" />
     <Compile Include="Dependencies\AssemblyRereference.cs" />
     <Compile Include="Dependencies\DependenciesConfig.cs" />

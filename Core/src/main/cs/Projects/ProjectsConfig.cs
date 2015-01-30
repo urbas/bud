@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using NuGet;
 
 namespace Bud.Projects {
   public static class ProjectsConfig {
@@ -8,6 +9,10 @@ namespace Bud.Projects {
 
     public static Key GetProject(this IConfig context, string id) {
       return GetAllProjects(context)[id];
+    }
+
+    public static SemanticVersion GetVersionOf(this IConfig context, Key project) {
+      return context.Evaluate(ProjectKeys.Version.In(project));
     }
   }
 }

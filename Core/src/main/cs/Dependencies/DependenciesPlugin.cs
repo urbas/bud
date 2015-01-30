@@ -13,13 +13,13 @@ namespace Bud.Dependencies {
     public static Settings Init(Settings settings) {
       return settings.Globally(DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
                                DependenciesKeys.DependenciesRepositoryDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),
-                               DependenciesKeys.FetchedDependenciesFile.Init(PersistedPackagesListFileImpl),
+                               DependenciesKeys.FetchedDependenciesFile.Init(FetchedDependenciesFileImpl),
                                DependenciesKeys.FetchDependencies.Init(FetchImpl),
-                               DependenciesKeys.DependenciesClean.InitSync(CleanDependenciesImpl),
-                               DependenciesKeys.FetchedDependencies.Init(NuGetResolvedPackagesImpl));
+                               DependenciesKeys.CleanDependencies.InitSync(CleanDependenciesImpl),
+                               DependenciesKeys.FetchedDependencies.Init(FetchedDependenciesImpl));
     }
 
-    private static FetchedDependencies NuGetResolvedPackagesImpl(IConfig context) {
+    private static FetchedDependencies FetchedDependenciesImpl(IConfig context) {
       FetchedDependencies resolution;
       if (TryLoadPersistedResolution(context, out resolution)) {
         return resolution;
@@ -89,7 +89,7 @@ namespace Bud.Dependencies {
       return resolvedExternalDependencies;
     }
 
-    private static string PersistedPackagesListFileImpl(IConfig context) {
+    private static string FetchedDependenciesFileImpl(IConfig context) {
       return Path.Combine(context.GetPersistentBuildConfigDir(), DependenciesSettings.FetchedPackagesFileName);
     }
   }

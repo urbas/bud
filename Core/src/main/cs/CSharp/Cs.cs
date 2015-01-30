@@ -6,11 +6,11 @@ namespace Bud.CSharp {
   public static class Cs {
     public static Setup Dependency(string packageName, string packageVersion = null, string scope = null) {
       var dependencyProject = ProjectsSettings.ProjectKey(packageName);
-      var dependencyBuildTargetKey = BuildUtils.BuildTarget(dependencyProject, BuildKeys.Main, CSharpKeys.CSharp);
+      var dependencyBuildTarget = BuildUtils.BuildTarget(dependencyProject, BuildKeys.Main, CSharpKeys.CSharp);
       return DependenciesSettings.AddDependency(
-        new InternalDependency(dependencyBuildTargetKey, BuildUtils.BuildTaskKey(dependencyProject, BuildKeys.Main, CSharpKeys.CSharp)),
+        new CSharpInternalDependency(dependencyBuildTarget),
         new ExternalDependency(packageName, packageVersion),
-        shouldUseInternalDependency: context => IsMainBuildTargetDefined(context, dependencyBuildTargetKey));
+        shouldUseInternalDependency: context => IsMainBuildTargetDefined(context, dependencyBuildTarget));
     }
 
     public static Setup Exe(params Setup[] setups) {
@@ -29,8 +29,7 @@ namespace Bud.CSharp {
       return settings => {
         var project = settings.Scope.Parent.Parent;
         var mainBuildTarget = BuildUtils.BuildTarget(project, BuildKeys.Main, CSharpKeys.CSharp);
-        var mainBuildTask = BuildUtils.BuildTaskKey(project, BuildKeys.Main, CSharpKeys.CSharp);
-        return settings.Do(DependenciesSettings.AddDependency(new InternalDependency(mainBuildTarget, mainBuildTask), config => IsMainBuildTargetDefined(config, mainBuildTarget)));
+        return settings.Do(DependenciesSettings.AddDependency(new CSharpInternalDependency(mainBuildTarget), config => IsMainBuildTargetDefined(config, mainBuildTarget)));
       };
     }
 

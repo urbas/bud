@@ -103,5 +103,9 @@ namespace Bud {
       var prepended = parent.IsRoot ? stringBuilder : PrependAsString(stringBuilder, parent.Parent).Append(parent.Id);
       return prepended.Append(KeySeparator);
     }
+
+    public bool IdsEqual(Key otherKey) {
+      return Id.Equals(otherKey.Id);
+    }
   }
 }

@@ -18,12 +18,14 @@ namespace Bud.Dependencies {
     public static Setup AddDependency(InternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
       return Settings.Modify(DependenciesKeys.InternalDependencies.Init(ImmutableList<InternalDependency>.Empty),
                              DependenciesKeys.InternalDependencies.Modify((config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies),
-                             DependenciesKeys.ResolveInternalDependencies.Init(ResolveInternalDependenciesImpl));
+                             DependenciesKeys.EvaluateInternalDependencies.Init(ResolveInternalDependenciesImpl),
+                             DependenciesKeys.Dependencies.Init(DependenciesImpl));
     }
 
     public static Setup AddDependency(ExternalDependency dependency, Predicate<IConfig> conditionForInclusion = null) {
       return settings => settings.Do(DependenciesKeys.ExternalDependencies.Init(ImmutableList<ExternalDependency>.Empty),
-                                     DependenciesKeys.ExternalDependencies.Modify((config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies))
+                                     DependenciesKeys.ExternalDependencies.Modify((config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies),
+                                     DependenciesKeys.Dependencies.Init(DependenciesImpl))
                                  .Globally(DependenciesKeys.ExternalDependenciesKeys.Modify((ctxt, oldValue) => oldValue.Add(DependenciesKeys.ExternalDependencies.In(settings.Scope))));
     }
 
@@ -38,8 +40,20 @@ namespace Bud.Dependencies {
 
     private static async Task<IEnumerable<Key>> ResolveDependencyImpl(IContext context, InternalDependency dependency) {
       await dependency.Resolve(context);
-      var transitiveDependencies = await ResolveInternalDependenciesImpl(context, dependency.DepdendencyTarget);
-      return new[] {dependency.DepdendencyTarget}.Concat(transitiveDependencies);
+      var transitiveDependencies = await ResolveInternalDependenciesImpl(context, dependency.DependencyTarget);
+      return new[] {dependency.DependencyTarget}.Concat(transitiveDependencies);
+    }
+
+    private static IEnumerable<IDependency> DependenciesImpl(IConfig config, Key project) {
+      var internalDependencies = config.GetInternalDependencies(project);
+      var transitiveDependencies = internalDependencies.SelectMany(dependency => config.GetDependencies(project));
+      var externalDependencies = config.GetExternalDependencies(project);
+
+      var id2packages = (from dependency in internalDependencies.Concat(transitiveDependencies)
+                         let package = dependency.AsPackage(config)
+                         group package by package.Id).ToDictionary(group => group.Key, group => group.ToList());
+
+      return ImmutableList<IDependency>.Empty;
     }
   }
 }
