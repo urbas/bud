@@ -9,10 +9,13 @@ namespace Bud.Dependencies {
     public readonly string Id;
     public readonly ImmutableList<Package> Versions;
 
+    [JsonIgnore]
+    public FetchedDependencies HostFetchedDependencies { get; private set; }
+
     [JsonConstructor]
     public PackageVersions(string id, IEnumerable<Package> versions) {
       Id = id;
-      Versions = versions == null ? ImmutableList<Package>.Empty : versions.Select(package => package.WithId(Id))
+      Versions = versions == null ? ImmutableList<Package>.Empty : versions.Select(package => package.WithHostPackageVersions(this))
                                                                            .OrderByDescending(package => package.Version)
                                                                            .ToImmutableList();
     }
@@ -25,6 +28,11 @@ namespace Bud.Dependencies {
 
     public Package GetMostCurrentVersion() {
       return Versions.Count == 0 ? null : Versions[0];
+    }
+
+    public PackageVersions WithHostFetchedDependencies(FetchedDependencies fetchedDependencies) {
+      HostFetchedDependencies = fetchedDependencies;
+      return this;
     }
   }
 }

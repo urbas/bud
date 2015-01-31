@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Bud.Logging;
 
 namespace Bud {
   public interface IConfig {
     ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions { get; }
+    ILogger Logger { get; }
     bool IsConfigDefined(Key key);
     T Evaluate<T>(ConfigKey<T> configKey);
     object EvaluateConfig(Key key);
@@ -15,13 +17,16 @@ namespace Bud {
     private readonly ImmutableDictionary<Key, IConfigDefinition> configDefinitions;
     private readonly Dictionary<Key, object> configValues = new Dictionary<Key, object>();
 
-    public Config(ImmutableDictionary<Key, IConfigDefinition> configDefinitions) {
+    public Config(ImmutableDictionary<Key, IConfigDefinition> configDefinitions, ILogger logger) {
+      Logger = logger;
       this.configDefinitions = configDefinitions;
     }
 
     public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions {
       get { return configDefinitions; }
     }
+
+    public ILogger Logger { get; private set; }
 
     public bool IsConfigDefined(Key key) {
       return configDefinitions.ContainsKey(key.In(Key.Root));

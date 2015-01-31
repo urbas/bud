@@ -7,8 +7,12 @@
           "Version": "1.0.34",
           "Assemblies": [
             {
+              "Name": "System.Collections.Immutable.dll",
               "Path": "lib/portable-net45+win8+wp8+wpa81/System.Collections.Immutable.dll",
-              "Framework": ".NETPortable,Version=v0.0,Profile=net45+win8+wp8+wpa81"
+              "Framework": ".NETPortable,Version=v0.0,Profile=net45+win8+wp8+wpa81",
+              "SupportedFrameworks": [
+                ".NETPortable,Version=v0.0,Profile=net45+win8+wp8+wpa81"
+              ]
             }
           ]
         }
@@ -21,8 +25,12 @@
           "Version": "2.1.1",
           "Assemblies": [
             {
+              "Name": "Microsoft.Web.XmlTransform.dll",
               "Path": "lib/net40/Microsoft.Web.XmlTransform.dll",
-              "Framework": ".NETFramework,Version=v4.0"
+              "Framework": ".NETFramework,Version=v4.0",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v4.0"
+              ]
             }
           ]
         }
@@ -35,32 +43,60 @@
           "Version": "6.0.8",
           "Assemblies": [
             {
+              "Name": "Newtonsoft.Json.dll",
               "Path": "lib/net20/Newtonsoft.Json.dll",
-              "Framework": ".NETFramework,Version=v2.0"
+              "Framework": ".NETFramework,Version=v2.0",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v2.0"
+              ]
             },
             {
+              "Name": "Newtonsoft.Json.dll",
               "Path": "lib/net35/Newtonsoft.Json.dll",
-              "Framework": ".NETFramework,Version=v3.5"
+              "Framework": ".NETFramework,Version=v3.5",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v3.5"
+              ]
             },
             {
+              "Name": "Newtonsoft.Json.dll",
               "Path": "lib/net40/Newtonsoft.Json.dll",
-              "Framework": ".NETFramework,Version=v4.0"
+              "Framework": ".NETFramework,Version=v4.0",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v4.0"
+              ]
             },
             {
+              "Name": "Newtonsoft.Json.dll",
               "Path": "lib/net45/Newtonsoft.Json.dll",
-              "Framework": ".NETFramework,Version=v4.5"
+              "Framework": ".NETFramework,Version=v4.5",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v4.5"
+              ]
             },
             {
+              "Name": "Newtonsoft.Json.dll",
               "Path": "lib/netcore45/Newtonsoft.Json.dll",
-              "Framework": ".NETCore,Version=v4.5"
+              "Framework": ".NETCore,Version=v4.5",
+              "SupportedFrameworks": [
+                ".NETCore,Version=v4.5"
+              ]
             },
             {
+              "Name": "Newtonsoft.Json.dll",
               "Path": "lib/portable-net40+sl5+wp80+win8+wpa81/Newtonsoft.Json.dll",
-              "Framework": ".NETPortable,Version=v0.0,Profile=net40+sl5+wp80+win8+wpa81"
+              "Framework": ".NETPortable,Version=v0.0,Profile=net40+sl5+wp80+win8+wpa81",
+              "SupportedFrameworks": [
+                ".NETPortable,Version=v0.0,Profile=net40+sl5+wp80+win8+wpa81"
+              ]
             },
             {
+              "Name": "Newtonsoft.Json.dll",
               "Path": "lib/portable-net45+wp80+win8+wpa81+aspnetcore50/Newtonsoft.Json.dll",
-              "Framework": ".NETPortable,Version=v0.0,Profile=net45+wp80+win8+wpa81+aspnetcore50"
+              "Framework": ".NETPortable,Version=v0.0,Profile=net45+wp80+win8+wpa81+aspnetcore50",
+              "SupportedFrameworks": [
+                ".NETPortable,Version=v0.0,Profile=net45+wp80+win8+wpa81+aspnetcore50"
+              ]
             }
           ]
         }
@@ -73,8 +109,12 @@
           "Version": "2.8.3",
           "Assemblies": [
             {
+              "Name": "NuGet.Core.dll",
               "Path": "lib/net40-Client/NuGet.Core.dll",
-              "Framework": ".NETFramework,Version=v4.0,Profile=Client"
+              "Framework": ".NETFramework,Version=v4.0,Profile=Client",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v4.0,Profile=Client"
+              ]
             }
           ],
           "Dependencies": [
@@ -93,6 +133,7 @@
           "Version": "2.6.4",
           "Assemblies": [
             {
+              "Name": "nunit.framework.dll",
               "Path": "lib/nunit.framework.dll"
             }
           ]

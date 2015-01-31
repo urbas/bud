@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bud.Build;
 using Bud.CSharp;
+using Bud.Logging;
 using Bud.Projects;
 
 namespace Bud.Commander {
@@ -14,7 +15,7 @@ namespace Bud.Commander {
       var buildProjectDir = Path.Combine(path, BuildDirs.BudDirName);
       const string buildProjectId = "BuildDefinition";
       var buildProject = BuildProject(GlobalBuild.New(buildProjectDir), buildProjectId, buildProjectDir, path);
-      var evaluationContext = Context.FromSettings(buildProject);
+      var evaluationContext = Context.FromSettings(buildProject, Logger.CreateFromStandardOutputs());
       var buildCommanderTask = CreateBuildCommander(evaluationContext, ProjectsSettings.ProjectKey(buildProjectId));
       buildCommanderTask.Wait();
       return buildCommanderTask.Result;
@@ -36,7 +37,7 @@ namespace Bud.Commander {
                CSharpKeys.SourceFiles.Modify(AddBuildDefinitionSourceFile),
                CSharpKeys.OutputAssemblyDir.Modify(BuildDirs.GetBaseDir),
                CSharpKeys.OutputAssemblyName.Modify("Build"),
-               CSharpKeys.CollectReferencedAssemblies.Modify(AddBudAssemblies)));
+               CSharpKeys.ReferencedAssemblies.Modify(AddBudAssemblies)));
     }
 
     private static string GetBuildConfigSourceFile(this IContext context, Key buildLoadingProject) {
@@ -52,7 +53,7 @@ namespace Bud.Commander {
     }
 
     private static async Task<IBuildCommander> CreateBuildCommanderImpl(IContext context, Key project) {
-      var buildTarget = BuildUtils.BuildTarget(project, BuildKeys.Main, CSharpKeys.CSharp);
+      var buildTarget = project / BuildKeys.Main / CSharpKeys.CSharp;
       var buildConfigSourceFile = context.GetBuildConfigSourceFile(buildTarget);
       var dirOfProjectToBeBuilt = context.GetDirOfProjectToBeBuilt(buildTarget);
       // TODO: Check if the BakedBuild.dll file exists. If it does, just load it.
@@ -68,8 +69,8 @@ namespace Bud.Commander {
       return previousSources.Concat(new[] {context.GetBuildConfigSourceFile(key)});
     }
 
-    private static async Task<ImmutableList<string>> AddBudAssemblies(IContext context, Func<Task<ImmutableList<string>>> existingAssemblies) {
-      return (await existingAssemblies()).AddRange(BudAssemblies.GetBudAssembliesLocations());
+    private static IEnumerable<string> AddBudAssemblies(IConfig config, IEnumerable<string> existingAssemblies) {
+      return existingAssemblies.Concat(BudAssemblies.GetBudAssembliesLocations());
     }
   }
 }

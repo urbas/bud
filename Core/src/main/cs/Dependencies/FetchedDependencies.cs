@@ -9,11 +9,12 @@ namespace Bud.Dependencies {
   public class FetchedDependencies {
     public readonly ImmutableList<PackageVersions> Packages;
     [JsonIgnore] private readonly Dictionary<string, PackageVersions> packageId2PackageVersions;
+    [JsonIgnore] internal IConfig Config;
 
     [JsonConstructor]
     public FetchedDependencies(IEnumerable<PackageVersions> packages) {
       Packages = packages == null ? ImmutableList<PackageVersions>.Empty : packages.ToImmutableList();
-      packageId2PackageVersions = Packages.ToDictionary(packageVersions => packageVersions.Id, packageVersions => packageVersions);
+      packageId2PackageVersions = Packages.ToDictionary(packageVersions => packageVersions.Id, packageVersions => packageVersions.WithHostFetchedDependencies(this));
     }
 
     public FetchedDependencies(IEnumerable<IGrouping<string, IPackage>> fetchedPackages)
@@ -53,6 +54,11 @@ namespace Bud.Dependencies {
 
     private static string PackageNotFoundMessage(string dependencyId) {
       return string.Format("Could not find any version of the package '{0}'. Try running '{1}' to download packages.", dependencyId, DependenciesKeys.FetchDependencies);
+    }
+
+    public FetchedDependencies WithConfig(IConfig config) {
+      Config = config;
+      return this;
     }
   }
 }

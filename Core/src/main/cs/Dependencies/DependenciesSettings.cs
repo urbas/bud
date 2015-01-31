@@ -46,19 +46,24 @@ namespace Bud.Dependencies {
     }
 
     private static IEnumerable<IDependency> DependenciesImpl(IConfig config, Key project) {
+      // TODO: Get only dependencies that are meant for the current target framework.
       var internalDependencies = config.GetInternalDependencies(project);
-      var transitiveDependencies = internalDependencies.SelectMany(dependency => config.GetDependencies(project));
-      var externalDependencies = config.GetExternalDependencies(project);
+      var transitiveDependencies = internalDependencies.SelectMany(dependency => config.GetDependencies(dependency.DependencyTarget));
+      var directExternalDependencies = config.GetExternalDependencies(project);
       var fetchedDependencies = config.GetFetchedDependencies();
-      var internalId2packages = GroupById2Packages(config, internalDependencies);
-      var transitiveId2packages = GroupById2Packages(config, transitiveDependencies);
-      return ImmutableList<IDependency>.Empty;
+      IEnumerable<Package> directExternalPackages = directExternalDependencies.Select(fetchedDependencies.GetPackage);
+      return internalDependencies.Concat(transitiveDependencies)
+                                 .Concat(GetExternalDependenciesTransitive(directExternalPackages, fetchedDependencies))
+                                 .Distinct(new DependencyEquality(config));
     }
 
-    private static Dictionary<string, List<IPackage>> GroupById2Packages(IConfig config, IEnumerable<IDependency> dependencies) {
-      return (from dependency in dependencies
-              let package = dependency.AsPackage(config)
-              group package by package.Id).ToDictionary(group => group.Key, group => group.ToList());
+    private static IEnumerable<Package> GetExternalDependenciesTransitive(IEnumerable<Package> directDependencies, FetchedDependencies fetchedDependencies) {
+      // TODO: Get only dependencies that are meant for the current target framework.
+      return directDependencies.Concat(directDependencies.SelectMany(directDependency => GetExternalDependenciesTransitive(directDependency.Dependencies, fetchedDependencies)));
+    }
+
+    private static IEnumerable<Package> GetExternalDependenciesTransitive(IEnumerable<PackageDependencyInfo> directDependencies, FetchedDependencies fetchedDependencies) {
+      return GetExternalDependenciesTransitive(directDependencies.Select(directDependency => fetchedDependencies.GetPackage(directDependency.Id, directDependency.VersionSpec)), fetchedDependencies);
     }
   }
 }

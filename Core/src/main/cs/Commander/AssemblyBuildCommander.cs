@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Bud.Build;
+using Bud.Logging;
 
 namespace Bud.Commander {
   public class AssemblyBuildCommander : MarshalByRefObject, IBuildCommander {
@@ -14,7 +15,7 @@ namespace Bud.Commander {
       var assembly = AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(buildConfigurationAssemblyFile));
       var build = (IBuild) assembly.CreateInstance("Build");
       settings = build.Setup(GlobalBuild.New(baseDirectory), baseDirectory);
-      config = new Config(settings.ConfigDefinitions);
+      config = new Config(settings.ConfigDefinitions, Logger.CreateFromWriters(standardOutputTextWriter, standardErrorTextWriter));
     }
 
     public object Evaluate(string command) {

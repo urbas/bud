@@ -61,6 +61,10 @@ namespace Bud {
     public new TaskKey In(Key parent) {
       return new TaskKey(Id, Concat(parent, Parent), Description);
     }
+
+    public static TaskKey operator /(Key parent, TaskKey child) {
+      return child.In(parent);
+    }
   }
 
   /// <summary>
@@ -73,6 +77,10 @@ namespace Bud {
 
     public new TaskKey<T> In(Key parent) {
       return new TaskKey<T>(Id, Concat(parent, Parent), Description);
+    }
+
+    public static TaskKey<T> operator /(Key parent, TaskKey<T> child) {
+      return child.In(parent);
     }
 
     public Setup InitSync(Func<T> taskDefinition) {

@@ -16,16 +16,16 @@ namespace Bud.Build {
       this.setups = setups ?? ImmutableList<Setup>.Empty;
     }
 
-    public Settings Setup(Settings settings) {
-      var project = settings.Scope;
+    public Settings Setup(Settings projectSettings) {
+      var project = projectSettings.Scope;
       var buildTargetKey = BuildTargetKey(project);
-      return settings
+      return projectSettings
         .Do(BuildKeys.Test.Init(TaskUtils.NoOpTask))
         .In(buildTargetKey,
             BuildDirsKeys.BaseDir.Init(context => Path.Combine(context.GetBaseDir(project), "src", BuildScope.Id, Language.Id)),
             BuildDirsKeys.OutputDir.Init(context => Path.Combine(context.GetOutputDir(project), BuildScope.Id, Language.Id)),
             BuildKeys.Build.Init(BuildTaskImpl),
-            existingsettings => Setup(existingsettings, project),
+            buildTargetSettings => Setup(buildTargetSettings, project),
             setups.ToPlugin())
         .Globally(BuildKeys.Test.Init(TaskUtils.NoOpTask),
                   BuildKeys.Test.DependsOn(BuildKeys.Test.In(project)),
@@ -35,12 +35,15 @@ namespace Bud.Build {
                   BuildKeys.Build.In(BuildScope).DependsOn(BuildKeys.Build.In(buildTargetKey)));
     }
 
-    protected abstract Settings Setup(Settings existingsettings, Key project);
+    protected abstract Settings Setup(Settings projectSettings, Key project);
 
-    protected abstract Task BuildTaskImpl(IContext arg, Key buildTarget);
+    private Task BuildTaskImpl(IContext context, Key buildTarget) {
+      context.Logger.Info(string.Format("Building project '{0}' [Scope: {1}, Language: {2}]", BuildUtils.ProjectOf(buildTarget).Id, BuildScope.Id, Language.Id));
+      return TaskUtils.NullAsyncResult;
+    }
 
     protected Key BuildTargetKey(Key project) {
-      return BuildUtils.BuildTarget(project, BuildScope, Language);
+      return project / BuildScope / Language;
     }
   }
 }

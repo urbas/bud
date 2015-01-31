@@ -18,19 +18,21 @@ namespace Bud.CSharp {
       return new CSharpBuildTargetPlugin(project, setups).Setup;
     }
 
-    protected override Settings Setup(Settings settings, Key project) {
-      return settings.Do(CSharpKeys.SourceFiles.InitSync(FindSources),
-                         CSharpKeys.TargetFramework.Init(Framework.Net45),
-                         CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
-                         CSharpKeys.CollectReferencedAssemblies.Init(CollectReferencedAssembliesImpl),
-                         CSharpKeys.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
-                         CSharpKeys.OutputAssemblyName.Init(context => OutputAssemblyName(project, BuildScope)),
-                         CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile),
-                         CSharpKeys.Dist.Init(CreateDistributablePackage));
+    protected override Settings Setup(Settings buildTargetSettings, Key project) {
+      return buildTargetSettings.Do(CSharpKeys.SourceFiles.InitSync(FindSources),
+                                    CSharpKeys.TargetFramework.Init(Framework.Net45),
+                                    CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
+                                    BuildKeys.Build.Modify(BuildTaskImpl),
+                                    CSharpKeys.ReferencedAssemblies.Init(ReferencedAssembliesImpl),
+                                    CSharpKeys.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
+                                    CSharpKeys.OutputAssemblyName.Init(context => OutputAssemblyName(project, BuildScope)),
+                                    CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile),
+                                    CSharpKeys.Dist.Init(CreateDistributablePackage));
     }
 
-    protected override Task BuildTaskImpl(IContext context, Key buildTarget) {
-      return CSharpCompiler.CompileBuildTarget(context, buildTarget);
+    private async Task BuildTaskImpl(IContext context, Func<Task> oldBuild, Key buildTarget) {
+      await oldBuild();
+      await CSharpCompiler.CompileBuildTarget(context, buildTarget);
     }
 
     private static string GetDefaultOutputAssemblyDir(IConfig context, Key buildTarget) {
@@ -56,41 +58,36 @@ namespace Bud.CSharp {
       return ImmutableList<string>.Empty;
     }
 
-    private async Task<ImmutableList<string>> CollectReferencedAssembliesImpl(IContext context, Key buildTarget) {
-      var internalDependencies = await context.ResolveInternalDependencies(buildTarget);
-      var internalDependencyAssemblyPaths = CollectInternalDependencies(context, internalDependencies);
-      var directNuGetDependencies = CollectExternalDependencies(context, buildTarget);
-      var transitiveNuGetDependencies = internalDependencies.SelectMany(dependency => CollectExternalDependencies(context, dependency));
-      return internalDependencyAssemblyPaths.AddRange(directNuGetDependencies).AddRange(transitiveNuGetDependencies);
+    private IEnumerable<string> ReferencedAssembliesImpl(IConfig config, Key buildTarget) {
+      return config.GetDependencies(buildTarget)
+                   .Select(dependency => GetCompatibleAssembly(config, buildTarget, dependency))
+                   .Select(assembly => assembly.EffectivePath);
     }
 
-    private ImmutableList<string> CollectInternalDependencies(IContext context, IEnumerable<Key> dependencyBuildTargets) {
-      var collectedAssemblies = ImmutableList.CreateBuilder<string>();
-      foreach (var buildTarget in dependencyBuildTargets) {
-        var cSharpOutputAssemblyFile = context.GetCSharpOutputAssemblyFile(buildTarget);
-        if (File.Exists(cSharpOutputAssemblyFile)) {
-          collectedAssemblies.Add(cSharpOutputAssemblyFile);
+    private IPackageAssemblyReference GetCompatibleAssembly(IConfig config, Key buildTarget, IDependency dependency) {
+      IEnumerable<IPackageAssemblyReference> compatibleAssemblyRereferences;
+      var package = dependency.AsPackage(config);
+      var targetFramework = config.GetTargetFramework(buildTarget).FrameworkName;
+      if (VersionUtility.TryGetCompatibleItems(targetFramework, package.AssemblyReferences, out compatibleAssemblyRereferences) && compatibleAssemblyRereferences.Any()) {
+        return GetAssemblyWithLatestTargetFramework(compatibleAssemblyRereferences);
+      }
+      throw new Exception(string.Format("Could not find a compatible assembly in dependency '{0}' for build target '{1}'. The build target requires target framework of '{2}'.", package.Id, buildTarget, targetFramework.FullName));
+    }
+
+    private IPackageAssemblyReference GetAssemblyWithLatestTargetFramework(IEnumerable<IPackageAssemblyReference> compatibleAssemblyRereferences) {
+      IPackageAssemblyReference bestAssemblyReference = null;
+      foreach (var assemblyReference in compatibleAssemblyRereferences) {
+        if (bestAssemblyReference == null || HasNewerTargetFramework(bestAssemblyReference, assemblyReference)) {
+          bestAssemblyReference = assemblyReference;
         }
       }
-      return collectedAssemblies.ToImmutable();
+      return bestAssemblyReference;
     }
 
-    private IEnumerable<string> CollectExternalDependencies(IConfig context, Key buildTarget) {
-      var allNuGetDependencies = context.GetFetchedDependencies();
-      var directExternalDependencies = context.GetExternalDependencies(buildTarget);
-      var nuGetRepositoryPath = context.GetFetchedDependenciesDir();
-      return CollectDependenciesTransitively(directExternalDependencies.Select(dependency => allNuGetDependencies.GetPackage(dependency)),
-                                             allNuGetDependencies)
-        .Select(dependency => dependency.Assemblies.Select(assemblyReference => assemblyReference.GetAbsolutePath(nuGetRepositoryPath)).First());
-    }
-
-    private static IEnumerable<Package> CollectDependenciesTransitively(IEnumerable<Package> directDependencies, FetchedDependencies allExternalDependencies) {
-      return directDependencies.Select(directDependency => allExternalDependencies.GetPackage(directDependency.Id, new VersionSpec(directDependency.Version)))
-                               .Concat(directDependencies.SelectMany(directDependency => CollectDependenciesTransitively(directDependency.Dependencies, allExternalDependencies)));
-    }
-
-    private static IEnumerable<Package> CollectDependenciesTransitively(ImmutableList<PackageInfo> directDependencies, FetchedDependencies allExternalDependencies) {
-      return CollectDependenciesTransitively(directDependencies.Select(directDependency => allExternalDependencies.GetPackage(directDependency.Id, VersionUtility.ParseVersionSpec(directDependency.Version))), allExternalDependencies);
+    private static bool HasNewerTargetFramework(IPackageAssemblyReference relativeToAssemblyReference, IPackageAssemblyReference assemblyReference) {
+      return relativeToAssemblyReference.TargetFramework != null &&
+             (assemblyReference.TargetFramework == null || (
+               assemblyReference.TargetFramework != null && relativeToAssemblyReference.TargetFramework.Version < assemblyReference.TargetFramework.Version));
     }
 
     private static string GetAssemblyFileExtension(IConfig context, Key project) {
@@ -110,7 +107,7 @@ namespace Bud.CSharp {
 
     private async Task CreateDistributablePackage(IContext context, Key buildTarget) {
       await context.Evaluate(BuildKeys.Build.In(buildTarget));
-      var referencedAssemblies = await context.CollectCSharpReferencedAssemblies(buildTarget);
+      var referencedAssemblies = context.GetReferencedAssemblies(buildTarget);
       var targetDir = Path.Combine(context.GetOutputDir(buildTarget), "dist");
       Directory.CreateDirectory(targetDir);
       foreach (var referencedAssembly in referencedAssemblies) {

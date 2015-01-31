@@ -46,8 +46,9 @@ namespace Bud.Dependencies {
       return context.Evaluate(DependenciesKeys.FetchedDependencies);
     }
 
-    public static IEnumerable<IDependency> GetDependencies(this IConfig config, Key project) {
-      return config.Evaluate(DependenciesKeys.Dependencies.In(project));
+    public static IEnumerable<IDependency> GetDependencies(this IConfig config, Key key) {
+      var dependenciesKey = DependenciesKeys.Dependencies.In(key);
+      return config.IsConfigDefined(dependenciesKey) ? config.Evaluate(dependenciesKey) : ImmutableList<IDependency>.Empty;
     }
   }
 }

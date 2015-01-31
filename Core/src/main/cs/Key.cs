@@ -107,5 +107,9 @@ namespace Bud {
     public bool IdsEqual(Key otherKey) {
       return Id.Equals(otherKey.Id);
     }
+
+    public static Key operator /(Key parent, Key child) {
+      return child.In(parent);
+    }
   }
 }

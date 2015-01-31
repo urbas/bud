@@ -4,15 +4,17 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Bud.Cli;
+using Bud.Dependencies;
 
 namespace Bud.CSharp.Compiler {
   public static class CSharpCompiler {
     public static Task CompileBuildTarget(IContext context, Key buildTarget) {
       return Task.Run(async () => {
+        await context.EvaluateInternalDependencies(buildTarget);
         var outputFile = context.GetCSharpOutputAssemblyFile(buildTarget);
         var framework = context.GetTargetFramework(buildTarget);
         var sourceFiles = await context.GetCSharpSources(buildTarget);
-        var libraryDependencies = await GetReferencedAssemblies(context, buildTarget);
+        var libraryDependencies = context.GetReferencedAssemblies(buildTarget);
         var frameworkAssemblies = framework.RuntimeAssemblies;
         if (sourceFiles.Any()) {
           Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
@@ -24,17 +26,12 @@ namespace Bud.CSharp.Compiler {
           }
           compilerProcess = compilerProcess.AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(buildTarget)));
           compilerProcess = compilerProcess.AddArguments(sourceFiles);
-          Console.WriteLine(compilerProcess.ExecutablePath + " " + compilerProcess.Arguments);
           var exitCode = compilerProcess.Start(Console.Out, Console.Error);
           if (exitCode != 0) {
             throw new Exception("Compilation failed.");
           }
         }
       });
-    }
-
-    private static async Task<IEnumerable<string>> GetReferencedAssemblies(IContext context, Key buildKey) {
-      return await context.CollectCSharpReferencedAssemblies(buildKey);
     }
 
     public static string GetTargetKind(AssemblyType assemblyType) {

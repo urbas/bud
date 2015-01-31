@@ -19,10 +19,10 @@ namespace Bud.Dependencies {
                                DependenciesKeys.FetchedDependencies.Init(FetchedDependenciesImpl));
     }
 
-    private static FetchedDependencies FetchedDependenciesImpl(IConfig context) {
+    private static FetchedDependencies FetchedDependenciesImpl(IConfig config) {
       FetchedDependencies resolution;
-      if (TryLoadPersistedResolution(context, out resolution)) {
-        return resolution;
+      if (TryLoadPersistedResolution(config, out resolution)) {
+        return resolution.WithConfig(config);
       }
       return new FetchedDependencies(ImmutableList<PackageVersions>.Empty);
     }
@@ -43,7 +43,7 @@ namespace Bud.Dependencies {
     }
 
     private static bool TryLoadPersistedResolution(IConfig context, out FetchedDependencies persistedResolution) {
-      var fetchedPackagesFile = context.GetPersistedPackagesListFile();
+      var fetchedPackagesFile = context.GetFetchedDependenciesListFile();
       if (File.Exists(fetchedPackagesFile)) {
         using (var streamReader = new StreamReader(fetchedPackagesFile)) {
           using (var jsonStreamReader = new JsonTextReader(streamReader)) {
@@ -80,7 +80,7 @@ namespace Bud.Dependencies {
     private static FetchedDependencies PersistNuGetResolution(IContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
       context.CreatePersistentBuildConfigDir();
       var resolvedExternalDependencies = new FetchedDependencies(fetchedPackages);
-      using (var streamWriter = new StreamWriter(context.GetPersistedPackagesListFile())) {
+      using (var streamWriter = new StreamWriter(context.GetFetchedDependenciesListFile())) {
         using (var jsonTextWriter = new JsonTextWriter(streamWriter)) {
           jsonTextWriter.Formatting = Formatting.Indented;
           JsonSerializer.CreateDefault().Serialize(jsonTextWriter, resolvedExternalDependencies);

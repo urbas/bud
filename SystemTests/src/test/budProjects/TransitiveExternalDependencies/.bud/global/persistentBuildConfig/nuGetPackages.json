@@ -14,8 +14,7 @@
           "Dependencies": [
             {
               "Id": "Urbas.Example.Foo",
-              "Version": "1.0.1",
-              "Framework": null
+              "Version": "1.0.1"
             }
           ]
         }
@@ -31,8 +30,7 @@
               "Path": "lib/net40/Urbas.Example.Foo.dll",
               "Framework": ".NETFramework,Version=v4.0"
             }
-          ],
-          "Dependencies": []
+          ]
         }
       ]
     }

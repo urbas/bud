@@ -126,8 +126,7 @@ namespace Bud {
         TestTaskKey.Modify(async previousTask => await previousTask() + await previousTask()));
 
       var evaluatedValue = await Context.FromSettings(
-        settings
-        ).Evaluate(TestTaskKey);
+        settings).Evaluate(TestTaskKey);
 
       Assert.AreEqual("foofoo", evaluatedValue);
       Assert.AreEqual(1, numberOfTimesDependentInvoked);

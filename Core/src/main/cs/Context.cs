@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
 using System.Threading.Tasks;
+using Bud.Logging;
 
 namespace Bud {
   public interface IContext : IConfig {
@@ -21,9 +22,10 @@ namespace Bud {
     private readonly IConfig configuration;
     private readonly ImmutableDictionary<Key, ITaskDefinition> taskDefinitions;
     private readonly Dictionary<Key, Task> taskValues = new Dictionary<Key, Task>();
+
     private readonly Dictionary<ITaskDefinition, Task> oldTaskValues = new Dictionary<ITaskDefinition, Task>();
 
-    private Context(ImmutableDictionary<Key, IConfigDefinition> configDefinitions, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) : this(new Config(configDefinitions), taskDefinitions) {}
+    private Context(ImmutableDictionary<Key, IConfigDefinition> configDefinitions, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions, ILogger logger) : this(new Config(configDefinitions, logger), taskDefinitions) {}
 
     private Context(IConfig configuration, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) {
       this.configuration = configuration;
@@ -32,6 +34,10 @@ namespace Bud {
 
     public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions {
       get { return configuration.ConfigDefinitions; }
+    }
+
+    public ILogger Logger {
+      get { return configuration.Logger; }
     }
 
     public ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions {
@@ -84,8 +90,13 @@ namespace Bud {
       return freshEvaluation;
     }
 
-    public static Context FromSettings(Settings settings) {
-      return new Context(settings.ConfigDefinitions, settings.TaskDefinitions);
+    public static Context FromSettings(Settings settings, ILogger logger) {
+      return new Context(settings.ConfigDefinitions, settings.TaskDefinitions, logger);
+    }
+
+    public static IContext FromSettings(Settings settings)
+    {
+      return FromSettings(settings, Logging.Logger.CreateFromStandardOutputs());
     }
 
     public static Context FromConfig(IConfig config, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) {

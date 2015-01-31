@@ -1,6 +1,7 @@
 using System.IO;
 using Bud.Build;
 using Bud.CSharp;
+using Bud.Logging;
 using Bud.Projects;
 
 namespace Bud.Commander {
@@ -11,7 +12,7 @@ namespace Bud.Commander {
     public DefaultBuildCommander(string dirOfProjectToBeBuilt) {
       settings = GlobalBuild.New(dirOfProjectToBeBuilt)
                             .Project(Path.GetFileName(dirOfProjectToBeBuilt), dirOfProjectToBeBuilt, Cs.Exe(), Cs.Test());
-      config = new Config(settings.ConfigDefinitions);
+      config = new Config(settings.ConfigDefinitions, Logger.CreateFromStandardOutputs());
     }
 
     public object Evaluate(string command) {

@@ -19,6 +19,10 @@ namespace Bud {
       return new ConfigKey<T>(Id, Concat(parent, Parent), Description);
     }
 
+    public static ConfigKey<T> operator /(Key parent, ConfigKey<T> child) {
+      return child.In(parent);
+    }
+
     public Setup Init(T configValue) {
       return settings => settings.Add(new InitializeConfig<T>(In(settings.Scope), configValue));
     }
