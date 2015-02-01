@@ -4,7 +4,7 @@ namespace Bud.Build {
       return buildTarget.Parent.Parent;
     }
 
-    private static Key ScopeOf(Key buildTarget) {
+    public static Key ScopeOf(Key buildTarget) {
       return buildTarget.Parent;
     }
 
@@ -12,6 +12,10 @@ namespace Bud.Build {
       var projectId = ProjectOf(buildTarget).Id;
       var scope = ScopeOf(buildTarget);
       return scope.IdsEqual(BuildKeys.Main) ? projectId : projectId + "." + scope;
+    }
+
+    public static Key LanguageOf(Key buildTarget) {
+      return buildTarget;
     }
   }
 }

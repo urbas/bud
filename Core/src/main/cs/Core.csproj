@@ -59,6 +59,7 @@
     <Compile Include="ConfigKey.cs" />
     <Compile Include="CSharp\AssemblyType.cs" />
     <Compile Include="CSharp\Compiler\CSharpCompiler.cs" />
+    <Compile Include="CSharp\Compiler\Files.cs" />
     <Compile Include="CSharp\Cs.cs" />
     <Compile Include="CSharp\CSharpBuildTargetPackage.cs" />
     <Compile Include="CSharp\CSharpBuildTargetPlugin.cs" />

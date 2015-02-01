@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Bud.Build;
 using Bud.Cli;
 using Bud.Dependencies;
+using Bud.IO;
 
 namespace Bud.CSharp.Compiler {
   public static class CSharpCompiler {
@@ -16,8 +18,10 @@ namespace Bud.CSharp.Compiler {
         var sourceFiles = await context.GetCSharpSources(buildTarget);
         var libraryDependencies = context.GetReferencedAssemblies(buildTarget);
         var frameworkAssemblies = framework.RuntimeAssemblies;
-        if (sourceFiles.Any()) {
+        if (sourceFiles.Any() && Files.AreFilesNewer(sourceFiles, outputFile)) {
           Compile(context, buildTarget, outputFile, framework, libraryDependencies, frameworkAssemblies, sourceFiles);
+        } else {
+          context.Logger.Info(string.Format("{0}: skipping build of scope '{1}' language '{2}'", BuildUtils.ProjectOf(buildTarget).Id, BuildUtils.ScopeOf(buildTarget).Id, BuildUtils.LanguageOf(buildTarget).Id));
         }
       });
     }
