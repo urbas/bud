@@ -11,22 +11,15 @@ using Bud.Projects;
 
 namespace Bud.Commander {
   public static class BuildCommander {
+    private const string BuildDefinitionProjectId = "BuildDefinition";
+
     public static IBuildCommander Load(string path) {
       var buildProjectDir = Path.Combine(path, BuildDirs.BudDirName);
-      const string buildProjectId = "BuildDefinition";
-      var buildProject = BuildProject(GlobalBuild.New(buildProjectDir), buildProjectId, buildProjectDir, path);
+      var buildProject = GlobalBuild.New(buildProjectDir).Project(BuildDefinitionProjectId, buildProjectDir, Init(path));
       var evaluationContext = Context.FromSettings(buildProject, Logger.CreateFromStandardOutputs());
-      var buildCommanderTask = CreateBuildCommander(evaluationContext, ProjectsSettings.ProjectKey(buildProjectId));
+      var buildCommanderTask = CreateBuildCommander(evaluationContext, ProjectsSettings.ProjectKey(BuildDefinitionProjectId));
       buildCommanderTask.Wait();
       return buildCommanderTask.Result;
-    }
-
-    private static Settings BuildProject(Settings build, string projectId, string budDir, string dirOfProjectToBeBuilt) {
-      return build.Project(projectId, budDir, Init(dirOfProjectToBeBuilt));
-    }
-
-    private static async Task<IBuildCommander> CreateBuildCommander(IContext context, Key buildLoadingProject) {
-      return await context.Evaluate(BuildCommanderKeys.CreateBuildCommander.In(buildLoadingProject));
     }
 
     private static Setup Init(string dirOfProjectToBeBuilt) {
@@ -38,6 +31,10 @@ namespace Bud.Commander {
                CSharpKeys.OutputAssemblyDir.Modify(BuildDirs.GetBaseDir),
                CSharpKeys.OutputAssemblyName.Modify("Build"),
                CSharpKeys.ReferencedAssemblies.Modify(AddBudAssemblies)));
+    }
+
+    private static async Task<IBuildCommander> CreateBuildCommander(IContext context, Key buildLoadingProject) {
+      return await context.Evaluate(BuildCommanderKeys.CreateBuildCommander.In(buildLoadingProject));
     }
 
     private static string GetBuildConfigSourceFile(this IContext context, Key buildLoadingProject) {

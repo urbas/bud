@@ -17,21 +17,24 @@ namespace Bud.CSharp.Compiler {
         var libraryDependencies = context.GetReferencedAssemblies(buildTarget);
         var frameworkAssemblies = framework.RuntimeAssemblies;
         if (sourceFiles.Any()) {
-          Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
-          var compilerProcess = ProcessBuilder
-            .Executable(framework.CSharpCompilerPath)
-            .AddParamArgument("-out:", outputFile);
-          if (libraryDependencies.Any()) {
-            compilerProcess = compilerProcess.AddParamArgument("-reference:", libraryDependencies.Concat(frameworkAssemblies));
-          }
-          compilerProcess = compilerProcess.AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(buildTarget)));
-          compilerProcess = compilerProcess.AddArguments(sourceFiles);
-          var exitCode = compilerProcess.Start(Console.Out, Console.Error);
-          if (exitCode != 0) {
-            throw new Exception("Compilation failed.");
-          }
+          Compile(context, buildTarget, outputFile, framework, libraryDependencies, frameworkAssemblies, sourceFiles);
         }
       });
+    }
+
+    private static void Compile(IContext context, Key buildTarget, string outputFile, Framework framework, IEnumerable<string> libraryDependencies, IEnumerable<string> frameworkAssemblies, IEnumerable<string> sourceFiles) {
+      Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
+      var compilerProcess = ProcessBuilder.Executable(framework.CSharpCompilerPath)
+                                          .AddParamArgument("-out:", outputFile);
+      if (libraryDependencies.Any() || frameworkAssemblies.Any()) {
+        compilerProcess.AddParamArgument("-reference:", libraryDependencies.Concat(frameworkAssemblies));
+      }
+      compilerProcess.AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(buildTarget)))
+                     .AddArguments(sourceFiles);
+      var exitCode = compilerProcess.Start(Console.Out, Console.Error);
+      if (exitCode != 0) {
+        throw new Exception("Compilation failed.");
+      }
     }
 
     public static string GetTargetKind(AssemblyType assemblyType) {
