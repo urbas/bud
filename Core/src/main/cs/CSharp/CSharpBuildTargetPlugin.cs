@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Bud.Build;
 using Bud.CSharp.Compiler;
 using Bud.Dependencies;
+using Bud.Publishing;
 using Bud.Util;
 using NuGet;
 
@@ -25,9 +26,10 @@ namespace Bud.CSharp {
                                     BuildKeys.Build.Modify(BuildTaskImpl),
                                     CSharpKeys.ReferencedAssemblies.Init(ReferencedAssembliesImpl),
                                     CSharpKeys.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
-                                    CSharpKeys.OutputAssemblyName.Init(context => OutputAssemblyName(project, BuildScope)),
+                                    CSharpKeys.OutputAssemblyName.Init(OutputAssemblyName),
                                     CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile),
-                                    CSharpKeys.Dist.Init(CreateDistributablePackage));
+                                    CSharpKeys.Dist.Init(CreateDistributablePackage),
+                                    PublishingPlugin.Init());
     }
 
     private async Task BuildTaskImpl(IContext context, Func<Task> oldBuild, Key buildTarget) {
@@ -39,11 +41,8 @@ namespace Bud.CSharp {
       return Path.Combine(context.GetOutputDir(buildTarget), "debug", "bin");
     }
 
-    private static string OutputAssemblyName(Key project, Key scope) {
-      if (BuildKeys.Main.Equals(scope)) {
-        return project.Id;
-      }
-      return project.Id + "." + StringUtils.Capitalize(scope.Id);
+    private static string OutputAssemblyName(IConfig context, Key buildTarget) {
+      return BuildUtils.IdOf(buildTarget);
     }
 
     private static string GetDefaultOutputAssemblyFile(IConfig context, Key buildTarget) {

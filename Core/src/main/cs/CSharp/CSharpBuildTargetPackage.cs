@@ -135,40 +135,4 @@ namespace Bud.CSharp {
 
     public IEnumerable<IPackageAssemblyReference> AssemblyReferences { get; private set; }
   }
-
-  public class CSharpBuildTargetAssembly : IPackageAssemblyReference {
-    private readonly string path;
-    private readonly FrameworkName targetFramework;
-    private readonly string name;
-
-    public CSharpBuildTargetAssembly(IConfig config, Key buildTarget) {
-      path = config.GetCSharpOutputAssemblyFile(buildTarget);
-      targetFramework = config.GetTargetFramework(buildTarget).FrameworkName;
-      name = config.GetCSharpOutputAssemblyName(buildTarget);
-    }
-
-    public IEnumerable<FrameworkName> SupportedFrameworks {
-      get { return null; }
-    }
-
-    public Stream GetStream() {
-      throw new NotImplementedException();
-    }
-
-    public string Path {
-      get { return path; }
-    }
-
-    public string EffectivePath {
-      get { return path; }
-    }
-
-    public FrameworkName TargetFramework {
-      get { return targetFramework; }
-    }
-
-    public string Name {
-      get { return name; }
-    }
-  }
 }

@@ -4,15 +4,16 @@ using System.Runtime.Versioning;
 
 namespace Bud.CSharp {
   public class Framework {
-    public static readonly Framework Net20 = new Framework(@"C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe", "/usr/bin/mcs", new string[0], new string[0], new FrameworkName(".NETFramework,Version=v2.0"));
-    public static readonly Framework Net45 = new Framework(@"C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe", "/usr/bin/mcs", new[] { "System.Runtime.dll" }, new[] { "Facades/System.Runtime.dll" }, new FrameworkName(".NETFramework,Version=v4.5"));
+    public static readonly Framework Net20 = new Framework("net45", @"C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe", "/usr/bin/mcs", new string[0], new string[0], new FrameworkName(".NETFramework,Version=v2.0"));
+    public static readonly Framework Net45 = new Framework("net45", @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe", "/usr/bin/mcs", new[] {"System.Runtime.dll"}, new[] {"Facades/System.Runtime.dll"}, new FrameworkName(".NETFramework,Version=v4.5"));
 
     private readonly string windowsCSharpCompilerPath;
     private readonly string linuxCSharpCompilerPath;
     private readonly string[] windowsSystemRuntimeFacadeDll;
     private readonly string[] linuxSystemRuntimeFacadeDll;
 
-    private Framework(string windowsCSharpCompilerPath, string linuxCSharpCompilerPath, string[] windowsSystemRuntimeFacadeDll, string[] linuxSystemRuntimeFacadeDll, FrameworkName frameworkName) {
+    private Framework(string identifier, string windowsCSharpCompilerPath, string linuxCSharpCompilerPath, string[] windowsSystemRuntimeFacadeDll, string[] linuxSystemRuntimeFacadeDll, FrameworkName frameworkName) {
+      Identifier = identifier;
       FrameworkName = frameworkName;
       this.windowsCSharpCompilerPath = windowsCSharpCompilerPath;
       this.linuxCSharpCompilerPath = linuxCSharpCompilerPath;
@@ -39,5 +40,6 @@ namespace Bud.CSharp {
     }
 
     public FrameworkName FrameworkName { get; private set; }
+    public string Identifier { get; private set; }
   }
 }

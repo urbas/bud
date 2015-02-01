@@ -38,7 +38,7 @@ namespace Bud.Build {
     protected abstract Settings Setup(Settings projectSettings, Key project);
 
     private Task BuildTaskImpl(IContext context, Key buildTarget) {
-      context.Logger.Info(string.Format("{0}: building scope '{1}' language '{2}'...", BuildUtils.ProjectOf(buildTarget).Id, BuildUtils.ScopeOf(buildTarget).Id, BuildUtils.LanguageOf(buildTarget).Id));
+      context.Logger.Info(context.LogMessage(buildTarget, "building..."));
       return TaskUtils.NullAsyncResult;
     }
 

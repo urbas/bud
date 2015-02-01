@@ -33,6 +33,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Collections.Immutable">
       <HintPath>..\..\..\..\packages\Microsoft.Bcl.Immutable.1.0.34\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
@@ -48,6 +49,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BudPaths.cs" />
     <Compile Include="Build\BuildDirs.cs" />
     <Compile Include="Build\BuildDirsKeys.cs" />
     <Compile Include="Build\BuildKeys.cs" />
@@ -61,6 +63,7 @@
     <Compile Include="CSharp\Compiler\CSharpCompiler.cs" />
     <Compile Include="CSharp\Compiler\Files.cs" />
     <Compile Include="CSharp\Cs.cs" />
+    <Compile Include="CSharp\CSharpBuildTargetAssembly.cs" />
     <Compile Include="CSharp\CSharpBuildTargetPackage.cs" />
     <Compile Include="CSharp\CSharpBuildTargetPlugin.cs" />
     <Compile Include="CSharp\CSharpConfig.cs" />
@@ -88,6 +91,9 @@
     <Compile Include="Projects\ProjectKeys.cs" />
     <Compile Include="Projects\ProjectsConfig.cs" />
     <Compile Include="Projects\ProjectsSettings.cs" />
+    <Compile Include="Publishing\PublishingPlugin.cs" />
+    <Compile Include="Publishing\PublishKeys.cs" />
+    <Compile Include="Publishing\PublishTasks.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsUtils.cs" />

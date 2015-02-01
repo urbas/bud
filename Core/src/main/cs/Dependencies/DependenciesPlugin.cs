@@ -10,6 +10,8 @@ using NuGet;
 
 namespace Bud.Dependencies {
   public class DependenciesPlugin {
+    public const string NuGetRemoteRepoUri = "http://packages.nuget.org/api/v2";
+
     public static Settings Init(Settings settings) {
       return settings.Globally(DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
                                DependenciesKeys.FetchedDependenciesDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),
@@ -58,7 +60,7 @@ namespace Bud.Dependencies {
 
     private static PackageManager CreatePackageManager(IContext context) {
       var nuGetRepositoryDir = context.GetFetchedDependenciesDir();
-      IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository("http://packages.nuget.org/api/v2");
+      IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository(NuGetRemoteRepoUri);
       return new PackageManager(repo, nuGetRepositoryDir);
     }
 
