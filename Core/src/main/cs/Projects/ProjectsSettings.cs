@@ -14,7 +14,7 @@ namespace Bud.Projects {
     }
 
     public static Key ProjectKey(string projectId) {
-      return new Key(projectId).In(ProjectKeys.Project);
+      return Key.Root / ProjectKeys.Project / new Key(projectId);
     }
 
     private static Setup Init(string projectId, string baseDir, IEnumerable<Setup> setups) {
@@ -32,7 +32,7 @@ namespace Bud.Projects {
       if (config.IsConfigDefined(ProjectKeys.Version)) {
         return config.Evaluate(ProjectKeys.Version);
       }
-      return SemanticVersion.Parse("0.0.1");
+      return SemanticVersion.Parse("0.0.1-SNAPSHOT");
     }
   }
 }

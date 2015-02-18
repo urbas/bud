@@ -97,6 +97,8 @@
     <Compile Include="Setup.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsUtils.cs" />
+    <Compile Include="SolutionExporter\SolutionExporterKeys.cs" />
+    <Compile Include="SolutionExporter\SolutionExporterSettings.cs" />
     <Compile Include="TaskDependencies.cs" />
     <Compile Include="TaskKey.cs" />
     <Compile Include="Util\StringUtils.cs" />
@@ -126,7 +128,6 @@
     <Compile Include="Commander\DefaultBuildCommander.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

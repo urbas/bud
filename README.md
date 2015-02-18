@@ -20,7 +20,7 @@ Optional:
 
 A build consists of multiple projects.
 
-Key: `project/:projectId`.
+Key: `project/:projectId`.  
 
 ### Project configuration
 

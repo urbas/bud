@@ -1,5 +1,6 @@
 using Bud;
 using Bud.CSharp;
+using Bud.Csproj;
 using Bud.Projects;
 using Bud.Publishing;
 using System.IO;
@@ -8,6 +9,7 @@ public class Build : IBuild {
   public Settings Setup(Settings settings, string baseDir) {
     return settings
       .Version("0.0.2")
+      .ExportAsSolution()
       .Project("bud", Path.Combine(baseDir, "bud"), Cs.Exe(
         Cs.Dependency("Bud.Core")
       ))

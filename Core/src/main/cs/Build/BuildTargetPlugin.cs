@@ -18,7 +18,7 @@ namespace Bud.Build {
 
     public Settings Setup(Settings projectSettings) {
       var project = projectSettings.Scope;
-      var buildTargetKey = BuildTargetKey(project);
+      var buildTargetKey = project / BuildScope / Language;
       return projectSettings
         .Do(BuildKeys.Test.Init(TaskUtils.NoOpTask))
         .In(buildTargetKey,
@@ -40,10 +40,6 @@ namespace Bud.Build {
     private Task BuildTaskImpl(IContext context, Key buildTarget) {
       context.Logger.Info(context.LogMessage(buildTarget, "building..."));
       return TaskUtils.NullAsyncResult;
-    }
-
-    protected Key BuildTargetKey(Key project) {
-      return project / BuildScope / Language;
     }
   }
 }

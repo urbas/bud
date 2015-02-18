@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Bud.Util;
 
 namespace Bud.Build {
@@ -22,7 +23,11 @@ namespace Bud.Build {
     }
 
     public static string LogMessage(this IConfig context, Key buildTarget, string messageFormat, params object[] formatParams) {
-      return String.Format("{0} @ {1}/{2}> {3}", BuildUtils.ProjectOf(buildTarget).Id, BuildUtils.ScopeOf(buildTarget).Id, BuildUtils.LanguageOf(buildTarget).Id, String.Format(messageFormat, formatParams));
+      return string.Format("{0} @ {1}/{2}> {3}", ProjectOf(buildTarget).Id, ScopeOf(buildTarget).Id, LanguageOf(buildTarget).Id, string.Format(messageFormat, formatParams));
+    }
+
+    public static bool HasBuildTarget(this IContext context, Key project, Key scope, Key language) {
+      return context.IsTaskDefined(project / scope / language / BuildKeys.Build);
     }
   }
 }
