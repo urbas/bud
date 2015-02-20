@@ -28,11 +28,11 @@ namespace Bud.Build {
             buildTargetSettings => Setup(buildTargetSettings, project),
             setups.ToPlugin())
         .Globally(BuildKeys.Test.Init(TaskUtils.NoOpTask),
-                  BuildKeys.Test.DependsOn(BuildKeys.Test.In(project)),
+                  BuildKeys.Test.DependsOn(project / BuildKeys.Test),
                   BuildKeys.Build.Init(TaskUtils.NoOpTask),
-                  BuildKeys.Build.DependsOn(BuildKeys.Build.In(BuildScope)),
-                  BuildKeys.Build.In(BuildScope).Init(TaskUtils.NoOpTask),
-                  BuildKeys.Build.In(BuildScope).DependsOn(BuildKeys.Build.In(buildTargetKey)));
+                  BuildKeys.Build.DependsOn(BuildScope / BuildKeys.Build),
+                  (BuildScope / BuildKeys.Build).Init(TaskUtils.NoOpTask),
+                  (BuildScope / BuildKeys.Build).DependsOn(buildTargetKey / BuildKeys.Build));
     }
 
     protected abstract Settings Setup(Settings projectSettings, Key project);

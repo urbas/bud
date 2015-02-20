@@ -27,7 +27,7 @@ namespace Bud {
       return setups.Aggregate(this, (oldSettings, plugin) => plugin(oldSettings)).In(Scope);
     }
 
-    public Settings Globally(params Setup [] setups) {
+    public Settings Globally(params Setup[] setups) {
       return In(Key.Root).Do(setups).In(Scope);
     }
 
@@ -76,13 +76,13 @@ namespace Bud {
     }
 
     private Settings In(Key newScope) {
-      if (newScope.Equals(Scope)) {
-        return this;
-      } else if (newScope.IsAbsolute) {
+      if (newScope.IsAbsolute) {
+        if (newScope.Equals(Scope)) {
+          return this;
+        }
         return new Settings(ConfigConstructors, TaskConstructors, newScope);
-      } else {
-        return new Settings(ConfigConstructors, TaskConstructors, newScope.In(Scope));
       }
+      return new Settings(ConfigConstructors, TaskConstructors, Scope / newScope);
     }
   }
 }

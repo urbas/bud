@@ -14,11 +14,16 @@ namespace Bud.Dependencies {
 
     public static Settings Init(Settings settings) {
       return settings.Globally(DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
-                               DependenciesKeys.FetchedDependenciesDir.Init(context => Path.Combine(context.GetBudDir(), "nuGetRepository")),
+                               DependenciesKeys.FetchedDependenciesDir.Init(FetchedDependenciesDirImpl),
                                DependenciesKeys.FetchedDependenciesListFile.Init(FetchedDependenciesFileImpl),
                                DependenciesKeys.FetchDependencies.Init(FetchImpl),
                                DependenciesKeys.CleanDependencies.InitSync(CleanDependenciesImpl),
                                DependenciesKeys.FetchedDependencies.Init(FetchedDependenciesImpl));
+    }
+
+    private static string FetchedDependenciesDirImpl(IConfig context) {
+      Console.WriteLine("Defined the deps dir!");
+      return Path.Combine(context.GetBudDir(), "nuGetRepository");
     }
 
     private static FetchedDependencies FetchedDependenciesImpl(IConfig config) {
