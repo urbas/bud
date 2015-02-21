@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Immutable;
-using System.Linq;
 using System.Text;
 
 namespace Bud {
@@ -10,9 +9,7 @@ namespace Bud {
     public static readonly Key Root = Define(RootId, "The root scope. There can be only one!");
     public const char KeySeparator = '/';
     private static readonly char[] KeySplitter = {KeySeparator};
-    private readonly int cachedHash;
-    private Key cachedParent;
-    private string cachedPathString;
+    private Key CachedParent;
 
     public static Key Define(string id, string description = null) {
       return Define(ImmutableList.Create(id), description);
@@ -23,10 +20,10 @@ namespace Bud {
         return childKey;
       }
       if (childKey == null) {
-        return Define(parentKey.Path, parentKey.Description);
+        return Define(parentKey.PathComponents, parentKey.Description);
       }
       if (!childKey.IsAbsolute) {
-        return Define(parentKey.Path.AddRange(childKey.Path), childKey.Description);
+        return Define(parentKey.PathComponents.AddRange(childKey.PathComponents), childKey.Description);
       }
       if (parentKey.IsRoot) {
         return childKey;
@@ -35,44 +32,46 @@ namespace Bud {
     }
 
     public static Key Define(Key parentKey, string id, string description = null) {
-      return Define(parentKey.Path.Add(id), description);
+      return Define(parentKey.PathComponents.Add(id), description);
     }
 
-    public static Key Define(ImmutableList<string> path, string description = null) {
+    private static Key Define(ImmutableList<string> path, string description = null) {
       return new Key(path, description);
     }
 
     protected internal Key(ImmutableList<string> path, string description = null) {
       Id = path[path.Count - 1];
-      Path = path;
-      cachedHash = CalculateHashCode(path);
+      PathComponents = path;
       Description = description;
+      Path = BuildPathString(PathComponents);
     }
 
-    public string Id { get; }
+    public string Id { get; private set; }
 
-    public string Description { get; }
+    public string Description { get; private set; }
 
-    public ImmutableList<string> Path { get; }
+    public string Path { get; private set; }
+
+    public ImmutableList<string> PathComponents { get; private set; }
 
     public bool IsRoot {
       get { return PathDepth == 1 && IsAbsolute; }
     }
 
     public bool IsAbsolute {
-      get { return RootId.Equals(Path[0]); }
+      get { return RootId.Equals(PathComponents[0]); }
     }
 
     public int PathDepth {
-      get { return Path.Count; }
+      get { return PathComponents.Count; }
     }
 
     public Key Parent {
       get {
-        if (cachedParent == null) {
-          cachedParent = PathDepth > 1 ? new Key(Path.GetRange(0, PathDepth - 1)) : null;
+        if (CachedParent == null) {
+          CachedParent = PathDepth > 1 ? new Key(PathComponents.GetRange(0, PathDepth - 1)) : null;
         }
-        return cachedParent;
+        return CachedParent;
       }
     }
 
@@ -106,45 +105,36 @@ namespace Bud {
       return Equals(this, otherKey);
     }
 
-    public static bool Equals(Key thisKey, IKey otherKey) {
-      if (ReferenceEquals(thisKey, otherKey)) {
-        return true;
-      }
-      if (thisKey.GetHashCode() != otherKey.GetHashCode()) {
-        return false;
-      }
-      if (thisKey.PathDepth != otherKey.PathDepth) {
-        return false;
-      }
-      return ArePathsEqual(thisKey.Path, otherKey.Path);
+    public static bool Equals(IKey thisKey, IKey otherKey) {
+      return thisKey.Path.Equals(otherKey.Path);
     }
 
     public override int GetHashCode() {
-      return cachedHash;
+      return Path.GetHashCode();
     }
 
     public override string ToString() {
-      if (cachedPathString == null) {
-        cachedPathString = BuildPathString();
-      }
-      return cachedPathString;
+      return Path;
     }
 
-    private string BuildPathString() {
-      var sb = new StringBuilder();
-      var pathEnumerator = Path.GetEnumerator();
-      if (IsAbsolute) {
-        pathEnumerator.MoveNext();
-        sb.Append(KeySeparator);
-      }
+    private static string BuildPathString(ImmutableList<string> pathComponents) {
+      var pathEnumerator = pathComponents.GetEnumerator();
       if (pathEnumerator.MoveNext()) {
-        sb.Append(pathEnumerator.Current);
+        var sb = new StringBuilder();
+        if (RootId.Equals(pathEnumerator.Current)) {
+          sb.Append(KeySeparator);
+          if (pathEnumerator.MoveNext()) {
+            sb.Append(pathEnumerator.Current);
+          }
+        } else {
+          sb.Append(pathEnumerator.Current);
+        }
         while (pathEnumerator.MoveNext()) {
           sb.Append(KeySeparator).Append(pathEnumerator.Current);
         }
+        return sb.ToString();
       }
-      var asString = sb.ToString();
-      return asString;
+      throw new Exception("Cannot convert the list of path components to a string. The list of path components must not be empty.");
     }
 
     public bool IdsEqual(IKey otherKey) {
@@ -164,17 +154,7 @@ namespace Bud {
     }
 
     protected static ImmutableList<string> ConcatenatePath(Key parent, string newComponent) {
-      return ConcatenatePath(parent == null ? null : parent.Path, newComponent);
-    }
-
-    private static int CreateNextHashCode(int parentHash, string nextPathComponent) {
-      unchecked {
-        return parentHash ^ nextPathComponent.GetHashCode();
-      }
-    }
-
-    private static int CalculateHashCode(ImmutableList<string> pathToAppend) {
-      return pathToAppend.Aggregate(0, CreateNextHashCode);
+      return ConcatenatePath(parent == null ? null : parent.PathComponents, newComponent);
     }
 
     private static bool ArePathsEqual(ImmutableList<string> pathA, ImmutableList<string> pathB) {

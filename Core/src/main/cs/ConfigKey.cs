@@ -34,8 +34,8 @@ namespace Bud {
       get { return UnderlyingKey.Description; }
     }
 
-    public ImmutableList<string> Path {
-      get { return UnderlyingKey.Path; }
+    public ImmutableList<string> PathComponents {
+      get { return UnderlyingKey.PathComponents; }
     }
 
     public bool IsRoot {
@@ -52,6 +52,10 @@ namespace Bud {
 
     public Key Parent {
       get { return UnderlyingKey.Parent; }
+    }
+
+    public string Path {
+      get { return UnderlyingKey.Path; }
     }
 
     public bool Equals(IKey otherKey) {

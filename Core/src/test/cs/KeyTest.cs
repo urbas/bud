@@ -178,7 +178,7 @@ namespace Bud {
     [Test]
     public void Parse_MUST_a_child_key_of_the_global_key_WHEN_prefixed_with_the_global_colon() {
       var parsedKey = Key.Parse("/child");
-      Assert.AreEqual(Key.Define(Key.Root, "child"), parsedKey);
+      Assert.AreEqual(Key.Root / Key.Define("child"), parsedKey);
     }
 
     [Test]
