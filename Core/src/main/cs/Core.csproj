@@ -86,6 +86,7 @@
     <Compile Include="Dependencies\ResolvedExternalDependency.cs" />
     <Compile Include="IKey.cs" />
     <Compile Include="IO\Paths.cs" />
+    <Compile Include="KeyPathUtils.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\Logger.cs" />
     <Compile Include="Logging\WriterLogger.cs" />

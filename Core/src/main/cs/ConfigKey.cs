@@ -46,10 +46,6 @@ namespace Bud {
       get { return UnderlyingKey.IsAbsolute; }
     }
 
-    public int PathDepth {
-      get { return UnderlyingKey.PathDepth; }
-    }
-
     public Key Parent {
       get { return UnderlyingKey.Parent; }
     }

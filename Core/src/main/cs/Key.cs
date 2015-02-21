@@ -6,13 +6,16 @@ namespace Bud {
   // TODO: Store keys in a pool to speed up equality comparisons.
   public class Key : MarshalByRefObject, IKey {
     public const string RootId = "root";
-    public static readonly Key Root = Define(RootId, "The root scope. There can be only one!");
     public const char KeySeparator = '/';
+    public static readonly string KeySeparatorAsString = KeySeparator.ToString();
     private static readonly char[] KeySplitter = {KeySeparator};
+    public static readonly Key Root = new Key(KeySeparator.ToString(), "The root scope. There can be only one!");
     private Key CachedParent;
+    private ImmutableList<string> CachedPathComponents;
+    private string CachedId;
 
     public static Key Define(string id, string description = null) {
-      return Define(ImmutableList.Create(id), description);
+      return new Key(id, description);
     }
 
     public static Key Define(Key parentKey, Key childKey) {
@@ -20,10 +23,10 @@ namespace Bud {
         return childKey;
       }
       if (childKey == null) {
-        return Define(parentKey.PathComponents, parentKey.Description);
+        return parentKey;
       }
       if (!childKey.IsAbsolute) {
-        return Define(parentKey.PathComponents.AddRange(childKey.PathComponents), childKey.Description);
+        return new Key(KeyPathUtils.JoinPath(parentKey.Path, childKey.Path), childKey.Description);
       }
       if (parentKey.IsRoot) {
         return childKey;
@@ -32,50 +35,55 @@ namespace Bud {
     }
 
     public static Key Define(Key parentKey, string id, string description = null) {
-      return Define(parentKey.PathComponents.Add(id), description);
+      return new Key(KeyPathUtils.JoinPath(parentKey.Path, id), description);
     }
 
-    private static Key Define(ImmutableList<string> path, string description = null) {
-      return new Key(path, description);
-    }
-
-    protected internal Key(ImmutableList<string> path, string description = null) {
-      Id = path[path.Count - 1];
-      PathComponents = path;
+    internal Key(string path, string description = null) {
       Description = description;
-      Path = BuildPathString(PathComponents);
+      Path = path;
     }
-
-    public string Id { get; private set; }
 
     public string Description { get; private set; }
 
     public string Path { get; private set; }
 
-    public ImmutableList<string> PathComponents { get; private set; }
+    public string Id {
+      get { return CachedId ?? (CachedId = KeyPathUtils.ExtractIdFromPath(Path)); }
+    }
+
+    public ImmutableList<string> PathComponents {
+      get {
+        if (CachedPathComponents == null) {
+          CachedPathComponents = ToPathComponents(Path);
+        }
+        return CachedPathComponents;
+      }
+    }
 
     public bool IsRoot {
-      get { return PathDepth == 1 && IsAbsolute; }
+      get { return KeyPathUtils.IsRootPath(Path); }
     }
 
     public bool IsAbsolute {
-      get { return RootId.Equals(PathComponents[0]); }
-    }
-
-    public int PathDepth {
-      get { return PathComponents.Count; }
+      get { return KeyPathUtils.IsAbsolutePath(Path); }
     }
 
     public Key Parent {
       get {
         if (CachedParent == null) {
-          CachedParent = PathDepth > 1 ? new Key(PathComponents.GetRange(0, PathDepth - 1)) : null;
+          var parentPath = KeyPathUtils.ExtractParentPath(Path);
+          CachedParent = KeyPathUtils.IsRootPath(parentPath) ? Root : new Key(parentPath, KeyPathUtils.ExtractIdFromPath(parentPath));
         }
         return CachedParent;
       }
     }
 
+
     public static Key Parse(string key) {
+      return KeyPathUtils.IsRootPath(key) ? Root : new Key(key, KeyPathUtils.ExtractIdFromPath(key));
+    }
+
+    private static ImmutableList<string> ToPathComponents(string key) {
       if (string.IsNullOrEmpty(key)) {
         throw new ArgumentException("Could not parse an empty string. An empty string is not a valid key.");
       }
@@ -87,7 +95,8 @@ namespace Bud {
       for (int index = 0; index < keyIdChain.Length; index++) {
         parsedPath.Add(keyIdChain[index]);
       }
-      return Define(parsedPath.ToImmutable());
+      var pathComponents = parsedPath.ToImmutable();
+      return pathComponents;
     }
 
     public override bool Equals(object other) {
@@ -155,26 +164,6 @@ namespace Bud {
 
     protected static ImmutableList<string> ConcatenatePath(Key parent, string newComponent) {
       return ConcatenatePath(parent == null ? null : parent.PathComponents, newComponent);
-    }
-
-    private static bool ArePathsEqual(ImmutableList<string> pathA, ImmutableList<string> pathB) {
-      // TODO: Investigate whether we can efficiently perform a reverse-traversal comparison. This is an optimisation, as it is more likely that paths will differ closer to the end.
-      var iterA = pathA.GetEnumerator();
-      var iterB = pathB.GetEnumerator();
-      while (true) {
-        var aHadNext = iterA.MoveNext();
-        var bHadNext = iterB.MoveNext();
-        if (aHadNext ^ bHadNext) {
-          return false;
-        }
-        if (aHadNext) {
-          if (!iterA.Current.Equals(iterB.Current)) {
-            return false;
-          }
-        } else {
-          return true;
-        }
-      }
     }
   }
 }

@@ -122,8 +122,7 @@ namespace Bud {
     }
 
     [Test]
-    public void Concat_MUST_return_a_key_with_concatenated_paths()
-    {
+    public void Concat_MUST_return_a_key_with_concatenated_paths() {
       var parent = Key.Parse("/foo/bar/zar");
       var child = Key.Parse("a/b/c");
       Assert.AreEqual(Key.Parse("/foo/bar/zar/a/b/c"), parent / child);
@@ -194,6 +193,11 @@ namespace Bud {
     }
 
     [Test]
+    public void Parse_MUST_return_the_singleton_root_instance_WHEN_given_the_root_path() {
+      Assert.AreSame(Key.Root, Key.Parse("/"));
+    }
+
+    [Test]
     public void Parse_MUST_perform_the_inverse_of_ToString() {
       var deeplyNestedKey = configKeyB / Key.Define("C") / Key.Define("foo") / Key.Define("D") / Key.Define("E") / taskKeyA;
       Assert.AreEqual(deeplyNestedKey, Key.Parse(deeplyNestedKey.ToString()));
@@ -216,6 +220,11 @@ namespace Bud {
       var parent = Key.Parse("/foo/bar/zar");
       var child = Key.Parse("a/b/c");
       Assert.AreEqual(Key.Parse("/foo/bar/zar/a/b"), (parent / child).Parent);
+    }
+
+    [Test]
+    public void Parent_MUST_return_the_root_WHEN_given_a_single_component_absolute_path() {
+      Assert.AreSame(Key.Root, Key.Parse("/bar").Parent);
     }
   }
 }

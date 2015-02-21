@@ -7,10 +7,10 @@ namespace Bud {
     ImmutableList<string> PathComponents { get; }
     bool IsRoot { get; }
     bool IsAbsolute { get; }
-    int PathDepth { get; }
     Key Parent { get; }
     string Path { get; }
     bool Equals(IKey otherKey);
+    // TODO: Remove this one. Replace it with 'Leaf'.
     bool IdsEqual(IKey otherKey);
   }
 }
