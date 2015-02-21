@@ -33,15 +33,15 @@ namespace Bud.Commander {
     }
 
     private static async Task<IBuildCommander> CreateBuildCommander(IContext context, Key buildLoadingProject) {
-      return await context.Evaluate(BuildCommanderKeys.CreateBuildCommander.In(buildLoadingProject));
+      return await context.Evaluate(buildLoadingProject / BuildCommanderKeys.CreateBuildCommander);
     }
 
     private static string GetBuildConfigSourceFile(this IContext context, Key buildLoadingProject) {
-      return context.Evaluate(BuildCommanderKeys.BuildConfigSourceFile.In(buildLoadingProject));
+      return context.Evaluate(buildLoadingProject / BuildCommanderKeys.BuildConfigSourceFile);
     }
 
     public static string GetDirOfProjectToBeBuilt(this IContext context, Key buildLoadingProject) {
-      return context.Evaluate(BuildCommanderKeys.DirOfProjectToBeBuilt.In(buildLoadingProject));
+      return context.Evaluate(buildLoadingProject / BuildCommanderKeys.DirOfProjectToBeBuilt);
     }
 
     private static string GetDefaultBuildSourceFile(IConfig context) {

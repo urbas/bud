@@ -1,42 +1,23 @@
 using System;
-using System.Text;
+using System.Collections.Immutable;
 
 namespace Bud {
-  public class Key : MarshalByRefObject {
-    public static readonly Key Root = new Key("Root", null, "The root scope. There can be only one!");
+  // TODO: Store keys in a pool to speed up equality comparisons.
+  public class Key : MarshalByRefObject, IKey {
+    public const string RootId = "root";
     public const char KeySeparator = '/';
-    private static readonly char[] KeySplitter = {KeySeparator};
-    public readonly Key Parent;
-    public readonly string Id;
-    public readonly string Description;
-    private readonly int depth;
-    private readonly int hash;
+    public static readonly string KeySeparatorAsString = KeySeparator.ToString();
+    public static readonly Key Root = new Key(KeySeparator.ToString(), "The root scope. There can be only one!");
+    private Key CachedParent;
+    private ImmutableList<string> CachedPathComponents;
+    private string CachedId;
+    private Key CachedLeaf;
 
-    public Key(string id, string description = null) : this(id, null, description) {}
-
-    public Key(string id, Key parent, string description = null) {
-      Parent = parent;
-      Id = id;
-      Description = description ?? string.Empty;
-      depth = parent == null ? 1 : (parent.depth + 1);
-      unchecked {
-        hash = (parent == null ? -1498327287 : parent.hash) ^ Id.GetHashCode();
-      }
+    public static Key Define(string id, string description = null) {
+      return new Key(KeyPathUtils.ParseId(id), description);
     }
 
-    public bool IsRoot {
-      get { return Equals(this, Root); }
-    }
-
-    public bool IsAbsolute {
-      get { return Equals(this, Root) || (Parent != null && Parent.IsAbsolute); }
-    }
-
-    public Key In(Key parent) {
-      return Concat(parent, this);
-    }
-
-    public static Key Concat(Key parentKey, Key childKey) {
+    public static Key Define(Key parentKey, Key childKey) {
       if (parentKey == null) {
         return childKey;
       }
@@ -44,7 +25,7 @@ namespace Bud {
         return parentKey;
       }
       if (!childKey.IsAbsolute) {
-        return new Key(childKey.Id, Concat(parentKey, childKey.Parent), childKey.Description);
+        return new Key(KeyPathUtils.JoinPath(parentKey.Path, childKey.Path), childKey.Description);
       }
       if (parentKey.IsRoot) {
         return childKey;
@@ -52,64 +33,97 @@ namespace Bud {
       throw new ArgumentException("Cannot add a parent to an absolute key.");
     }
 
+    public static Key Define(Key parentKey, string id, string description = null) {
+      return new Key(KeyPathUtils.JoinPath(parentKey.Path, KeyPathUtils.ParseId(id)), description);
+    }
+
+    internal Key(string path, string description = null) {
+      Description = description;
+      Path = path;
+    }
+
+    public string Description { get; private set; }
+
+    public Key Leaf {
+      get {
+        if (CachedLeaf == null) {
+          if (IsRoot) {
+            CachedLeaf = this;
+          } else {
+            var leafId = KeyPathUtils.ExtractIdFromPath(Path);
+            CachedLeaf = leafId.Equals(Path) ? this : new Key(leafId, Description);
+          }
+        }
+        return CachedLeaf;
+      }
+    }
+
+    public string Path { get; private set; }
+
+    public string Id {
+      get { return CachedId ?? (CachedId = KeyPathUtils.ExtractIdFromPath(Path)); }
+    }
+
+    public ImmutableList<string> PathComponents {
+      get { return CachedPathComponents ?? (CachedPathComponents = KeyPathUtils.ToPathComponents(Path)); }
+    }
+
+    public bool IsRoot {
+      get { return KeyPathUtils.IsRootPath(Path); }
+    }
+
+    public bool IsAbsolute {
+      get { return KeyPathUtils.IsAbsolutePath(Path); }
+    }
+
+    public Key Parent {
+      get {
+        if (CachedParent == null) {
+          var parentPath = KeyPathUtils.ExtractParentPath(Path);
+          CachedParent = KeyPathUtils.IsRootPath(parentPath) ? Root : new Key(parentPath, KeyPathUtils.ExtractIdFromPath(parentPath));
+        }
+        return CachedParent;
+      }
+    }
+
+
     public static Key Parse(string key) {
-      if (string.IsNullOrEmpty(key)) {
-        throw new ArgumentException("Could not parse an empty string. An empty string is not a valid key.");
-      }
-      var keyIdChain = key.Split(KeySplitter, StringSplitOptions.RemoveEmptyEntries);
-      Key parsedKey = key[0] == KeySeparator ? Root : null;
-      for (int index = 0; index < keyIdChain.Length; index++) {
-        parsedKey = new Key(keyIdChain[index], parsedKey);
-      }
-      return parsedKey;
-    }
-
-    public bool Equals(Key otherKey) {
-      return Equals(this, otherKey);
-    }
-
-    public static bool Equals(Key thisKey, Key otherKey) {
-      if (ReferenceEquals(thisKey, otherKey)) {
-        return true;
-      }
-      if (thisKey.depth != otherKey.depth) {
-        return false;
-      }
-      return thisKey.Id.Equals(otherKey.Id) && Equals(thisKey.Parent, otherKey.Parent);
+      return KeyPathUtils.IsRootPath(key) ? Root : new Key(key, KeyPathUtils.ExtractIdFromPath(key));
     }
 
     public override bool Equals(object other) {
       if (other == null) {
         return false;
       }
-      if (!(other is Key)) {
+      var otherKey = other as IKey;
+      if (otherKey == null) {
         return false;
       }
-      return Equals((Key) other);
+      return Equals(otherKey);
+    }
+
+    public bool Equals(IKey otherKey) {
+      return Equals(this, otherKey);
+    }
+
+    public static bool Equals(IKey thisKey, IKey otherKey) {
+      return thisKey.Path.Equals(otherKey.Path);
     }
 
     public override int GetHashCode() {
-      return hash;
+      return Path.GetHashCode();
     }
 
     public override string ToString() {
-      return IsRoot ? KeySeparator.ToString() : PrependAsString(new StringBuilder(), Parent).Append(Id).ToString();
-    }
-
-    private static StringBuilder PrependAsString(StringBuilder stringBuilder, Key parent) {
-      if (parent == null) {
-        return stringBuilder;
-      }
-      var prepended = parent.IsRoot ? stringBuilder : PrependAsString(stringBuilder, parent.Parent).Append(parent.Id);
-      return prepended.Append(KeySeparator);
-    }
-
-    public bool IdsEqual(Key otherKey) {
-      return Id.Equals(otherKey.Id);
+      return Path;
     }
 
     public static Key operator /(Key parent, Key child) {
-      return child.In(parent);
+      return Define(parent, child);
+    }
+
+    public static Key operator /(Key parent, string id) {
+      return Define(parent, id);
     }
   }
 }

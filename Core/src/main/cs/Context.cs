@@ -61,7 +61,7 @@ namespace Bud {
     }
 
     public Task EvaluateKey(Key key) {
-      var absoluteKey = key.In(Key.Root);
+      var absoluteKey = Key.Root / key;
       if (IsTaskDefined(absoluteKey)) {
         return EvaluateTask(absoluteKey);
       }
@@ -105,7 +105,7 @@ namespace Bud {
 
     public Task EvaluateTask(Key key) {
       Task value;
-      var absoluteKey = key.In(Key.Root);
+      var absoluteKey = Key.Root / key;
       if (taskValues.TryGetValue(absoluteKey, out value)) {
         return value;
       }

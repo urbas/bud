@@ -19,7 +19,7 @@ namespace Bud.Publishing {
       return settings => settings.Do(PublishKeys.Publish.Init(PublishImpl),
                                      PublishKeys.Package.Init(PackageImpl))
                                  .Globally(PublishKeys.Publish.Init(TaskUtils.NoOpTask),
-                                           PublishKeys.Publish.DependsOn(PublishKeys.Publish.In(settings.Scope)));
+                                           PublishKeys.Publish.DependsOn(settings.Scope / PublishKeys.Publish));
     }
 
     private static async Task<string> PackageImpl(IContext context, Key buildTarget) {

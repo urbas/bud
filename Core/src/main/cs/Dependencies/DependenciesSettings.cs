@@ -27,7 +27,7 @@ namespace Bud.Dependencies {
       return settings => settings.Do(DependenciesKeys.ExternalDependencies.Init(ImmutableList<ExternalDependency>.Empty),
                                      DependenciesKeys.ExternalDependencies.Modify((config, dependencies) => conditionForInclusion == null || conditionForInclusion(config) ? dependencies.Add(dependency) : dependencies),
                                      DependenciesKeys.Dependencies.Init(DependenciesImpl))
-                                 .Globally(DependenciesKeys.ExternalDependenciesKeys.Modify((ctxt, oldValue) => oldValue.Add(DependenciesKeys.ExternalDependencies.In(settings.Scope))));
+                                 .Globally(DependenciesKeys.ExternalDependenciesKeys.Modify((ctxt, oldValue) => oldValue.Add(settings.Scope / DependenciesKeys.ExternalDependencies)));
     }
 
     private static Task<ISet<Key>> ResolveInternalDependenciesImpl(IContext context, Key dependent) {

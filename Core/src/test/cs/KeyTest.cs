@@ -3,16 +3,15 @@ using NUnit.Framework;
 
 namespace Bud {
   public class KeyTest {
-
-    private Key keyA = new Key("A");
-    private ConfigKey<string> configKeyA = new ConfigKey<string>("A");
-    private TaskKey<int> taskKeyA = new TaskKey<int>("A");
-    private Key keyB = new Key("B");
-    private ConfigKey<string> configKeyB = new ConfigKey<string>("B");
-    private TaskKey<int> taskKeyB = new TaskKey<int>("B");
-    private Key keydKeyA = new Key("A").In(new Key("C"));
-    private ConfigKey<string> keydConfigKeyA = new ConfigKey<string>("A").In(new Key("C"));
-    private TaskKey<int> keydTaskKeyA = new TaskKey<int>("A").In(new Key("C"));
+    private Key keyA = Key.Define("A");
+    private ConfigKey<string> configKeyA = Key.Define("A");
+    private TaskKey<int> taskKeyA = Key.Define("A");
+    private Key keyB = Key.Define("B");
+    private ConfigKey<string> configKeyB = Key.Define("B");
+    private TaskKey<int> taskKeyB = Key.Define("B");
+    private Key keydKeyA = Key.Define("C") / Key.Define("A");
+    private ConfigKey<string> keydConfigKeyA = Key.Define("C") / "A";
+    private TaskKey<int> keydTaskKeyA = Key.Define("C") / "A";
 
     [Test]
     public void Equals_MUST_return_true_WHEN_the_keys_have_the_same_id_and_same_key() {
@@ -94,58 +93,71 @@ namespace Bud {
 
     [Test]
     public void ToString_MUST_return_the_id_and_the_ids_of_keys_WHEN_the_key_is_nested_in_multiple_keys() {
-      var deeplyNestedKey = taskKeyA
-        .In(new TaskKey<uint>("E").In(new Key("D").In(new Key("foo").In(new ConfigKey<bool>("C").In(configKeyB)))));
+      var deeplyNestedKey = configKeyB / "C" / Key.Define("foo") / "D" / Key.Define("E") / taskKeyA;
       Assert.AreEqual("B/C/foo/D/E/A", deeplyNestedKey.ToString());
     }
 
     [Test]
     public void Equals_MUST_return_true_WHEN_two_key_instances_have_the_same_id_and_key() {
-      var keydConfigKeyAClone = new ConfigKey<string>("A").In(new Key("C"));
+      ConfigKey<string> keydConfigKeyAClone = Key.Define("C") / "A";
       Assert.AreEqual(keydConfigKeyA.GetHashCode(), keydConfigKeyAClone.GetHashCode());
       Assert.AreEqual(keydConfigKeyA, keydConfigKeyAClone);
     }
 
     [Test]
     public void Concat_MUST_parent_the_key_to_root_WHEN_the_key_is_relative() {
-      Assert.AreEqual(keyB.In(Key.Root), Key.Concat(Key.Root, keyB));
+      Assert.AreEqual(Key.Parse("/B"), Key.Root / keyB);
     }
 
     [Test]
-    [ExpectedException(typeof(ArgumentException))]
-    public void Concat_MUST_throw_an_exception_WHEN_trying_to_add_a_parent_to_roor() {
-      Key.Concat(keyB, Key.Root);
+    [ExpectedException(typeof (ArgumentException))]
+    public void Concat_MUST_throw_an_exception_WHEN_trying_to_add_a_parent_to_root() {
+      var _ = keyB / Key.Root;
+    }
+
+    [Test]
+    public void Concat_MUST_return_the_same_absolute_path_WHEN_trying_to_parent_it_to_root() {
+      var absPath = Key.Parse("/foo/bar");
+      Assert.AreSame(absPath, Key.Root / absPath);
+    }
+
+    [Test]
+    public void Concat_MUST_return_a_key_with_concatenated_paths() {
+      var parent = Key.Parse("/foo/bar/zar");
+      var child = Key.Parse("a/b/c");
+      Assert.AreEqual(Key.Parse("/foo/bar/zar/a/b/c"), parent / child);
+      Assert.AreEqual("/foo/bar/zar/a/b/c", (parent / child).ToString());
     }
 
     [Test]
     public void Concat_MUST_add_the_single_parent_to_the_child_with_no_parents() {
-      Assert.AreEqual(new Key("A", keyB), Key.Concat(keyB, keyA));
+      Assert.AreEqual(Key.Parse("A/B"), keyA / keyB);
     }
 
     [Test]
     public void Concat_MUST_add_the_parent_hierarchy_to_the_child_with_no_parents() {
-      var keydKey = new Key("B", new Key("C"));
-      Assert.AreEqual(new Key("A", keydKey), Key.Concat(keydKey, new Key("A")));
+      var keydKey = Key.Parse("C/B");
+      Assert.AreEqual(Key.Parse("C/B/A"), keydKey / Key.Define("A"));
     }
 
     [Test]
     public void Concat_MUST_add_the_parent_to_the_child_with_parents() {
       Assert.AreEqual(
-        new Key("A", new Key("B", new Key("C"))),
-        Key.Concat(new Key("C"), new Key("A", new Key("B")))
-      );
+        Key.Define(Key.Define("A"), Key.Define(Key.Define("B"), Key.Define("C"))),
+        Key.Define("A") / Key.Define("B") / Key.Define("C")
+        );
     }
 
     [Test]
     public void Concat_MUST_add_the_parents_to_the_child_with_parents() {
       Assert.AreEqual(
-        new Key("A", new Key("B", new Key("C", new Key("D")))),
-        Key.Concat(new Key("C", new Key("D")), new Key("A", new Key("B")))
-      );
+        Key.Parse("A/B/C/D"),
+        Key.Define(Key.Define(Key.Define("A"), Key.Define("B")), Key.Define(Key.Define("C"), Key.Define("D")))
+        );
     }
 
     [Test]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof (ArgumentException))]
     public void Parse_MUST_throw_an_exception_WHEN_given_an_empty_string() {
       Key.Parse(String.Empty);
     }
@@ -159,30 +171,41 @@ namespace Bud {
     [Test]
     public void Parse_MUST_return_a_key() {
       var parsedKey = Key.Parse("child");
-      Assert.AreEqual(new Key("child"), parsedKey);
+      Assert.AreEqual(Key.Define("child"), parsedKey);
     }
 
     [Test]
     public void Parse_MUST_a_child_key_of_the_global_key_WHEN_prefixed_with_the_global_colon() {
       var parsedKey = Key.Parse("/child");
-      Assert.AreEqual(new Key("child", Key.Root), parsedKey);
+      Assert.AreEqual(Key.Root / Key.Define("child"), parsedKey);
     }
 
     [Test]
     public void Parse_MUST_return_a_chain_of_keys() {
       var parsedKey = Key.Parse("parent/child");
-      Assert.AreEqual(new Key("child").In(new Key("parent")), parsedKey);
+      Assert.AreEqual(Key.Define("parent") / Key.Define("child"), parsedKey);
     }
 
     [Test]
     public void Parse_MUST_return_a_chain_of_keys_WHEN_prefixed_with_the_global_colon() {
       var parsedKey = Key.Parse("/parent/child");
-      Assert.AreEqual(new Key("child").In(new Key("parent")).In(Key.Root), parsedKey);
+      Assert.AreEqual(Key.Root / Key.Define("parent") / Key.Define("child"), parsedKey);
+    }
+
+    [Test]
+    public void Parse_MUST_return_the_singleton_root_instance_WHEN_given_the_root_path() {
+      Assert.AreSame(Key.Root, Key.Parse("/"));
+    }
+
+    [Test]
+    [ExpectedException(typeof(ArgumentException))]
+    public void Define_MUST_throw_an_exception_WHEN_the_id_contains_the_key_separator() {
+      Key.Define("/");
     }
 
     [Test]
     public void Parse_MUST_perform_the_inverse_of_ToString() {
-      var deeplyNestedKey = taskKeyA.In(new TaskKey<uint>("E").In(new Key("D").In(new Key("foo").In(new ConfigKey<bool>("C").In(configKeyB)))));
+      var deeplyNestedKey = configKeyB / Key.Define("C") / Key.Define("foo") / Key.Define("D") / Key.Define("E") / taskKeyA;
       Assert.AreEqual(deeplyNestedKey, Key.Parse(deeplyNestedKey.ToString()));
       Assert.AreEqual("B/C/foo/D/E/A", Key.Parse("B/C/foo/D/E/A").ToString());
       Assert.AreEqual("/B/C/foo/D/E/A", Key.Parse("/B/C/foo/D/E/A").ToString());
@@ -195,8 +218,32 @@ namespace Bud {
 
     [Test]
     public void IsAbsolute_MUST_return_true_WHEN_parented_to_global() {
-      Assert.IsTrue(taskKeyA.In(Key.Root).IsAbsolute);
+      Assert.IsTrue((Key.Root / taskKeyA).IsAbsolute);
+    }
+
+    [Test]
+    public void Parent_MUST_return_the_path_without_the_leaf_WHEN_two_long_keys_are_concatenated() {
+      var parent = Key.Parse("/foo/bar/zar");
+      var child = Key.Parse("a/b/c");
+      Assert.AreEqual(Key.Parse("/foo/bar/zar/a/b"), (parent / child).Parent);
+    }
+
+    [Test]
+    public void Parent_MUST_return_the_root_WHEN_given_a_single_component_absolute_path() {
+      Assert.AreSame(Key.Root, Key.Parse("/bar").Parent);
+    }
+
+    [Test]
+    public void Leaf_MUST_return_self_WHEN_the_key_is_single_component_relative() {
+      var barKey = Key.Define("bar");
+      Assert.AreSame(barKey, barKey.Leaf);
+      Assert.AreSame(Key.Root, Key.Root.Leaf);
+    }
+
+    [Test]
+    public void Leaf_MUST_return_the_last_component_key_WHEN_the_key_is_composite() {
+      Assert.AreEqual(Key.Define("boo"), Key.Parse("bar/boo").Leaf);
+      Assert.AreEqual(Key.Define("boo"), Key.Parse("/bar/boo").Leaf);
     }
   }
 }
-

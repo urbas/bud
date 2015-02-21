@@ -3,8 +3,8 @@ using System.IO;
 
 namespace Bud.Logging {
   public class WriterLogger : ILogger {
-    private const string ErrorLevelId = "E";
-    private const string InfoLevelId = "I";
+    private const string ErrorLevelId = "Error";
+    private const string InfoLevelId = "Info";
     private readonly TextWriter infoLevelWriter;
     private readonly TextWriter errorLevelWriter;
 
@@ -26,7 +26,7 @@ namespace Bud.Logging {
     private void PrintMessageHeader(string level, TextWriter writer) {
       writer.Write("[");
       writer.Write(level);
-      writer.Write(":");
+      writer.Write(" ");
       writer.Write(DateTime.Now.ToString("HH:mm:ss.fff"));
       writer.Write("] ");
     }

@@ -22,7 +22,7 @@ namespace Bud.Build {
           BuildDirsKeys.Clean.Modify(CleanBuildDirsTask)
         )
         .Globally(BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
-                  BuildDirsKeys.Clean.DependsOn(BuildDirsKeys.Clean.In(settings.Scope)));
+                  BuildDirsKeys.Clean.DependsOn(settings.Scope / BuildDirsKeys.Clean));
     }
 
     public static string GetBaseDir(this IConfig buildConfiguration) {
@@ -30,7 +30,7 @@ namespace Bud.Build {
     }
 
     public static string GetBaseDir(this IConfig buildConfiguration, Key project) {
-      return buildConfiguration.Evaluate(BuildDirsKeys.BaseDir.In(project));
+      return buildConfiguration.Evaluate(project / BuildDirsKeys.BaseDir);
     }
 
     public static string GetBudDir(this IConfig buildConfiguration) {
@@ -38,7 +38,7 @@ namespace Bud.Build {
     }
 
     public static string GetBudDir(this IConfig buildConfiguration, Key project) {
-      return buildConfiguration.Evaluate(BuildDirsKeys.BudDir.In(project));
+      return buildConfiguration.Evaluate(project / BuildDirsKeys.BudDir);
     }
 
     public static string GetDefaultBudDir(this IConfig ctxt, Key key) {
@@ -47,7 +47,7 @@ namespace Bud.Build {
 
     /// <returns>The directory where build output (such as compiled assemblies) are stored.</returns>
     public static string GetOutputDir(this IConfig buildConfiguration, Key key) {
-      return buildConfiguration.Evaluate(BuildDirsKeys.OutputDir.In(key));
+      return buildConfiguration.Evaluate(key / BuildDirsKeys.OutputDir);
     }
 
     public static string GetDefaultOutputDir(this IConfig ctxt, Key key) {
@@ -59,7 +59,7 @@ namespace Bud.Build {
     ///   dependencies).
     /// </returns>
     public static string GetBuildConfigCacheDir(this IConfig buildConfiguration, Key project) {
-      return buildConfiguration.Evaluate(BuildDirsKeys.BuildConfigCacheDir.In(project));
+      return buildConfiguration.Evaluate(project / BuildDirsKeys.BuildConfigCacheDir);
     }
 
     public static string GetDefaultBuildConfigCacheDir(this IConfig ctxt, Key key) {
@@ -72,7 +72,7 @@ namespace Bud.Build {
     ///   This directoy should be committed to the VCS.
     /// </returns>
     public static string GetPersistentBuildConfigDir(this IConfig buildConfiguration, Key project) {
-      return buildConfiguration.Evaluate(BuildDirsKeys.PersistentBuildConfigDir.In(project));
+      return buildConfiguration.Evaluate(project / BuildDirsKeys.PersistentBuildConfigDir);
     }
 
     public static string GetPersistentBuildConfigDir(this IConfig buildConfiguration) {

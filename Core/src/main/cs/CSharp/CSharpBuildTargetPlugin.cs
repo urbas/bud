@@ -105,7 +105,7 @@ namespace Bud.CSharp {
     }
 
     private async Task CreateDistributablePackage(IContext context, Key buildTarget) {
-      await context.Evaluate(BuildKeys.Build.In(buildTarget));
+      await context.Evaluate(buildTarget / BuildKeys.Build);
       var referencedAssemblies = context.GetReferencedAssemblies(buildTarget);
       var targetDir = Path.Combine(context.GetOutputDir(buildTarget), "dist");
       Directory.CreateDirectory(targetDir);

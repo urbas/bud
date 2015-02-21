@@ -1,58 +1,125 @@
 ﻿using System;
+using System.Collections.Immutable;
 using Bud.SettingsConstruction;
 
 namespace Bud {
-  public abstract class ConfigKey : Key {
-    protected ConfigKey(string id, string description = null) : base(id, description) {}
-    protected ConfigKey(string id, Key parent, string description = null) : base(id, parent, description) {}
-  }
+  public class ConfigKey : IKey {
+    protected internal readonly Key UnderlyingKey;
 
-  /// <summary>
-  ///   Values of this key are evaluated once only per settings compilation.
-  /// </summary>
-  public class ConfigKey<T> : ConfigKey {
-    public ConfigKey(string id, string description = null) : base(id, description) {}
-
-    public ConfigKey(string id, Key parent, string description = null) : base(id, parent, description) {}
-
-    public new ConfigKey<T> In(Key parent) {
-      return new ConfigKey<T>(Id, Concat(parent, Parent), Description);
+    protected ConfigKey(Key underlyingKey) {
+      UnderlyingKey = underlyingKey;
     }
 
+    public static implicit operator ConfigKey(Key key) {
+      return new ConfigKey(key);
+    }
+
+    public static implicit operator Key(ConfigKey key) {
+      return key.UnderlyingKey;
+    }
+
+    public static Key operator /(ConfigKey parent, Key child) {
+      return Key.Define(parent, child);
+    }
+
+    public static Key operator /(ConfigKey parent, string id) {
+      return Key.Define(parent, id);
+    }
+
+    public string Id {
+      get { return UnderlyingKey.Id; }
+    }
+
+    public string Description {
+      get { return UnderlyingKey.Description; }
+    }
+
+    public ImmutableList<string> PathComponents {
+      get { return UnderlyingKey.PathComponents; }
+    }
+
+    public bool IsRoot {
+      get { return UnderlyingKey.IsRoot; }
+    }
+
+    public bool IsAbsolute {
+      get { return UnderlyingKey.IsAbsolute; }
+    }
+
+    public Key Parent {
+      get { return UnderlyingKey.Parent; }
+    }
+
+    public Key Leaf {
+      get { return UnderlyingKey.Leaf; }
+    }
+
+    public string Path {
+      get { return UnderlyingKey.Path; }
+    }
+
+    public bool Equals(IKey otherKey) {
+      return UnderlyingKey.Equals(otherKey);
+    }
+
+    public override int GetHashCode() {
+      return UnderlyingKey.GetHashCode();
+    }
+
+    public override bool Equals(object obj) {
+      return obj != null && obj.Equals(UnderlyingKey);
+    }
+
+    public override string ToString() {
+      return UnderlyingKey.ToString();
+    }
+  }
+
+  public class ConfigKey<T> : ConfigKey {
+    public static implicit operator ConfigKey<T>(Key key) {
+      return new ConfigKey<T>(key);
+    }
+
+    public static implicit operator Key(ConfigKey<T> key) {
+      return key.UnderlyingKey;
+    }
+
+    private ConfigKey(Key underlyingKey) : base(underlyingKey) {}
+
     public static ConfigKey<T> operator /(Key parent, ConfigKey<T> child) {
-      return child.In(parent);
+      return Key.Define(parent, child);
     }
 
     public Setup Init(T configValue) {
-      return settings => settings.Add(new InitializeConfig<T>(In(settings.Scope), configValue));
+      return settings => settings.Add(new InitializeConfig<T>(settings.Scope / this, configValue));
     }
 
     public Setup Init(Func<IConfig, T> configValue) {
-      return settings => settings.Add(new InitializeConfig<T>(In(settings.Scope), configValue));
+      return settings => settings.Add(new InitializeConfig<T>(settings.Scope / this, configValue));
     }
 
     public Setup Init(Func<IConfig, Key, T> configValue) {
-      return settings => settings.Add(new InitializeConfig<T>(In(settings.Scope), ctxt => configValue(ctxt, settings.Scope)));
+      return settings => settings.Add(new InitializeConfig<T>(settings.Scope / this, ctxt => configValue(ctxt, settings.Scope)));
     }
 
     public Setup Modify(T newConfigValue) {
-      return settings => settings.Add(new ModifyConfig<T>(In(settings.Scope), (ctxt, oldValue) => newConfigValue));
+      return settings => settings.Add(new ModifyConfig<T>(settings.Scope / this, (ctxt, oldValue) => newConfigValue));
     }
 
     public Setup Modify(Func<T, T> configValueMutation) {
-      return settings => settings.Add(new ModifyConfig<T>(In(settings.Scope), (ctxt, oldValue) => configValueMutation(oldValue)));
+      return settings => settings.Add(new ModifyConfig<T>(settings.Scope / this, (ctxt, oldValue) => configValueMutation(oldValue)));
     }
 
     public Setup Modify(Func<IConfig, T> configValueMutation) {
-      return settings => settings.Add(new ModifyConfig<T>(In(settings.Scope), (ctxt, oldValue) => configValueMutation(ctxt)));
+      return settings => settings.Add(new ModifyConfig<T>(settings.Scope / this, (ctxt, oldValue) => configValueMutation(ctxt)));
     }
 
     public Setup Modify(Func<IConfig, T, T> configValueMutation) {
-      return settings => settings.Add(new ModifyConfig<T>(In(settings.Scope), configValueMutation));
+      return settings => settings.Add(new ModifyConfig<T>(settings.Scope / this, configValueMutation));
     }
 
     public Setup Modify(Func<IConfig, T, Key, T> configValueMutation) {
-      return settings => settings.Add(new ModifyConfig<T>(In(settings.Scope), (ctxt, oldTaskDef) => configValueMutation(ctxt, oldTaskDef, settings.Scope)));
+      return settings => settings.Add(new ModifyConfig<T>(settings.Scope / this, (ctxt, oldTaskDef) => configValueMutation(ctxt, oldTaskDef, settings.Scope)));
     }
   }
 }
