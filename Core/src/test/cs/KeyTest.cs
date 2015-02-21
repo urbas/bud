@@ -132,13 +132,13 @@ namespace Bud {
 
     [Test]
     public void Concat_MUST_add_the_single_parent_to_the_child_with_no_parents() {
-      Assert.AreEqual(Key.Parse("A/B"), Key.Concat(keyA, keyB));
+      Assert.AreEqual(Key.Parse("A/B"), keyA / keyB);
     }
 
     [Test]
     public void Concat_MUST_add_the_parent_hierarchy_to_the_child_with_no_parents() {
       var keydKey = Key.Parse("C/B");
-      Assert.AreEqual(Key.Parse("C/B/A"), Key.Concat(keydKey, Key.Define("A")));
+      Assert.AreEqual(Key.Parse("C/B/A"), keydKey / Key.Define("A"));
     }
 
     [Test]

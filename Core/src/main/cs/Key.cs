@@ -2,6 +2,7 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using Bud.Keys;
 
 namespace Bud {
   // TODO: Store keys in a pool to speed up equality comparisons.
@@ -10,47 +11,34 @@ namespace Bud {
     public static readonly Key Root = Define(RootId, "The root scope. There can be only one!");
     public const char KeySeparator = '/';
     private static readonly char[] KeySplitter = {KeySeparator};
-    public readonly Key Parent;
     public readonly string Id;
     public readonly string Description;
     private readonly int hash;
     public readonly ImmutableList<string> Path;
+    private Key cachedParent;
+    private string cachedPathString;
 
     public static Key Define(string id, string description = null) {
-      return Define(ImmutableList.Create(id), description);
+      return KeyCreator.Define(id, description, KeyFactory.Instance);
     }
 
     public static Key Define(Key parentKey, Key childKey) {
-      if (parentKey == null) {
-        return childKey;
-      }
-      if (childKey == null) {
-        return parentKey;
-      }
-      if (!childKey.IsAbsolute) {
-        return Define(parentKey.Path.AddRange(childKey.Path), childKey.Description);
-      }
-      if (parentKey.IsRoot) {
-        return childKey;
-      }
-      throw new ArgumentException("Cannot add a parent to an absolute key.");
+      return KeyCreator.Define(parentKey, childKey, KeyFactory.Instance);
     }
 
     public static Key Define(Key parentKey, string id, string description = null) {
-      return Define(parentKey.Path.Add(id), description);
+      return KeyCreator.Define(parentKey, id, description, KeyFactory.Instance);
     }
 
     public static Key Define(ImmutableList<string> path, string description = null) {
-      return new Key(path, description);
+      return KeyCreator.Define(path, description, KeyFactory.Instance);
     }
 
-    protected Key(ImmutableList<string> path, string description = null) {
+    protected internal Key(ImmutableList<string> path, string description = null) {
       Id = path[path.Count - 1];
-      Parent = path.Count > 1 ? Define(path.GetRange(0, path.Count - 1)) : null;
       Path = path;
       hash = AppendedPathHashCode(0, path);
       Description = description;
-      Console.WriteLine("Defined: " + ToString());
     }
 
     public bool IsRoot {
@@ -65,20 +53,14 @@ namespace Bud {
       get { return Path.Count; }
     }
 
-    public static Key Concat(Key parentKey, Key childKey) {
-      if (parentKey == null) {
-        return childKey;
+    public Key Parent {
+      get {
+        Console.WriteLine("The parent of this was called.");
+        if (cachedParent == null) {
+          cachedParent = PathDepth > 1 ? new Key(Path.GetRange(0, PathDepth - 1)) : null;
+        }
+        return cachedParent;
       }
-      if (childKey == null) {
-        return parentKey;
-      }
-      if (!childKey.IsAbsolute) {
-        return Key.Define(parentKey, childKey);
-      }
-      if (parentKey.IsRoot) {
-        return childKey;
-      }
-      throw new ArgumentException("Cannot add a parent to an absolute key.");
     }
 
     public static Key Parse(string key) {
@@ -128,15 +110,27 @@ namespace Bud {
     }
 
     public override string ToString() {
-      return IsRoot ? KeySeparator.ToString() : PrependAsString(new StringBuilder(), Parent).Append(Id).ToString();
+      if (cachedPathString == null) {
+        cachedPathString = BuildPathString();
+      }
+      return cachedPathString;
     }
 
-    private static StringBuilder PrependAsString(StringBuilder stringBuilder, Key parent) {
-      if (parent == null) {
-        return stringBuilder;
+    private string BuildPathString() {
+      var sb = new StringBuilder();
+      var pathEnumerator = Path.GetEnumerator();
+      if (IsAbsolute) {
+        pathEnumerator.MoveNext();
+        sb.Append(KeySeparator);
       }
-      var prepended = parent.IsRoot ? stringBuilder : PrependAsString(stringBuilder, parent.Parent).Append(parent.Id);
-      return prepended.Append(KeySeparator);
+      if (pathEnumerator.MoveNext()) {
+        sb.Append(pathEnumerator.Current);
+        while (pathEnumerator.MoveNext()) {
+          sb.Append(KeySeparator).Append(pathEnumerator.Current);
+        }
+      }
+      var asString = sb.ToString();
+      return asString;
     }
 
     public bool IdsEqual(Key otherKey) {

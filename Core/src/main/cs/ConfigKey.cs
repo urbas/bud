@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using Bud.Keys;
 using Bud.SettingsConstruction;
 
 namespace Bud {
@@ -12,22 +13,22 @@ namespace Bud {
   /// </summary>
   public class ConfigKey<T> : ConfigKey {
     public new static ConfigKey<T> Define(string id, string description = null) {
-      return Define(ImmutableList.Create(id), description);
+      return KeyCreator.Define(id, description, ConfigKeyFactory<T>.Instance);
+    }
+
+    public static ConfigKey<T> Define(Key parentKey, ConfigKey<T> childKey) {
+      return KeyCreator.Define(parentKey, childKey, ConfigKeyFactory<T>.Instance);
     }
 
     public new static ConfigKey<T> Define(Key parentKey, string id, string description = null) {
-      return Define(parentKey.Path.Add(id), description);
-    }
-
-    public new static ConfigKey<T> Define(Key parentKey, Key childKey) {
-      return Define(parentKey.Path.AddRange(childKey.Path), childKey.Description);
+      return KeyCreator.Define(parentKey, id, description, ConfigKeyFactory<T>.Instance);
     }
 
     public new static ConfigKey<T> Define(ImmutableList<string> path, string description = null) {
-      return new ConfigKey<T>(path, description);
+      return KeyCreator.Define(path, description, ConfigKeyFactory<T>.Instance);
     }
 
-    private ConfigKey(ImmutableList<string> path, string description) : base(path, description) {}
+    internal ConfigKey(ImmutableList<string> path, string description) : base(path, description) {}
 
     public static ConfigKey<T> operator /(Key parent, ConfigKey<T> child) {
       return Define(parent, child);
@@ -38,7 +39,10 @@ namespace Bud {
     }
 
     public Setup Init(Func<IConfig, T> configValue) {
-      return settings => settings.Add(new InitializeConfig<T>(settings.Scope / this, configValue));
+      return settings => {
+        Console.WriteLine("Init config...");
+        return settings.Add(new InitializeConfig<T>(settings.Scope / this, configValue));
+      };
     }
 
     public Setup Init(Func<IConfig, Key, T> configValue) {
