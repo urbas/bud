@@ -50,16 +50,16 @@ namespace Bud {
       get { return UnderlyingKey.Parent; }
     }
 
+    public Key Leaf {
+      get { return UnderlyingKey.Leaf; }
+    }
+
     public string Path {
       get { return UnderlyingKey.Path; }
     }
 
     public bool Equals(IKey otherKey) {
       return UnderlyingKey.Equals(otherKey);
-    }
-
-    public bool IdsEqual(IKey otherKey) {
-      return UnderlyingKey.IdsEqual(otherKey);
     }
 
     public override int GetHashCode() {

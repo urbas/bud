@@ -11,9 +11,10 @@ namespace Bud {
     private Key CachedParent;
     private ImmutableList<string> CachedPathComponents;
     private string CachedId;
+    private Key CachedLeaf;
 
     public static Key Define(string id, string description = null) {
-      return new Key(id, description);
+      return new Key(KeyPathUtils.ParseId(id), description);
     }
 
     public static Key Define(Key parentKey, Key childKey) {
@@ -33,7 +34,7 @@ namespace Bud {
     }
 
     public static Key Define(Key parentKey, string id, string description = null) {
-      return new Key(KeyPathUtils.JoinPath(parentKey.Path, id), description);
+      return new Key(KeyPathUtils.JoinPath(parentKey.Path, KeyPathUtils.ParseId(id)), description);
     }
 
     internal Key(string path, string description = null) {
@@ -42,6 +43,20 @@ namespace Bud {
     }
 
     public string Description { get; private set; }
+
+    public Key Leaf {
+      get {
+        if (CachedLeaf == null) {
+          if (IsRoot) {
+            CachedLeaf = this;
+          } else {
+            var leafId = KeyPathUtils.ExtractIdFromPath(Path);
+            CachedLeaf = leafId.Equals(Path) ? this : new Key(leafId, Description);
+          }
+        }
+        return CachedLeaf;
+      }
+    }
 
     public string Path { get; private set; }
 
@@ -101,10 +116,6 @@ namespace Bud {
 
     public override string ToString() {
       return Path;
-    }
-
-    public bool IdsEqual(IKey otherKey) {
-      return Id.Equals(otherKey.Id);
     }
 
     public static Key operator /(Key parent, Key child) {

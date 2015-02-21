@@ -198,6 +198,12 @@ namespace Bud {
     }
 
     [Test]
+    [ExpectedException(typeof(ArgumentException))]
+    public void Define_MUST_throw_an_exception_WHEN_the_id_contains_the_key_separator() {
+      Key.Define("/");
+    }
+
+    [Test]
     public void Parse_MUST_perform_the_inverse_of_ToString() {
       var deeplyNestedKey = configKeyB / Key.Define("C") / Key.Define("foo") / Key.Define("D") / Key.Define("E") / taskKeyA;
       Assert.AreEqual(deeplyNestedKey, Key.Parse(deeplyNestedKey.ToString()));
@@ -225,6 +231,19 @@ namespace Bud {
     [Test]
     public void Parent_MUST_return_the_root_WHEN_given_a_single_component_absolute_path() {
       Assert.AreSame(Key.Root, Key.Parse("/bar").Parent);
+    }
+
+    [Test]
+    public void Leaf_MUST_return_self_WHEN_the_key_is_single_component_relative() {
+      var barKey = Key.Define("bar");
+      Assert.AreSame(barKey, barKey.Leaf);
+      Assert.AreSame(Key.Root, Key.Root.Leaf);
+    }
+
+    [Test]
+    public void Leaf_MUST_return_the_last_component_key_WHEN_the_key_is_composite() {
+      Assert.AreEqual(Key.Define("boo"), Key.Parse("bar/boo").Leaf);
+      Assert.AreEqual(Key.Define("boo"), Key.Parse("/bar/boo").Leaf);
     }
   }
 }

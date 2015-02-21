@@ -2,9 +2,8 @@ using System;
 using System.Collections.Immutable;
 
 namespace Bud {
-  public static class KeyPathUtils
-  {
-    private static readonly char[] KeySplitter = { Key.KeySeparator };
+  public static class KeyPathUtils {
+    private static readonly char[] KeySplitter = {Key.KeySeparator};
 
     public static string ExtractParentPath(string path) {
       var lastIndexOfKeySeparator = path.LastIndexOf(Key.KeySeparator);
@@ -72,6 +71,13 @@ namespace Bud {
       }
       var pathComponents = parsedPath.ToImmutable();
       return pathComponents;
+    }
+
+    public static string ParseId(string id) {
+      if (id.IndexOf(Key.KeySeparator) >= 0) {
+        throw new ArgumentException("Could not parse the id '" + id + "'. It contains a key separator.");
+      }
+      return id;
     }
   }
 }
