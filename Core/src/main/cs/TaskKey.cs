@@ -6,25 +6,20 @@ using Bud.SettingsConstruction;
 using Bud.Util;
 
 namespace Bud {
-  public class TaskKey : Key
-  {
-    public new static TaskKey Define(string id, string description = null)
-    {
+  public class TaskKey : Key {
+    public new static TaskKey Define(string id, string description = null) {
       return KeyCreator.Define(id, description, TaskKeyFactory.Instance);
     }
 
-    public static TaskKey Define(Key parentKey, TaskKey childKey)
-    {
+    public static TaskKey Define(Key parentKey, TaskKey childKey) {
       return KeyCreator.Define(parentKey, childKey, TaskKeyFactory.Instance);
     }
 
-    public new static TaskKey Define(Key parentKey, string id, string description = null)
-    {
+    public new static TaskKey Define(Key parentKey, string id, string description = null) {
       return KeyCreator.Define(parentKey, id, description, TaskKeyFactory.Instance);
     }
 
-    public new static TaskKey Define(ImmutableList<string> path, string description = null)
-    {
+    public new static TaskKey Define(ImmutableList<string> path, string description = null) {
       return KeyCreator.Define(path, description, TaskKeyFactory.Instance);
     }
 
@@ -87,25 +82,20 @@ namespace Bud {
   /// <summary>
   ///   Values of this key are evaluated once per evaluation context.
   /// </summary>
-  public class TaskKey<T> : TaskKey
-  {
-    public new static TaskKey<T> Define(string id, string description = null)
-    {
+  public class TaskKey<T> : TaskKey {
+    public new static TaskKey<T> Define(string id, string description = null) {
       return KeyCreator.Define(id, description, TaskKeyFactory<T>.Instance);
     }
 
-    public static TaskKey<T> Define(Key parentKey, TaskKey<T> childKey)
-    {
+    public static TaskKey<T> Define(Key parentKey, TaskKey<T> childKey) {
       return KeyCreator.Define(parentKey, childKey, TaskKeyFactory<T>.Instance);
     }
 
-    public new static TaskKey<T> Define(Key parentKey, string id, string description = null)
-    {
+    public new static TaskKey<T> Define(Key parentKey, string id, string description = null) {
       return KeyCreator.Define(parentKey, id, description, TaskKeyFactory<T>.Instance);
     }
 
-    public new static TaskKey<T> Define(ImmutableList<string> path, string description = null)
-    {
+    public new static TaskKey<T> Define(ImmutableList<string> path, string description = null) {
       return KeyCreator.Define(path, description, TaskKeyFactory<T>.Instance);
     }
 
