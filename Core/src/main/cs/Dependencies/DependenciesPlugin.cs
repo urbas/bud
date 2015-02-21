@@ -22,7 +22,6 @@ namespace Bud.Dependencies {
     }
 
     private static string FetchedDependenciesDirImpl(IConfig context) {
-      Console.WriteLine("Defined the deps dir!");
       return Path.Combine(context.GetBudDir(), "nuGetRepository");
     }
 

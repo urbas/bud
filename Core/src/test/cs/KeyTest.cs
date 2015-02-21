@@ -4,14 +4,14 @@ using NUnit.Framework;
 namespace Bud {
   public class KeyTest {
     private Key keyA = Key.Define("A");
-    private ConfigKey<string> configKeyA = ConfigKey<string>.Define("A");
-    private TaskKey<int> taskKeyA = TaskKey<int>.Define("A");
+    private ConfigKey<string> configKeyA = Key.Define("A");
+    private TaskKey<int> taskKeyA = Key.Define("A");
     private Key keyB = Key.Define("B");
-    private ConfigKey<string> configKeyB = ConfigKey<string>.Define("B");
-    private TaskKey<int> taskKeyB = TaskKey<int>.Define("B");
+    private ConfigKey<string> configKeyB = Key.Define("B");
+    private TaskKey<int> taskKeyB = Key.Define("B");
     private Key keydKeyA = Key.Define("C") / Key.Define("A");
-    private ConfigKey<string> keydConfigKeyA = Key.Define("C") / ConfigKey<string>.Define("A");
-    private TaskKey<int> keydTaskKeyA = Key.Define("C") / TaskKey<int>.Define("A");
+    private ConfigKey<string> keydConfigKeyA = Key.Define("C") / "A";
+    private TaskKey<int> keydTaskKeyA = Key.Define("C") / "A";
 
     [Test]
     public void Equals_MUST_return_true_WHEN_the_keys_have_the_same_id_and_same_key() {
@@ -93,13 +93,13 @@ namespace Bud {
 
     [Test]
     public void ToString_MUST_return_the_id_and_the_ids_of_keys_WHEN_the_key_is_nested_in_multiple_keys() {
-      var deeplyNestedKey = configKeyB / ConfigKey<bool>.Define("C") / Key.Define("foo") / Key.Define("D") / TaskKey<uint>.Define("E") / taskKeyA;
+      var deeplyNestedKey = configKeyB / "C" / Key.Define("foo") / "D" / Key.Define("E") / taskKeyA;
       Assert.AreEqual("B/C/foo/D/E/A", deeplyNestedKey.ToString());
     }
 
     [Test]
     public void Equals_MUST_return_true_WHEN_two_key_instances_have_the_same_id_and_key() {
-      var keydConfigKeyAClone = Key.Define("C") / ConfigKey<string>.Define("A");
+      ConfigKey<string> keydConfigKeyAClone = Key.Define("C") / "A";
       Assert.AreEqual(keydConfigKeyA.GetHashCode(), keydConfigKeyAClone.GetHashCode());
       Assert.AreEqual(keydConfigKeyA, keydConfigKeyAClone);
     }
@@ -195,7 +195,7 @@ namespace Bud {
 
     [Test]
     public void Parse_MUST_perform_the_inverse_of_ToString() {
-      var deeplyNestedKey = configKeyB / ConfigKey<bool>.Define("C") / Key.Define("foo") / Key.Define("D") / TaskKey<uint>.Define("E") / taskKeyA;
+      var deeplyNestedKey = configKeyB / Key.Define("C") / Key.Define("foo") / Key.Define("D") / Key.Define("E") / taskKeyA;
       Assert.AreEqual(deeplyNestedKey, Key.Parse(deeplyNestedKey.ToString()));
       Assert.AreEqual("B/C/foo/D/E/A", Key.Parse("B/C/foo/D/E/A").ToString());
       Assert.AreEqual("/B/C/foo/D/E/A", Key.Parse("/B/C/foo/D/E/A").ToString());

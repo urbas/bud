@@ -2,44 +2,58 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
-using Bud.Keys;
 
 namespace Bud {
   // TODO: Store keys in a pool to speed up equality comparisons.
-  public class Key : MarshalByRefObject {
+  public class Key : MarshalByRefObject, IKey {
     public const string RootId = "root";
     public static readonly Key Root = Define(RootId, "The root scope. There can be only one!");
     public const char KeySeparator = '/';
     private static readonly char[] KeySplitter = {KeySeparator};
-    public readonly string Id;
-    public readonly string Description;
-    private readonly int hash;
-    public readonly ImmutableList<string> Path;
+    private readonly int cachedHash;
     private Key cachedParent;
     private string cachedPathString;
 
     public static Key Define(string id, string description = null) {
-      return KeyCreator.Define(id, description, KeyFactory.Instance);
+      return Define(ImmutableList.Create(id), description);
     }
 
     public static Key Define(Key parentKey, Key childKey) {
-      return KeyCreator.Define(parentKey, childKey, KeyFactory.Instance);
+      if (parentKey == null) {
+        return childKey;
+      }
+      if (childKey == null) {
+        return Define(parentKey.Path, parentKey.Description);
+      }
+      if (!childKey.IsAbsolute) {
+        return Define(parentKey.Path.AddRange(childKey.Path), childKey.Description);
+      }
+      if (parentKey.IsRoot) {
+        return childKey;
+      }
+      throw new ArgumentException("Cannot add a parent to an absolute key.");
     }
 
     public static Key Define(Key parentKey, string id, string description = null) {
-      return KeyCreator.Define(parentKey, id, description, KeyFactory.Instance);
+      return Define(parentKey.Path.Add(id), description);
     }
 
     public static Key Define(ImmutableList<string> path, string description = null) {
-      return KeyCreator.Define(path, description, KeyFactory.Instance);
+      return new Key(path, description);
     }
 
     protected internal Key(ImmutableList<string> path, string description = null) {
       Id = path[path.Count - 1];
       Path = path;
-      hash = AppendedPathHashCode(0, path);
+      cachedHash = CalculateHashCode(path);
       Description = description;
     }
+
+    public string Id { get; }
+
+    public string Description { get; }
+
+    public ImmutableList<string> Path { get; }
 
     public bool IsRoot {
       get { return PathDepth == 1 && IsAbsolute; }
@@ -55,7 +69,6 @@ namespace Bud {
 
     public Key Parent {
       get {
-        Console.WriteLine("The parent of this was called.");
         if (cachedParent == null) {
           cachedParent = PathDepth > 1 ? new Key(Path.GetRange(0, PathDepth - 1)) : null;
         }
@@ -78,11 +91,22 @@ namespace Bud {
       return Define(parsedPath.ToImmutable());
     }
 
-    public bool Equals(Key otherKey) {
+    public override bool Equals(object other) {
+      if (other == null) {
+        return false;
+      }
+      var otherKey = other as IKey;
+      if (otherKey == null) {
+        return false;
+      }
+      return Equals(otherKey);
+    }
+
+    public bool Equals(IKey otherKey) {
       return Equals(this, otherKey);
     }
 
-    public static bool Equals(Key thisKey, Key otherKey) {
+    public static bool Equals(Key thisKey, IKey otherKey) {
       if (ReferenceEquals(thisKey, otherKey)) {
         return true;
       }
@@ -95,18 +119,8 @@ namespace Bud {
       return ArePathsEqual(thisKey.Path, otherKey.Path);
     }
 
-    public override bool Equals(object other) {
-      if (other == null) {
-        return false;
-      }
-      if (!(other is Key)) {
-        return false;
-      }
-      return Equals((Key) other);
-    }
-
     public override int GetHashCode() {
-      return hash;
+      return cachedHash;
     }
 
     public override string ToString() {
@@ -133,7 +147,7 @@ namespace Bud {
       return asString;
     }
 
-    public bool IdsEqual(Key otherKey) {
+    public bool IdsEqual(IKey otherKey) {
       return Id.Equals(otherKey.Id);
     }
 
@@ -159,8 +173,8 @@ namespace Bud {
       }
     }
 
-    private static int AppendedPathHashCode(int parentHash, ImmutableList<string> pathToAppend) {
-      return pathToAppend.Aggregate(parentHash, CreateNextHashCode);
+    private static int CalculateHashCode(ImmutableList<string> pathToAppend) {
+      return pathToAppend.Aggregate(0, CreateNextHashCode);
     }
 
     private static bool ArePathsEqual(ImmutableList<string> pathA, ImmutableList<string> pathB) {

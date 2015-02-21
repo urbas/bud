@@ -3,10 +3,10 @@ using NUnit.Framework;
 
 namespace Bud {
   public class SettingConstructionTest {
-    private static readonly ConfigKey<string> TestKey = ConfigKey<string>.Define("testKey");
-    private static readonly TaskKey<string> TestTaskKey = TaskKey<string>.Define("testTaskKey");
-    private static readonly TaskKey<string> TestTaskKey2 = TaskKey<string>.Define("testTaskKey2");
-    private static readonly TaskKey<string> TestTaskKey3 = TaskKey<string>.Define("testTaskKey3");
+    private static readonly ConfigKey<string> TestKey = Key.Define("testKey");
+    private static readonly TaskKey<string> TestTaskKey = Key.Define("testTaskKey");
+    private static readonly TaskKey<string> TestTaskKey2 = Key.Define("testTaskKey2");
+    private static readonly TaskKey<string> TestTaskKey3 = Key.Define("testTaskKey3");
 
     [Test]
     public void Evaluating_an_initialized_config_MUST_return_the_value_of_initialization() {

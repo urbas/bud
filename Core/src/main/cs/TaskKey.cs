@@ -1,29 +1,36 @@
 using System;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
-using Bud.Keys;
 using Bud.SettingsConstruction;
 using Bud.Util;
 
 namespace Bud {
-  public class TaskKey : Key {
-    public new static TaskKey Define(string id, string description = null) {
-      return KeyCreator.Define(id, description, TaskKeyFactory.Instance);
+  public class TaskKey : IKey {
+    protected internal readonly Key UnderlyingKey;
+
+    protected TaskKey(Key underlyingKey) {
+      UnderlyingKey = underlyingKey;
     }
 
-    public static TaskKey Define(Key parentKey, TaskKey childKey) {
-      return KeyCreator.Define(parentKey, childKey, TaskKeyFactory.Instance);
+    public static implicit operator TaskKey(Key key) {
+      return new TaskKey(key);
     }
 
-    public new static TaskKey Define(Key parentKey, string id, string description = null) {
-      return KeyCreator.Define(parentKey, id, description, TaskKeyFactory.Instance);
+    public static implicit operator Key(TaskKey key) {
+      return key.UnderlyingKey;
     }
 
-    public new static TaskKey Define(ImmutableList<string> path, string description = null) {
-      return KeyCreator.Define(path, description, TaskKeyFactory.Instance);
+    public static Key operator /(TaskKey parent, Key child) {
+      return Key.Define(parent, child);
     }
 
-    protected internal TaskKey(ImmutableList<string> path, string description) : base(path, description) {}
+    public static Key operator /(TaskKey parent, string id) {
+      return Key.Define(parent, id);
+    }
+
+    public static TaskKey operator /(Key parent, TaskKey child) {
+      return Key.Define(parent, child);
+    }
 
     public Setup Init(Func<IContext, Task> taskDefinition) {
       return settings => settings.Add(new InitializeTask(settings.Scope / this, taskDefinition));
@@ -74,8 +81,52 @@ namespace Bud {
       return settings => settings.Add(new AddDependencies(settings.Scope / this, dependents));
     }
 
-    public static TaskKey operator /(Key parent, TaskKey child) {
-      return Define(parent, child);
+    public string Id {
+      get { return UnderlyingKey.Id; }
+    }
+
+    public string Description {
+      get { return UnderlyingKey.Description; }
+    }
+
+    public ImmutableList<string> Path {
+      get { return UnderlyingKey.Path; }
+    }
+
+    public bool IsRoot {
+      get { return UnderlyingKey.IsRoot; }
+    }
+
+    public bool IsAbsolute {
+      get { return UnderlyingKey.IsAbsolute; }
+    }
+
+    public int PathDepth {
+      get { return UnderlyingKey.PathDepth; }
+    }
+
+    public Key Parent {
+      get { return UnderlyingKey.Parent; }
+    }
+
+    public bool Equals(IKey otherKey) {
+      return UnderlyingKey.Equals(otherKey);
+    }
+
+    public bool IdsEqual(IKey otherKey) {
+      return UnderlyingKey.IdsEqual(otherKey);
+    }
+
+    public override int GetHashCode() {
+      return UnderlyingKey.GetHashCode();
+    }
+
+    public override bool Equals(object obj) {
+      return obj != null && obj.Equals(UnderlyingKey);
+    }
+
+    public override string ToString() {
+      return UnderlyingKey.ToString();
     }
   }
 
@@ -83,27 +134,18 @@ namespace Bud {
   ///   Values of this key are evaluated once per evaluation context.
   /// </summary>
   public class TaskKey<T> : TaskKey {
-    public new static TaskKey<T> Define(string id, string description = null) {
-      return KeyCreator.Define(id, description, TaskKeyFactory<T>.Instance);
+    public static implicit operator TaskKey<T>(Key key) {
+      return new TaskKey<T>(key);
     }
 
-    public static TaskKey<T> Define(Key parentKey, TaskKey<T> childKey) {
-      return KeyCreator.Define(parentKey, childKey, TaskKeyFactory<T>.Instance);
+    public static implicit operator Key(TaskKey<T> key) {
+      return key.UnderlyingKey;
     }
 
-    public new static TaskKey<T> Define(Key parentKey, string id, string description = null) {
-      return KeyCreator.Define(parentKey, id, description, TaskKeyFactory<T>.Instance);
-    }
-
-    public new static TaskKey<T> Define(ImmutableList<string> path, string description = null) {
-      return KeyCreator.Define(path, description, TaskKeyFactory<T>.Instance);
-    }
-
-    internal TaskKey(ImmutableList<string> path, string description) : base(path, description) {}
-
+    private TaskKey(Key underlyingKey) : base(underlyingKey) {}
 
     public static TaskKey<T> operator /(Key parent, TaskKey<T> child) {
-      return Define(parent, child);
+      return Key.Define(parent, child);
     }
 
     public Setup InitSync(Func<T> taskDefinition) {

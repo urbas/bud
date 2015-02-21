@@ -1,37 +1,93 @@
 ﻿using System;
 using System.Collections.Immutable;
-using Bud.Keys;
 using Bud.SettingsConstruction;
 
 namespace Bud {
-  public abstract class ConfigKey : Key {
-    protected ConfigKey(ImmutableList<string> path, string description) : base(path, description) {}
+  public class ConfigKey : IKey {
+    protected internal readonly Key UnderlyingKey;
+
+    protected ConfigKey(Key underlyingKey) {
+      UnderlyingKey = underlyingKey;
+    }
+
+    public static implicit operator ConfigKey(Key key) {
+      return new ConfigKey(key);
+    }
+
+    public static implicit operator Key(ConfigKey key) {
+      return key.UnderlyingKey;
+    }
+
+    public static Key operator /(ConfigKey parent, Key child) {
+      return Key.Define(parent, child);
+    }
+
+    public static Key operator /(ConfigKey parent, string id) {
+      return Key.Define(parent, id);
+    }
+
+    public string Id {
+      get { return UnderlyingKey.Id; }
+    }
+
+    public string Description {
+      get { return UnderlyingKey.Description; }
+    }
+
+    public ImmutableList<string> Path {
+      get { return UnderlyingKey.Path; }
+    }
+
+    public bool IsRoot {
+      get { return UnderlyingKey.IsRoot; }
+    }
+
+    public bool IsAbsolute {
+      get { return UnderlyingKey.IsAbsolute; }
+    }
+
+    public int PathDepth {
+      get { return UnderlyingKey.PathDepth; }
+    }
+
+    public Key Parent {
+      get { return UnderlyingKey.Parent; }
+    }
+
+    public bool Equals(IKey otherKey) {
+      return UnderlyingKey.Equals(otherKey);
+    }
+
+    public bool IdsEqual(IKey otherKey) {
+      return UnderlyingKey.IdsEqual(otherKey);
+    }
+
+    public override int GetHashCode() {
+      return UnderlyingKey.GetHashCode();
+    }
+
+    public override bool Equals(object obj) {
+      return obj != null && obj.Equals(UnderlyingKey);
+    }
+
+    public override string ToString() {
+      return UnderlyingKey.ToString();
+    }
   }
 
-  /// <summary>
-  ///   Values of this key are evaluated once only per settings compilation.
-  /// </summary>
   public class ConfigKey<T> : ConfigKey {
-    public new static ConfigKey<T> Define(string id, string description = null) {
-      return KeyCreator.Define(id, description, ConfigKeyFactory<T>.Instance);
+    public static implicit operator ConfigKey<T>(Key key) {
+      return new ConfigKey<T>(key);
     }
 
-    public static ConfigKey<T> Define(Key parentKey, ConfigKey<T> childKey) {
-      return KeyCreator.Define(parentKey, childKey, ConfigKeyFactory<T>.Instance);
+    public static implicit operator Key(ConfigKey<T> key) {
+      return key.UnderlyingKey;
     }
 
-    public new static ConfigKey<T> Define(Key parentKey, string id, string description = null) {
-      return KeyCreator.Define(parentKey, id, description, ConfigKeyFactory<T>.Instance);
-    }
-
-    public new static ConfigKey<T> Define(ImmutableList<string> path, string description = null) {
-      return KeyCreator.Define(path, description, ConfigKeyFactory<T>.Instance);
-    }
-
-    internal ConfigKey(ImmutableList<string> path, string description) : base(path, description) {}
+    private ConfigKey(Key underlyingKey) : base(underlyingKey) {}
 
     public static ConfigKey<T> operator /(Key parent, ConfigKey<T> child) {
-      return Define(parent, child);
+      return Key.Define(parent, child);
     }
 
     public Setup Init(T configValue) {
@@ -39,10 +95,7 @@ namespace Bud {
     }
 
     public Setup Init(Func<IConfig, T> configValue) {
-      return settings => {
-        Console.WriteLine("Init config...");
-        return settings.Add(new InitializeConfig<T>(settings.Scope / this, configValue));
-      };
+      return settings => settings.Add(new InitializeConfig<T>(settings.Scope / this, configValue));
     }
 
     public Setup Init(Func<IConfig, Key, T> configValue) {
