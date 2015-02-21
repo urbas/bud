@@ -2,9 +2,9 @@
 
 namespace Bud.Build {
   public static class BuildKeys {
-    public static readonly Key Main = new Key("main");
-    public static readonly TaskKey Test = new TaskKey("test");
-    public static readonly TaskKey Build = new TaskKey("build");
-    public static readonly ConfigKey<SemanticVersion> Version = new ConfigKey<SemanticVersion>("version");
+    public static readonly Key Main = Key.Define("main");
+    public static readonly TaskKey Test = Key.Define("test");
+    public static readonly TaskKey Build = Key.Define("build");
+    public static readonly ConfigKey<SemanticVersion> Version = Key.Define("version");
   }
 }

@@ -14,7 +14,7 @@ namespace Bud.Projects {
     }
 
     public static Key ProjectKey(string projectId) {
-      return Key.Root / ProjectKeys.Project / new Key(projectId);
+      return Key.Root / ProjectKeys.Project / projectId;
     }
 
     private static Setup Init(string projectId, string baseDir, IEnumerable<Setup> setups) {

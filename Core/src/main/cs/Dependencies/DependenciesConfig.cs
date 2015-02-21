@@ -8,12 +8,12 @@ using Bud.Build;
 namespace Bud.Dependencies {
   public static class DependenciesConfig {
     public static ImmutableList<InternalDependency> GetInternalDependencies(this IConfig config, Key dependent) {
-      var dependenciesKey = DependenciesKeys.InternalDependencies.In(dependent);
+      var dependenciesKey = dependent / DependenciesKeys.InternalDependencies;
       return config.IsConfigDefined(dependenciesKey) ? config.Evaluate(dependenciesKey) : ImmutableList<InternalDependency>.Empty;
     }
 
     public static ImmutableList<ExternalDependency> GetExternalDependencies(this IConfig config, Key dependent) {
-      var dependenciesKey = DependenciesKeys.ExternalDependencies.In(dependent);
+      var dependenciesKey = dependent / DependenciesKeys.ExternalDependencies;
       return config.IsConfigDefined(dependenciesKey) ? config.Evaluate(dependenciesKey) : ImmutableList<ExternalDependency>.Empty;
     }
 
@@ -30,7 +30,7 @@ namespace Bud.Dependencies {
     /// Invokes the tasks on all internal dependencies transitively and returns their keys.
     /// </summary>
     public static async Task<ISet<Key>> EvaluateInternalDependencies(this IContext context, Key dependent) {
-      var resolveDependenciesKey = DependenciesKeys.EvaluateInternalDependencies.In(dependent);
+      var resolveDependenciesKey = dependent / DependenciesKeys.EvaluateInternalDependencies;
       return context.IsTaskDefined(resolveDependenciesKey) ? await context.Evaluate(resolveDependenciesKey) : ImmutableHashSet<Key>.Empty;
     }
 
@@ -47,7 +47,7 @@ namespace Bud.Dependencies {
     }
 
     public static IEnumerable<IDependency> GetDependencies(this IConfig config, Key key) {
-      var dependenciesKey = DependenciesKeys.Dependencies.In(key);
+      var dependenciesKey = key / DependenciesKeys.Dependencies;
       return config.IsConfigDefined(dependenciesKey) ? config.Evaluate(dependenciesKey) : ImmutableList<IDependency>.Empty;
     }
   }

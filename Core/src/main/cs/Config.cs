@@ -29,7 +29,7 @@ namespace Bud {
     public ILogger Logger { get; private set; }
 
     public bool IsConfigDefined(Key key) {
-      return configDefinitions.ContainsKey(key.In(Key.Root));
+      return configDefinitions.ContainsKey(Key.Root / key);
     }
 
     public object Evaluate(ConfigKey key) {
@@ -42,7 +42,7 @@ namespace Bud {
 
     public object EvaluateConfig(Key key) {
       object value;
-      var absoluteKey = key.In(Key.Root);
+      var absoluteKey = Key.Root / key;
       if (configValues.TryGetValue(absoluteKey, out value)) {
         return value;
       }

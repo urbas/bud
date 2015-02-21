@@ -34,7 +34,7 @@ namespace Bud.CSharp {
     }
 
     private static bool IsMainBuildTargetDefined(IConfig context, Key dependencyBuildTargetKey) {
-      return context.IsConfigDefined(CSharpKeys.OutputAssemblyFile.In(dependencyBuildTargetKey));
+      return context.IsConfigDefined(dependencyBuildTargetKey / CSharpKeys.OutputAssemblyFile);
     }
   }
 }

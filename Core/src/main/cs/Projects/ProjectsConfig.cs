@@ -12,7 +12,7 @@ namespace Bud.Projects {
     }
 
     public static SemanticVersion GetVersionOf(this IConfig context, Key project) {
-      return context.Evaluate(ProjectKeys.Version.In(project));
+      return context.Evaluate(project / ProjectKeys.Version);
     }
   }
 }
