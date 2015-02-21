@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Immutable;
-using System.Text;
 
 namespace Bud {
   // TODO: Store keys in a pool to speed up equality comparisons.
@@ -8,7 +7,6 @@ namespace Bud {
     public const string RootId = "root";
     public const char KeySeparator = '/';
     public static readonly string KeySeparatorAsString = KeySeparator.ToString();
-    private static readonly char[] KeySplitter = {KeySeparator};
     public static readonly Key Root = new Key(KeySeparator.ToString(), "The root scope. There can be only one!");
     private Key CachedParent;
     private ImmutableList<string> CachedPathComponents;
@@ -52,12 +50,7 @@ namespace Bud {
     }
 
     public ImmutableList<string> PathComponents {
-      get {
-        if (CachedPathComponents == null) {
-          CachedPathComponents = ToPathComponents(Path);
-        }
-        return CachedPathComponents;
-      }
+      get { return CachedPathComponents ?? (CachedPathComponents = KeyPathUtils.ToPathComponents(Path)); }
     }
 
     public bool IsRoot {
@@ -81,22 +74,6 @@ namespace Bud {
 
     public static Key Parse(string key) {
       return KeyPathUtils.IsRootPath(key) ? Root : new Key(key, KeyPathUtils.ExtractIdFromPath(key));
-    }
-
-    private static ImmutableList<string> ToPathComponents(string key) {
-      if (string.IsNullOrEmpty(key)) {
-        throw new ArgumentException("Could not parse an empty string. An empty string is not a valid key.");
-      }
-      var keyIdChain = key.Split(KeySplitter, StringSplitOptions.RemoveEmptyEntries);
-      var parsedPath = ImmutableList.CreateBuilder<string>();
-      if (key[0] == KeySeparator) {
-        parsedPath.Add(RootId);
-      }
-      for (int index = 0; index < keyIdChain.Length; index++) {
-        parsedPath.Add(keyIdChain[index]);
-      }
-      var pathComponents = parsedPath.ToImmutable();
-      return pathComponents;
     }
 
     public override bool Equals(object other) {
@@ -126,26 +103,6 @@ namespace Bud {
       return Path;
     }
 
-    private static string BuildPathString(ImmutableList<string> pathComponents) {
-      var pathEnumerator = pathComponents.GetEnumerator();
-      if (pathEnumerator.MoveNext()) {
-        var sb = new StringBuilder();
-        if (RootId.Equals(pathEnumerator.Current)) {
-          sb.Append(KeySeparator);
-          if (pathEnumerator.MoveNext()) {
-            sb.Append(pathEnumerator.Current);
-          }
-        } else {
-          sb.Append(pathEnumerator.Current);
-        }
-        while (pathEnumerator.MoveNext()) {
-          sb.Append(KeySeparator).Append(pathEnumerator.Current);
-        }
-        return sb.ToString();
-      }
-      throw new Exception("Cannot convert the list of path components to a string. The list of path components must not be empty.");
-    }
-
     public bool IdsEqual(IKey otherKey) {
       return Id.Equals(otherKey.Id);
     }
@@ -156,14 +113,6 @@ namespace Bud {
 
     public static Key operator /(Key parent, string id) {
       return Define(parent, id);
-    }
-
-    protected static ImmutableList<string> ConcatenatePath(ImmutableList<string> parentPath, string newComponent) {
-      return parentPath == null ? ImmutableList.Create(newComponent) : parentPath.Add(newComponent);
-    }
-
-    protected static ImmutableList<string> ConcatenatePath(Key parent, string newComponent) {
-      return ConcatenatePath(parent == null ? null : parent.PathComponents, newComponent);
     }
   }
 }
