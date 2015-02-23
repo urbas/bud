@@ -13,8 +13,8 @@ namespace Bud {
     Task<T> Evaluate<T>(TaskKey<T> key);
     Task EvaluateTask(Key key);
     Task EvaluateKey(Key key);
-    Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition);
-    Task Evaluate(ITaskDefinition taskDefinition);
+    Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition, Key taskKey);
+    Task Evaluate(ITaskDefinition taskDefinition, Key taskKey);
   }
 
   // TODO: Make this class thread-safe.
@@ -32,33 +32,19 @@ namespace Bud {
       this.taskDefinitions = taskDefinitions;
     }
 
-    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions {
-      get { return configuration.ConfigDefinitions; }
-    }
+    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions => configuration.ConfigDefinitions;
 
-    public ILogger Logger {
-      get { return configuration.Logger; }
-    }
+    public ILogger Logger => configuration.Logger;
 
-    public ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions {
-      get { return taskDefinitions; }
-    }
+    public ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions => taskDefinitions;
 
-    public bool IsConfigDefined(Key key) {
-      return configuration.IsConfigDefined(key);
-    }
+    public bool IsConfigDefined(Key key) => configuration.IsConfigDefined(key);
 
-    public T Evaluate<T>(ConfigKey<T> configKey) {
-      return configuration.Evaluate(configKey);
-    }
+    public T Evaluate<T>(ConfigKey<T> configKey) => configuration.Evaluate(configKey);
 
-    public object EvaluateConfig(Key key) {
-      return configuration.EvaluateConfig(key);
-    }
+    public object EvaluateConfig(Key key) => configuration.EvaluateConfig(key);
 
-    public bool IsTaskDefined(Key key) {
-      return taskDefinitions.ContainsKey(key);
-    }
+    public bool IsTaskDefined(Key key) => taskDefinitions.ContainsKey(key);
 
     public Task EvaluateKey(Key key) {
       var absoluteKey = Key.Root / key;
@@ -68,24 +54,18 @@ namespace Bud {
       return Task.FromResult(configuration.EvaluateConfig(absoluteKey));
     }
 
-    public Task Evaluate(TaskKey key) {
-      return EvaluateTask(key);
-    }
+    public Task Evaluate(TaskKey key) => EvaluateTask(key);
 
-    public Task<T> Evaluate<T>(TaskKey<T> key) {
-      return (Task<T>) Evaluate((TaskKey) key);
-    }
+    public Task<T> Evaluate<T>(TaskKey<T> key) => (Task<T>) Evaluate((TaskKey) key);
 
-    public Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition) {
-      return (Task<T>) Evaluate((ITaskDefinition) taskDefinition);
-    }
+    public Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition, Key taskKey) => (Task<T>) Evaluate((ITaskDefinition) taskDefinition, taskKey);
 
-    public Task Evaluate(ITaskDefinition taskDefinition) {
+    public Task Evaluate(ITaskDefinition taskDefinition, Key taskKey) {
       Task existingEvaluation;
       if (oldTaskValues.TryGetValue(taskDefinition, out existingEvaluation)) {
         return existingEvaluation;
       }
-      Task freshEvaluation = taskDefinition.Evaluate(this);
+      Task freshEvaluation = taskDefinition.Evaluate(this, taskKey);
       oldTaskValues.Add(taskDefinition, freshEvaluation);
       return freshEvaluation;
     }
@@ -94,8 +74,7 @@ namespace Bud {
       return new Context(settings.ConfigDefinitions, settings.TaskDefinitions, logger);
     }
 
-    public static IContext FromSettings(Settings settings)
-    {
+    public static IContext FromSettings(Settings settings) {
       return FromSettings(settings, Logging.Logger.CreateFromStandardOutputs());
     }
 
@@ -111,7 +90,7 @@ namespace Bud {
       }
       ITaskDefinition taskDefinition;
       if (taskDefinitions.TryGetValue(absoluteKey, out taskDefinition)) {
-        value = taskDefinition.Evaluate(this);
+        value = taskDefinition.Evaluate(this, key);
         taskValues.Add(absoluteKey, value);
         return value;
       }

@@ -12,15 +12,13 @@ namespace Bud.Build {
 
     public static Setup Init(string baseDir) {
       return settings => settings
-        .Do(
-          BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
-          BuildDirsKeys.BaseDir.Init(baseDir),
-          BuildDirsKeys.BudDir.Init(GetDefaultBudDir),
-          BuildDirsKeys.OutputDir.Init(GetDefaultOutputDir),
-          BuildDirsKeys.BuildConfigCacheDir.Init(GetDefaultBuildConfigCacheDir),
-          BuildDirsKeys.PersistentBuildConfigDir.Init(GetDefaultPersistentBuildConfigDir),
-          BuildDirsKeys.Clean.Modify(CleanBuildDirsTask)
-        )
+        .Do(BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
+            BuildDirsKeys.BaseDir.Init(baseDir),
+            BuildDirsKeys.BudDir.Init(GetDefaultBudDir),
+            BuildDirsKeys.OutputDir.Init(GetDefaultOutputDir),
+            BuildDirsKeys.BuildConfigCacheDir.Init(GetDefaultBuildConfigCacheDir),
+            BuildDirsKeys.PersistentBuildConfigDir.Init(GetDefaultPersistentBuildConfigDir),
+            BuildDirsKeys.Clean.Modify(CleanBuildDirsImpl))
         .Globally(BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
                   BuildDirsKeys.Clean.DependsOn(settings.Scope / BuildDirsKeys.Clean));
     }
@@ -89,7 +87,7 @@ namespace Bud.Build {
       return persistentConfigDir;
     }
 
-    private static async Task CleanBuildDirsTask(IContext context, Func<Task> oldCleanTask, Key project) {
+    private static async Task CleanBuildDirsImpl(IContext context, Func<Task> oldCleanTask, Key project) {
       await oldCleanTask();
       var dir = context.GetOutputDir(project);
       if (Directory.Exists(dir)) {

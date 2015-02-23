@@ -10,7 +10,7 @@ namespace Bud {
     public readonly Func<IConfig, T> ConfigValue;
 
     public ConfigDefinition(Func<IConfig, T> configValue) {
-      this.ConfigValue = configValue;
+      ConfigValue = configValue;
     }
 
     object IConfigDefinition.Evaluate(IConfig context) {

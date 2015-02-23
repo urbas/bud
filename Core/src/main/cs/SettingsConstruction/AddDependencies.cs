@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using Bud.Util;
 
 namespace Bud.SettingsConstruction {
   public class AddDependencies : TaskDefinitionConstructor {

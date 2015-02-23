@@ -17,11 +17,11 @@ namespace Bud.Commander {
       Key keyToEvaluate = Key.Parse(command);
       return context.EvaluateKey(keyToEvaluate)
                     .ContinueWith(task => {
-                      var resultTask = task as Task<object>;
-                      if (resultTask != null) {
-                        return resultTask.Result;
+                      if (task.Exception != null) {
+                        throw task.Exception;
                       }
-                      return null;
+                      var resultTask = task as Task<object>;
+                      return resultTask?.Result;
                     });
     }
   }
