@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Bud.Logging;
 
@@ -11,38 +12,36 @@ namespace Bud {
     bool IsTaskDefined(Key key);
     Task Evaluate(TaskKey key);
     Task<T> Evaluate<T>(TaskKey<T> key);
-    Task EvaluateTask(Key key);
     Task EvaluateKey(Key key);
     Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition, Key taskKey);
     Task Evaluate(ITaskDefinition taskDefinition, Key taskKey);
   }
 
-  // TODO: Make this class thread-safe.
   public class Context : IContext {
-    private readonly IConfig configuration;
+    private readonly IConfig Configuration;
     private readonly ImmutableDictionary<Key, ITaskDefinition> taskDefinitions;
-    private readonly Dictionary<Key, Task> taskValues = new Dictionary<Key, Task>();
-
-    private readonly Dictionary<ITaskDefinition, Task> oldTaskValues = new Dictionary<ITaskDefinition, Task>();
+    private readonly Dictionary<Key, Task> TaskEvaluations = new Dictionary<Key, Task>();
+    private readonly Dictionary<ITaskDefinition, Task> OverridenTaskEvaluations = new Dictionary<ITaskDefinition, Task>();
+    private readonly SemaphoreSlim EvaluationStoreGuard = new SemaphoreSlim(1);
 
     private Context(ImmutableDictionary<Key, IConfigDefinition> configDefinitions, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions, ILogger logger) : this(new Config(configDefinitions, logger), taskDefinitions) {}
 
     private Context(IConfig configuration, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) {
-      this.configuration = configuration;
+      this.Configuration = configuration;
       this.taskDefinitions = taskDefinitions;
     }
 
-    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions => configuration.ConfigDefinitions;
+    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions => Configuration.ConfigDefinitions;
 
-    public ILogger Logger => configuration.Logger;
+    public ILogger Logger => Configuration.Logger;
 
     public ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions => taskDefinitions;
 
-    public bool IsConfigDefined(Key key) => configuration.IsConfigDefined(key);
+    public bool IsConfigDefined(Key key) => Configuration.IsConfigDefined(key);
 
-    public T Evaluate<T>(ConfigKey<T> configKey) => configuration.Evaluate(configKey);
+    public T Evaluate<T>(ConfigKey<T> configKey) => Configuration.Evaluate(configKey);
 
-    public object EvaluateConfig(Key key) => configuration.EvaluateConfig(key);
+    public object EvaluateConfig(Key key) => Configuration.EvaluateConfig(key);
 
     public bool IsTaskDefined(Key key) => taskDefinitions.ContainsKey(key);
 
@@ -51,23 +50,21 @@ namespace Bud {
       if (IsTaskDefined(absoluteKey)) {
         return EvaluateTask(absoluteKey);
       }
-      return Task.FromResult(configuration.EvaluateConfig(absoluteKey));
+      return Task.FromResult(Configuration.EvaluateConfig(absoluteKey));
     }
 
     public Task Evaluate(TaskKey key) => EvaluateTask(key);
 
-    public Task<T> Evaluate<T>(TaskKey<T> key) => (Task<T>) Evaluate((TaskKey) key);
+    public Task<T> Evaluate<T>(TaskKey<T> key) => EvaluateTask<T>(key);
 
     public Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition, Key taskKey) => (Task<T>) Evaluate((ITaskDefinition) taskDefinition, taskKey);
 
     public Task Evaluate(ITaskDefinition taskDefinition, Key taskKey) {
       Task existingEvaluation;
-      if (oldTaskValues.TryGetValue(taskDefinition, out existingEvaluation)) {
+      if (OverridenTaskEvaluations.TryGetValue(taskDefinition, out existingEvaluation)) {
         return existingEvaluation;
       }
-      Task freshEvaluation = taskDefinition.Evaluate(this, taskKey);
-      oldTaskValues.Add(taskDefinition, freshEvaluation);
-      return freshEvaluation;
+      return EvaluateOverridenTaskToCacheUnguarded(taskDefinition, taskKey);
     }
 
     public static Context FromSettings(Settings settings, ILogger logger) {
@@ -82,24 +79,63 @@ namespace Bud {
       return new Context(config, taskDefinitions);
     }
 
-    public Task EvaluateTask(Key key) {
-      Task value;
+    private Task EvaluateTask(Key key) {
       var absoluteKey = Key.Root / key;
-      if (taskValues.TryGetValue(absoluteKey, out value)) {
-        return value;
-      }
+      return TryGetTaskEvaluationFromCache(absoluteKey) ?? ExecuteGuarded(() => EvaluateTaskToCacheUnguarded(absoluteKey));
+    }
+
+    private Task<T> EvaluateTask<T>(Key key) {
+      var absoluteKey = Key.Root / key;
+      Task evaluation = TryGetTaskEvaluationFromCache(absoluteKey);
+      return evaluation != null ? (Task<T>) evaluation : ExecuteGuarded(() => (Task<T>)EvaluateTaskToCacheUnguarded(absoluteKey));
+    }
+
+    private Task<T> ExecuteGuarded<T>(Func<Task<T>> actionToGuard) {
+      return EvaluationStoreGuard
+        .WaitAsync()
+        .ContinueWith(t => actionToGuard())
+        .ContinueWith(t => {
+          EvaluationStoreGuard.Release();
+          return t.Result;
+        })
+        .Unwrap();
+    }
+
+    private Task ExecuteGuarded(Func<Task> unguardedAction) {
+      return EvaluationStoreGuard
+        .WaitAsync()
+        .ContinueWith(t => unguardedAction())
+        .ContinueWith(t => {
+          EvaluationStoreGuard.Release();
+          return t.Result;
+        })
+        .Unwrap();
+    }
+
+    private Task TryGetTaskEvaluationFromCache(Key absoluteKey) {
+      Task value;
+      return TaskEvaluations.TryGetValue(absoluteKey, out value) ? value : null;
+    }
+
+    private Task EvaluateTaskToCacheUnguarded(Key absoluteKey) {
       ITaskDefinition taskDefinition;
       if (taskDefinitions.TryGetValue(absoluteKey, out taskDefinition)) {
-        value = taskDefinition.Evaluate(this, key);
-        taskValues.Add(absoluteKey, value);
+        var value = taskDefinition.Evaluate(this, absoluteKey);
+        TaskEvaluations.Add(absoluteKey, value);
         return value;
       }
-      throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. The value for this task was not defined.", absoluteKey));
+      throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. This task is not defined.", absoluteKey));
+    }
+
+    private Task EvaluateOverridenTaskToCacheUnguarded(ITaskDefinition taskDefinition, Key taskKey) {
+      Task freshEvaluation = taskDefinition.Evaluate(this, taskKey);
+      OverridenTaskEvaluations.Add(taskDefinition, freshEvaluation);
+      return freshEvaluation;
     }
 
     public override string ToString() {
       StringBuilder sb = new StringBuilder("EvaluationContext(Configurations: [");
-      ToString(sb, configuration.ConfigDefinitions.Keys);
+      ToString(sb, Configuration.ConfigDefinitions.Keys);
       sb.Append("], Tasks: [");
       ToString(sb, taskDefinitions.Keys);
       return sb.Append("])").ToString();
