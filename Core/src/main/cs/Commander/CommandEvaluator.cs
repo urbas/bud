@@ -9,7 +9,7 @@ namespace Bud.Commander {
         evaluationOutput.Wait();
         return evaluationOutput.Result;
       } catch (Exception ex) {
-        throw new OperationCanceledException(string.Format("Evaluation of '{0}' did not complete successfully.", command), ex);
+        throw new OperationCanceledException(string.Format("Task '{0}' failed.", command), ex);
       }
     }
 

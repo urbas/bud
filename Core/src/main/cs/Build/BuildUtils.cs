@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Bud.Util;
 
@@ -20,10 +19,6 @@ namespace Bud.Build {
 
     public static Key LanguageOf(Key buildTarget) {
       return buildTarget;
-    }
-
-    public static string LogMessage(this IConfig context, Key buildTarget, string messageFormat, params object[] formatParams) {
-      return String.Format("{0}:{1}/{2}> {3}", BuildUtils.ProjectOf(buildTarget).Id, BuildUtils.ScopeOf(buildTarget).Id, BuildUtils.LanguageOf(buildTarget).Id, String.Format(messageFormat, formatParams));
     }
 
     public static bool HasBuildTarget(this IContext context, Key project, Key scope, Key language) {

@@ -84,11 +84,14 @@
     <Compile Include="Dependencies\PackageDependencyInfo.cs" />
     <Compile Include="Dependencies\PackageVersions.cs" />
     <Compile Include="Dependencies\ResolvedExternalDependency.cs" />
+    <Compile Include="IConfig.cs" />
+    <Compile Include="IContext.cs" />
     <Compile Include="IKey.cs" />
     <Compile Include="IO\Paths.cs" />
     <Compile Include="KeyPathUtils.cs" />
     <Compile Include="Logging\ILogger.cs" />
     <Compile Include="Logging\Logger.cs" />
+    <Compile Include="Logging\ScopedLogger.cs" />
     <Compile Include="Logging\WriterLogger.cs" />
     <Compile Include="Projects\ProjectKeys.cs" />
     <Compile Include="Projects\ProjectsConfig.cs" />
@@ -96,6 +99,8 @@
     <Compile Include="Publishing\PublishingPlugin.cs" />
     <Compile Include="Publishing\PublishKeys.cs" />
     <Compile Include="Publishing\PublishTasks.cs" />
+    <Compile Include="ScopedConfig.cs" />
+    <Compile Include="ScopedContext.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsUtils.cs" />

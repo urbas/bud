@@ -19,7 +19,7 @@ namespace Bud.SolutionExporter {
                                         .Select(project => project / BuildKeys.Main / CSharpKeys.CSharp);
       foreach (var buildTarget in mainBuildTargets) {
         var buildTargetCsprojFile = GetCsprojFileFor(context, buildTarget);
-        context.Logger.Info(context.LogMessage(buildTarget, "Generating '{0}'...", buildTargetCsprojFile));
+        context.Logger.Info(string.Format("Generating '{0}'...", buildTargetCsprojFile));
       }
       return TaskUtils.NullAsyncResult;
     }

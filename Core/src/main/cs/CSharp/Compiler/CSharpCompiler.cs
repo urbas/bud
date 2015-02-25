@@ -21,7 +21,7 @@ namespace Bud.CSharp.Compiler {
         if (sourceFiles.Any() && Files.AreFilesNewer(sourceFiles, outputFile)) {
           Compile(context, buildTarget, outputFile, framework, libraryDependencies, frameworkAssemblies, sourceFiles);
         } else {
-          context.Logger.Info(context.LogMessage(buildTarget, "skipping build..."));
+          context.Logger.Info("skipping build...");
         }
       });
     }

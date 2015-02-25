@@ -23,7 +23,7 @@ namespace Bud.Publishing {
     }
 
     private static async Task<string> PackageImpl(IContext context, Key buildTarget) {
-      context.Logger.Info(context.LogMessage(buildTarget, "preparing package..."));
+      context.Logger.Info("preparing package...");
       await context.Evaluate(buildTarget / BuildKeys.Build);
       var project = BuildUtils.ProjectOf(buildTarget);
       var buildTargetId = BuildUtils.IdOf(buildTarget);
@@ -71,12 +71,12 @@ namespace Bud.Publishing {
     private static Task PublishImpl(IContext context, Key buildTarget) {
       return Task.Run(async () => {
         try {
-          context.Logger.Info(context.LogMessage(buildTarget, "publishing..."));
+          context.Logger.Info("publishing...");
           string packageFile = await PublishTasks.Package(context, buildTarget);
           var packageServer = new PackageServer("https://www.nuget.org", "IE");
           packageServer.PushPackage(context.Evaluate(PublishKeys.PublishApiKey), new ZipPackage(packageFile), new FileInfo(packageFile).Length, 3600000, false);
         } catch (Exception e) {
-          context.Logger.Error(context.LogMessage(buildTarget, "publishing failed: " + e));
+          context.Logger.Error("publishing failed: " + e);
         }
       });
     }

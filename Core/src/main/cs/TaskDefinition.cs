@@ -37,9 +37,8 @@ namespace Bud {
       }
     }
 
-    public static string EvaluationErrorMessage(Key taskKey)
-    {
-      return string.Format("Evaluation of task '{0}' failed.", taskKey);
+    public static string EvaluationErrorMessage(Key taskKey) {
+      return string.Format("Task '{0}' failed.", taskKey);
     }
   }
 
