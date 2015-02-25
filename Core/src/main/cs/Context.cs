@@ -51,10 +51,8 @@ namespace Bud {
 
     public Task Evaluate(ITaskDefinition taskDefinition, Key taskKey) {
       Task existingEvaluation;
-      if (OverridenTaskEvaluations.TryGetValue(taskDefinition, out existingEvaluation)) {
-        return existingEvaluation;
-      }
-      return EvaluateOverridenTaskToCacheUnguarded(taskDefinition, taskKey);
+      // TODO: verify whether we can do this optimistic fetching with dictionary. Can we read while someone is writing to the dictionary? Will we get concurrent access exceptions? Corruptions?
+      return OverridenTaskEvaluations.TryGetValue(taskDefinition, out existingEvaluation) ? existingEvaluation : EvaluateOverridenTaskToCacheUnguarded(taskDefinition, taskKey);
     }
 
     public static Context FromSettings(Settings settings, ILogger logger) {
@@ -76,6 +74,7 @@ namespace Bud {
 
     private Task<T> EvaluateTask<T>(Key key) {
       var absoluteKey = Key.Root / key;
+      // TODO: verify whether we can do this optimistic fetching with dictionary. Can we read while someone is writing to the dictionary? Will we get concurrent access exceptions? Corruptions?
       Task evaluation = TryGetTaskEvaluationFromCache(absoluteKey);
       return evaluation != null ? (Task<T>) evaluation : TaskUtils.ExecuteGuarded(EvaluationCacheSemaphore, () => (Task<T>) EvaluateTaskToCacheUnguarded(absoluteKey));
     }

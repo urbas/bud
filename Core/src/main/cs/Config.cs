@@ -31,7 +31,9 @@ namespace Bud {
     public object EvaluateConfig(Key key) {
       object value;
       var absoluteKey = Key.Root / key;
-      if (ConfigEvaluationCache.TryGetValue(absoluteKey, out value)) {
+      // TODO: verify whether we can do this optimistic fetching with dictionary. Can we read while someone is writing to the dictionary? Will we get concurrent access exceptions? Corruptions?
+      if (ConfigEvaluationCache.TryGetValue(absoluteKey, out value))
+      {
         return value;
       }
       IConfigDefinition configDefinition;
