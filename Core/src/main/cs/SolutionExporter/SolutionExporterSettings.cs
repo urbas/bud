@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Bud.Build;
@@ -13,18 +14,14 @@ namespace Bud.SolutionExporter {
     }
 
     private static Task ExportAsSolutionImpl(IContext context) {
-      var allProjects = context.GetAllProjects()
-                               .Select(idToProject => idToProject.Value);
-      var mainBuildTargets = allProjects.Where(project => context.HasBuildTarget(project, BuildKeys.Main, CSharpKeys.CSharp))
-                                        .Select(project => project / BuildKeys.Main / CSharpKeys.CSharp);
-      foreach (var buildTarget in mainBuildTargets) {
-        var buildTargetCsprojFile = GetCsprojFileFor(context, buildTarget);
+      foreach (var buildTarget in BuildTargetUtils.GetAllBuildTargets(context)) {
+        var buildTargetCsprojFile = GetBuildTargetCsprojPath(context, buildTarget);
         context.Logger.Info(string.Format("Generating '{0}'...", buildTargetCsprojFile));
       }
       return TaskUtils.NullAsyncResult;
     }
 
-    private static string GetCsprojFileFor(IContext context, Key buildTarget) {
+    private static string GetBuildTargetCsprojPath(IContext context, Key buildTarget) {
       return Path.Combine(context.GetBaseDir(buildTarget),
                           context.GetCSharpOutputAssemblyName(buildTarget) + ".csproj");
     }

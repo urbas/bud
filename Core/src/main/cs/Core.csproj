@@ -54,7 +54,7 @@
     <Compile Include="Build\BuildDirsKeys.cs" />
     <Compile Include="Build\BuildKeys.cs" />
     <Compile Include="Build\BuildTargetPlugin.cs" />
-    <Compile Include="Build\BuildUtils.cs" />
+    <Compile Include="Build\BuildTargetUtils.cs" />
     <Compile Include="Build\GlobalBuild.cs" />
     <Compile Include="Commander\BuildCommander.cs" />
     <Compile Include="Commander\BuildCommanderKeys.cs" />

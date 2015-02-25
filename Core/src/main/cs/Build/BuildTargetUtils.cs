@@ -1,8 +1,11 @@
 using System.Collections.Generic;
+using System.Linq;
+using Bud.CSharp;
+using Bud.Projects;
 using Bud.Util;
 
 namespace Bud.Build {
-  public static class BuildUtils {
+  public static class BuildTargetUtils {
     public static Key ProjectOf(Key buildTarget) {
       return buildTarget.Parent.Parent;
     }
@@ -23,6 +26,12 @@ namespace Bud.Build {
 
     public static bool HasBuildTarget(this IContext context, Key project, Key scope, Key language) {
       return context.IsTaskDefined(project / scope / language / BuildKeys.Build);
+    }
+
+    public static IEnumerable<Key> GetAllBuildTargets(IContext context) {
+      return context.GetAllProjects()
+                    .Select(idToProject => idToProject.Value)
+                    .SelectMany(projectKey => context.Evaluate(projectKey / BuildKeys.BuildTargets));
     }
   }
 }

@@ -15,8 +15,8 @@ namespace Bud.CSharp {
     }
 
     public CSharpBuildTargetPackage(IConfig config, Key buildTarget) {
-      var project = BuildUtils.ProjectOf(buildTarget);
-      Id = BuildUtils.IdOf(buildTarget);
+      var project = BuildTargetUtils.ProjectOf(buildTarget);
+      Id = BuildTargetUtils.IdOf(buildTarget);
       Version = config.GetVersionOf(project);
       AssemblyReferences = ImmutableList.Create<IPackageAssemblyReference>(new CSharpBuildTargetAssembly(config, buildTarget));
     }

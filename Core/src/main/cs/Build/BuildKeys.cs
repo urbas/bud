@@ -1,4 +1,5 @@
-﻿using NuGet;
+﻿using System.Collections.Immutable;
+using NuGet;
 
 namespace Bud.Build {
   public static class BuildKeys {
@@ -6,5 +7,6 @@ namespace Bud.Build {
     public static readonly TaskKey Test = Key.Define("test");
     public static readonly TaskKey Build = Key.Define("build");
     public static readonly ConfigKey<SemanticVersion> Version = Key.Define("version");
+    public static readonly ConfigKey<ImmutableList<Key>> BuildTargets = Key.Define("buildTargets");
   }
 }

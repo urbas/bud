@@ -27,7 +27,7 @@ namespace Bud.CSharp {
 
     private static Setup AddMainBuildTargetDependency() {
       return settings => {
-        var project = BuildUtils.ProjectOf(settings.Scope);
+        var project = BuildTargetUtils.ProjectOf(settings.Scope);
         var mainBuildTarget = project / BuildKeys.Main / CSharpKeys.CSharp;
         return settings.Do(DependenciesSettings.AddDependency(new CSharpInternalDependency(mainBuildTarget), config => IsMainBuildTargetDefined(config, mainBuildTarget)));
       };

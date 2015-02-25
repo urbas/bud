@@ -50,7 +50,7 @@ namespace Bud.CSharp {
     }
 
     private static string OutputAssemblyName(IConfig context, Key buildTarget) {
-      return BuildUtils.IdOf(buildTarget);
+      return BuildTargetUtils.IdOf(buildTarget);
     }
 
     private static string GetDefaultOutputAssemblyFile(IConfig context, Key buildTarget) {

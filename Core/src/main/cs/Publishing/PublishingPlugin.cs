@@ -25,8 +25,8 @@ namespace Bud.Publishing {
     private static async Task<string> PackageImpl(IContext context, Key buildTarget) {
       context.Logger.Info("preparing package...");
       await context.Evaluate(buildTarget / BuildKeys.Build);
-      var project = BuildUtils.ProjectOf(buildTarget);
-      var buildTargetId = BuildUtils.IdOf(buildTarget);
+      var project = BuildTargetUtils.ProjectOf(buildTarget);
+      var buildTargetId = BuildTargetUtils.IdOf(buildTarget);
       var targetFramework = context.GetTargetFramework(buildTarget);
       var packageDir = Path.Combine(context.GetOutputDir(project), "package");
       var packageFile = Path.Combine(packageDir, buildTargetId + ".nupkg");
