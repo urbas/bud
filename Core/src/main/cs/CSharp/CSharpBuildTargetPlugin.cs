@@ -21,7 +21,7 @@ namespace Bud.CSharp {
 
     protected override Settings Setup(Settings buildTargetSettings, Key project) {
       return buildTargetSettings.Do(CSharpKeys.SourceFiles.InitSync(FindSources),
-                                    CSharpKeys.TargetFramework.Init(Framework.Net45),
+                                    CSharpKeys.TargetFramework.Init(GetDefaultFramework),
                                     CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
                                     BuildKeys.Build.Modify(BuildTaskImpl),
                                     CSharpKeys.ReferencedAssemblies.Init(ReferencedAssembliesImpl),
@@ -30,6 +30,14 @@ namespace Bud.CSharp {
                                     CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile),
                                     CSharpKeys.Dist.Init(CreateDistributablePackage),
                                     PublishingPlugin.Init());
+    }
+
+    private static Framework GetDefaultFramework(IConfig config) {
+      var globalTargetFramework = Key.Root / CSharpKeys.TargetFramework;
+      if (config.IsConfigDefined(globalTargetFramework)) {
+        return config.Evaluate(globalTargetFramework);
+      }
+      return Framework.Net45;
     }
 
     private async Task BuildTaskImpl(IContext context, Func<Task> oldBuild, Key buildTarget) {

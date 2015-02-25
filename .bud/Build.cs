@@ -8,6 +8,7 @@ using System.IO;
 public class Build : IBuild {
   public Settings Setup(Settings settings, string baseDir) {
     return settings
+      .Globally(CSharpKeys.TargetFramework.Init(Framework.Net46))
       .Version("0.0.2")
       .ExportAsSolution()
       .Project("bud", Path.Combine(baseDir, "bud"), Cs.Exe(

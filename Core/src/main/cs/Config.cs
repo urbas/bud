@@ -32,12 +32,11 @@ namespace Bud {
       object value;
       var absoluteKey = Key.Root / key;
       // TODO: verify whether we can do this optimistic fetching with dictionary. Can we read while someone is writing to the dictionary? Will we get concurrent access exceptions? Corruptions?
-      if (ConfigEvaluationCache.TryGetValue(absoluteKey, out value))
-      {
+      if (ConfigEvaluationCache.TryGetValue(absoluteKey, out value)) {
         return value;
       }
-      IConfigDefinition configDefinition;
       lock (ConfigEvaluationCache) {
+        IConfigDefinition configDefinition;
         if (ConfigDefinitions.TryGetValue(absoluteKey, out configDefinition)) {
           value = configDefinition.Evaluate(new ScopedConfig(this, key));
           ConfigEvaluationCache.Add(absoluteKey, value);
