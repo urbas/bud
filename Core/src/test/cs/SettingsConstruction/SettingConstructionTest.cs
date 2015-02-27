@@ -77,7 +77,7 @@ namespace Bud {
           return "bar";
         }),
         TestTaskKey.DependsOn(TestTaskKey2));
-      Context.FromSettings(settings).Evaluate(TestTaskKey);
+      Context.FromSettings(settings).Evaluate(TestTaskKey).Wait();
       Assert.IsTrue(wasDependentInvoked);
     }
 
@@ -93,7 +93,7 @@ namespace Bud {
         TestTaskKey2.DependsOn(TestTaskKey),
         TestTaskKey3.InitSync("zar"),
         TestTaskKey3.DependsOn(TestTaskKey2, TestTaskKey));
-      Context.FromSettings(settings).Evaluate(TestTaskKey3);
+      Context.FromSettings(settings).Evaluate(TestTaskKey3).Wait();
       Assert.AreEqual(1, numberOfTimesDependentInvoked);
     }
 
@@ -125,8 +125,7 @@ namespace Bud {
         }),
         TestTaskKey.Modify(async previousTask => await previousTask() + await previousTask()));
 
-      var evaluatedValue = await Context.FromSettings(
-        settings).Evaluate(TestTaskKey);
+      var evaluatedValue = await Context.FromSettings(settings).Evaluate(TestTaskKey);
 
       Assert.AreEqual("foofoo", evaluatedValue);
       Assert.AreEqual(1, numberOfTimesDependentInvoked);
