@@ -16,10 +16,8 @@ namespace Bud {
 
     [Test]
     public void Evaluating_a_config_WHEN_initialization_is_performed_the_second_time_MUST_return_the_value_of_initialization() {
-      var settings = Settings.Create(
-        TestKey.Init("bar"),
-        TestKey.Init("foo")
-        );
+      var settings = Settings.Create(TestKey.Init("bar"),
+                                     TestKey.Init("foo"));
       Assert.AreEqual("bar", Context.FromSettings(settings).Evaluate(TestKey));
     }
 
@@ -31,9 +29,8 @@ namespace Bud {
 
     [Test]
     public void Modifying_an_initialized_config_MUST_return_the_modified_value() {
-      var settings = Settings.Create(
-        TestKey.Init("foo"),
-        TestKey.Modify((string v) => v + "bar"));
+      var settings = Settings.Create(TestKey.Init("foo"),
+                                     TestKey.Modify((string v) => v + "bar"));
       Assert.AreEqual("foobar", Context.FromSettings(settings).Evaluate(TestKey));
     }
 
