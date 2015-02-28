@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <!-- Read this before publishing packages to chocolatey.org: https://github.com/chocolatey/chocolatey/wiki/CreatePackages -->
+    <id>bud</id>
+    <title>Bud</title>
+    <version>0.0.1</version>
+    <authors>Matej Urbas</authors>
+    <owners>Matej Urbas</owners>
+    <summary>Bud is a build tool and a general automation tool</summary>
+    <description>Bud is a build tool and a general automation tool</description>
+    <projectUrl>http://bud.urbas.si/#/</projectUrl>
+    <tags>bud build tool automation</tags>
+    <copyright>2015 Matej Urbas</copyright>
+    <licenseUrl>http://bud.urbas.si/#/licence</licenseUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <releaseNotes></releaseNotes>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
