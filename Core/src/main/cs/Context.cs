@@ -10,9 +10,10 @@ using Bud.Util;
 namespace Bud {
   public class Context : IContext {
     private readonly IConfig Configuration;
-    private readonly Dictionary<Key, Task> TaskEvaluationCache = new Dictionary<Key, Task>();
-    private readonly Dictionary<ITaskDefinition, Task> OverridenTaskEvaluations = new Dictionary<ITaskDefinition, Task>();
+    private ImmutableDictionary<Key, Task> TaskEvaluationCache = ImmutableDictionary<Key, Task>.Empty;
     private readonly SemaphoreSlim EvaluationCacheSemaphore = new SemaphoreSlim(1);
+    private ImmutableDictionary<ITaskDefinition, Task> OverridenTaskEvaluations = ImmutableDictionary<ITaskDefinition, Task>.Empty;
+    private readonly SemaphoreSlim OverridenTaskEvaluationCacheSemaphore = new SemaphoreSlim(1);
 
     private Context(ImmutableDictionary<Key, IConfigDefinition> configDefinitions, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions, ILogger logger) : this(new Config(configDefinitions, logger), taskDefinitions) {}
 
@@ -47,12 +48,14 @@ namespace Bud {
 
     public Task<T> Evaluate<T>(TaskKey<T> key) => EvaluateTask<T>(key);
 
-    public Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition, Key taskKey) => (Task<T>) Evaluate((ITaskDefinition) taskDefinition, taskKey);
+    public Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition, Key taskKey) {
+      Task existingEvaluation;
+      return OverridenTaskEvaluations.TryGetValue(taskDefinition, out existingEvaluation) ? (Task<T>) existingEvaluation : TaskUtils.ExecuteGuarded(OverridenTaskEvaluationCacheSemaphore, () => (Task<T>) EvaluateOverridenTaskToCacheUnguarded(taskDefinition, taskKey));
+    }
 
     public Task Evaluate(ITaskDefinition taskDefinition, Key taskKey) {
       Task existingEvaluation;
-      // TODO: verify whether we can do this optimistic fetching with dictionary. Can we read while someone is writing to the dictionary? Will we get concurrent access exceptions? Corruptions?
-      return OverridenTaskEvaluations.TryGetValue(taskDefinition, out existingEvaluation) ? existingEvaluation : EvaluateOverridenTaskToCacheUnguarded(taskDefinition, taskKey);
+      return OverridenTaskEvaluations.TryGetValue(taskDefinition, out existingEvaluation) ? existingEvaluation : TaskUtils.ExecuteGuarded(OverridenTaskEvaluationCacheSemaphore, () => EvaluateOverridenTaskToCacheUnguarded(taskDefinition, taskKey));
     }
 
     public static Context FromSettings(Settings settings, ILogger logger) {
@@ -74,9 +77,7 @@ namespace Bud {
 
     private Task<T> EvaluateTask<T>(Key key) {
       var absoluteKey = Key.Root / key;
-      // TODO: verify whether we can do this optimistic fetching with dictionary. Can we read while someone is writing to the dictionary? Will we get concurrent access exceptions? Corruptions?
-      Task evaluation = TryGetTaskEvaluationFromCache(absoluteKey);
-      return evaluation != null ? (Task<T>) evaluation : TaskUtils.ExecuteGuarded(EvaluationCacheSemaphore, () => (Task<T>) EvaluateTaskToCacheUnguarded(absoluteKey));
+      return (Task<T>) (TryGetTaskEvaluationFromCache(absoluteKey) ?? TaskUtils.ExecuteGuarded(EvaluationCacheSemaphore, () => (Task<T>) EvaluateTaskToCacheUnguarded(absoluteKey)));
     }
 
     private Task TryGetTaskEvaluationFromCache(Key absoluteKey) {
@@ -88,7 +89,7 @@ namespace Bud {
       ITaskDefinition taskDefinition;
       if (TaskDefinitions.TryGetValue(absoluteKey, out taskDefinition)) {
         var value = EvaluateTaskDefinition(absoluteKey, taskDefinition);
-        TaskEvaluationCache.Add(absoluteKey, value);
+        TaskEvaluationCache = TaskEvaluationCache.Add(absoluteKey, value);
         return value;
       }
       throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. This task is not defined.", absoluteKey));
@@ -96,7 +97,7 @@ namespace Bud {
 
     private Task EvaluateOverridenTaskToCacheUnguarded(ITaskDefinition taskDefinition, Key taskKey) {
       Task freshEvaluation = EvaluateTaskDefinition(taskKey, taskDefinition);
-      OverridenTaskEvaluations.Add(taskDefinition, freshEvaluation);
+      OverridenTaskEvaluations = OverridenTaskEvaluations.Add(taskDefinition, freshEvaluation);
       return freshEvaluation;
     }
 
