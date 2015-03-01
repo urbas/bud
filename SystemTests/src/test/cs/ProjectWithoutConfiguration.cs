@@ -1,8 +1,6 @@
-using Bud.Commander;
-using Bud.Test.Util;
-using Bud.Build;
-using Bud.Test.Assertions;
 using System.IO;
+using Bud.Test.Assertions;
+using Bud.Test.Util;
 using NUnit.Framework;
 
 namespace Bud.SystemTests {
