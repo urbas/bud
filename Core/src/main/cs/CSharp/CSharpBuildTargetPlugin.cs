@@ -19,7 +19,7 @@ namespace Bud.CSharp {
     }
 
     protected override Settings Setup(Settings buildTargetSettings, Key project) {
-      return buildTargetSettings.Do(CSharpKeys.SourceFiles.InitSync(FindSources),
+      return buildTargetSettings.Do(BuildTargetKeys.SourceFiles.InitSync(FindSources),
                                     CSharpKeys.TargetFramework.Init(GetDefaultFramework),
                                     CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
                                     BuildKeys.Build.Modify(BuildTaskImpl),

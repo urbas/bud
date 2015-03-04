@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,6 +9,8 @@ using Antlr4.StringTemplate;
 using Bud.Build;
 using Bud.CSharp;
 using Bud.Dependencies;
+using Bud.IO;
+using Bud.Resources;
 using NuGet;
 
 namespace Bud.SolutionExporter {
@@ -16,44 +20,88 @@ namespace Bud.SolutionExporter {
     }
 
     private static async Task GenerateSolutionImpl(IContext context) {
-      using (var manifestResourceStream = typeof (SolutionExporterSettings).Assembly.GetManifestResourceStream("Bud.CsProjectTemplate.csproj")) {
-        var csProjectTemplate = manifestResourceStream.ReadToEnd();
+      GenerateSolution(context);
+      await GenerateCsprojs(context);
+    }
+
+    private static void GenerateSolution(IContext context) {
+      using (var solutionTemplateStream = typeof (SolutionExporterSettings).Assembly.GetManifestResourceStream("Bud.SolutionTemplate.sln")) {
         try {
-          await GenerateCsprojs(context, csProjectTemplate);
+          var generatedSolutionPath = Path.Combine(context.GetBaseDir(), Path.GetFileName(context.GetBaseDir()) + ".tmp.sln");
+          context.Logger.Info(string.Format("Generating '{0}'...", generatedSolutionPath));
+          var template = new Template(solutionTemplateStream.ReadToEnd(), '%', '%');
+          var generatedSolutionPathUri = new Uri(generatedSolutionPath);
+          template.Add("projects", GetCSharpBuildTargets(context).Select(buildTarget => new {
+            BuildTarget = buildTarget,
+            Guid = BuildTargetUtils.GuidOf(buildTarget),
+            Id = BuildTargetUtils.PackageIdOf(buildTarget),
+            RelativeCsprojPath = generatedSolutionPathUri.MakeRelativeUri(new Uri(GetBuildTargetCsprojPath(context, buildTarget)))
+          }));
+          RenderTemplate(generatedSolutionPath, template);
         } catch (Exception e) {
           Console.WriteLine(e.ToString());
         }
       }
     }
 
-    private static async Task GenerateCsprojs(IContext context, string csProjectTemplate) {
-      foreach (var buildTarget in BuildTargetUtils.GetAllBuildTargets(context)) {
-        var buildTargetCsprojFile = GetBuildTargetCsprojPath(context, buildTarget);
-        context.Logger.Info(string.Format("Generating '{0}'...", buildTargetCsprojFile));
-        var template = new Template(csProjectTemplate, '%', '%');
-        var csprojUri = new Uri(buildTargetCsprojFile);
-        var sourceFiles = await CollectSourceFiles(context, buildTarget, csprojUri);
-        template.Add("assemblyName", context.GetCSharpOutputAssemblyName(buildTarget));
-        template.Add("outputType", context.GetCSharpAssemblyType(buildTarget));
-        template.Add("assemblyReferences", CollectAssemblyReferences(context, buildTarget, csprojUri));
-        template.Add("projectReferences", CollectProjectReferences(context, buildTarget, csprojUri));
-        template.Add("projectGuid", BuildTargetUtils.GuidOf(buildTarget));
-        template.Add("builtTargetScope", BuildTargetUtils.ScopeOf(buildTarget).Id);
-        template.Add("sourceFiles", sourceFiles);
-        template.Add("rootNamespace", context.GetRootNamespace(buildTarget));
-        using (var fileStream = new FileStream(buildTargetCsprojFile, FileMode.Create, FileAccess.Write)) {
-          using (var streamWriter = new StreamWriter(fileStream)) {
-            template.Write(new AutoIndentWriter(streamWriter));
+    private static async Task GenerateCsprojs(IContext context) {
+      using (var csprojTemplateStream = typeof (SolutionExporterSettings).Assembly.GetManifestResourceStream("Bud.CsProjectTemplate.csproj")) {
+        try {
+          var csprojTemplateAsString = csprojTemplateStream.ReadToEnd();
+          foreach (var buildTarget in GetCSharpBuildTargets(context)) {
+            var buildTargetCsprojFile = GetBuildTargetCsprojPath(context, buildTarget);
+            context.Logger.Info(string.Format("Generating '{0}'...", buildTargetCsprojFile));
+            var template = new Template(csprojTemplateAsString, '%', '%');
+            var csprojUri = new Uri(buildTargetCsprojFile);
+            var sourceFiles = await CollectSourceFiles(context, buildTarget, csprojUri);
+            var embeddedResourceFiles = await CollectEmbeddedResourceFiles(context, buildTarget, csprojUri);
+            template.Add("assemblyName", context.GetCSharpOutputAssemblyName(buildTarget));
+            template.Add("outputType", context.GetCSharpAssemblyType(buildTarget));
+            template.Add("assemblyReferences", CollectAssemblyReferences(context, buildTarget, csprojUri));
+            template.Add("projectReferences", CollectProjectReferences(context, buildTarget, csprojUri));
+            template.Add("projectGuid", BuildTargetUtils.GuidOf(buildTarget));
+            template.Add("builtTargetScope", BuildTargetUtils.ScopeOf(buildTarget).Id);
+            template.Add("sourceFiles", sourceFiles);
+            template.Add("embeddedResources", embeddedResourceFiles);
+            template.Add("rootNamespace", context.GetRootNamespace(buildTarget));
+            RenderTemplate(buildTargetCsprojFile, template);
           }
+        } catch (Exception e) {
+          Console.WriteLine(e.ToString());
+        }
+      }
+    }
+
+    private static IEnumerable<Key> GetCSharpBuildTargets(IContext context) {
+      return BuildTargetUtils.GetAllBuildTargets(context).Where(buildTarget => buildTarget.Leaf.Equals(CSharpKeys.CSharp));
+    }
+
+    private static void RenderTemplate(string outputFilePath, Template template) {
+      using (var fileStream = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write)) {
+        using (var streamWriter = new StreamWriter(fileStream)) {
+          template.Write(new AutoIndentWriter(streamWriter));
         }
       }
     }
 
     private static async Task<IEnumerable> CollectSourceFiles(IContext context, Key buildTarget, Uri csprojUri) {
-      var sourceFiles = await context.GetCSharpSources(buildTarget);
+      var sourceFiles = await context.GetSourceFiles(buildTarget);
+      return ToRelativePaths(csprojUri, sourceFiles);
+    }
+
+    private static async Task<IEnumerable> CollectEmbeddedResourceFiles(IContext context, Key buildTarget, Uri csprojUri) {
+      var resourcesBuildTarget = buildTarget.Parent / ResourcesKeys.Resources;
+      if (context.IsBuildTargetDefined(resourcesBuildTarget)) {
+        var embeddedResourceFiles = await context.GetSourceFiles(resourcesBuildTarget);
+        return ToRelativePaths(csprojUri, embeddedResourceFiles);
+      }
+      return ImmutableList<object>.Empty;
+    }
+
+    private static IEnumerable ToRelativePaths(Uri csprojUri, IEnumerable<string> sourceFiles) {
       return sourceFiles.Select(path => new {
         AbsolutePath = path,
-        RelativePath = csprojUri.MakeRelativeUri(new Uri(path))
+        RelativePath = Paths.ToWindowsPath(csprojUri.MakeRelativeUri(new Uri(path)).ToString())
       });
     }
 

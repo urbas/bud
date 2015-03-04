@@ -1,6 +1,7 @@
 using Bud;
 using Bud.CSharp;
 using Bud.Projects;
+using Bud.Resources;
 using Bud.Publishing;
 using Bud.SolutionExporter;
 using System.IO;
@@ -15,7 +16,7 @@ public class Build : IBuild {
         Cs.Dependency("Bud.Core"),
         CSharpKeys.RootNamespace.Modify("Bud")
       ))
-      .Project("Bud.Core", Path.Combine(baseDir, "Core"), Cs.Dll(
+      .Project("Bud.Core", Path.Combine(baseDir, "Core"), Res.Main(), Cs.Dll(
         Cs.Dependency("Microsoft.Bcl.Immutable"),
         Cs.Dependency("Newtonsoft.Json"),
         Cs.Dependency("NuGet.Core"),

@@ -56,6 +56,8 @@
     <Compile Include="Build\BuildDirs.cs" />
     <Compile Include="Build\BuildDirsKeys.cs" />
     <Compile Include="Build\BuildKeys.cs" />
+    <Compile Include="Build\BuildTargetConfig.cs" />
+    <Compile Include="Build\BuildTargetKeys.cs" />
     <Compile Include="Build\BuildTargetPlugin.cs" />
     <Compile Include="Build\BuildTargetUtils.cs" />
     <Compile Include="Build\GlobalBuild.cs" />
@@ -102,6 +104,9 @@
     <Compile Include="Publishing\PublishingPlugin.cs" />
     <Compile Include="Publishing\PublishKeys.cs" />
     <Compile Include="Publishing\PublishTasks.cs" />
+    <Compile Include="Resources\Res.cs" />
+    <Compile Include="Resources\ResourcesBuildTarget.cs" />
+    <Compile Include="Resources\ResourcesKeys.cs" />
     <Compile Include="ScopedConfig.cs" />
     <Compile Include="ScopedContext.cs" />
     <Compile Include="Setup.cs" />
@@ -143,5 +148,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\resources\CsProjectTemplate.csproj" />
+    <EmbeddedResource Include="..\resources\SolutionTemplate.sln" />
   </ItemGroup>
 </Project>

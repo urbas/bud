@@ -5,9 +5,6 @@ using NuGet;
 
 namespace Bud.CSharp {
   public static class CSharpConfig {
-    public static Task<IEnumerable<string>> GetCSharpSources(this IContext context, Key buildTarget) {
-      return context.Evaluate(buildTarget / CSharpKeys.SourceFiles);
-    }
 
     public static Framework GetTargetFramework(this IConfig config, Key buildTarget) {
       return config.Evaluate(buildTarget / CSharpKeys.TargetFramework);

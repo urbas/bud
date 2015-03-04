@@ -34,7 +34,12 @@ namespace Bud.Build {
     }
 
     public static bool HasBuildTarget(this IContext context, Key project, Key scope, Key language) {
-      return context.IsTaskDefined(project / scope / language / BuildKeys.Build);
+      var buildTarget = project / scope / language;
+      return IsBuildTargetDefined(context, buildTarget);
+    }
+
+    public static bool IsBuildTargetDefined(this IContext context, Key buildTarget) {
+      return context.IsTaskDefined(buildTarget / BuildKeys.Build);
     }
 
     public static IEnumerable<Key> GetAllBuildTargets(IContext context) {

@@ -42,7 +42,7 @@ namespace Bud {
       Path = path;
     }
 
-    public string Description { get; private set; }
+    public string Description { get; }
 
     public Key Leaf {
       get {
@@ -58,23 +58,15 @@ namespace Bud {
       }
     }
 
-    public string Path { get; private set; }
+    public string Path { get; }
 
-    public string Id {
-      get { return CachedId ?? (CachedId = KeyPathUtils.ExtractIdFromPath(Path)); }
-    }
+    public string Id => CachedId ?? (CachedId = KeyPathUtils.ExtractIdFromPath(Path));
 
-    public ImmutableList<string> PathComponents {
-      get { return CachedPathComponents ?? (CachedPathComponents = KeyPathUtils.ToPathComponents(Path)); }
-    }
+    public ImmutableList<string> PathComponents => CachedPathComponents ?? (CachedPathComponents = KeyPathUtils.ToPathComponents(Path));
 
-    public bool IsRoot {
-      get { return KeyPathUtils.IsRootPath(Path); }
-    }
+    public bool IsRoot => KeyPathUtils.IsRootPath(Path);
 
-    public bool IsAbsolute {
-      get { return KeyPathUtils.IsAbsolutePath(Path); }
-    }
+    public bool IsAbsolute => KeyPathUtils.IsAbsolutePath(Path);
 
     public Key Parent {
       get {
@@ -92,14 +84,8 @@ namespace Bud {
     }
 
     public override bool Equals(object other) {
-      if (other == null) {
-        return false;
-      }
       var otherKey = other as IKey;
-      if (otherKey == null) {
-        return false;
-      }
-      return Equals(otherKey);
+      return otherKey != null && Equals(otherKey);
     }
 
     public bool Equals(IKey otherKey) {

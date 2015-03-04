@@ -56,5 +56,12 @@
 }%
   </ItemGroup>
 
+  <ItemGroup>
+
+%embeddedResources:{ embeddedResource |
+    <EmbeddedResource Include="%embeddedResource.RelativePath%" />
+}%
+  </ItemGroup>
+
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

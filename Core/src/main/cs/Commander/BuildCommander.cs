@@ -26,7 +26,7 @@ namespace Bud.Commander {
         BuildCommanderKeys.CreateBuildCommander.Init(CreateBuildCommanderImpl),
         Cs.Dll(BuildCommanderKeys.BuildConfigSourceFile.Init(GetDefaultBuildSourceFile),
                BuildCommanderKeys.DirOfProjectToBeBuilt.Init(dirOfProjectToBeBuilt),
-               CSharpKeys.SourceFiles.Modify(AddBuildDefinitionSourceFile),
+               BuildTargetKeys.SourceFiles.Modify(AddBuildDefinitionSourceFile),
                CSharpKeys.OutputAssemblyDir.Modify(BuildDirs.GetBaseDir),
                CSharpKeys.OutputAssemblyName.Modify("Build"),
                CSharpKeys.ReferencedAssemblyPaths.Modify(AddBudAssemblies)));

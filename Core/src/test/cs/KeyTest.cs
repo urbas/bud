@@ -198,7 +198,7 @@ namespace Bud {
     }
 
     [Test]
-    [ExpectedException(typeof(ArgumentException))]
+    [ExpectedException(typeof (ArgumentException))]
     public void Define_MUST_throw_an_exception_WHEN_the_id_contains_the_key_separator() {
       Key.Define("/");
     }

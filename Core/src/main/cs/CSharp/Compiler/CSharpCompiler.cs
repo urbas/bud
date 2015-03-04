@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Bud.Build;
 using Bud.Cli;
 using Bud.Dependencies;
 using Bud.IO;
@@ -14,7 +15,7 @@ namespace Bud.CSharp.Compiler {
         await context.EvaluateInternalDependencies(buildTarget);
         var outputFile = context.GetCSharpOutputAssemblyFile(buildTarget);
         var framework = context.GetTargetFramework(buildTarget);
-        var sourceFiles = await context.GetCSharpSources(buildTarget);
+        var sourceFiles = await context.GetSourceFiles(buildTarget);
         var libraryDependencies = context.GetReferencedAssemblyPaths(buildTarget);
         var frameworkAssemblies = framework.RuntimeAssemblies;
         if (sourceFiles.Any() && Files.AreFilesNewer(sourceFiles, outputFile)) {

@@ -6,10 +6,12 @@ test-results/
 packages/
 
 # Visual Studio Files
+*.sln
+*.csproj
 *.csproj.user
 *.suo
 *.user
-bud.sln.ide/
+*.sln.ide/
 
 # Editors
 *.swp
