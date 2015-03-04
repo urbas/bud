@@ -15,7 +15,7 @@ namespace Bud.CSharp.Compiler {
         var outputFile = context.GetCSharpOutputAssemblyFile(buildTarget);
         var framework = context.GetTargetFramework(buildTarget);
         var sourceFiles = await context.GetCSharpSources(buildTarget);
-        var libraryDependencies = context.GetReferencedAssemblies(buildTarget);
+        var libraryDependencies = context.GetReferencedAssemblyPaths(buildTarget);
         var frameworkAssemblies = framework.RuntimeAssemblies;
         if (sourceFiles.Any() && Files.AreFilesNewer(sourceFiles, outputFile)) {
           Compile(context, buildTarget, outputFile, framework, libraryDependencies, frameworkAssemblies, sourceFiles);

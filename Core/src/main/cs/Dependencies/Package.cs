@@ -10,7 +10,7 @@ using NuGet;
 namespace Bud.Dependencies {
   public class Package : IDependency, IPackage {
     [JsonProperty(PropertyName = "Version")] private readonly SemanticVersion version;
-    public readonly ImmutableList<AssemblyRereference> Assemblies;
+    public readonly ImmutableList<AssemblyReference> Assemblies;
     [JsonProperty(PropertyName = "Dependencies", NullValueHandling = NullValueHandling.Ignore)] private readonly ImmutableList<PackageDependencyInfo> dependencies;
 
     [JsonIgnore]
@@ -32,15 +32,15 @@ namespace Bud.Dependencies {
     }
 
     [JsonConstructor]
-    public Package(SemanticVersion version, IEnumerable<AssemblyRereference> assemblies, IEnumerable<PackageDependencyInfo> dependencies) {
+    public Package(SemanticVersion version, IEnumerable<AssemblyReference> assemblies, IEnumerable<PackageDependencyInfo> dependencies) {
       this.version = version;
-      Assemblies = assemblies == null ? ImmutableList<AssemblyRereference>.Empty : assemblies.Select(assemblyReference => assemblyReference.WithHostPackage(this)).ToImmutableList();
+      Assemblies = assemblies == null ? ImmutableList<AssemblyReference>.Empty : assemblies.Select(assemblyReference => assemblyReference.WithHostPackage(this)).ToImmutableList();
       this.dependencies = dependencies == null || dependencies.IsEmpty() ? null : dependencies.ToImmutableList();
     }
 
     public Package(IPackage package) :
       this(package.Version,
-           package.AssemblyReferences.Select(assemblyReference => new AssemblyRereference(assemblyReference)),
+           package.AssemblyReferences.Select(assemblyReference => new AssemblyReference(assemblyReference)),
            package.DependencySets.SelectMany(dependencySet => dependencySet.Dependencies.Select(dependency => new PackageDependencyInfo(dependency, dependencySet.TargetFramework, dependencySet.SupportedFrameworks)))) {}
 
     public IPackage AsPackage(IConfig config) {

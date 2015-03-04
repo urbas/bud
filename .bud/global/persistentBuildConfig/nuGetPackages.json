@@ -1,6 +1,24 @@
 {
   "Packages": [
     {
+      "Id": "Antlr4.StringTemplate",
+      "Versions": [
+        {
+          "Version": "4.0.6.9004",
+          "Assemblies": [
+            {
+              "Name": "Antlr4.StringTemplate.dll",
+              "Path": "lib/net35/Antlr4.StringTemplate.dll",
+              "Framework": ".NETFramework,Version=v3.5",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v3.5"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": "Microsoft.Bcl.Immutable",
       "Versions": [
         {

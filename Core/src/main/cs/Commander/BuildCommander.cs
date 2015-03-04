@@ -29,7 +29,7 @@ namespace Bud.Commander {
                CSharpKeys.SourceFiles.Modify(AddBuildDefinitionSourceFile),
                CSharpKeys.OutputAssemblyDir.Modify(BuildDirs.GetBaseDir),
                CSharpKeys.OutputAssemblyName.Modify("Build"),
-               CSharpKeys.ReferencedAssemblies.Modify(AddBudAssemblies)));
+               CSharpKeys.ReferencedAssemblyPaths.Modify(AddBudAssemblies)));
     }
 
     private static async Task<IBuildCommander> CreateBuildCommander(IContext context, Key buildLoadingProject) {

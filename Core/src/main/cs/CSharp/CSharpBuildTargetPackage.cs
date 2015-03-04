@@ -16,14 +16,15 @@ namespace Bud.CSharp {
 
     public CSharpBuildTargetPackage(IConfig config, Key buildTarget) {
       var project = BuildTargetUtils.ProjectOf(buildTarget);
-      Id = BuildTargetUtils.IdOf(buildTarget);
+      Id = BuildTargetUtils.PackageIdOf(buildTarget);
       Version = config.GetVersionOf(project);
       AssemblyReferences = ImmutableList.Create<IPackageAssemblyReference>(new CSharpBuildTargetAssembly(config, buildTarget));
     }
 
-    public string Id { get; private set; }
+    public string Id { get; }
 
-    public SemanticVersion Version { get; private set; }
+    public SemanticVersion Version { get; }
+    public IEnumerable<IPackageAssemblyReference> AssemblyReferences { get; }
 
     public string Title {
       get { throw new NotImplementedException(); }
@@ -132,7 +133,5 @@ namespace Bud.CSharp {
     public DateTimeOffset? Published {
       get { throw new NotImplementedException(); }
     }
-
-    public IEnumerable<IPackageAssemblyReference> AssemblyReferences { get; private set; }
   }
 }

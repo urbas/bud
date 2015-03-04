@@ -8,7 +8,6 @@ using Bud.Build;
 using Bud.CSharp.Compiler;
 using Bud.Dependencies;
 using Bud.Publishing;
-using Bud.Util;
 using NuGet;
 
 namespace Bud.CSharp {
@@ -24,9 +23,11 @@ namespace Bud.CSharp {
                                     CSharpKeys.TargetFramework.Init(GetDefaultFramework),
                                     CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
                                     BuildKeys.Build.Modify(BuildTaskImpl),
-                                    CSharpKeys.ReferencedAssemblies.Init(ReferencedAssembliesImpl),
+                                    CSharpKeys.AssemblyReferences.Init(AssemblyReferencesImpl),
+                                    CSharpKeys.ReferencedAssemblyPaths.Init(ReferencedAssemblyPathsImpl),
                                     CSharpKeys.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
-                                    CSharpKeys.OutputAssemblyName.Init(OutputAssemblyName),
+                                    CSharpKeys.OutputAssemblyName.Init(GetDefaultOutputAssemblyName),
+                                    CSharpKeys.RootNamespace.Init(GetDefaultRootNamespace),
                                     CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile),
                                     CSharpKeys.Dist.Init(CreateDistributablePackage),
                                     PublishingPlugin.Init());
@@ -49,8 +50,12 @@ namespace Bud.CSharp {
       return Path.Combine(context.GetOutputDir(buildTarget), "debug", "bin");
     }
 
-    private static string OutputAssemblyName(IConfig context, Key buildTarget) {
-      return BuildTargetUtils.IdOf(buildTarget);
+    private static string GetDefaultOutputAssemblyName(IConfig context, Key buildTarget) {
+      return BuildTargetUtils.PackageIdOf(buildTarget);
+    }
+
+    private static string GetDefaultRootNamespace(IConfig context, Key buildTarget) {
+      return context.GetCSharpOutputAssemblyName(buildTarget);
     }
 
     private static string GetDefaultOutputAssemblyFile(IConfig context, Key buildTarget) {
@@ -65,9 +70,13 @@ namespace Bud.CSharp {
       return ImmutableList<string>.Empty;
     }
 
-    private IEnumerable<string> ReferencedAssembliesImpl(IConfig config, Key buildTarget) {
+    private IEnumerable<IPackageAssemblyReference> AssemblyReferencesImpl(IConfig config, Key buildTarget) {
       return config.GetDependencies(buildTarget)
-                   .Select(dependency => GetCompatibleAssembly(config, buildTarget, dependency))
+                   .Select(dependency => GetCompatibleAssembly(config, buildTarget, dependency));
+    }
+
+    private IEnumerable<string> ReferencedAssemblyPathsImpl(IConfig config, Key buildTarget) {
+      return config.GetAssemblyReferences(buildTarget)
                    .Select(assembly => assembly.EffectivePath);
     }
 
@@ -114,7 +123,7 @@ namespace Bud.CSharp {
 
     private async Task CreateDistributablePackage(IContext context, Key buildTarget) {
       await context.Evaluate(buildTarget / BuildKeys.Build);
-      var referencedAssemblies = context.GetReferencedAssemblies(buildTarget);
+      var referencedAssemblies = context.GetReferencedAssemblyPaths(buildTarget);
       var targetDir = Path.Combine(context.GetOutputDir(buildTarget), "dist");
       Directory.CreateDirectory(targetDir);
       foreach (var referencedAssembly in referencedAssemblies) {

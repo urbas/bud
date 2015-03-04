@@ -1,43 +1,36 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Versioning;
+using Bud.Build;
 using NuGet;
 
 namespace Bud.CSharp {
   public class CSharpBuildTargetAssembly : IPackageAssemblyReference {
-    private readonly string path;
     private readonly Framework targetFramework;
-    private readonly string name;
 
     public CSharpBuildTargetAssembly(IConfig config, Key buildTarget) {
-      path = config.GetCSharpOutputAssemblyFile(buildTarget);
+      BuildTarget = buildTarget;
+      Path = config.GetCSharpOutputAssemblyFile(buildTarget);
       targetFramework = config.GetTargetFramework(buildTarget);
-      name = config.GetCSharpOutputAssemblyName(buildTarget);
+      Name = config.GetCSharpOutputAssemblyName(buildTarget);
+      Id = BuildTargetUtils.PackageIdOf(buildTarget);
     }
 
-    public IEnumerable<FrameworkName> SupportedFrameworks {
-      get { return null; }
-    }
+    public string Id { get; }
 
-    public Stream GetStream() {
-      return new FileStream(EffectivePath, FileMode.Open);
-    }
+    public Key BuildTarget { get; }
 
-    public string Path {
-      get { return path; }
-    }
+    public IEnumerable<FrameworkName> SupportedFrameworks => null;
 
-    public string EffectivePath {
-      get { return path; }
-    }
+    public Stream GetStream() => new FileStream(EffectivePath, FileMode.Open);
 
-    public FrameworkName TargetFramework {
-      get { return targetFramework.FrameworkName; }
-    }
+    public string Path { get; }
 
-    public string Name {
-      get { return name; }
-    }
+    public string EffectivePath => Path;
+
+    public FrameworkName TargetFramework => targetFramework.FrameworkName;
+
+    public string Name { get; }
 
     public IPackageFile ToPackagedAssembly() {
       return new PhysicalPackageFile {

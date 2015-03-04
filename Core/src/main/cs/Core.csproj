@@ -32,6 +32,9 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Antlr4.StringTemplate">
+      <HintPath>..\..\..\..\.bud\global\nuGetRepository\Antlr4.StringTemplate.4.0.6.9004\lib\net35\Antlr4.StringTemplate.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data.Linq" />
@@ -70,7 +73,7 @@
     <Compile Include="CSharp\CSharpKeys.cs" />
     <Compile Include="CSharp\CSharpInternalDependency.cs" />
     <Compile Include="CSharp\Framework.cs" />
-    <Compile Include="Dependencies\AssemblyRereference.cs" />
+    <Compile Include="Dependencies\AssemblyReference.cs" />
     <Compile Include="Dependencies\DependenciesConfig.cs" />
     <Compile Include="Dependencies\DependenciesKeys.cs" />
     <Compile Include="Dependencies\DependenciesPlugin.cs" />
@@ -137,5 +140,8 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\resources\CsProjectTemplate.csproj" />
   </ItemGroup>
 </Project>
