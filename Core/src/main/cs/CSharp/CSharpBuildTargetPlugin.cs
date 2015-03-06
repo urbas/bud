@@ -8,6 +8,7 @@ using Bud.Build;
 using Bud.CSharp.Compiler;
 using Bud.Dependencies;
 using Bud.Publishing;
+using Bud.SolutionExporter;
 using NuGet;
 
 namespace Bud.CSharp {
@@ -30,7 +31,8 @@ namespace Bud.CSharp {
                                     CSharpKeys.RootNamespace.Init(GetDefaultRootNamespace),
                                     CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile),
                                     CSharpKeys.Dist.Init(CreateDistributablePackage),
-                                    PublishingPlugin.Init());
+                                    PublishingPlugin.Init(),
+                                    SolutionExporterPlugin.Init());
     }
 
     private static Framework GetDefaultFramework(IConfig config) {

@@ -3,7 +3,6 @@ using Bud.CSharp;
 using Bud.Projects;
 using Bud.Resources;
 using Bud.Publishing;
-using Bud.SolutionExporter;
 using System.IO;
 
 public class Build : IBuild {
@@ -11,7 +10,6 @@ public class Build : IBuild {
     return settings
       .Globally(CSharpKeys.TargetFramework.Init(Framework.Net46))
       .Version("0.0.2")
-      .GenerateSolution()
       .Project("bud", Path.Combine(baseDir, "bud"), Cs.Exe(
         Cs.Dependency("Bud.Core"),
         CSharpKeys.RootNamespace.Modify("Bud")
