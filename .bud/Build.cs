@@ -29,8 +29,7 @@ public class Build : IBuild {
         Cs.Dependency("NUnit")
       ))
       .Project("Bud.SystemTests", Path.Combine(baseDir, "SystemTests"), Cs.Test(
-        Cs.Dependency("Bud.Test"),
-        CSharpKeys.RootNamespace.Modify("Bud")
+        Cs.Dependency("Bud.Test")
       ));
   }
 }

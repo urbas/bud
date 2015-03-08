@@ -57,7 +57,8 @@ namespace Bud.CSharp {
     }
 
     private static string GetDefaultRootNamespace(IConfig context, Key buildTarget) {
-      return context.GetCSharpOutputAssemblyName(buildTarget);
+      var mainCSharpBuildTarget = BuildTargetUtils.ProjectOf(buildTarget) / BuildKeys.Main / CSharpKeys.CSharp;
+      return BuildTargetUtils.PackageIdOf(mainCSharpBuildTarget);
     }
 
     private static string GetDefaultOutputAssemblyFile(IConfig context, Key buildTarget) {
