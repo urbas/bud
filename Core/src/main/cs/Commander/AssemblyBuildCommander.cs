@@ -11,8 +11,8 @@ namespace Bud.Commander {
     private IConfig config;
 
     public void LoadBuildConfiguration(string buildConfigurationAssemblyFile, string baseDirectory, TextWriter standardOutputTextWriter, TextWriter standardErrorTextWriter) {
-//      Console.SetOut(new NonSerializingOutputWriter(standardOutputTextWriter));
-//      Console.SetError(new NonSerializingOutputWriter(standardErrorTextWriter));
+      Console.SetOut(new NonSerializingOutputWriter(standardOutputTextWriter));
+      Console.SetError(new NonSerializingOutputWriter(standardErrorTextWriter));
       var assembly = AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(buildConfigurationAssemblyFile));
       var build = (IBuild) assembly.CreateInstance("Build");
       settings = build.Setup(GlobalBuild.New(baseDirectory), baseDirectory);

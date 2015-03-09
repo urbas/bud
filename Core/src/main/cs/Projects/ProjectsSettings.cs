@@ -29,10 +29,7 @@ namespace Bud.Projects {
     }
 
     private static SemanticVersion VersionImpl(IConfig config) {
-      if (config.IsConfigDefined(ProjectKeys.Version)) {
-        return config.Evaluate(ProjectKeys.Version);
-      }
-      return SemanticVersion.Parse("0.0.1-SNAPSHOT");
+      return config.IsConfigDefined(ProjectKeys.Version) ? config.Evaluate(ProjectKeys.Version) : SemanticVersion.Parse("0.0.1-SNAPSHOT");
     }
   }
 }
