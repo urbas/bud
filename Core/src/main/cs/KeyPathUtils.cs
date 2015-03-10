@@ -34,7 +34,7 @@ namespace Bud {
     }
 
     public static bool IsRootPath(string path) {
-      return path.Length == 1 && IsAbsolutePath(path);
+      return Key.KeySeparatorAsString.Equals(path);
     }
 
     public static bool IsAbsolutePath(string path) {
@@ -78,6 +78,13 @@ namespace Bud {
         throw new ArgumentException("Could not parse the id '" + id + "'. It contains a key separator.");
       }
       return id;
+    }
+
+    public static string NormalizePath(string path) {
+      if (string.IsNullOrEmpty(path)) {
+        throw new ArgumentException("The key path cannot be empty.");
+      }
+      return path;
     }
   }
 }

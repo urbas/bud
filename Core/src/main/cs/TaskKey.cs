@@ -12,25 +12,15 @@ namespace Bud {
       UnderlyingKey = underlyingKey;
     }
 
-    public static implicit operator TaskKey(Key key) {
-      return new TaskKey(key);
-    }
+    public static implicit operator TaskKey(Key key) => new TaskKey(key);
 
-    public static implicit operator Key(TaskKey key) {
-      return key.UnderlyingKey;
-    }
+    public static implicit operator Key(TaskKey key) => key.UnderlyingKey;
 
-    public static Key operator /(TaskKey parent, Key child) {
-      return Key.Define(parent, child);
-    }
+    public static Key operator /(TaskKey parent, Key child) => Key.Define(parent, child);
 
-    public static Key operator /(TaskKey parent, string id) {
-      return Key.Define(parent, id);
-    }
+    public static Key operator /(TaskKey parent, string id) => Key.Define(parent, id);
 
-    public static TaskKey operator /(Key parent, TaskKey child) {
-      return Key.Define(parent, child);
-    }
+    public static TaskKey operator /(Key parent, TaskKey child) => Key.Define(parent, child);
 
     public Setup Init(Func<IContext, Task> taskDefinition) {
       return settings => settings.Add(new InitializeTask(settings.Scope / this, taskDefinition));
@@ -81,72 +71,42 @@ namespace Bud {
       return settings => settings.Add(new AddDependencies(settings.Scope / this, dependents));
     }
 
-    public string Id {
-      get { return UnderlyingKey.Id; }
-    }
+    public string Id => UnderlyingKey.Id;
 
-    public string Description {
-      get { return UnderlyingKey.Description; }
-    }
+    public string Description => UnderlyingKey.Description;
 
-    public ImmutableList<string> PathComponents {
-      get { return UnderlyingKey.PathComponents; }
-    }
+    public ImmutableList<string> PathComponents => UnderlyingKey.PathComponents;
 
-    public bool IsRoot {
-      get { return UnderlyingKey.IsRoot; }
-    }
+    public bool IsRoot => UnderlyingKey.IsRoot;
 
-    public bool IsAbsolute {
-      get { return UnderlyingKey.IsAbsolute; }
-    }
+    public bool IsAbsolute => UnderlyingKey.IsAbsolute;
 
-    public Key Parent {
-      get { return UnderlyingKey.Parent; }
-    }
+    public Key Parent => UnderlyingKey.Parent;
 
-    public Key Leaf {
-      get { return UnderlyingKey.Leaf; }
-    }
+    public Key Leaf => UnderlyingKey.Leaf;
 
-    public string Path {
-      get { return UnderlyingKey.Path; }
-    }
+    public string Path => UnderlyingKey.Path;
 
-    public bool Equals(IKey otherKey) {
-      return UnderlyingKey.Equals(otherKey);
-    }
+    public bool Equals(IKey otherKey) => UnderlyingKey.Equals(otherKey);
 
-    public override int GetHashCode() {
-      return UnderlyingKey.GetHashCode();
-    }
+    public override int GetHashCode() => UnderlyingKey.GetHashCode();
 
-    public override bool Equals(object obj) {
-      return obj != null && obj.Equals(UnderlyingKey);
-    }
+    public override bool Equals(object obj) => obj != null && obj.Equals(UnderlyingKey);
 
-    public override string ToString() {
-      return UnderlyingKey.ToString();
-    }
+    public override string ToString() => UnderlyingKey.ToString();
   }
 
   /// <summary>
   ///   Values of this key are evaluated once per evaluation context.
   /// </summary>
   public class TaskKey<T> : TaskKey {
-    public static implicit operator TaskKey<T>(Key key) {
-      return new TaskKey<T>(key);
-    }
+    public static implicit operator TaskKey<T>(Key key) => new TaskKey<T>(key);
 
-    public static implicit operator Key(TaskKey<T> key) {
-      return key.UnderlyingKey;
-    }
+    public static implicit operator Key(TaskKey<T> key) => key.UnderlyingKey;
 
     private TaskKey(Key underlyingKey) : base(underlyingKey) {}
 
-    public static TaskKey<T> operator /(Key parent, TaskKey<T> child) {
-      return Key.Define(parent, child);
-    }
+    public static TaskKey<T> operator /(Key parent, TaskKey<T> child) => Key.Define(parent, child);
 
     public Setup InitSync(Func<T> taskDefinition) {
       return settings => settings.Add(new InitializeTask<T>(settings.Scope / this, ctxt => Task.FromResult(taskDefinition())));

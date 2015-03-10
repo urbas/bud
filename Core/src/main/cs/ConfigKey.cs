@@ -10,85 +10,47 @@ namespace Bud {
       UnderlyingKey = underlyingKey;
     }
 
-    public static implicit operator ConfigKey(Key key) {
-      return new ConfigKey(key);
-    }
+    public static implicit operator ConfigKey(Key key) => new ConfigKey(key);
 
-    public static implicit operator Key(ConfigKey key) {
-      return key.UnderlyingKey;
-    }
+    public static implicit operator Key(ConfigKey key) => key.UnderlyingKey;
 
-    public static Key operator /(ConfigKey parent, Key child) {
-      return Key.Define(parent, child);
-    }
+    public static Key operator /(ConfigKey parent, Key child) => Key.Define(parent, child);
 
-    public static Key operator /(ConfigKey parent, string id) {
-      return Key.Define(parent, id);
-    }
+    public static Key operator /(ConfigKey parent, string id) => Key.Define(parent, id);
 
-    public string Id {
-      get { return UnderlyingKey.Id; }
-    }
+    public string Id => UnderlyingKey.Id;
 
-    public string Description {
-      get { return UnderlyingKey.Description; }
-    }
+    public string Description => UnderlyingKey.Description;
 
-    public ImmutableList<string> PathComponents {
-      get { return UnderlyingKey.PathComponents; }
-    }
+    public ImmutableList<string> PathComponents => UnderlyingKey.PathComponents;
 
-    public bool IsRoot {
-      get { return UnderlyingKey.IsRoot; }
-    }
+    public bool IsRoot => UnderlyingKey.IsRoot;
 
-    public bool IsAbsolute {
-      get { return UnderlyingKey.IsAbsolute; }
-    }
+    public bool IsAbsolute => UnderlyingKey.IsAbsolute;
 
-    public Key Parent {
-      get { return UnderlyingKey.Parent; }
-    }
+    public Key Parent => UnderlyingKey.Parent;
 
-    public Key Leaf {
-      get { return UnderlyingKey.Leaf; }
-    }
+    public Key Leaf => UnderlyingKey.Leaf;
 
-    public string Path {
-      get { return UnderlyingKey.Path; }
-    }
+    public string Path => UnderlyingKey.Path;
 
-    public bool Equals(IKey otherKey) {
-      return UnderlyingKey.Equals(otherKey);
-    }
+    public bool Equals(IKey otherKey) => UnderlyingKey.Equals(otherKey);
 
-    public override int GetHashCode() {
-      return UnderlyingKey.GetHashCode();
-    }
+    public override int GetHashCode() => UnderlyingKey.GetHashCode();
 
-    public override bool Equals(object obj) {
-      return obj != null && obj.Equals(UnderlyingKey);
-    }
+    public override bool Equals(object obj) => obj != null && obj.Equals(UnderlyingKey);
 
-    public override string ToString() {
-      return UnderlyingKey.ToString();
-    }
+    public override string ToString() => UnderlyingKey.ToString();
   }
 
   public class ConfigKey<T> : ConfigKey {
-    public static implicit operator ConfigKey<T>(Key key) {
-      return new ConfigKey<T>(key);
-    }
-
-    public static implicit operator Key(ConfigKey<T> key) {
-      return key.UnderlyingKey;
-    }
-
     private ConfigKey(Key underlyingKey) : base(underlyingKey) {}
 
-    public static ConfigKey<T> operator /(Key parent, ConfigKey<T> child) {
-      return Key.Define(parent, child);
-    }
+    public static implicit operator ConfigKey<T>(Key key) => new ConfigKey<T>(key);
+
+    public static implicit operator Key(ConfigKey<T> key) => key.UnderlyingKey;
+
+    public static ConfigKey<T> operator /(Key parent, ConfigKey<T> child) => Key.Define(parent, child);
 
     public Setup Init(T configValue) {
       return settings => settings.Add(new InitializeConfig<T>(settings.Scope / this, configValue));

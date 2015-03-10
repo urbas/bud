@@ -159,7 +159,7 @@ namespace Bud {
     [Test]
     [ExpectedException(typeof (ArgumentException))]
     public void Parse_MUST_throw_an_exception_WHEN_given_an_empty_string() {
-      Key.Parse(String.Empty);
+      Key.Parse(string.Empty);
     }
 
     [Test]

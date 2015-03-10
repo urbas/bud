@@ -13,6 +13,11 @@ namespace Bud {
     private string CachedId;
     private Key CachedLeaf;
 
+    internal Key(string path, string description = null) {
+      Description = description;
+      Path = KeyPathUtils.NormalizePath(path);
+    }
+
     public static Key Define(string id, string description = null) {
       return new Key(KeyPathUtils.ParseId(id), description);
     }
@@ -37,11 +42,6 @@ namespace Bud {
       return new Key(KeyPathUtils.JoinPath(parentKey.Path, KeyPathUtils.ParseId(id)), description);
     }
 
-    internal Key(string path, string description = null) {
-      Description = description;
-      Path = path;
-    }
-
     public string Description { get; }
 
     public Key Leaf {
@@ -50,8 +50,7 @@ namespace Bud {
           if (IsRoot) {
             CachedLeaf = this;
           } else {
-            var leafId = KeyPathUtils.ExtractIdFromPath(Path);
-            CachedLeaf = leafId.Equals(Path) ? this : new Key(leafId, Description);
+            CachedLeaf = Id.Equals(Path) ? this : new Key(Id, Description);
           }
         }
         return CachedLeaf;
@@ -72,7 +71,7 @@ namespace Bud {
       get {
         if (CachedParent == null) {
           var parentPath = KeyPathUtils.ExtractParentPath(Path);
-          CachedParent = KeyPathUtils.IsRootPath(parentPath) ? Root : new Key(parentPath, KeyPathUtils.ExtractIdFromPath(parentPath));
+          CachedParent = KeyPathUtils.IsRootPath(parentPath) ? Root : new Key(parentPath);
         }
         return CachedParent;
       }
@@ -80,7 +79,7 @@ namespace Bud {
 
 
     public static Key Parse(string key) {
-      return KeyPathUtils.IsRootPath(key) ? Root : new Key(key, KeyPathUtils.ExtractIdFromPath(key));
+      return KeyPathUtils.IsRootPath(key) ? Root : new Key(key);
     }
 
     public override bool Equals(object other) {

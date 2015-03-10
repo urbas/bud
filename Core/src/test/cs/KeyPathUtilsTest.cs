@@ -103,5 +103,23 @@ namespace Bud {
       const string id = "foo";
       Assert.AreSame(id, KeyPathUtils.ParseId(id));
     }
+
+    [Test]
+    [ExpectedException(typeof(ArgumentException))]
+    public void NormalizePath_MUST_throw_an_exception_WHEN_given_an_empty_string() {
+      KeyPathUtils.NormalizePath(string.Empty);
+    }
+
+    [Test]
+    [ExpectedException(typeof(ArgumentException))]
+    public void NormalizePath_MUST_throw_an_exception_WHEN_given_null() {
+      KeyPathUtils.NormalizePath(null);
+    }
+
+    [Test]
+    public void NormalizePath_MUST_return_the_given_already_normalized_path() {
+      const string somePath = "/some/path";
+      Assert.AreSame(somePath, KeyPathUtils.NormalizePath(somePath));
+    }
   }
 }
