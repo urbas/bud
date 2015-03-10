@@ -7,20 +7,20 @@ using Bud.Logging;
 
 namespace Bud.Commander {
   public class AssemblyBuildCommander : MarshalByRefObject, IBuildCommander {
-    private Settings settings;
-    private IConfig config;
+    private Settings Settings;
+    private IConfig Config;
 
     public void LoadBuildConfiguration(string buildConfigurationAssemblyFile, string baseDirectory, TextWriter standardOutputTextWriter, TextWriter standardErrorTextWriter) {
       Console.SetOut(new NonSerializingOutputWriter(standardOutputTextWriter));
       Console.SetError(new NonSerializingOutputWriter(standardErrorTextWriter));
       var assembly = AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(buildConfigurationAssemblyFile));
       var build = (IBuild) assembly.CreateInstance("Build");
-      settings = build.Setup(GlobalBuild.New(baseDirectory), baseDirectory);
-      config = new Config(settings.ConfigDefinitions, Logger.CreateFromWriters(standardOutputTextWriter, standardErrorTextWriter));
+      Settings = build.Setup(GlobalBuild.New(baseDirectory), baseDirectory);
+      Config = new Config(Settings.ConfigDefinitions, Logger.CreateFromWriters(standardOutputTextWriter, standardErrorTextWriter));
     }
 
     public object Evaluate(string command) {
-      var context = Context.FromConfig(config, settings.TaskDefinitions);
+      var context = Context.FromConfig(Config, Settings.TaskDefinitions);
       return CommandEvaluator.EvaluateSynchronously(context, command);
     }
 

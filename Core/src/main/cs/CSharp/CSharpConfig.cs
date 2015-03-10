@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Bud.Build;
 using NuGet;
@@ -26,8 +27,10 @@ namespace Bud.CSharp {
       return context.Evaluate(buildTarget / CSharpKeys.OutputAssemblyFile);
     }
 
-    public static IEnumerable<string> GetReferencedAssemblyPaths(this IConfig config, Key project) {
-      return config.Evaluate(project / CSharpKeys.ReferencedAssemblyPaths);
+    public static IEnumerable<string> GetReferencedAssemblyPaths(this IConfig config, Key buildTarget)
+    {
+      return config.GetAssemblyReferences(buildTarget)
+                   .Select(assembly => assembly.EffectivePath);
     }
 
     public static AssemblyType GetCSharpAssemblyType(this IConfig context, Key project) {

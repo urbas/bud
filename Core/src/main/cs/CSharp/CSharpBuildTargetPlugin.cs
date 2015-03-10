@@ -25,7 +25,6 @@ namespace Bud.CSharp {
                                     CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
                                     BuildKeys.Build.Modify(BuildTaskImpl),
                                     CSharpKeys.AssemblyReferences.Init(AssemblyReferencesImpl),
-                                    CSharpKeys.ReferencedAssemblyPaths.Init(ReferencedAssemblyPathsImpl),
                                     CSharpKeys.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
                                     CSharpKeys.OutputAssemblyName.Init(GetDefaultOutputAssemblyName),
                                     CSharpKeys.RootNamespace.Init(GetDefaultRootNamespace),

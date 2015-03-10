@@ -7,6 +7,7 @@ using Bud.Build;
 using Bud.CSharp;
 using Bud.Logging;
 using Bud.Projects;
+using NuGet;
 
 namespace Bud.Commander {
   public static class BuildCommander {
@@ -29,7 +30,7 @@ namespace Bud.Commander {
                BuildTargetKeys.SourceFiles.Modify(AddBuildDefinitionSourceFile),
                CSharpKeys.OutputAssemblyDir.Modify(BuildDirs.GetBaseDir),
                CSharpKeys.OutputAssemblyName.Modify("Build"),
-               CSharpKeys.ReferencedAssemblyPaths.Modify(AddBudAssemblies)));
+               CSharpKeys.AssemblyReferences.Modify(AddBudAssemblies)));
     }
 
     private static async Task<IBuildCommander> CreateBuildCommander(IContext context, Key buildLoadingProject) {
@@ -65,8 +66,8 @@ namespace Bud.Commander {
       return previousSources.Concat(new[] {context.GetBuildConfigSourceFile(key)});
     }
 
-    private static IEnumerable<string> AddBudAssemblies(IConfig config, IEnumerable<string> existingAssemblies) {
-      return existingAssemblies.Concat(BudAssemblies.GetBudAssembliesLocations());
+    private static IEnumerable<IPackageAssemblyReference> AddBudAssemblies(IConfig config, IEnumerable<IPackageAssemblyReference> existingAssemblies) {
+      return existingAssemblies.Concat(BudAssemblies.GetBudAssemblyReferences());
     }
   }
 }

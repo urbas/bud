@@ -1,9 +1,8 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Linq;
 using System.Reflection;
-using Bud.Build;
+using NuGet;
 
 namespace Bud {
 
@@ -20,6 +19,11 @@ namespace Bud {
     public static Assembly GetBudCoreAssembly() {
       return GetBudAssemblies()
         .First(assembly => assembly.GetName().Name.EndsWith(".Core"));
+    }
+
+    public static IEnumerable<IPackageAssemblyReference> GetBudAssemblyReferences() {
+      return GetBudAssemblies()
+        .Select(assembly => new PhysicalPackageAssemblyReference {SourcePath = assembly.Location, TargetPath = assembly.Location});
     }
   }
   

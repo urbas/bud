@@ -114,9 +114,10 @@ namespace Bud.SolutionExporter {
 
     private static IEnumerable<object> CollectAssemblyReferences(IContext context, Key buildTarget, Uri csprojUri) {
       return context.GetAssemblyReferences(buildTarget)
-                    .OfType<AssemblyReference>()
+                    .Where(assemblyReference => !(assemblyReference is CSharpBuildTargetAssembly))
                     .Select(ar => new {
                       Reference = ar,
+                      Name = ar.Name,
                       RelativePath = csprojUri.MakeRelativeUri(new Uri(ar.Path))
                     });
     }

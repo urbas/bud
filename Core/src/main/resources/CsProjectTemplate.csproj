@@ -37,7 +37,7 @@
     <Reference Include="System.Data.Linq" />
 
 %assemblyReferences:{ assemblyReference |
-    <Reference Include="%assemblyReference.Reference.HostPackage.Id%">
+    <Reference Include="%assemblyReference.Name%">
       <HintPath>%assemblyReference.RelativePath%</HintPath>
     </Reference>
 }%
