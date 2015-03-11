@@ -11,6 +11,7 @@ public class Build : IBuild {
       .Version("0.0.2")
       .Project("bud", Path.Combine(baseDir, "bud"), Cs.Exe(
         Cs.Dependency("Bud.Core"),
+        Cs.Dependency("CommandLineParser"),
         CSharpKeys.RootNamespace.Modify("Bud")
       ))
       .Project("Bud.Core", Path.Combine(baseDir, "Core"), Res.Main(), Cs.Dll(

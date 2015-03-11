@@ -19,6 +19,40 @@
       ]
     },
     {
+      "Id": "CommandLineParser",
+      "Versions": [
+        {
+          "Version": "1.9.71",
+          "Assemblies": [
+            {
+              "Name": "CommandLine.dll",
+              "Path": "lib/net35/CommandLine.dll",
+              "Framework": ".NETFramework,Version=v3.5",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v3.5"
+              ]
+            },
+            {
+              "Name": "CommandLine.dll",
+              "Path": "lib/net40/CommandLine.dll",
+              "Framework": ".NETFramework,Version=v4.0",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v4.0"
+              ]
+            },
+            {
+              "Name": "CommandLine.dll",
+              "Path": "lib/net45/CommandLine.dll",
+              "Framework": ".NETFramework,Version=v4.5",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v4.5"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": "Microsoft.Bcl.Immutable",
       "Versions": [
         {

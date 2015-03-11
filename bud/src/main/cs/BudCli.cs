@@ -8,12 +8,20 @@ namespace Bud {
     private static readonly string[] DefaultCommandsToExecute = {"build"};
 
     public static void Main(string[] args) {
-      var buildCommander = BuildCommander.Load(Directory.GetCurrentDirectory());
-      var commandsToExecute = args.Length == 0 ? DefaultCommandsToExecute : args;
-      ExecuteCommands(commandsToExecute, buildCommander);
+      var cliArguments = new CliArguments();
+      if (CommandLine.Parser.Default.ParseArguments(args, cliArguments)) {
+        var buildCommander = cliArguments.BuildLevel ? BuildCommander.LoadBuildLevelCommander(Directory.GetCurrentDirectory()) : BuildCommander.Load(Directory.GetCurrentDirectory());
+        ExecuteCommands(CommandsToExecute(cliArguments), buildCommander);
+      } else {
+        Console.Error.Write(cliArguments.GetUsage());
+      }
     }
 
-    private static void ExecuteCommands(string[] commandsToExecute, IBuildCommander buildCommander) {
+    private static IEnumerable<string> CommandsToExecute(CliArguments cliArguments) {
+      return cliArguments.Commands.Count == 0 ? DefaultCommandsToExecute : cliArguments.Commands;
+    }
+
+    private static void ExecuteCommands(IEnumerable<string> commandsToExecute, IBuildCommander buildCommander) {
       foreach (var command in commandsToExecute) {
         try {
           buildCommander.Evaluate(command);

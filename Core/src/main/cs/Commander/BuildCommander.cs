@@ -14,12 +14,16 @@ namespace Bud.Commander {
     private const string BuildDefinitionProjectId = "BuildDefinition";
 
     public static IBuildCommander Load(string path) {
-      var buildProjectDir = Path.Combine(path, BuildDirs.BudDirName);
-      var buildProject = GlobalBuild.New(buildProjectDir).Project(BuildDefinitionProjectId, buildProjectDir, Init(path));
-      var evaluationContext = Context.FromSettings(buildProject, Logger.CreateFromStandardOutputs());
+      var buildSettings = LoadBuildLevelSettings(path);
+      var evaluationContext = Context.FromSettings(buildSettings, Logger.CreateFromStandardOutputs());
       var buildCommanderTask = CreateBuildCommander(evaluationContext, ProjectsSettings.ProjectKey(BuildDefinitionProjectId));
       buildCommanderTask.Wait();
       return buildCommanderTask.Result;
+    }
+
+    private static Settings LoadBuildLevelSettings(string path) {
+      var buildProjectDir = Path.Combine(path, BuildDirs.BudDirName);
+      return GlobalBuild.New(buildProjectDir).Project(BuildDefinitionProjectId, buildProjectDir, Init(path));
     }
 
     private static Setup Init(string dirOfProjectToBeBuilt) {
@@ -68,6 +72,10 @@ namespace Bud.Commander {
 
     private static IEnumerable<IPackageAssemblyReference> AddBudAssemblies(IConfig config, IEnumerable<IPackageAssemblyReference> existingAssemblies) {
       return existingAssemblies.Concat(BudAssemblies.GetBudAssemblyReferences());
+    }
+
+    public static IBuildCommander LoadBuildLevelCommander(string projectLevelDir) {
+      return new DefaultBuildCommander(LoadBuildLevelSettings(projectLevelDir));
     }
   }
 }
