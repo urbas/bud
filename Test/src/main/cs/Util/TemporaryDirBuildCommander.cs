@@ -8,7 +8,7 @@ namespace Bud.Test.Util {
 
     public TemporaryDirBuildCommander(TemporaryDirectory temporaryDirectory) {
       TemporaryDirectory = temporaryDirectory;
-      buildCommander = BuildCommander.Load(TemporaryDirectory.Path);
+      buildCommander = BuildCommander.LoadProjectLevelCommander(TemporaryDirectory.Path);
     }
 
     public object Evaluate(string command) {

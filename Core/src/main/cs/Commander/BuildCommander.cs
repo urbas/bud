@@ -13,7 +13,7 @@ namespace Bud.Commander {
   public static class BuildCommander {
     private const string BuildDefinitionProjectId = "BuildDefinition";
 
-    public static IBuildCommander Load(string path) {
+    public static IBuildCommander LoadProjectLevelCommander(string path) {
       var buildSettings = LoadBuildLevelSettings(path);
       var evaluationContext = Context.FromSettings(buildSettings, Logger.CreateFromStandardOutputs());
       var buildCommanderTask = CreateBuildCommander(evaluationContext, ProjectsSettings.ProjectKey(BuildDefinitionProjectId));

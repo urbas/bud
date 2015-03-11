@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Bud.Commander;
+using Bud.Commander.BuildCommander;
 
 namespace Bud {
   public static class BudCli {
@@ -10,7 +11,7 @@ namespace Bud {
     public static void Main(string[] args) {
       var cliArguments = new CliArguments();
       if (CommandLine.Parser.Default.ParseArguments(args, cliArguments)) {
-        var buildCommander = cliArguments.BuildLevel ? BuildCommander.LoadBuildLevelCommander(Directory.GetCurrentDirectory()) : BuildCommander.Load(Directory.GetCurrentDirectory());
+        var buildCommander = cliArguments.BuildLevel ? LoadBuildLevelCommander(Directory.GetCurrentDirectory()) : LoadProjectLevelCommander(Directory.GetCurrentDirectory());
         ExecuteCommands(CommandsToExecute(cliArguments), buildCommander);
       } else {
         Console.Error.Write(cliArguments.GetUsage());
