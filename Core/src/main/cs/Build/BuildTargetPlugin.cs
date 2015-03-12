@@ -28,7 +28,7 @@ namespace Bud.Build {
             BuildDirsKeys.OutputDir.Init(context => Path.Combine(context.GetOutputDir(project), BuildScope.Id, Language.Id)),
             BuildKeys.Build.Init(BuildTaskImpl),
             buildTargetSettings => Setup(buildTargetSettings, project),
-            setups.ToPlugin())
+            setups.ToSetup())
         .Globally(BuildKeys.Test.Init(TaskUtils.NoOpTask),
                   BuildKeys.Test.DependsOn(project / BuildKeys.Test),
                   BuildKeys.Build.Init(TaskUtils.NoOpTask),

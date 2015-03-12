@@ -16,7 +16,7 @@ namespace Bud.Commander {
     public static IBuildCommander LoadProjectLevelCommander(string path) {
       var buildSettings = LoadBuildLevelSettings(path);
       var evaluationContext = Context.FromSettings(buildSettings, Logger.CreateFromStandardOutputs());
-      var buildCommanderTask = CreateBuildCommander(evaluationContext, ProjectsSettings.ProjectKey(BuildDefinitionProjectId));
+      var buildCommanderTask = CreateBuildCommander(evaluationContext, ProjectPlugin.ProjectKey(BuildDefinitionProjectId));
       buildCommanderTask.Wait();
       return buildCommanderTask.Result;
     }
@@ -34,7 +34,7 @@ namespace Bud.Commander {
                BuildTargetKeys.SourceFiles.Modify(AddBuildDefinitionSourceFile),
                CSharpKeys.OutputAssemblyDir.Modify(BuildDirs.GetBaseDir),
                CSharpKeys.OutputAssemblyName.Modify("Build"),
-               CSharpKeys.AssemblyReferences.Modify(AddBudAssemblies)));
+               BuildCommanderPlugin.BudAssemblyReferences));
     }
 
     private static async Task<IBuildCommander> CreateBuildCommander(IContext context, Key buildLoadingProject) {
@@ -68,10 +68,6 @@ namespace Bud.Commander {
     private static async Task<IEnumerable<string>> AddBuildDefinitionSourceFile(IContext context, Func<Task<IEnumerable<string>>> previousSourcesTask, Key key) {
       var previousSources = await previousSourcesTask();
       return previousSources.Concat(new[] {context.GetBuildConfigSourceFile(key)});
-    }
-
-    private static IEnumerable<IPackageAssemblyReference> AddBudAssemblies(IConfig config, IEnumerable<IPackageAssemblyReference> existingAssemblies) {
-      return existingAssemblies.Concat(BudAssemblies.GetBudAssemblyReferences());
     }
 
     public static IBuildCommander LoadBuildLevelCommander(string projectLevelDir) {

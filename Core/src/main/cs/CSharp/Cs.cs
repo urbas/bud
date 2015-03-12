@@ -5,7 +5,7 @@ using Bud.Projects;
 namespace Bud.CSharp {
   public static class Cs {
     public static Setup Dependency(string packageName, string packageVersion = null, string scope = null) {
-      var dependencyProject = ProjectsSettings.ProjectKey(packageName);
+      var dependencyProject = ProjectPlugin.ProjectKey(packageName);
       var dependencyBuildTarget = dependencyProject / BuildKeys.Main / CSharpKeys.CSharp;
       return DependenciesSettings.AddDependency(
         new CSharpInternalDependency(dependencyBuildTarget),
@@ -18,11 +18,11 @@ namespace Bud.CSharp {
     }
 
     public static Setup Dll(params Setup[] setups) {
-      return CSharpBuildTargetPlugin.Init(BuildKeys.Main, CSharpKeys.AssemblyType.Modify(AssemblyType.Library), setups.ToPlugin());
+      return CSharpBuildTargetPlugin.Init(BuildKeys.Main, CSharpKeys.AssemblyType.Modify(AssemblyType.Library), setups.ToSetup());
     }
 
     public static Setup Test(params Setup[] setups) {
-      return CSharpBuildTargetPlugin.Init(BuildKeys.Test, CSharpKeys.AssemblyType.Modify(AssemblyType.Library), setups.ToPlugin(), AddMainBuildTargetDependency());
+      return CSharpBuildTargetPlugin.Init(BuildKeys.Test, CSharpKeys.AssemblyType.Modify(AssemblyType.Library), setups.ToSetup(), AddMainBuildTargetDependency());
     }
 
     private static Setup AddMainBuildTargetDependency() {

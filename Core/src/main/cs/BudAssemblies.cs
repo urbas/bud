@@ -5,7 +5,6 @@ using System.Reflection;
 using NuGet;
 
 namespace Bud {
-
   public static class BudAssemblies {
     public static IEnumerable<string> GetBudAssembliesLocations() {
       return GetBudAssemblies().Select(assembly => assembly.Location);
@@ -13,7 +12,7 @@ namespace Bud {
 
     public static IEnumerable<Assembly> GetBudAssemblies() {
       return AppDomain.CurrentDomain.GetAssemblies()
-        .Where(assembly => assembly.GetName().Name.StartsWith("Bud."));
+                      .Where(assembly => assembly.GetName().Name.StartsWith("Bud."));
     }
 
     public static Assembly GetBudCoreAssembly() {
@@ -26,5 +25,4 @@ namespace Bud {
         .Select(assembly => new PhysicalPackageAssemblyReference {SourcePath = assembly.Location, TargetPath = assembly.Location});
     }
   }
-  
 }
