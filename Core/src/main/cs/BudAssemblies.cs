@@ -6,23 +6,26 @@ using NuGet;
 
 namespace Bud {
   public static class BudAssemblies {
-    public static IEnumerable<string> GetBudAssembliesLocations() {
-      return GetBudAssemblies().Select(assembly => assembly.Location);
+    public static IEnumerable<Assembly> AllAssemblies { get; } = AppDomain.CurrentDomain
+                                                                          .GetAssemblies()
+                                                                          .Where(IsBudAssembly);
+
+    public static IEnumerable<string> AssemblyLocations { get; } = AllAssemblies.Select(assembly => assembly.Location);
+
+    public static Assembly CoreAssembly { get; } = AllAssemblies.First(IsCoreAssembly);
+
+    public static IEnumerable<IPackageAssemblyReference> AssemblyReferences { get; } = AllAssemblies.Select(ToAssembyReference);
+
+    private static bool IsBudAssembly(Assembly assembly) {
+      return assembly.GetName().Name.StartsWith("Bud.");
     }
 
-    public static IEnumerable<Assembly> GetBudAssemblies() {
-      return AppDomain.CurrentDomain.GetAssemblies()
-                      .Where(assembly => assembly.GetName().Name.StartsWith("Bud."));
+    private static bool IsCoreAssembly(Assembly assembly) {
+      return assembly.GetName().Name.EndsWith(".Core");
     }
 
-    public static Assembly GetBudCoreAssembly() {
-      return GetBudAssemblies()
-        .First(assembly => assembly.GetName().Name.EndsWith(".Core"));
-    }
-
-    public static IEnumerable<IPackageAssemblyReference> GetBudAssemblyReferences() {
-      return GetBudAssemblies()
-        .Select(assembly => new PhysicalPackageAssemblyReference {SourcePath = assembly.Location, TargetPath = assembly.Location});
+    private static PhysicalPackageAssemblyReference ToAssembyReference(Assembly assembly) {
+      return new PhysicalPackageAssemblyReference {SourcePath = assembly.Location, TargetPath = assembly.Location};
     }
   }
 }

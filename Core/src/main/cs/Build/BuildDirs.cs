@@ -5,7 +5,6 @@ using Bud.Util;
 
 namespace Bud.Build {
   public static class BuildDirs {
-    public const string BudDirName = ".bud";
     public const string OutputDirName = "output";
     public const string BuildConfigCacheDirName = "buildConfigCache";
     public const string PersistentBuildConfigDirName = "persistentBuildConfig";
@@ -40,7 +39,7 @@ namespace Bud.Build {
     }
 
     public static string GetDefaultBudDir(this IConfig ctxt, Key key) {
-      return Path.Combine(ctxt.GetBaseDir(key), BudDirName);
+      return Path.Combine(ctxt.GetBaseDir(key), BudPaths.BudDirName);
     }
 
     /// <returns>The directory where build output (such as compiled assemblies) are stored.</returns>

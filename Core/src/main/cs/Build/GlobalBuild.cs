@@ -15,7 +15,7 @@ namespace Bud.Build {
     }
 
     private static string GetDefaultGlobalBudDir(IConfig ctxt) {
-      return Path.Combine(ctxt.GetBaseDir(), BuildDirs.BudDirName, "global");
+      return Path.Combine(ctxt.GetBaseDir(), BudPaths.BudDirName, "global");
     }
   }
 

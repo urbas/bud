@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using Bud.Build;
+using Bud.BuildDefinition;
 using Bud.Commander;
 using Bud.CSharp;
 using NuGet;
@@ -18,7 +19,7 @@ namespace Bud.Projects {
     }
 
     public static Setup BudPlugin(string projectId, string baseDir, Setup[] setups) {
-      return Project(projectId, baseDir, Cs.Dll(BuildCommanderPlugin.BudAssemblyReferences, setups.ToSetup()));
+      return Project(projectId, baseDir, Cs.Dll(BuildDefinitionPlugin.BudAssemblyReferences, setups.ToSetup()));
     }
 
     public static Key ProjectKey(string projectId) {

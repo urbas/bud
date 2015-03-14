@@ -4,8 +4,8 @@ using CommandLine.Text;
 
 namespace Bud {
   public class CliArguments {
-    [Option('b', "build-level", DefaultValue = false, HelpText = "When set, evaluates the commands at the build level.")]
-    public bool BuildLevel { get; set; }
+    [Option('b', "build-level", DefaultValue = 0, HelpText = "The build configuration level at which to evaluate tasks. Level 0 corresponds to the build configuration defined in '.bud/Build.cs', level 1 to '.bud/.bud/Build.cs' and so on.")]
+    public int BuildLevel { get; set; }
 
     [ValueList(typeof(List<string>))]
     public IList<string> Commands { get; set; }

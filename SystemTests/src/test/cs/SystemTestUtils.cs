@@ -20,7 +20,7 @@ namespace Bud {
     }
 
     private static string OutputAssemblyPath(Key buildScope, string projectBaseDir, string fileName) {
-      var projectOutputSubPath = Path.Combine(BuildDirs.BudDirName, BuildDirs.OutputDirName, buildScope.Id, CSharpKeys.CSharp.Id, "debug", "bin", fileName);
+      var projectOutputSubPath = Path.Combine(BudPaths.BudDirName, BuildDirs.OutputDirName, buildScope.Id, CSharpKeys.CSharp.Id, "debug", "bin", fileName);
       return Path.Combine(projectBaseDir, projectOutputSubPath);
     }
   }

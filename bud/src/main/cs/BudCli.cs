@@ -1,24 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Bud.Build;
 using Bud.Commander;
 using Bud.Commander.BuildCommander;
 
 namespace Bud {
   public static class BudCli {
-    private static readonly string[] DefaultCommandsToExecute = {"build"};
+    private static readonly string[] DefaultCommandsToExecute = {BuildKeys.Build.Id};
 
     public static void Main(string[] args) {
       var cliArguments = new CliArguments();
       if (CommandLine.Parser.Default.ParseArguments(args, cliArguments)) {
-        var buildCommander = cliArguments.BuildLevel ? LoadBuildLevelCommander(Directory.GetCurrentDirectory()) : LoadProjectLevelCommander(Directory.GetCurrentDirectory());
-        ExecuteCommands(CommandsToExecute(cliArguments), buildCommander);
+        ExecuteCommands(cliArguments);
       } else {
         Console.Error.Write(cliArguments.GetUsage());
       }
     }
 
-    private static IEnumerable<string> CommandsToExecute(CliArguments cliArguments) {
+    private static void ExecuteCommands(CliArguments cliArguments) {
+      var buildCommander = LoadBuildCommander(cliArguments.BuildLevel, Directory.GetCurrentDirectory());
+      var commandsToExecute = GetCommandsToExecute(cliArguments);
+      ExecuteCommands(commandsToExecute, buildCommander);
+    }
+
+    private static IEnumerable<string> GetCommandsToExecute(CliArguments cliArguments) {
       return cliArguments.Commands.Count == 0 ? DefaultCommandsToExecute : cliArguments.Commands;
     }
 
