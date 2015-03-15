@@ -11,8 +11,8 @@ namespace Bud.BuildDefinition {
       return context.Evaluate(buildLoadingProject / BuildDefinitionKeys.DirOfProjectToBeBuilt);
     }
 
-    public static async Task<IBuildCommander> CreateBuildCommander(this IContext context, Key buildLoadingProject) {
-      return await context.Evaluate(buildLoadingProject / BuildDefinitionKeys.CreateBuildCommander);
+    public static async Task<IBuildCommander> CreateBuildCommander(this IContext context, Key buildDefinitionProject) {
+      return await context.Evaluate(buildDefinitionProject / BuildDefinitionKeys.CreateBuildCommander);
     }
   }
 }

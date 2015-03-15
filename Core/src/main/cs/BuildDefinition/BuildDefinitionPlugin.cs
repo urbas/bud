@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Bud.Build;
 using Bud.Commander;
 using Bud.CSharp;
+using Bud.Projects;
 using NuGet;
 
 namespace Bud.BuildDefinition {
@@ -14,6 +15,7 @@ namespace Bud.BuildDefinition {
     public const string BuildDefinitionProjectId = "BuildDefinition";
     public const string BuildDefinitionAssemblyName = "Build";
     public const string BuildDefinitionMainSourceFile = "Build.cs";
+    public static readonly Key BuildDefinitionProjectKey = ProjectPlugin.ProjectKey(BuildDefinitionPlugin.BuildDefinitionProjectId);
 
     public static Setup AddToProject(string dirOfProjectToBeBuilt) {
       return Settings.Modify(BuildDefinitionKeys.CreateBuildCommander.Init(CreateBuildCommanderImpl),
