@@ -4,21 +4,24 @@ using Bud.Commander;
 namespace Bud.Test.Util {
   public class TemporaryDirBuildCommander : IBuildCommander {
     public readonly TemporaryDirectory TemporaryDirectory;
-    private readonly IBuildCommander buildCommander;
+    private readonly IBuildCommander BuildCommander;
 
     public TemporaryDirBuildCommander(TemporaryDirectory temporaryDirectory) {
       TemporaryDirectory = temporaryDirectory;
-      buildCommander = BuildCommander.LoadProjectLevelCommander(TemporaryDirectory.Path);
+      try {
+        BuildCommander = Commander.BuildCommander.LoadProjectLevelCommander(TemporaryDirectory.Path);
+      } catch (Exception) {
+        TemporaryDirectory.Dispose();
+        throw;
+      }
     }
 
-    public object Evaluate(string command) {
-      return buildCommander.Evaluate(command);
-    }
+    public object Evaluate(string command) => BuildCommander.Evaluate(command);
 
     public void Dispose() {
       Exception buildCommanderDisposeException = null;
       try {
-        buildCommander.Dispose();
+        BuildCommander.Dispose();
       } catch (Exception ex) {
         buildCommanderDisposeException = ex;
       }
@@ -29,8 +32,6 @@ namespace Bud.Test.Util {
       }
     }
 
-    public override string ToString() {
-      return TemporaryDirectory.ToString();
-    }
+    public override string ToString() => TemporaryDirectory.ToString();
   }
 }

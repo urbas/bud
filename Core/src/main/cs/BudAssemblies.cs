@@ -10,9 +10,7 @@ namespace Bud {
                                                                           .GetAssemblies()
                                                                           .Where(IsBudAssembly);
 
-    public static IEnumerable<string> AssemblyLocations { get; } = AllAssemblies.Select(assembly => assembly.Location);
-
-    public static Assembly CoreAssembly { get; } = AllAssemblies.First(IsCoreAssembly);
+    public static Assembly CoreAssembly { get; } = AllAssemblies.Single(IsCoreAssembly);
 
     public static IEnumerable<IPackageAssemblyReference> AssemblyReferences { get; } = AllAssemblies.Select(ToAssembyReference);
 

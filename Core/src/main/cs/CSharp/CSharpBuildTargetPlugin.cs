@@ -13,6 +13,8 @@ using NuGet;
 
 namespace Bud.CSharp {
   public class CSharpBuildTargetPlugin : BuildTargetPlugin {
+    public const string DistDirName = "dist";
+
     public CSharpBuildTargetPlugin(Key buildScope, params Setup[] setups) : base(buildScope, CSharpKeys.CSharp, setups) {}
 
     public static Setup Init(Key project, params Setup[] setups) {
@@ -29,6 +31,7 @@ namespace Bud.CSharp {
                                     CSharpKeys.OutputAssemblyName.Init(GetDefaultOutputAssemblyName),
                                     CSharpKeys.RootNamespace.Init(GetDefaultRootNamespace),
                                     CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile),
+                                    CSharpKeys.DistDir.Init(DefaultDistDir),
                                     CSharpKeys.Dist.Init(CreateDistributablePackage),
                                     PublishingPlugin.Init(),
                                     SolutionExporterPlugin.Init());
@@ -77,11 +80,6 @@ namespace Bud.CSharp {
                    .Select(dependency => GetCompatibleAssembly(config, buildTarget, dependency));
     }
 
-    private IEnumerable<string> ReferencedAssemblyPathsImpl(IConfig config, Key buildTarget) {
-      return config.GetAssemblyReferences(buildTarget)
-                   .Select(assembly => assembly.EffectivePath);
-    }
-
     private IPackageAssemblyReference GetCompatibleAssembly(IConfig config, Key buildTarget, IDependency dependency) {
       IEnumerable<IPackageAssemblyReference> compatibleAssemblyRereferences;
       var package = dependency.AsPackage(config);
@@ -123,15 +121,19 @@ namespace Bud.CSharp {
       }
     }
 
+    private string DefaultDistDir(IConfig context, Key buildTarget) {
+      return Path.Combine(context.GetOutputDir(buildTarget), DistDirName);
+    }
+
     private async Task CreateDistributablePackage(IContext context, Key buildTarget) {
       await context.Evaluate(buildTarget / BuildKeys.Build);
       var referencedAssemblies = context.GetReferencedAssemblyPaths(buildTarget);
-      var targetDir = Path.Combine(context.GetOutputDir(buildTarget), "dist");
-      Directory.CreateDirectory(targetDir);
+      var distributionPath = context.GetDistDir(buildTarget);
+      Directory.CreateDirectory(distributionPath);
       foreach (var referencedAssembly in referencedAssemblies) {
-        CopyFile(referencedAssembly, targetDir);
+        CopyFile(referencedAssembly, distributionPath);
       }
-      CopyFile(context.GetCSharpOutputAssemblyFile(buildTarget), targetDir);
+      CopyFile(context.GetCSharpOutputAssemblyFile(buildTarget), distributionPath);
     }
 
     private static void CopyFile(string referencedAssembly, string targetDir) {

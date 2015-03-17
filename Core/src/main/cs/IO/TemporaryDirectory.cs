@@ -5,30 +5,29 @@ using Bud.IO;
 namespace Bud.Test.Util {
   public class TemporaryDirectory : IDisposable {
 
-    private readonly string temporaryDirectory;
+    private readonly string TempDirPath;
 
     public TemporaryDirectory() {
-      temporaryDirectory = Directories.CreateTemporary(string.Empty, string.Empty);
+      TempDirPath = Directories.CreateTemporary(string.Empty, string.Empty);
     }
 
     public TemporaryDirectory(string directoryToCopy) {
       if (!Directory.Exists(directoryToCopy)) {
         throw new ArgumentException(string.Format("The directory '{0}' does not exist.", directoryToCopy));
       }
-      temporaryDirectory = Directories.CreateTemporary(System.IO.Path.GetFileName(directoryToCopy) + "-", string.Empty);
-      Directories.Copy(directoryToCopy, temporaryDirectory);
+      TempDirPath = Directories.CreateTemporary(System.IO.Path.GetFileName(directoryToCopy) + "-", string.Empty);
+      try {
+        Directories.Copy(directoryToCopy, TempDirPath);
+      } catch (Exception) {
+        Dispose();
+        throw;
+      }
     }
 
-    public string Path {
-      get { return temporaryDirectory; }
-    }
+    public string Path => TempDirPath;
 
-    public void Dispose() {
-      Directory.Delete(temporaryDirectory, true);
-    }
+    public void Dispose() => Directory.Delete(TempDirPath, true);
 
-    public override string ToString() {
-      return Path;
-    }
+    public override string ToString() => Path;
   }
 }

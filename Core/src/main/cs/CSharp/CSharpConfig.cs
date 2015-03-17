@@ -44,5 +44,9 @@ namespace Bud.CSharp {
     public static IEnumerable<IPackageAssemblyReference> GetAssemblyReferences(this IConfig config, Key buildTarget) {
       return config.Evaluate(buildTarget / CSharpKeys.AssemblyReferences);
     }
+
+    public static string GetDistDir(this IConfig context, Key buildTarget) {
+      return context.Evaluate(buildTarget / CSharpKeys.DistDir);
+    }
   }
 }

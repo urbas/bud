@@ -1,0 +1,22 @@
+{
+  "Packages": [
+    {
+      "Id": "Bud.Examples.HelloWorldPlugin",
+      "Versions": [
+        {
+          "Version": "0.0.2",
+          "Assemblies": [
+            {
+              "Name": "Bud.Examples.HelloWorldPlugin.dll",
+              "Path": "lib/net45/Bud.Examples.HelloWorldPlugin.dll",
+              "Framework": ".NETFramework,Version=v4.5",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v4.5"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
