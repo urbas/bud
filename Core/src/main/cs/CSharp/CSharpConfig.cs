@@ -27,12 +27,6 @@ namespace Bud.CSharp {
       return context.Evaluate(buildTarget / CSharpKeys.OutputAssemblyFile);
     }
 
-    public static IEnumerable<string> GetReferencedAssemblyPaths(this IConfig config, Key buildTarget)
-    {
-      return config.GetAssemblyReferences(buildTarget)
-                   .Select(assembly => assembly.EffectivePath);
-    }
-
     public static AssemblyType GetCSharpAssemblyType(this IConfig context, Key project) {
       return context.Evaluate(project / CSharpKeys.AssemblyType);
     }
@@ -43,6 +37,11 @@ namespace Bud.CSharp {
 
     public static IEnumerable<IPackageAssemblyReference> GetAssemblyReferences(this IConfig config, Key buildTarget) {
       return config.Evaluate(buildTarget / CSharpKeys.AssemblyReferences);
+    }
+
+    public static IEnumerable<string> GetAssemblyReferencePaths(this IConfig config, Key buildTarget)
+    {
+      return config.Evaluate(buildTarget / CSharpKeys.AssemblyReferencePaths);
     }
 
     public static string GetDistDir(this IConfig context, Key buildTarget) {

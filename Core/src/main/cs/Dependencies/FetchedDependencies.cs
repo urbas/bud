@@ -8,13 +8,13 @@ using NuGet;
 namespace Bud.Dependencies {
   public class FetchedDependencies {
     public readonly ImmutableList<PackageVersions> Packages;
-    [JsonIgnore] private readonly Dictionary<string, PackageVersions> packageId2PackageVersions;
+    [JsonIgnore] private readonly Dictionary<string, PackageVersions> PackageId2PackageVersions;
     [JsonIgnore] internal IConfig Config;
 
     [JsonConstructor]
     public FetchedDependencies(IEnumerable<PackageVersions> packages) {
       Packages = packages == null ? ImmutableList<PackageVersions>.Empty : packages.ToImmutableList();
-      packageId2PackageVersions = Packages.ToDictionary(packageVersions => packageVersions.Id, packageVersions => packageVersions.WithHostFetchedDependencies(this));
+      PackageId2PackageVersions = Packages.ToDictionary(packageVersions => packageVersions.Id, packageVersions => packageVersions.WithHostFetchedDependencies(this));
     }
 
     public FetchedDependencies(IEnumerable<IGrouping<string, IPackage>> fetchedPackages)
@@ -33,7 +33,7 @@ namespace Bud.Dependencies {
       if (bestSuitedVersion != null) {
         return bestSuitedVersion;
       }
-      throw new Exception(string.Format("Could not find the version '{0}' of package '{1}'. Try running '{2}' to download packages.", dependencyId, versionRange, DependenciesKeys.FetchDependencies));
+      throw new Exception(string.Format("Could not find the version '{0}' of package '{1}'. Try running '{2}' to download packages.", dependencyId, versionRange, DependenciesKeys.Fetch));
     }
 
     private Package GetMostCurrentVersion(string dependencyId) {
@@ -46,14 +46,14 @@ namespace Bud.Dependencies {
 
     private PackageVersions GetAllVersionsForPackage(string id) {
       try {
-        return packageId2PackageVersions[id];
+        return PackageId2PackageVersions[id];
       } catch (Exception e) {
         throw new ArgumentException(PackageNotFoundMessage(id), e);
       }
     }
 
     private static string PackageNotFoundMessage(string dependencyId) {
-      return string.Format("Could not find any version of the package '{0}'. Try running '{1}' to download packages.", dependencyId, DependenciesKeys.FetchDependencies);
+      return string.Format("Could not find any version of the package '{0}'. Try running '{1}' to download packages.", dependencyId, DependenciesKeys.Fetch);
     }
 
     public FetchedDependencies WithConfig(IConfig config) {

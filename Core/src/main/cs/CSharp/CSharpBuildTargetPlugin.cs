@@ -27,6 +27,7 @@ namespace Bud.CSharp {
                                     CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
                                     BuildKeys.Build.Modify(BuildTaskImpl),
                                     CSharpKeys.AssemblyReferences.Init(AssemblyReferencesImpl),
+                                    CSharpKeys.AssemblyReferencePaths.Init(AssemblyReferencePathsImpl),
                                     CSharpKeys.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
                                     CSharpKeys.OutputAssemblyName.Init(GetDefaultOutputAssemblyName),
                                     CSharpKeys.RootNamespace.Init(GetDefaultRootNamespace),
@@ -80,6 +81,12 @@ namespace Bud.CSharp {
                    .Select(dependency => GetCompatibleAssembly(config, buildTarget, dependency));
     }
 
+    private static string[] AssemblyReferencePathsImpl(IConfig config, Key buildTarget) {
+      return config.GetAssemblyReferences(buildTarget)
+                   .Select(assembly => assembly.EffectivePath)
+                   .ToArray();
+    }
+
     private IPackageAssemblyReference GetCompatibleAssembly(IConfig config, Key buildTarget, IDependency dependency) {
       IEnumerable<IPackageAssemblyReference> compatibleAssemblyRereferences;
       var package = dependency.AsPackage(config);
@@ -127,7 +134,7 @@ namespace Bud.CSharp {
 
     private async Task CreateDistributablePackage(IContext context, Key buildTarget) {
       await context.Evaluate(buildTarget / BuildKeys.Build);
-      var referencedAssemblies = context.GetReferencedAssemblyPaths(buildTarget);
+      var referencedAssemblies = context.GetAssemblyReferencePaths(buildTarget);
       var distributionPath = context.GetDistDir(buildTarget);
       Directory.CreateDirectory(distributionPath);
       foreach (var referencedAssembly in referencedAssemblies) {

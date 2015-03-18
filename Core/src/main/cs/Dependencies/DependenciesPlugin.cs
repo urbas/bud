@@ -16,7 +16,7 @@ namespace Bud.Dependencies {
       return settings.Globally(DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
                                DependenciesKeys.FetchedDependenciesDir.Init(FetchedDependenciesDirImpl),
                                DependenciesKeys.FetchedDependenciesListFile.Init(FetchedDependenciesFileImpl),
-                               DependenciesKeys.FetchDependencies.Init(FetchImpl),
+                               DependenciesKeys.Fetch.Init(FetchImpl),
                                DependenciesKeys.CleanDependencies.InitSync(CleanDependenciesImpl),
                                DependenciesKeys.FetchedDependencies.Init(FetchedDependenciesImpl));
     }
@@ -26,10 +26,11 @@ namespace Bud.Dependencies {
     }
 
     private static FetchedDependencies FetchedDependenciesImpl(IConfig config) {
-      FetchedDependencies resolution;
-      if (TryLoadPersistedResolution(config, out resolution)) {
-        return resolution.WithConfig(config);
+      FetchedDependencies fetchedDependencies;
+      if (TryLoadPersistedFetchedDependencies(config, out fetchedDependencies)) {
+        return fetchedDependencies.WithConfig(config);
       }
+      // TODO: rather throw an exception saying that the user should call update first.
       return new FetchedDependencies(ImmutableList<PackageVersions>.Empty);
     }
 
@@ -39,7 +40,7 @@ namespace Bud.Dependencies {
         var packageManager = CreatePackageManager(context);
         InstallNuGetPackages(packageManager, dependencies);
         var installedPackages = packageManager.LocalRepository.GetPackages().GroupBy(package => package.Id);
-        return PersistNuGetResolution(context, installedPackages);
+        return PersistFetchedDependencies(context, installedPackages);
       });
     }
 
@@ -48,7 +49,7 @@ namespace Bud.Dependencies {
       Directory.Delete(nuGetRepositoryDir, true);
     }
 
-    private static bool TryLoadPersistedResolution(IConfig context, out FetchedDependencies persistedResolution) {
+    private static bool TryLoadPersistedFetchedDependencies(IConfig context, out FetchedDependencies persistedResolution) {
       var fetchedPackagesFile = context.GetFetchedDependenciesListFile();
       if (File.Exists(fetchedPackagesFile)) {
         using (var streamReader = new StreamReader(fetchedPackagesFile)) {
@@ -83,8 +84,8 @@ namespace Bud.Dependencies {
       }
     }
 
-    private static FetchedDependencies PersistNuGetResolution(IContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
-      context.CreatePersistentBuildConfigDir();
+    private static FetchedDependencies PersistFetchedDependencies(IContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
+      Directory.CreateDirectory(context.GetPersistentBuildConfigDir());
       var resolvedExternalDependencies = new FetchedDependencies(fetchedPackages);
       using (var streamWriter = new StreamWriter(context.GetFetchedDependenciesListFile())) {
         using (var jsonTextWriter = new JsonTextWriter(streamWriter)) {

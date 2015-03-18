@@ -7,11 +7,16 @@ namespace Bud.Commander {
     private readonly AssemblyBuildCommander AssemblyBuildCommander;
     private readonly AppDomain AppDomain;
 
-    public AppDomainBuildCommander(string buildConfigurationAssemblyFile, string dirOfProjectToBeBuilt, int buildType) {
+    public AppDomainBuildCommander(BuildDefinitionInfo buildDefinitionInfo, string dirOfProjectToBeBuilt, int buildType) {
       AppDomain = AppDomain.CreateDomain(BuildConfigurationAppDomainName, new Evidence(), new AppDomainSetup {ApplicationBase = AppDomain.CurrentDomain.BaseDirectory});
       try {
-        AssemblyBuildCommander = (AssemblyBuildCommander) AppDomain.CreateInstanceFromAndUnwrap(BudAssemblies.CoreAssembly.Location, typeof (AssemblyBuildCommander).FullName);
-        AssemblyBuildCommander.LoadBuildConfiguration(buildConfigurationAssemblyFile, dirOfProjectToBeBuilt, buildType, Console.Out, Console.Error);
+        AssemblyBuildCommander = (AssemblyBuildCommander) AppDomain.CreateInstanceFromAndUnwrap(BudAssemblies.CoreAssembly.Location, typeof(AssemblyBuildCommander).FullName);
+        AssemblyBuildCommander.LoadBuildDefinition(buildDefinitionInfo.BuildDefinitionAssemblyFile,
+                                                   buildDefinitionInfo.DependencyDlls,
+                                                   dirOfProjectToBeBuilt,
+                                                   buildType,
+                                                   Console.Out,
+                                                   Console.Error);
       } catch (Exception) {
         Dispose();
         throw;

@@ -80,12 +80,6 @@ namespace Bud.Build {
       return Path.Combine(ctxt.GetBudDir(key), PersistentBuildConfigDirName);
     }
 
-    public static string CreatePersistentBuildConfigDir(this IContext context) {
-      var persistentConfigDir = context.GetPersistentBuildConfigDir();
-      Directory.CreateDirectory(persistentConfigDir);
-      return persistentConfigDir;
-    }
-
     private static async Task CleanBuildDirsImpl(IContext context, Func<Task> oldCleanTask, Key project) {
       await oldCleanTask();
       var dir = context.GetOutputDir(project);

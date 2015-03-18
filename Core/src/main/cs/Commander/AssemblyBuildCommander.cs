@@ -1,10 +1,12 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using Bud.Build;
 using Bud.BuildDefinition;
 using Bud.Logging;
+using Bud.Util;
 
 namespace Bud.Commander {
   public class AssemblyBuildCommander : MarshalByRefObject, IBuildCommander {
@@ -12,10 +14,11 @@ namespace Bud.Commander {
     private Settings Settings;
     private IConfig Config;
 
-    public void LoadBuildConfiguration(string buildConfigurationAssemblyFile, string baseDirectory, int buildType, TextWriter standardOutputTextWriter, TextWriter standardErrorTextWriter) {
+    public void LoadBuildDefinition(string buildDefinitionAssemblyFile, string[] dependencyDlls, string baseDirectory, int buildType, TextWriter standardOutputTextWriter, TextWriter standardErrorTextWriter) {
       Console.SetOut(new NonSerializingOutputWriter(standardOutputTextWriter));
       Console.SetError(new NonSerializingOutputWriter(standardErrorTextWriter));
-      var assembly = AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(buildConfigurationAssemblyFile));
+      AppDomain.CurrentDomain.AssemblyResolve += AssemblyUtils.PathListAssemblyResolver(dependencyDlls);
+      var assembly = AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(buildDefinitionAssemblyFile));
       var build = (IBuild) assembly.CreateInstance(BuildDefinitionClassName);
       Settings = build.Setup(GetInitialSettings(baseDirectory, buildType), baseDirectory);
       Config = new Config(Settings.ConfigDefinitions, Logger.CreateFromWriters(standardOutputTextWriter, standardErrorTextWriter));
