@@ -30,8 +30,10 @@ namespace Bud.Dependencies {
       if (TryLoadPersistedFetchedDependencies(config, out fetchedDependencies)) {
         return fetchedDependencies.WithConfig(config);
       }
-      // TODO: rather throw an exception saying that the user should call update first.
-      return new FetchedDependencies(ImmutableList<PackageVersions>.Empty);
+      if (config.GetExternalDependencies().IsEmpty) {
+        return new FetchedDependencies(ImmutableList<PackageVersions>.Empty);
+      }
+      throw new InvalidOperationException(string.Format("Could not load the list of fetched dependencies. Please run the '{0}' task first.", DependenciesKeys.Fetch));
     }
 
     private static Task<FetchedDependencies> FetchImpl(IContext context) {
