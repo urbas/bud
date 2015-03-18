@@ -28,13 +28,15 @@ namespace Bud.Dependencies {
     private static FetchedDependencies FetchedDependenciesImpl(IConfig config) {
       FetchedDependencies fetchedDependencies;
       if (TryLoadPersistedFetchedDependencies(config, out fetchedDependencies)) {
-        return fetchedDependencies.WithConfig(config);
+        if (fetchedDependencies.Packages.TrueForAll(package => package.Versions.TrueForAll(versionOfPackage => versionOfPackage.Assemblies.TrueForAll(assembly => File.Exists(assembly.Path))))) {
+          return fetchedDependencies;
+        }
+        throw new InvalidOperationException(string.Format("Some assemblies from the list of fetched dependencies are missing. Please run the '{0}' task.", DependenciesKeys.Fetch));
       }
       if (config.GetExternalDependencies().IsEmpty) {
         return new FetchedDependencies(ImmutableList<PackageVersions>.Empty);
       }
-      // TODO: throw an exception if any of the files listed in fetched dependencies is missing.
-      throw new InvalidOperationException(string.Format("Could not load the list of fetched dependencies. Please run the '{0}' task first.", DependenciesKeys.Fetch));
+      throw new InvalidOperationException(string.Format("Could not load the list of fetched dependencies. Please run the '{0}' task.", DependenciesKeys.Fetch));
     }
 
     private static Task<FetchedDependencies> FetchImpl(IContext context) {
@@ -52,17 +54,18 @@ namespace Bud.Dependencies {
       Directory.Delete(nuGetRepositoryDir, true);
     }
 
-    private static bool TryLoadPersistedFetchedDependencies(IConfig context, out FetchedDependencies persistedResolution) {
+    private static bool TryLoadPersistedFetchedDependencies(IConfig context, out FetchedDependencies fetchedDependencies) {
       var fetchedPackagesFile = context.GetFetchedDependenciesListFile();
       if (File.Exists(fetchedPackagesFile)) {
         using (var streamReader = new StreamReader(fetchedPackagesFile)) {
           using (var jsonStreamReader = new JsonTextReader(streamReader)) {
-            persistedResolution = JsonSerializer.CreateDefault().Deserialize<FetchedDependencies>(jsonStreamReader);
+            fetchedDependencies = JsonSerializer.CreateDefault().Deserialize<FetchedDependencies>(jsonStreamReader);
+            fetchedDependencies.WithConfig(context);
             return true;
           }
         }
       }
-      persistedResolution = null;
+      fetchedDependencies = null;
       return false;
     }
 
@@ -76,10 +79,10 @@ namespace Bud.Dependencies {
       foreach (var dependency in dependencies) {
         IPackage foundPackage;
         try {
-          foundPackage = packageManager.SourceRepository.FindPackage(dependency.Id, dependency.Version, allowPrereleaseVersions: false, allowUnlisted: false);
-          packageManager.InstallPackage(foundPackage, ignoreDependencies: false, allowPrereleaseVersions: false);
+          foundPackage = packageManager.SourceRepository.FindPackage(dependency.Id, dependency.Version, false, false);
+          packageManager.InstallPackage(foundPackage, false, false);
         } catch (Exception) {
-          foundPackage = packageManager.LocalRepository.FindPackage(dependency.Id, dependency.Version, allowPrereleaseVersions: false, allowUnlisted: false);
+          foundPackage = packageManager.LocalRepository.FindPackage(dependency.Id, dependency.Version, false, false);
         }
         if (foundPackage == null) {
           throw new Exception(String.Format("Could not download dependency '{0}'. Please verify your build configuration.", dependency));
