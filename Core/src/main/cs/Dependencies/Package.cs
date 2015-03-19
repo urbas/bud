@@ -43,9 +43,9 @@ namespace Bud.Dependencies {
            package.AssemblyReferences.Select(assemblyReference => new AssemblyReference(assemblyReference)),
            package.DependencySets.SelectMany(dependencySet => dependencySet.Dependencies.Select(dependency => new PackageDependencyInfo(dependency, dependencySet.TargetFramework, dependencySet.SupportedFrameworks)))) {}
 
-    public IPackage AsPackage(IConfig config) {
-      return this;
-    }
+    public IPackage AsPackage(IConfig config) => this;
+
+    public override string ToString() => Version != null ? string.Format("{0}@{1}", Id, Version) : Id;
 
     [JsonIgnore]
     public string Title {

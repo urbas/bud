@@ -12,8 +12,7 @@ namespace Bud.Dependencies {
     public static readonly ConfigKey<string> FetchedDependenciesDir = Dependencies / "fetchedDependenciesDir";
     public static readonly ConfigKey<string> FetchedDependenciesListFile = Dependencies / "fetchedDependenciesListFile";
     public static readonly ConfigKey<FetchedDependencies> FetchedDependencies = Key.Define("fetchedDependencies", string.Format("A list of downloaded external dependencies. This list can be committed to the versioning control system to ensure that projects are built against the same versions of external dependencies on every machine."));
-    public static readonly TaskKey<FetchedDependencies> Fetch = Key.Define("fetch", string.Format("Downloads the versions of external packages that are specified in '{0}'. If the file '{0}' does not exist, then the latest versions of external dependencies will be downloaded.", FetchedDependenciesListFile));
-    public static readonly TaskKey<FetchedDependencies> Update = Key.Define("update", string.Format("Downloads the latest versions of external packages. It also updates the '{0}' file.", FetchedDependenciesListFile));
-    public static readonly TaskKey CleanDependencies = Dependencies / Key.Define(BuildDirsKeys.Clean.Id, string.Format("Deletes the downloaded NuGet packages. You should invoke either '{0}' or '{1}' to download the packages again.", Fetch, Update));
+    public static readonly TaskKey<FetchedDependencies> Fetch = Key.Define("fetch", string.Format("Downloads the latest versions of external packages. It also updates the '{0}' file.", FetchedDependenciesListFile));
+    public static readonly TaskKey CleanDependencies = Dependencies / Key.Define(BuildDirsKeys.Clean.Id, string.Format("Deletes the downloaded NuGet packages."));
   }
 }

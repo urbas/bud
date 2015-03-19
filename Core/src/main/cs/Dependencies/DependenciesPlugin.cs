@@ -28,24 +28,30 @@ namespace Bud.Dependencies {
     private static FetchedDependencies FetchedDependenciesImpl(IConfig config) {
       FetchedDependencies fetchedDependencies;
       if (TryLoadPersistedFetchedDependencies(config, out fetchedDependencies)) {
-        if (fetchedDependencies.Packages.TrueForAll(package => package.Versions.TrueForAll(versionOfPackage => versionOfPackage.Assemblies.TrueForAll(assembly => File.Exists(assembly.Path))))) {
-          return fetchedDependencies;
-        }
-        throw new InvalidOperationException(string.Format("Some assemblies from the list of fetched dependencies are missing. Please run the '{0}' task.", DependenciesKeys.Fetch));
+        DownloadMissingDependencies(config, fetchedDependencies);
+        return fetchedDependencies;
       }
       if (config.GetExternalDependencies().IsEmpty) {
         return new FetchedDependencies(ImmutableList<PackageVersions>.Empty);
       }
-      throw new InvalidOperationException(string.Format("Could not load the list of fetched dependencies. Please run the '{0}' task.", DependenciesKeys.Fetch));
+      var fetchTask = FetchImpl(config);
+      fetchTask.Wait();
+      return fetchTask.Result;
     }
 
-    private static Task<FetchedDependencies> FetchImpl(IContext context) {
+    private static void DownloadMissingDependencies(IConfig config, FetchedDependencies fetchedDependencies) {
+      var missingDependencies = FetchedDependenciesUtil.MissingDependencies(fetchedDependencies);
+      var packageManager = CreatePackageManager(config);
+      InstallNuGetPackages(packageManager, missingDependencies);
+    }
+
+    private static Task<FetchedDependencies> FetchImpl(IConfig config) {
       return Task.Run(() => {
-        var dependencies = context.GetExternalDependencies();
-        var packageManager = CreatePackageManager(context);
+        var dependencies = config.GetExternalDependencies();
+        var packageManager = CreatePackageManager(config);
         InstallNuGetPackages(packageManager, dependencies);
         var installedPackages = packageManager.LocalRepository.GetPackages().GroupBy(package => package.Id);
-        return PersistFetchedDependencies(context, installedPackages);
+        return PersistFetchedDependencies(config, installedPackages);
       });
     }
 
@@ -69,7 +75,7 @@ namespace Bud.Dependencies {
       return false;
     }
 
-    private static PackageManager CreatePackageManager(IContext context) {
+    private static PackageManager CreatePackageManager(IConfig context) {
       var nuGetRepositoryDir = context.GetFetchedDependenciesDir();
       IPackageRepository repo = PackageRepositoryFactory.Default.CreateRepository(NuGetRemoteRepoUri);
       return new PackageManager(repo, nuGetRepositoryDir);
@@ -90,7 +96,17 @@ namespace Bud.Dependencies {
       }
     }
 
-    private static FetchedDependencies PersistFetchedDependencies(IContext context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
+    private static void InstallNuGetPackages(PackageManager packageManager, IEnumerable<Package> packagesToInstall) {
+      foreach (var packageToInstall in packagesToInstall) {
+        try {
+          packageManager.InstallPackage(packageToInstall.Id, packageToInstall.Version);
+        } catch (Exception e) {
+          throw new Exception(string.Format("Could not download dependency '{0}'. Please check your internet connection of your build definition.", packageToInstall), e);
+        }
+      }
+    }
+
+    private static FetchedDependencies PersistFetchedDependencies(IConfig context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
       Directory.CreateDirectory(context.GetPersistentBuildConfigDir());
       var resolvedExternalDependencies = new FetchedDependencies(fetchedPackages);
       using (var streamWriter = new StreamWriter(context.GetFetchedDependenciesListFile())) {
