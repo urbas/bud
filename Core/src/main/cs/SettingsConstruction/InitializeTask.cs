@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Bud.SettingsConstruction {
-  public class InitializeTask<T> : TaskDefinitionConstructor {
+  public class InitializeTask<T> : TaskModifier {
     public Func<IContext, Task<T>> InitialValue;
 
     public InitializeTask(TaskKey<T> key, T initialValue) : this(key, b => Task.FromResult(initialValue)) {}
@@ -19,7 +19,7 @@ namespace Bud.SettingsConstruction {
     }
   }
 
-  public class InitializeTask : TaskDefinitionConstructor {
+  public class InitializeTask : TaskModifier {
     public Func<IContext, Task> TaskDefinition;
 
     public InitializeTask(TaskKey key, Func<IContext, Task> taskDefinition) : base(key) {

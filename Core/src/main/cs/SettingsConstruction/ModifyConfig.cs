@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using Bud;
 
 namespace Bud.SettingsConstruction {
-  public class ModifyConfig<T> : ConfigDefinitionConstructor {
+  public class ModifyConfig<T> : ConfigModifier {
     Func<IConfig, T, T> ValueModifier;
 
     public ModifyConfig(ConfigKey<T> key, Func<IConfig, T, T> valueModifier) : base(key) {

@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction {
-  public class InitializeConfig<T> : ConfigDefinitionConstructor {
+  public class InitializeConfig<T> : ConfigModifier {
     public Func<IConfig, T> InitialValue;
 
     public InitializeConfig(ConfigKey<T> key, T initialValue) : this(key, b => initialValue) {}

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction {
-  public abstract class ConfigDefinitionConstructor {
+  public abstract class ConfigModifier {
     public readonly ConfigKey Key;
 
-    protected ConfigDefinitionConstructor(ConfigKey key) {
+    protected ConfigModifier(ConfigKey key) {
       Key = key;
     }
 

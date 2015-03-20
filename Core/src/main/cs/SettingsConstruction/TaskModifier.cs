@@ -1,10 +1,10 @@
 ﻿using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction {
-  public abstract class TaskDefinitionConstructor {
+  public abstract class TaskModifier {
     public readonly TaskKey Key;
 
-    protected TaskDefinitionConstructor(TaskKey key) {
+    protected TaskModifier(TaskKey key) {
       Key = key;
     }
 

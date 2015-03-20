@@ -6,16 +6,16 @@ namespace Bud {
   public class Settings {
     public static readonly Settings Empty = new Settings();
     public readonly Key Scope;
-    public readonly ImmutableList<ConfigDefinitionConstructor> ConfigConstructors;
-    public readonly ImmutableList<TaskDefinitionConstructor> TaskConstructors;
+    public readonly ImmutableList<ConfigModifier> ConfigModifiers;
+    public readonly ImmutableList<TaskModifier> TaskModifier;
 
     public Settings() : this(Key.Root) {}
 
-    public Settings(Key scope) : this(ImmutableList<ConfigDefinitionConstructor>.Empty, ImmutableList<TaskDefinitionConstructor>.Empty, scope) {}
+    public Settings(Key scope) : this(ImmutableList<ConfigModifier>.Empty, ImmutableList<TaskModifier>.Empty, scope) {}
 
-    public Settings(ImmutableList<ConfigDefinitionConstructor> configConstructors, ImmutableList<TaskDefinitionConstructor> taskConstructors, Key scope) {
-      ConfigConstructors = configConstructors;
-      TaskConstructors = taskConstructors;
+    public Settings(ImmutableList<ConfigModifier> configModifiers, ImmutableList<TaskModifier> taskModifier, Key scope) {
+      ConfigModifiers = configModifiers;
+      TaskModifier = taskModifier;
       Scope = scope;
     }
 
@@ -43,22 +43,22 @@ namespace Bud {
       return settings => settings.Do(setups);
     }
 
-    public Settings Add(ConfigDefinitionConstructor configConstructor) {
-      return new Settings(ConfigConstructors.Add(configConstructor), TaskConstructors, Scope);
+    public Settings Add(ConfigModifier configModifier) {
+      return new Settings(ConfigModifiers.Add(configModifier), TaskModifier, Scope);
     }
 
-    public Settings Add(TaskDefinitionConstructor taskConstructor) {
-      return new Settings(ConfigConstructors, TaskConstructors.Add(taskConstructor), Scope);
+    public Settings Add(TaskModifier taskModifier) {
+      return new Settings(ConfigModifiers, TaskModifier.Add(taskModifier), Scope);
     }
 
     public Settings Add(Settings settings) {
-      return new Settings(ConfigConstructors.AddRange(settings.ConfigConstructors), TaskConstructors.AddRange(settings.TaskConstructors), Scope);
+      return new Settings(ConfigModifiers.AddRange(settings.ConfigModifiers), TaskModifier.AddRange(settings.TaskModifier), Scope);
     }
 
     public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions {
       get {
         var configDefinitions = ImmutableDictionary.CreateBuilder<Key, IConfigDefinition>();
-        foreach (var configConstructor in ConfigConstructors) {
+        foreach (var configConstructor in ConfigModifiers) {
           configConstructor.ApplyTo(configDefinitions);
         }
         return configDefinitions.ToImmutable();
@@ -68,7 +68,7 @@ namespace Bud {
     public ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions {
       get {
         var taskDefinitions = ImmutableDictionary.CreateBuilder<Key, ITaskDefinition>();
-        foreach (var taskConstructor in TaskConstructors) {
+        foreach (var taskConstructor in TaskModifier) {
           taskConstructor.ApplyTo(taskDefinitions);
         }
         return taskDefinitions.ToImmutable();
@@ -80,9 +80,9 @@ namespace Bud {
         if (newScope.Equals(Scope)) {
           return this;
         }
-        return new Settings(ConfigConstructors, TaskConstructors, newScope);
+        return new Settings(ConfigModifiers, TaskModifier, newScope);
       }
-      return new Settings(ConfigConstructors, TaskConstructors, Scope / newScope);
+      return new Settings(ConfigModifiers, TaskModifier, Scope / newScope);
     }
   }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using Bud.Util;
 
 namespace Bud.SettingsConstruction {
-  public class AddDependencies : TaskDefinitionConstructor {
+  public class AddDependencies : TaskModifier {
     private IEnumerable<TaskKey> extraDependencies;
 
     public AddDependencies(TaskKey key, IEnumerable<TaskKey> extraDependencies) : base(key) {
