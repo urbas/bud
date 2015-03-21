@@ -10,10 +10,10 @@ namespace Bud.Dependencies {
   public class Package : IDependency, IPackage {
     private readonly JsonPackage JsonPackage;
 
-    public Package(string id, JsonPackage jsonPackage, IConfig config) {
+    public Package(string fetchedDependenciesDir, string id, JsonPackage jsonPackage) {
       Id = id;
       JsonPackage = jsonPackage;
-      AssemblyReferences = JsonPackage.Assemblies.Select(assemblyReference => new AssemblyReference(config, Id, JsonPackage.Version.ToString(), assemblyReference));
+      AssemblyReferences = JsonPackage.Assemblies.Select(assemblyReference => new AssemblyReference(fetchedDependenciesDir, Id, JsonPackage.Version.ToString(), assemblyReference));
     }
 
     public SemanticVersion Version => JsonPackage.Version;
@@ -21,6 +21,8 @@ namespace Bud.Dependencies {
     public ImmutableList<PackageDependencyInfo> Dependencies => JsonPackage.Dependencies ?? ImmutableList<PackageDependencyInfo>.Empty;
 
     public string Id { get; }
+
+    public IEnumerable<IPackageAssemblyReference> AssemblyReferences { get; }
 
     public IPackage AsPackage(IConfig config) => this;
 
@@ -132,10 +134,6 @@ namespace Bud.Dependencies {
 
     public DateTimeOffset? Published {
       get { throw new NotImplementedException(); }
-    }
-
-    public IEnumerable<IPackageAssemblyReference> AssemblyReferences {
-      get;
     }
   }
 }

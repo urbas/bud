@@ -2,6 +2,26 @@
 
 Bud is a build tool. The word _Bud_ stands for _Build without the 'ill'_.
 
+## How to perform a release?
+
+Chocolatey:
+
+- Didn't work... [One time]: Install the API key (has to be done in administrative console): `choco apikey -source https://chocolatey.org/ -k <your-key-here>`
+
+- Change the version in the `chocolatey/bud.nuspec` file.
+
+- Change the version in the `chocolatey/tools/chocolateyInstall.ps1` file.
+
+- Invoke `bud project/bud/main/cs/dist`.
+
+- Create a zip of the contents of the `bud\.bud\output\main\cs\dist` folder. The name of the zip file should be `bud-x.x.x.zip`
+
+- Place the zip into `/home/budpage/production-budpage/shared/public/packages`.
+
+- Go to the folder `chocolatey` and run `cpack` there.
+
+- Didn't work. Upload manually for now on chocolatey. Now push the package with `choco push bud.x.x.x.nupkg`
+
 ## TODO
 
 - Bud must generate sln and csproj files from the build definition.

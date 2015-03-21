@@ -11,8 +11,8 @@ namespace Bud.Dependencies {
   public class AssemblyReference : IPackageAssemblyReference {
     public readonly string AbsolutePath;
 
-    public AssemblyReference(IConfig config, string packageId, string version, JsonAssembly jsonAssembly) {
-      AbsolutePath = Combine(config.GetFetchedDependenciesDir(), packageId + "." + version, jsonAssembly.Path);
+    public AssemblyReference(string fetchedDependenciesDir, string packageId, string version, JsonAssembly jsonAssembly) {
+      AbsolutePath = FetchedDependenciesUtil.FetchedAssemblyAbsolutePath(fetchedDependenciesDir, packageId, version, jsonAssembly.Path);
       TargetFramework = jsonAssembly.Framework == null ? null : new FrameworkName(jsonAssembly.Framework);
       SupportedFrameworks = jsonAssembly.SupportedFrameworks?.Select(supportedFramework => new FrameworkName(supportedFramework)) ?? ImmutableList<FrameworkName>.Empty;
       Name = jsonAssembly.Name;

@@ -5,15 +5,15 @@
     <!-- Read this before publishing packages to chocolatey.org: https://github.com/chocolatey/chocolatey/wiki/CreatePackages -->
     <id>bud</id>
     <title>Bud</title>
-    <version>0.0.1</version>
+    <version>0.0.2</version>
     <authors>Matej Urbas</authors>
     <owners>Matej Urbas</owners>
     <summary>Bud is a build tool and a general automation tool</summary>
     <description>Bud is a build tool and a general automation tool</description>
-    <projectUrl>http://bud.urbas.si/#/</projectUrl>
+    <projectUrl>http://bud.urbas.si/</projectUrl>
     <tags>bud build tool automation</tags>
     <copyright>2015 Matej Urbas</copyright>
-    <licenseUrl>http://bud.urbas.si/#/licence</licenseUrl>
+    <licenseUrl>http://bud.urbas.si/licence</licenseUrl>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <releaseNotes></releaseNotes>
   </metadata>
