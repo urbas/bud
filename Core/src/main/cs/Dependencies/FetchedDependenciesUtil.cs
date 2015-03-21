@@ -11,7 +11,7 @@ namespace Bud.Dependencies {
     }
 
     private static bool AnyAssemblyMissing(Package versionOfPackage) {
-      return versionOfPackage.Assemblies.Any(assembly => !File.Exists(assembly.Path));
+      return versionOfPackage.AssemblyReferences.Any(assembly => !File.Exists(assembly.Path));
     }
   }
 }

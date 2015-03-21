@@ -2,23 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Newtonsoft.Json;
 using NuGet;
 
 namespace Bud.Dependencies {
   public class FetchedDependencies {
-    public readonly ImmutableList<PackageVersions> Packages;
-    [JsonIgnore] private readonly Dictionary<string, PackageVersions> PackageId2PackageVersions;
-    [JsonIgnore] internal IConfig Config;
+    private readonly Dictionary<string, PackageVersions> PackageId2PackageVersions;
+    public readonly IConfig Config;
+    private readonly JsonFetchedDependencies JsonFetchedDependencies;
 
-    [JsonConstructor]
-    public FetchedDependencies(IEnumerable<PackageVersions> packages) {
-      Packages = packages == null ? ImmutableList<PackageVersions>.Empty : packages.ToImmutableList();
-      PackageId2PackageVersions = Packages.ToDictionary(packageVersions => packageVersions.Id, packageVersions => packageVersions.WithHostFetchedDependencies(this));
+    public FetchedDependencies(IConfig config, JsonFetchedDependencies jsonFetchedDependencies) {
+      PackageId2PackageVersions = jsonFetchedDependencies.Packages.ToDictionary(packageVersions => packageVersions.Id, packageVersions => new PackageVersions(config, packageVersions));
+      Config = config;
+      JsonFetchedDependencies = jsonFetchedDependencies;
+      Packages = JsonFetchedDependencies.Packages.Select(package => new PackageVersions(config, package)).ToImmutableList();
     }
 
-    public FetchedDependencies(IEnumerable<IGrouping<string, IPackage>> fetchedPackages)
-      : this(fetchedPackages.Select(packageGroup => new PackageVersions(packageGroup.Key, packageGroup))) {}
+    public ImmutableList<PackageVersions> Packages { get; }
 
     public Package GetPackage(ExternalDependency dependency) {
       return GetPackage(dependency.Id, dependency.Version);
@@ -54,11 +53,6 @@ namespace Bud.Dependencies {
 
     private static string PackageNotFoundMessage(string dependencyId) {
       return string.Format("Could not find any version of the package '{0}'. Try running '{1}' to download packages.", dependencyId, DependenciesKeys.Fetch);
-    }
-
-    public FetchedDependencies WithConfig(IConfig config) {
-      Config = config;
-      return this;
     }
   }
 }

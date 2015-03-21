@@ -22,11 +22,11 @@ namespace Bud.Dependencies {
       Framework = framework;
       SupportedFrameworks = supportedFrameworks == null || supportedFrameworks.IsEmpty() ? null : supportedFrameworks;
       FrameworkName = framework == null ? null : new FrameworkName(framework);
-      SupportedFrameworkNames = supportedFrameworks == null ? ImmutableList<FrameworkName>.Empty : supportedFrameworks.Select(supportedFramework => new FrameworkName(supportedFramework));
+      SupportedFrameworkNames = supportedFrameworks?.Select(supportedFramework => new FrameworkName(supportedFramework)) ?? ImmutableList<FrameworkName>.Empty;
       VersionSpec = VersionUtility.ParseVersionSpec(version);
     }
 
     public PackageDependencyInfo(PackageDependency dependency, FrameworkName targetFramework, IEnumerable<FrameworkName> supportedFrameworks) :
-      this(dependency.Id, dependency.VersionSpec.ToString(), targetFramework == null ? null : targetFramework.FullName, supportedFrameworks.Select(framework => framework.FullName)) {}
+      this(dependency.Id, dependency.VersionSpec.ToString(), targetFramework?.FullName, supportedFrameworks.Select(framework => framework.FullName)) {}
   }
 }

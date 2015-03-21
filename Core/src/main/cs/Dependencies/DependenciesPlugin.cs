@@ -32,7 +32,7 @@ namespace Bud.Dependencies {
         return fetchedDependencies;
       }
       if (config.GetExternalDependencies().IsEmpty) {
-        return new FetchedDependencies(ImmutableList<PackageVersions>.Empty);
+        return new FetchedDependencies(config, new JsonFetchedDependencies(ImmutableList<JsonPackageVersions>.Empty));
       }
       var fetchTask = FetchImpl(config);
       fetchTask.Wait();
@@ -60,13 +60,12 @@ namespace Bud.Dependencies {
       Directory.Delete(nuGetRepositoryDir, true);
     }
 
-    private static bool TryLoadPersistedFetchedDependencies(IConfig context, out FetchedDependencies fetchedDependencies) {
-      var fetchedPackagesFile = context.GetFetchedDependenciesListFile();
+    private static bool TryLoadPersistedFetchedDependencies(IConfig config, out FetchedDependencies fetchedDependencies) {
+      var fetchedPackagesFile = config.GetFetchedDependenciesListFile();
       if (File.Exists(fetchedPackagesFile)) {
         using (var streamReader = new StreamReader(fetchedPackagesFile)) {
           using (var jsonStreamReader = new JsonTextReader(streamReader)) {
-            fetchedDependencies = JsonSerializer.CreateDefault().Deserialize<FetchedDependencies>(jsonStreamReader);
-            fetchedDependencies.WithConfig(context);
+            fetchedDependencies = new FetchedDependencies(config, JsonSerializer.CreateDefault().Deserialize<JsonFetchedDependencies>(jsonStreamReader));
             return true;
           }
         }
@@ -106,16 +105,16 @@ namespace Bud.Dependencies {
       }
     }
 
-    private static FetchedDependencies PersistFetchedDependencies(IConfig context, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
-      Directory.CreateDirectory(context.GetPersistentBuildConfigDir());
-      var resolvedExternalDependencies = new FetchedDependencies(fetchedPackages);
-      using (var streamWriter = new StreamWriter(context.GetFetchedDependenciesListFile())) {
+    private static FetchedDependencies PersistFetchedDependencies(IConfig config, IEnumerable<IGrouping<string, IPackage>> fetchedPackages) {
+      Directory.CreateDirectory(config.GetPersistentBuildConfigDir());
+      var resolvedExternalDependencies = new JsonFetchedDependencies(fetchedPackages);
+      using (var streamWriter = new StreamWriter(config.GetFetchedDependenciesListFile())) {
         using (var jsonTextWriter = new JsonTextWriter(streamWriter)) {
           jsonTextWriter.Formatting = Formatting.Indented;
           JsonSerializer.CreateDefault().Serialize(jsonTextWriter, resolvedExternalDependencies);
         }
       }
-      return resolvedExternalDependencies;
+      return new FetchedDependencies(config, resolvedExternalDependencies);
     }
 
     private static string FetchedDependenciesFileImpl(IConfig context) {
