@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using Bud.Build;
 using Bud.BuildDefinition;
 using Bud.CSharp;
@@ -9,11 +6,11 @@ using NuGet;
 namespace Bud.Projects {
   public static class ProjectsSettings {
     public static Settings Project(this Settings settings, string id, string baseDir, params Setup[] setups) {
-      return settings.Add(ProjectPlugin.Project(id, baseDir, setups));
+      return settings.Add(new ProjectPlugin(id, baseDir, setups));
     }
 
     public static Settings BudPlugin(this Settings settings, string id, string baseDir, params Setup[] setups) {
-      return settings.Add(ProjectPlugin.BudPlugin(id, baseDir, setups));
+      return settings.Add(new ProjectPlugin(id, baseDir, Cs.Dll(BuildDefinitionPlugin.BudAssemblyReferences, setups.Merge())));
     }
 
     public static Settings BuildDefinition(this Settings settings, params Setup[] setups) {

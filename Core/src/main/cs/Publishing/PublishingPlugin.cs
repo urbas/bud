@@ -10,16 +10,15 @@ using Bud.Util;
 using NuGet;
 
 namespace Bud.Publishing {
-  public class PublishingPlugin {
-    public static Setup InitGlobally() {
-      return settings => settings.AddGlobally(PublishKeys.PublishApiKey.Init(PublishApiKeyImpl));
-    }
+  public class PublishingPlugin : Plugin {
+    public readonly static PublishingPlugin Instance = new PublishingPlugin();
 
-    public static Setup Init() {
-      return settings => settings.Add(PublishKeys.Publish.Init(PublishImpl),
-                                     PublishKeys.Package.Init(PackageImpl))
-                                 .AddGlobally(PublishKeys.Publish.Init(TaskUtils.NoOpTask),
-                                           PublishKeys.Publish.DependsOn(settings.Scope / PublishKeys.Publish));
+    public override Settings Setup(Settings settings) {
+      return settings.Add(PublishKeys.Publish.Init(PublishImpl),
+                          PublishKeys.Package.Init(PackageImpl))
+                     .AddGlobally(PublishKeys.Publish.Init(TaskUtils.NoOpTask),
+                                  PublishKeys.Publish.DependsOn(settings.Scope / PublishKeys.Publish),
+                                  PublishKeys.PublishApiKey.Init(PublishApiKeyImpl));
     }
 
     private static async Task<string> PackageImpl(IContext context, Key buildTarget) {

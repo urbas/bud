@@ -7,8 +7,8 @@ using System.IO;
 public class Build : IBuild {
   public Settings Setup(Settings settings, string baseDir) {
     return settings
-      .Globally(CSharpKeys.TargetFramework.Init(Framework.Net46))
-      .Version("0.0.2")
+      .AddGlobally(CSharpKeys.TargetFramework.Init(Framework.Net46))
+      .Version("0.0.3")
       .Project("bud", Path.Combine(baseDir, "bud"), Cs.Exe(
         Cs.Dependency("Bud.Core"),
         Cs.Dependency("CommandLineParser"),

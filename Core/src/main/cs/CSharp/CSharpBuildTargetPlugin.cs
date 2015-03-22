@@ -30,7 +30,7 @@ namespace Bud.CSharp {
                                      CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile),
                                      CSharpKeys.DistDir.Init(DefaultDistDir),
                                      CSharpKeys.Dist.Init(CreateDistributablePackage),
-                                     PublishingPlugin.Init(),
+                                     PublishingPlugin.Instance,
                                      SolutionExporterPlugin.Init());
     }
 

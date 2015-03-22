@@ -1,24 +1,28 @@
 using System.Collections.Immutable;
 using Bud.Build;
-using Bud.BuildDefinition;
-using Bud.CSharp;
 using NuGet;
 
 namespace Bud.Projects {
-  public static class ProjectPlugin {
-    public static Setup Project(string projectId, string baseDir, params Setup[] setups) {
-      var project = ProjectKey(projectId);
-      return settings => settings
-        .AddGlobally(ProjectKeys.Projects.Init(ImmutableDictionary<string, Key>.Empty),
-                     ProjectKeys.Projects.Modify(allProjects => allProjects.Add(projectId, project)))
-        .AddIn(project,
-               BuildDirs.Init(baseDir),
-               ProjectKeys.Version.Init(VersionImpl),
-               setups.Merge());
+  public class ProjectPlugin : Plugin {
+    private readonly string ProjectId;
+    private readonly string BaseDir;
+    private readonly Setup[] Setups;
+
+    public ProjectPlugin(string projectId, string baseDir, params Setup[] setups) {
+      ProjectId = projectId;
+      BaseDir = baseDir;
+      Setups = setups;
     }
 
-    public static Setup BudPlugin(string projectId, string baseDir, Setup[] setups) {
-      return Project(projectId, baseDir, Cs.Dll(BuildDefinitionPlugin.BudAssemblyReferences, setups.Merge()));
+    public override Settings Setup(Settings settings) {
+      var project = ProjectKey(ProjectId);
+      return settings
+        .AddGlobally(ProjectKeys.Projects.Init(ImmutableDictionary<string, Key>.Empty),
+                     ProjectKeys.Projects.Modify(allProjects => allProjects.Add(ProjectId, project)))
+        .AddIn(project,
+               new BuildDirsPlugin(BaseDir),
+               ProjectKeys.Version.Init(VersionImpl),
+               Setups.Merge());
     }
 
     public static Key ProjectKey(string projectId) {

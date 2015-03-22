@@ -3,7 +3,7 @@ using Bud.Build;
 using Bud.CSharp;
 using Bud.Test.Util;
 
-namespace Bud {
+namespace Bud.SystemTests {
   static internal class SystemTestUtils {
     public static string OutputAssemblyPath(TemporaryDirBuildCommander buildCommander, string fileName) {
       return OutputAssemblyPath(buildCommander, BuildKeys.Main, fileName);
@@ -20,7 +20,7 @@ namespace Bud {
     }
 
     private static string OutputAssemblyPath(Key buildScope, string projectBaseDir, string fileName) {
-      var projectOutputSubPath = Path.Combine(BudPaths.BudDirName, BuildDirs.OutputDirName, buildScope.Id, CSharpKeys.CSharp.Id, "debug", "bin", fileName);
+      var projectOutputSubPath = Path.Combine(BudPaths.BudDirName, BuildDirsPlugin.OutputDirName, buildScope.Id, CSharpKeys.CSharp.Id, "debug", "bin", fileName);
       return Path.Combine(projectBaseDir, projectOutputSubPath);
     }
   }

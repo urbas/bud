@@ -10,10 +10,10 @@ using Bud.Util;
 namespace Bud {
   public class Context : IContext {
     private readonly IConfig Configuration;
-    private ImmutableDictionary<Key, Task> TaskEvaluationCache = ImmutableDictionary<Key, Task>.Empty;
-    private readonly SemaphoreSlim EvaluationCacheSemaphore = new SemaphoreSlim(1);
-    private ImmutableDictionary<ITaskDefinition, Task> OverridenTaskEvaluations = ImmutableDictionary<ITaskDefinition, Task>.Empty;
-    private readonly SemaphoreSlim OverridenTaskEvaluationCacheSemaphore = new SemaphoreSlim(1);
+    private ImmutableDictionary<Key, Task> TaskValueCache = ImmutableDictionary<Key, Task>.Empty;
+    private readonly SemaphoreSlim TaskValueCacheSemaphore = new SemaphoreSlim(1);
+    private ImmutableDictionary<ITaskDefinition, Task> OverridenTaskValueCache = ImmutableDictionary<ITaskDefinition, Task>.Empty;
+    private readonly SemaphoreSlim OverridenTaskValueCacheSemaphore = new SemaphoreSlim(1);
 
     private Context(ImmutableDictionary<Key, IConfigDefinition> configDefinitions, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions, ILogger logger) : this(new Config(configDefinitions, logger), taskDefinitions) {}
 
@@ -50,12 +50,18 @@ namespace Bud {
 
     public Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition, Key taskKey) {
       Task existingEvaluation;
-      return OverridenTaskEvaluations.TryGetValue(taskDefinition, out existingEvaluation) ? (Task<T>) existingEvaluation : TaskUtils.ExecuteGuarded(OverridenTaskEvaluationCacheSemaphore, () => (Task<T>) EvaluateOverridenTaskToCacheUnguarded(taskDefinition, taskKey));
+      if (OverridenTaskValueCache.TryGetValue(taskDefinition, out existingEvaluation)) {
+        return (Task<T>) existingEvaluation;
+      }
+      return TaskUtils.ExecuteGuarded(OverridenTaskValueCacheSemaphore, () => (Task<T>) EvaluateOverridenTaskToCacheUnguarded(taskDefinition, taskKey));
     }
 
     public Task Evaluate(ITaskDefinition taskDefinition, Key taskKey) {
-      Task existingEvaluation;
-      return OverridenTaskEvaluations.TryGetValue(taskDefinition, out existingEvaluation) ? existingEvaluation : TaskUtils.ExecuteGuarded(OverridenTaskEvaluationCacheSemaphore, () => EvaluateOverridenTaskToCacheUnguarded(taskDefinition, taskKey));
+      Task existingValue;
+      if (OverridenTaskValueCache.TryGetValue(taskDefinition, out existingValue)) {
+        return existingValue;
+      }
+      return TaskUtils.ExecuteGuarded(OverridenTaskValueCacheSemaphore, () => EvaluateOverridenTaskToCacheUnguarded(taskDefinition, taskKey));
     }
 
     public static Context FromSettings(Settings settings, ILogger logger) {
@@ -68,37 +74,6 @@ namespace Bud {
 
     public static Context FromConfig(IConfig config, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) {
       return new Context(config, taskDefinitions);
-    }
-
-    private Task EvaluateTask(Key key) {
-      var absoluteKey = Key.Root / key;
-      return TryGetTaskEvaluationFromCache(absoluteKey) ?? TaskUtils.ExecuteGuarded(EvaluationCacheSemaphore, () => EvaluateTaskToCacheUnguarded(absoluteKey));
-    }
-
-    private Task<T> EvaluateTask<T>(Key key) {
-      var absoluteKey = Key.Root / key;
-      return (Task<T>) (TryGetTaskEvaluationFromCache(absoluteKey) ?? TaskUtils.ExecuteGuarded(EvaluationCacheSemaphore, () => (Task<T>) EvaluateTaskToCacheUnguarded(absoluteKey)));
-    }
-
-    private Task TryGetTaskEvaluationFromCache(Key absoluteKey) {
-      Task value;
-      return TaskEvaluationCache.TryGetValue(absoluteKey, out value) ? value : null;
-    }
-
-    private Task EvaluateTaskToCacheUnguarded(Key absoluteKey) {
-      ITaskDefinition taskDefinition;
-      if (TaskDefinitions.TryGetValue(absoluteKey, out taskDefinition)) {
-        var value = EvaluateTaskDefinition(absoluteKey, taskDefinition);
-        TaskEvaluationCache = TaskEvaluationCache.Add(absoluteKey, value);
-        return value;
-      }
-      throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. This task is not defined.", absoluteKey));
-    }
-
-    private Task EvaluateOverridenTaskToCacheUnguarded(ITaskDefinition taskDefinition, Key taskKey) {
-      Task freshEvaluation = EvaluateTaskDefinition(taskKey, taskDefinition);
-      OverridenTaskEvaluations = OverridenTaskEvaluations.Add(taskDefinition, freshEvaluation);
-      return freshEvaluation;
     }
 
     public override string ToString() {
@@ -118,6 +93,37 @@ namespace Bud {
           sb.Append(enumerator.Current);
         }
       }
+    }
+
+    private Task EvaluateTask(Key key) {
+      var absoluteKey = Key.Root / key;
+      return TryGetTaskEvaluationFromCache(absoluteKey) ?? TaskUtils.ExecuteGuarded(TaskValueCacheSemaphore, () => EvaluateTaskToCacheUnguarded(absoluteKey));
+    }
+
+    private Task<T> EvaluateTask<T>(Key key) {
+      var absoluteKey = Key.Root / key;
+      return (Task<T>) (TryGetTaskEvaluationFromCache(absoluteKey) ?? TaskUtils.ExecuteGuarded(TaskValueCacheSemaphore, () => (Task<T>) EvaluateTaskToCacheUnguarded(absoluteKey)));
+    }
+
+    private Task TryGetTaskEvaluationFromCache(Key absoluteKey) {
+      Task value;
+      return TaskValueCache.TryGetValue(absoluteKey, out value) ? value : null;
+    }
+
+    private Task EvaluateTaskToCacheUnguarded(Key absoluteKey) {
+      ITaskDefinition taskDefinition;
+      if (TaskDefinitions.TryGetValue(absoluteKey, out taskDefinition)) {
+        var value = EvaluateTaskDefinition(absoluteKey, taskDefinition);
+        TaskValueCache = TaskValueCache.Add(absoluteKey, value);
+        return value;
+      }
+      throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. This task is not defined.", absoluteKey));
+    }
+
+    private Task EvaluateOverridenTaskToCacheUnguarded(ITaskDefinition taskDefinition, Key taskKey) {
+      Task freshEvaluation = EvaluateTaskDefinition(taskKey, taskDefinition);
+      OverridenTaskValueCache = OverridenTaskValueCache.Add(taskDefinition, freshEvaluation);
+      return freshEvaluation;
     }
 
     private Task EvaluateTaskDefinition(Key absoluteKey, ITaskDefinition taskDefinition) {
