@@ -9,27 +9,31 @@ namespace Bud.CSharp {
       var dependencyBuildTarget = dependencyProject / BuildKeys.Main / CSharpKeys.CSharp;
       return DependenciesSettings.AddDependency(
         new CSharpInternalDependency(dependencyBuildTarget),
-        new ExternalDependency(packageName, packageVersion),
-        shouldUseInternalDependency: context => IsMainBuildTargetDefined(context, dependencyBuildTarget));
+        new ExternalDependency(packageName, packageVersion), context => IsMainBuildTargetDefined(context, dependencyBuildTarget));
     }
 
     public static Setup Exe(params Setup[] setups) {
-      return CSharpBuildTargetPlugin.Init(BuildKeys.Main, setups);
+      return new CSharpBuildTargetPlugin(BuildKeys.Main, setups);
     }
 
     public static Setup Dll(params Setup[] setups) {
-      return CSharpBuildTargetPlugin.Init(BuildKeys.Main, CSharpKeys.AssemblyType.Modify(AssemblyType.Library), setups.ToSetup());
+      return new CSharpBuildTargetPlugin(BuildKeys.Main,
+                                         CSharpKeys.AssemblyType.Modify(AssemblyType.Library),
+                                         setups.Merge());
     }
 
     public static Setup Test(params Setup[] setups) {
-      return CSharpBuildTargetPlugin.Init(BuildKeys.Test, CSharpKeys.AssemblyType.Modify(AssemblyType.Library), setups.ToSetup(), AddMainBuildTargetDependency());
+      return new CSharpBuildTargetPlugin(BuildKeys.Test,
+                                         CSharpKeys.AssemblyType.Modify(AssemblyType.Library),
+                                         setups.Merge(),
+                                         AddMainBuildTargetDependency());
     }
 
     private static Setup AddMainBuildTargetDependency() {
       return settings => {
         var project = BuildTargetUtils.ProjectOf(settings.Scope);
         var mainBuildTarget = project / BuildKeys.Main / CSharpKeys.CSharp;
-        return settings.Do(DependenciesSettings.AddDependency(new CSharpInternalDependency(mainBuildTarget), config => IsMainBuildTargetDefined(config, mainBuildTarget)));
+        return settings.Add(DependenciesSettings.AddDependency(new CSharpInternalDependency(mainBuildTarget), config => IsMainBuildTargetDefined(config, mainBuildTarget)));
       };
     }
 

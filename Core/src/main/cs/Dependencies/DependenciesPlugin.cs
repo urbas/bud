@@ -13,12 +13,12 @@ namespace Bud.Dependencies {
     public const string NuGetRemoteRepoUri = "http://packages.nuget.org/api/v2";
 
     public static Settings Init(Settings settings) {
-      return settings.Globally(DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
-                               DependenciesKeys.FetchedDependenciesDir.Init(FetchedDependenciesDirImpl),
-                               DependenciesKeys.FetchedDependenciesListFile.Init(FetchedDependenciesFileImpl),
-                               DependenciesKeys.Fetch.Init(FetchImpl),
-                               DependenciesKeys.CleanDependencies.InitSync(CleanDependenciesImpl),
-                               DependenciesKeys.FetchedDependencies.Init(FetchedDependenciesImpl));
+      return settings.AddGlobally(DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
+                                  DependenciesKeys.FetchedDependenciesDir.Init(FetchedDependenciesDirImpl),
+                                  DependenciesKeys.FetchedDependenciesListFile.Init(FetchedDependenciesFileImpl),
+                                  DependenciesKeys.Fetch.Init(FetchImpl),
+                                  DependenciesKeys.CleanDependencies.InitSync(CleanDependenciesImpl),
+                                  DependenciesKeys.FetchedDependencies.Init(FetchedDependenciesImpl));
     }
 
     private static string FetchedDependenciesDirImpl(IConfig context) {

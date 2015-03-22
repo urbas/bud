@@ -8,7 +8,7 @@ namespace Bud.Resources {
     public ResourcesBuildTarget(Key buildScope, params Setup[] setups) : base(buildScope, ResourcesKeys.Resources, setups) {}
 
     protected override Settings Setup(Settings projectSettings, Key project) {
-      return projectSettings.Do(BuildTargetKeys.SourceFiles.InitSync(FindResourceFiles));
+      return projectSettings.Add(BuildTargetKeys.SourceFiles.InitSync(FindResourceFiles));
     }
 
     private IEnumerable<string> FindResourceFiles(IContext context, Key buildTarget) {

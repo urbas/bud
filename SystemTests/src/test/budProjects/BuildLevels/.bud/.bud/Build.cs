@@ -5,7 +5,7 @@ using Bud.Projects;
 public class Build : IBuild {
   public Settings Setup(Settings settings, string baseDir) {
     return settings.BuildDefinition(
-      Cs.Dependency("Bud.Examples.HelloWorldPlugin")
+      Cs.Dependency("Bud.Examples.HelloWorldPlugin", "0.0.3")
     );
   }
 }

@@ -5,36 +5,36 @@ using System.Threading.Tasks;
 using Bud.Util;
 
 namespace Bud.Build {
-  public abstract class BuildTargetPlugin {
+  public abstract class BuildTargetPlugin : Plugin {
     protected readonly Key BuildScope;
     protected readonly Key Language;
-    private readonly IEnumerable<Setup> setups;
+    private readonly IEnumerable<Setup> Setups;
 
     protected BuildTargetPlugin(Key buildScope, Key language, IEnumerable<Setup> setups) {
       BuildScope = buildScope;
       Language = language;
-      this.setups = setups ?? ImmutableList<Setup>.Empty;
+      Setups = setups ?? ImmutableList<Setup>.Empty;
     }
 
-    public Settings Setup(Settings projectSettings) {
+    public override Settings Setup(Settings projectSettings) {
       var project = projectSettings.Scope;
       var buildTargetKey = project / BuildScope / Language;
       return projectSettings
-        .Do(BuildKeys.Test.Init(TaskUtils.NoOpTask),
-            BuildKeys.BuildTargets.Init(ImmutableList<Key>.Empty),
-            BuildKeys.BuildTargets.Modify((ctxt, oldBuildTargets) => oldBuildTargets.Add(buildTargetKey)))
-        .In(buildTargetKey,
-            BuildDirsKeys.BaseDir.Init(context => Path.Combine(context.GetBaseDir(project), "src", BuildScope.Id, Language.Id)),
-            BuildDirsKeys.OutputDir.Init(context => Path.Combine(context.GetOutputDir(project), BuildScope.Id, Language.Id)),
-            BuildKeys.Build.Init(BuildTaskImpl),
-            buildTargetSettings => Setup(buildTargetSettings, project),
-            setups.ToSetup())
-        .Globally(BuildKeys.Test.Init(TaskUtils.NoOpTask),
-                  BuildKeys.Test.DependsOn(project / BuildKeys.Test),
-                  BuildKeys.Build.Init(TaskUtils.NoOpTask),
-                  BuildKeys.Build.DependsOn(BuildScope / BuildKeys.Build),
-                  (BuildScope / BuildKeys.Build).Init(TaskUtils.NoOpTask),
-                  (BuildScope / BuildKeys.Build).DependsOn(buildTargetKey / BuildKeys.Build));
+        .Add(BuildKeys.Test.Init(TaskUtils.NoOpTask),
+             BuildKeys.BuildTargets.Init(ImmutableList<Key>.Empty),
+             BuildKeys.BuildTargets.Modify((ctxt, oldBuildTargets) => oldBuildTargets.Add(buildTargetKey)))
+        .AddIn(buildTargetKey,
+               BuildDirsKeys.BaseDir.Init(context => Path.Combine(context.GetBaseDir(project), "src", BuildScope.Id, Language.Id)),
+               BuildDirsKeys.OutputDir.Init(context => Path.Combine(context.GetOutputDir(project), BuildScope.Id, Language.Id)),
+               BuildKeys.Build.Init(BuildTaskImpl),
+               buildTargetSettings => Setup(buildTargetSettings, project),
+               Setups.Merge())
+        .AddGlobally(BuildKeys.Test.Init(TaskUtils.NoOpTask),
+                     BuildKeys.Test.DependsOn(project / BuildKeys.Test),
+                     BuildKeys.Build.Init(TaskUtils.NoOpTask),
+                     BuildKeys.Build.DependsOn(BuildScope / BuildKeys.Build),
+                     (BuildScope / BuildKeys.Build).Init(TaskUtils.NoOpTask),
+                     (BuildScope / BuildKeys.Build).DependsOn(buildTargetKey / BuildKeys.Build));
     }
 
     protected abstract Settings Setup(Settings projectSettings, Key project);

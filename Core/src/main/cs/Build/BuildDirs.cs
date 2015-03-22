@@ -11,14 +11,14 @@ namespace Bud.Build {
 
     public static Setup Init(string baseDir) {
       return settings => settings
-        .Do(BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
+        .Add(BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
             BuildDirsKeys.BaseDir.Init(baseDir),
             BuildDirsKeys.BudDir.Init(GetDefaultBudDir),
             BuildDirsKeys.OutputDir.Init(GetDefaultOutputDir),
             BuildDirsKeys.BuildConfigCacheDir.Init(GetDefaultBuildConfigCacheDir),
             BuildDirsKeys.PersistentBuildConfigDir.Init(GetDefaultPersistentBuildConfigDir),
             BuildDirsKeys.Clean.Modify(CleanBuildDirsImpl))
-        .Globally(BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
+        .AddGlobally(BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
                   BuildDirsKeys.Clean.DependsOn(settings.Scope / BuildDirsKeys.Clean));
     }
 

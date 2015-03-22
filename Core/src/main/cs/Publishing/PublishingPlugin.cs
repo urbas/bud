@@ -12,13 +12,13 @@ using NuGet;
 namespace Bud.Publishing {
   public class PublishingPlugin {
     public static Setup InitGlobally() {
-      return settings => settings.Globally(PublishKeys.PublishApiKey.Init(PublishApiKeyImpl));
+      return settings => settings.AddGlobally(PublishKeys.PublishApiKey.Init(PublishApiKeyImpl));
     }
 
     public static Setup Init() {
-      return settings => settings.Do(PublishKeys.Publish.Init(PublishImpl),
+      return settings => settings.Add(PublishKeys.Publish.Init(PublishImpl),
                                      PublishKeys.Package.Init(PackageImpl))
-                                 .Globally(PublishKeys.Publish.Init(TaskUtils.NoOpTask),
+                                 .AddGlobally(PublishKeys.Publish.Init(TaskUtils.NoOpTask),
                                            PublishKeys.Publish.DependsOn(settings.Scope / PublishKeys.Publish));
     }
 

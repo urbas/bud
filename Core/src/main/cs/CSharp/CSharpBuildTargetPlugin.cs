@@ -17,25 +17,21 @@ namespace Bud.CSharp {
 
     public CSharpBuildTargetPlugin(Key buildScope, params Setup[] setups) : base(buildScope, CSharpKeys.CSharp, setups) {}
 
-    public static Setup Init(Key project, params Setup[] setups) {
-      return new CSharpBuildTargetPlugin(project, setups).Setup;
-    }
-
     protected override Settings Setup(Settings buildTargetSettings, Key project) {
-      return buildTargetSettings.Do(BuildTargetKeys.SourceFiles.InitSync(FindSources),
-                                    CSharpKeys.TargetFramework.Init(GetDefaultFramework),
-                                    CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
-                                    BuildKeys.Build.Modify(BuildTaskImpl),
-                                    CSharpKeys.AssemblyReferences.Init(AssemblyReferencesImpl),
-                                    CSharpKeys.AssemblyReferencePaths.Init(AssemblyReferencePathsImpl),
-                                    CSharpKeys.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
-                                    CSharpKeys.OutputAssemblyName.Init(GetDefaultOutputAssemblyName),
-                                    CSharpKeys.RootNamespace.Init(GetDefaultRootNamespace),
-                                    CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile),
-                                    CSharpKeys.DistDir.Init(DefaultDistDir),
-                                    CSharpKeys.Dist.Init(CreateDistributablePackage),
-                                    PublishingPlugin.Init(),
-                                    SolutionExporterPlugin.Init());
+      return buildTargetSettings.Add(BuildTargetKeys.SourceFiles.InitSync(FindSources),
+                                     CSharpKeys.TargetFramework.Init(GetDefaultFramework),
+                                     CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
+                                     BuildKeys.Build.Modify(BuildTaskImpl),
+                                     CSharpKeys.AssemblyReferences.Init(AssemblyReferencesImpl),
+                                     CSharpKeys.AssemblyReferencePaths.Init(AssemblyReferencePathsImpl),
+                                     CSharpKeys.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
+                                     CSharpKeys.OutputAssemblyName.Init(GetDefaultOutputAssemblyName),
+                                     CSharpKeys.RootNamespace.Init(GetDefaultRootNamespace),
+                                     CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile),
+                                     CSharpKeys.DistDir.Init(DefaultDistDir),
+                                     CSharpKeys.Dist.Init(CreateDistributablePackage),
+                                     PublishingPlugin.Init(),
+                                     SolutionExporterPlugin.Init());
     }
 
     private static Framework GetDefaultFramework(IConfig config) {

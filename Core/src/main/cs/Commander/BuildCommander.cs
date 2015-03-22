@@ -36,14 +36,10 @@ namespace Bud.Commander {
     private static bool TryLoadBuildDefinition(string budDir, out BuildDefinitionInfo buildDefinitionInfo) {
       if (Exists(BuildDefinitionSourceFile(budDir))) {
         using (var buildLevelCommander = LoadBuildLevelCommander(budDir)) {
-          // TODO: Do not fetch dependencies if they were fetched already.
-          // This call must be super quick.
-//          thisBuildLevelCommander.Evaluate(DependenciesKeys.FetchDependencies);
           buildLevelCommander.Evaluate(BuildKeys.Build);
           buildDefinitionInfo = new BuildDefinitionInfo(
             BuildDefinitionAssemblyFile(budDir),
-            (string[]) buildLevelCommander.Evaluate(BuildDefinitionPlugin.BuildDefinitionProjectKey / BuildKeys.Main / CSharpKeys.CSharp / CSharpKeys.AssemblyReferencePaths)
-            );
+            (string[]) buildLevelCommander.Evaluate(BuildDefinitionPlugin.BuildDefinitionProjectKey / BuildKeys.Main / CSharpKeys.CSharp / CSharpKeys.AssemblyReferencePaths));
         }
         return true;
       }

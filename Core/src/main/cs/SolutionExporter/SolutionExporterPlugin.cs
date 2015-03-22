@@ -17,7 +17,7 @@ using NuGet;
 namespace Bud.SolutionExporter {
   public static class SolutionExporterPlugin {
     public static Setup Init() {
-      return settings => settings.Globally(SolutionExporterKeys.GenerateSolution.Init(GenerateSolutionImpl));
+      return settings => settings.AddGlobally(SolutionExporterKeys.GenerateSolution.Init(GenerateSolutionImpl));
     }
 
     private static async Task GenerateSolutionImpl(IContext context) {

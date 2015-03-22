@@ -4,6 +4,7 @@ using System.IO;
 using Bud.Build;
 using Bud.Commander;
 using Bud.Commander.BuildCommander;
+using Bud.Util;
 
 namespace Bud {
   public static class BudCli {
@@ -19,7 +20,14 @@ namespace Bud {
     }
 
     private static void ExecuteCommands(CliArguments cliArguments) {
-      var buildCommander = LoadBuildCommander(cliArguments.BuildLevel, Directory.GetCurrentDirectory());
+      IBuildCommander buildCommander;
+      try {
+        buildCommander = LoadBuildCommander(cliArguments.BuildLevel, Directory.GetCurrentDirectory());
+      } catch (Exception e) {
+        Console.Error.WriteLine("An error occurred during build initialiation. Error messages:");
+        ExceptionUtils.PrintItemizedErrorMessages(new[] {e}, 0);
+        return;
+      }
       var commandsToExecute = GetCommandsToExecute(cliArguments);
       ExecuteCommands(commandsToExecute, buildCommander);
     }
@@ -33,33 +41,11 @@ namespace Bud {
         try {
           buildCommander.Evaluate(command);
         } catch (Exception e) {
-          Console.Error.WriteLine("An error occurred during the execution of the command '{0}'. Error messages:", command);
-          PrintItemizedErrorMessages(new[] {e}, 0);
+          Console.Error.WriteLine("An error occurred during the execution of command '{0}'. Error messages:", command);
+          ExceptionUtils.PrintItemizedErrorMessages(new[] {e}, 0);
           break;
         }
       }
-    }
-
-    private static void PrintItemizedErrorMessages(IEnumerable<Exception> exceptions, int depth) {
-      foreach (var exception in exceptions) {
-        var aggregateException = exception as AggregateException;
-        if (aggregateException != null) {
-          PrintItemizedErrorMessages(aggregateException.InnerExceptions, depth);
-        } else if (exception.InnerException != null) {
-          PrintErrorMessageItem(depth, exception);
-          PrintItemizedErrorMessages(new[] {exception.InnerException}, depth + 1);
-        } else {
-          PrintErrorMessageItem(depth, exception);
-        }
-      }
-    }
-
-    private static void PrintErrorMessageItem(int depth, Exception exception) {
-      for (int i = 0; i <= depth; i++) {
-        Console.Error.Write(" ");
-      }
-      Console.Error.Write("- ");
-      Console.Error.WriteLine(exception.Message);
     }
   }
 }

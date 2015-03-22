@@ -6,7 +6,7 @@ using Bud.Examples.HelloWorldPlugin;
 public class Build : IBuild {
   public Settings Setup(Settings settings, string baseDir) {
     return settings
-      .Do(HelloWorldPlugin.Enable())
+      .Add(new HelloWorldPlugin())
       .Project("A", baseDir, Cs.Exe());
   }
 }

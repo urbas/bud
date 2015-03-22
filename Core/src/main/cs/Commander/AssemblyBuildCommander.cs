@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using Bud.Build;
 using Bud.BuildDefinition;
 using Bud.Logging;
@@ -14,9 +12,14 @@ namespace Bud.Commander {
     private Settings Settings;
     private IConfig Config;
 
-    public void LoadBuildDefinition(string buildDefinitionAssemblyFile, string[] dependencyDlls, string baseDirectory, int buildType, TextWriter standardOutputTextWriter, TextWriter standardErrorTextWriter) {
-      Console.SetOut(new NonSerializingOutputWriter(standardOutputTextWriter));
-      Console.SetError(new NonSerializingOutputWriter(standardErrorTextWriter));
+    public void LoadBuildDefinition(string buildDefinitionAssemblyFile,
+                                    string[] dependencyDlls,
+                                    string baseDirectory,
+                                    int buildType,
+                                    TextWriter standardOutputTextWriter,
+                                    TextWriter standardErrorTextWriter) {
+      Console.SetOut(standardOutputTextWriter);
+      Console.SetError(standardErrorTextWriter);
       AppDomain.CurrentDomain.AssemblyResolve += AssemblyUtils.PathListAssemblyResolver(dependencyDlls);
       var assembly = AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(buildDefinitionAssemblyFile));
       var build = (IBuild) assembly.CreateInstance(BuildDefinitionClassName);
@@ -41,17 +44,5 @@ namespace Bud.Commander {
     }
 
     public void Dispose() {}
-  }
-
-  public class NonSerializingOutputWriter : TextWriter {
-    private readonly TextWriter StandardOutputTextWriter;
-
-    public NonSerializingOutputWriter(TextWriter standardOutputTextWriter) {
-      StandardOutputTextWriter = standardOutputTextWriter;
-    }
-
-    public override Encoding Encoding => StandardOutputTextWriter.Encoding;
-
-    public override void Write(object value) => base.Write(value.ToString());
   }
 }

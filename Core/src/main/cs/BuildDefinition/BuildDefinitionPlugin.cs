@@ -17,12 +17,12 @@ namespace Bud.BuildDefinition {
     public static readonly Key BuildDefinitionProjectKey = ProjectPlugin.ProjectKey(BuildDefinitionProjectId);
 
     public override Settings Setup(Settings settings) {
-      return settings.Do(Cs.Dll(BuildDefinitionKeys.BuildConfigSourceFile.Init(GetDefaultBuildSourceFile),
-                                BuildTargetKeys.SourceFiles.Modify(AddBuildDefinitionSourceFile),
-                                CSharpKeys.OutputAssemblyDir.Modify(BuildDirs.GetBaseDir),
-                                CSharpKeys.OutputAssemblyName.Modify(BuildDefinitionAssemblyName),
-                                CSharpKeys.DistDir.Modify(BuildDirs.GetBaseDir),
-                                BudAssemblyReferences));
+      return settings.Add(Cs.Dll(BuildDefinitionKeys.BuildConfigSourceFile.Init(GetDefaultBuildSourceFile),
+                                 BuildTargetKeys.SourceFiles.Modify(AddBuildDefinitionSourceFile),
+                                 CSharpKeys.OutputAssemblyDir.Modify(BuildDirs.GetBaseDir),
+                                 CSharpKeys.OutputAssemblyName.Modify(BuildDefinitionAssemblyName),
+                                 CSharpKeys.DistDir.Modify(BuildDirs.GetBaseDir),
+                                 BudAssemblyReferences));
     }
 
     public static Setup BudAssemblyReferences => CSharpKeys.AssemblyReferences.Modify(AddBudAssembliesImpl);
