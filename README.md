@@ -24,11 +24,11 @@ Chocolatey:
 
 ## TODO
 
-- Bud must generate sln and csproj files from the build definition.
-
-- Users should be able to write plugins, publish them via NuGet, and use them in their build definitions.
-
 - Bud must be able to run tests.
+
+- Bud has to be able to run executable projects via `bud run` or `bud run project/My.Project/main/cs/run`.
+
+- Bud needs a concept of "macros". A macro can take parameters, reload or temporarily modify settings and then run a sequence of tasks. For example, `bud release` would take in the version of the next release, change the version run-time, publish packages, commit the new version to a file, and return the new settings.
 
 - Bud must have an interactive and non-interactive command-line mode.
 
