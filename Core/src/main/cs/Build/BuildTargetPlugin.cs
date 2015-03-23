@@ -8,12 +8,12 @@ namespace Bud.Build {
   public abstract class BuildTargetPlugin : Plugin {
     protected readonly Key BuildScope;
     protected readonly Key Language;
-    private readonly IEnumerable<Setup> Setups;
+    private readonly Setup ExtraBuildTargetSetup;
 
-    protected BuildTargetPlugin(Key buildScope, Key language, IEnumerable<Setup> setups) {
+    protected BuildTargetPlugin(Key buildScope, Key language, IEnumerable<Setup> extraBuildTargetSetup) {
       BuildScope = buildScope;
       Language = language;
-      Setups = setups ?? ImmutableList<Setup>.Empty;
+      ExtraBuildTargetSetup = (extraBuildTargetSetup ?? ImmutableList<Setup>.Empty).Merge();
     }
 
     public override Settings Setup(Settings projectSettings) {
@@ -27,8 +27,8 @@ namespace Bud.Build {
                BuildDirsKeys.BaseDir.Init(context => Path.Combine(context.GetBaseDir(project), "src", BuildScope.Id, Language.Id)),
                BuildDirsKeys.OutputDir.Init(context => Path.Combine(context.GetOutputDir(project), BuildScope.Id, Language.Id)),
                BuildKeys.Build.Init(BuildTaskImpl),
-               buildTargetSettings => Setup(buildTargetSettings, project),
-               Setups.Merge())
+               BuildTargetSetup,
+               ExtraBuildTargetSetup)
         .AddGlobally(BuildKeys.Test.Init(TaskUtils.NoOpTask),
                      BuildKeys.Test.DependsOn(project / BuildKeys.Test),
                      BuildKeys.Build.Init(TaskUtils.NoOpTask),
@@ -37,7 +37,7 @@ namespace Bud.Build {
                      (BuildScope / BuildKeys.Build).DependsOn(buildTargetKey / BuildKeys.Build));
     }
 
-    protected abstract Settings Setup(Settings projectSettings, Key project);
+    protected abstract Settings BuildTargetSetup(Settings projectSettings);
 
     private Task BuildTaskImpl(IContext context, Key buildTarget) {
       context.Logger.Info("building...");

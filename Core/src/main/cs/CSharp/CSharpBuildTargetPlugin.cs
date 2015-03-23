@@ -15,9 +15,9 @@ namespace Bud.CSharp {
   public class CSharpBuildTargetPlugin : BuildTargetPlugin {
     public const string DistDirName = "dist";
 
-    public CSharpBuildTargetPlugin(Key buildScope, params Setup[] setups) : base(buildScope, CSharpKeys.CSharp, setups) {}
+    public CSharpBuildTargetPlugin(Key buildScope, params Setup[] extraBuildTargetSetup) : base(buildScope, CSharpKeys.CSharp, extraBuildTargetSetup) {}
 
-    protected override Settings Setup(Settings buildTargetSettings, Key project) {
+    protected override Settings BuildTargetSetup(Settings buildTargetSettings) {
       return buildTargetSettings.Add(BuildTargetKeys.SourceFiles.InitSync(FindSources),
                                      CSharpKeys.TargetFramework.Init(GetDefaultFramework),
                                      CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
