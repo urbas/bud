@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Bud.Build;
 using Bud.CSharp.Compiler;
 using Bud.Dependencies;
+using Bud.IO;
 using Bud.Publishing;
 using Bud.SolutionExporter;
 using NuGet;
@@ -134,13 +135,9 @@ namespace Bud.CSharp {
       var distributionPath = context.GetDistDir(buildTarget);
       Directory.CreateDirectory(distributionPath);
       foreach (var referencedAssembly in referencedAssemblies) {
-        CopyFile(referencedAssembly, distributionPath);
+        Files.CopyFile(referencedAssembly, distributionPath);
       }
-      CopyFile(context.GetCSharpOutputAssemblyFile(buildTarget), distributionPath);
-    }
-
-    private static void CopyFile(string referencedAssembly, string targetDir) {
-      File.Copy(referencedAssembly, Path.Combine(targetDir, Path.GetFileName(referencedAssembly)), true);
+      Files.CopyFile(context.GetCSharpOutputAssemblyFile(buildTarget), distributionPath);
     }
 
     public static bool IsMainBuildTargetDefined(IConfig context, Key dependencyBuildTargetKey) {

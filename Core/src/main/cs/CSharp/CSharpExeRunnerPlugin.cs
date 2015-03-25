@@ -1,4 +1,7 @@
+using System;
+using System.IO;
 using System.Threading.Tasks;
+using Bud.Cli;
 using Bud.Util;
 
 namespace Bud.CSharp {
@@ -12,9 +15,12 @@ namespace Bud.CSharp {
                                   Run.DependsOn(buildTarget / Run));
     }
 
-    private Task RunImpl(IContext context, Key buildTarget) {
-      context.Logger.Info(string.Format("Executing {0}", context.GetCSharpOutputAssemblyFile(buildTarget)));
-      return TaskUtils.NullAsyncResult;
+    private async Task RunImpl(IContext context, Key buildTarget) {
+      await context.Evaluate(buildTarget / CSharpKeys.Dist);
+      var distributionPath = context.GetDistDir(buildTarget);
+      var executable = Path.Combine(distributionPath, Path.GetFileName(context.GetCSharpOutputAssemblyFile(buildTarget)));
+      context.Logger.Info(string.Format("Executing {0}...", executable));
+      ProcessBuilder.Executable(executable).Start(Console.Out, Console.Error);
     }
   }
 }

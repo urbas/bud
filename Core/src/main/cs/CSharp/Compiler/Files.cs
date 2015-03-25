@@ -13,5 +13,9 @@ namespace Bud.IO {
     public static bool IsFileNewer(string sourceFile, DateTime dateTime) {
       return File.GetLastWriteTime(sourceFile) >= dateTime;
     }
+
+    public static void CopyFile(string referencedAssembly, string targetDir) {
+      File.Copy(referencedAssembly, Path.Combine(targetDir, Path.GetFileName(referencedAssembly)), true);
+    }
   }
 }
