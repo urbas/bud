@@ -31,7 +31,7 @@ namespace Bud.CSharp {
                                      CSharpKeys.DistDir.Init(DefaultDistDir),
                                      CSharpKeys.Dist.Init(CreateDistributablePackage),
                                      PublishingPlugin.Instance,
-                                     SolutionExporterPlugin.Init());
+                                     SolutionExporterPlugin.Instance);
     }
 
     private static Framework GetDefaultFramework(IConfig config) {
@@ -90,7 +90,7 @@ namespace Bud.CSharp {
       if (VersionUtility.TryGetCompatibleItems(targetFramework, package.AssemblyReferences, out compatibleAssemblyRereferences) && compatibleAssemblyRereferences.Any()) {
         return GetAssemblyWithLatestTargetFramework(compatibleAssemblyRereferences);
       }
-      throw new Exception(string.Format("Could not find a compatible assembly in dependency '{0}' for build target '{1}'. The build target requires target framework of '{2}'.", package.Id, buildTarget, targetFramework.FullName));
+      throw new Exception(String.Format("Could not find a compatible assembly in dependency '{0}' for build target '{1}'. The build target requires target framework of '{2}'.", package.Id, buildTarget, targetFramework.FullName));
     }
 
     private IPackageAssemblyReference GetAssemblyWithLatestTargetFramework(IEnumerable<IPackageAssemblyReference> compatibleAssemblyRereferences) {
@@ -141,6 +141,10 @@ namespace Bud.CSharp {
 
     private static void CopyFile(string referencedAssembly, string targetDir) {
       File.Copy(referencedAssembly, Path.Combine(targetDir, Path.GetFileName(referencedAssembly)), true);
+    }
+
+    public static bool IsMainBuildTargetDefined(IConfig context, Key dependencyBuildTargetKey) {
+      return context.IsConfigDefined(dependencyBuildTargetKey / CSharpKeys.OutputAssemblyFile);
     }
   }
 }

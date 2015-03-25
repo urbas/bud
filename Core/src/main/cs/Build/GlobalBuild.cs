@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using Bud.Dependencies;
 using Bud.Projects;
-using Bud.Publishing;
 
 namespace Bud.Build {
   public static class GlobalBuild {
@@ -9,7 +8,7 @@ namespace Bud.Build {
 
     public static Settings New(string globalBuildDir = ".") {
       return Settings.Create(new BuildDirsPlugin(globalBuildDir),
-                             DependenciesPlugin.Init,
+                             DependenciesPlugin.Instance,
                              BuildDirsKeys.BudDir.Modify(GetDefaultGlobalBudDir),
                              ProjectKeys.Version.Init(GlobalBuildSettings.DefaultBuildVersion));
     }

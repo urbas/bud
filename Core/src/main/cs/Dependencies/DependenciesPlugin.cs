@@ -9,10 +9,11 @@ using Newtonsoft.Json;
 using NuGet;
 
 namespace Bud.Dependencies {
-  public class DependenciesPlugin {
+  public class DependenciesPlugin : Plugin {
+    public readonly static DependenciesPlugin Instance = new DependenciesPlugin();
     public const string NuGetRemoteRepoUri = "http://packages.nuget.org/api/v2";
 
-    public static Settings Init(Settings settings) {
+    public override Settings Setup(Settings settings) {
       return settings.AddGlobally(DependenciesKeys.ExternalDependenciesKeys.Init(ImmutableHashSet<ConfigKey<ImmutableList<ExternalDependency>>>.Empty),
                                   DependenciesKeys.FetchedDependenciesDir.Init(FetchedDependenciesDirImpl),
                                   DependenciesKeys.FetchedDependenciesListFile.Init(FetchedDependenciesFileImpl),

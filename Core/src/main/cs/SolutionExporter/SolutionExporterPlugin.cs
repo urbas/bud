@@ -9,15 +9,16 @@ using Antlr4.StringTemplate;
 using Bud.Build;
 using Bud.Build.BuildTargetUtils;
 using Bud.CSharp;
-using Bud.Dependencies;
 using Bud.IO.Paths;
 using Bud.Resources;
 using NuGet;
 
 namespace Bud.SolutionExporter {
-  public static class SolutionExporterPlugin {
-    public static Setup Init() {
-      return settings => settings.AddGlobally(SolutionExporterKeys.GenerateSolution.Init(GenerateSolutionImpl));
+  public class SolutionExporterPlugin : Plugin {
+    public static readonly SolutionExporterPlugin Instance = new SolutionExporterPlugin();
+
+    public override Settings Setup(Settings settings) {
+      return settings.AddGlobally(SolutionExporterKeys.GenerateSolution.Init(GenerateSolutionImpl));
     }
 
     private static async Task GenerateSolutionImpl(IContext context) {

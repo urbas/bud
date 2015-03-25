@@ -20,13 +20,13 @@ namespace Bud.Build {
       var project = projectSettings.Scope;
       var buildTargetKey = project / BuildScope / Language;
       return projectSettings
-        .Add(BuildKeys.Test.Init(TaskUtils.NoOpTask),
-             BuildKeys.BuildTargets.Init(ImmutableList<Key>.Empty),
+        .Add(BuildKeys.BuildTargets.Init(ImmutableList<Key>.Empty),
              BuildKeys.BuildTargets.Modify((ctxt, oldBuildTargets) => oldBuildTargets.Add(buildTargetKey)))
         .AddIn(buildTargetKey,
                BuildDirsKeys.BaseDir.Init(context => Path.Combine(context.GetBaseDir(project), "src", BuildScope.Id, Language.Id)),
                BuildDirsKeys.OutputDir.Init(context => Path.Combine(context.GetOutputDir(project), BuildScope.Id, Language.Id)),
                BuildKeys.Build.Init(BuildTaskImpl),
+               BuildKeys.Test.Init(TaskUtils.NoOpTask),
                BuildTargetSetup,
                ExtraBuildTargetSetup)
         .AddGlobally(BuildKeys.Test.Init(TaskUtils.NoOpTask),
