@@ -3,12 +3,12 @@ using Bud.Build;
 using NuGet;
 
 namespace Bud.Projects {
-  public class ProjectPlugin : Plugin {
+  public class Project : Plugin {
     private readonly string ProjectId;
     private readonly string BaseDir;
     private readonly Setup[] Setups;
 
-    public ProjectPlugin(string projectId, string baseDir, params Setup[] setups) {
+    public Project(string projectId, string baseDir, params Setup[] setups) {
       ProjectId = projectId;
       BaseDir = baseDir;
       Setups = setups;
@@ -30,6 +30,7 @@ namespace Bud.Projects {
     }
 
     private static SemanticVersion VersionImpl(IConfig config) {
+      // TODO: Read the version from the file `.bud/version` or `version` or maybe even `Your.Project.project.json`
       return config.IsConfigDefined(ProjectKeys.Version) ? config.Evaluate(ProjectKeys.Version) : SemanticVersion.Parse("0.0.1-SNAPSHOT");
     }
   }

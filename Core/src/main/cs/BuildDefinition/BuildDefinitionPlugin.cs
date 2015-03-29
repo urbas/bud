@@ -14,7 +14,7 @@ namespace Bud.BuildDefinition {
     public const string BuildDefinitionAssemblyName = "Build";
     public const string BuildDefinitionSourceFileName = "Build.cs";
     public const string BuildDefinitionAssemblyFileName = "Build.dll";
-    public static readonly Key BuildDefinitionProjectKey = ProjectPlugin.ProjectKey(BuildDefinitionProjectId);
+    public static readonly Key BuildDefinitionProjectKey = Project.ProjectKey(BuildDefinitionProjectId);
 
     public override Settings Setup(Settings settings) {
       return settings.Add(Cs.Dll(BuildDefinitionKeys.BuildConfigSourceFile.Init(GetDefaultBuildSourceFile),

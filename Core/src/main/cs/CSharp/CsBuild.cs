@@ -13,10 +13,10 @@ using Bud.SolutionExporter;
 using NuGet;
 
 namespace Bud.CSharp {
-  public class CSharpBuildTargetPlugin : BuildTargetPlugin {
+  public class CsBuild : BuildTargetPlugin {
     public const string DistDirName = "dist";
 
-    public CSharpBuildTargetPlugin(Key buildScope, params Setup[] extraBuildTargetSetup) : base(buildScope, CSharpKeys.CSharp, extraBuildTargetSetup) {}
+    public CsBuild(Key buildScope, params Setup[] extraBuildTargetSetup) : base(buildScope, CSharpKeys.CSharp, extraBuildTargetSetup) {}
 
     protected override Settings BuildTargetSetup(Settings buildTargetSettings) {
       return buildTargetSettings.Add(BuildTargetKeys.SourceFiles.InitSync(FindSources),
@@ -75,7 +75,7 @@ namespace Bud.CSharp {
 
     private IEnumerable<IPackageAssemblyReference> AssemblyReferencesImpl(IConfig config, Key buildTarget) {
       return config.GetDependencies(buildTarget)
-                   .Select(dependency => GetCompatibleAssembly(config, buildTarget, dependency));
+                   .SelectMany(dependency => GetCompatibleAssemblies(config, buildTarget, dependency));
     }
 
     private static string[] AssemblyReferencePathsImpl(IConfig config, Key buildTarget) {
@@ -84,12 +84,13 @@ namespace Bud.CSharp {
                    .ToArray();
     }
 
-    private IPackageAssemblyReference GetCompatibleAssembly(IConfig config, Key buildTarget, IDependency dependency) {
+    private IEnumerable<IPackageAssemblyReference> GetCompatibleAssemblies(IConfig config, Key buildTarget, IDependency dependency) {
       IEnumerable<IPackageAssemblyReference> compatibleAssemblyRereferences;
       var package = dependency.AsPackage(config);
       var targetFramework = config.GetTargetFramework(buildTarget).FrameworkName;
       if (VersionUtility.TryGetCompatibleItems(targetFramework, package.AssemblyReferences, out compatibleAssemblyRereferences) && compatibleAssemblyRereferences.Any()) {
-        return GetAssemblyWithLatestTargetFramework(compatibleAssemblyRereferences);
+        return compatibleAssemblyRereferences.GroupBy(assemblyReference => assemblyReference.Name)
+                                             .Select(GetAssemblyWithLatestTargetFramework);
       }
       throw new Exception(String.Format("Could not find a compatible assembly in dependency '{0}' for build target '{1}'. The build target requires target framework of '{2}'.", package.Id, buildTarget, targetFramework.FullName));
     }

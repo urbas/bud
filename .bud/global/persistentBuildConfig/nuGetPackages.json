@@ -19,6 +19,48 @@
       ]
     },
     {
+      "Id": "Bud.NUnit.ConsoleRunner",
+      "Versions": [
+        {
+          "Version": "0.0.1",
+          "Assemblies": [
+            {
+              "Name": "nunit-console-runner.dll",
+              "Path": "lib/net40/nunit-console-runner.dll",
+              "Framework": ".NETFramework,Version=v4.0",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v4.0"
+              ]
+            },
+            {
+              "Name": "nunit.core.dll",
+              "Path": "lib/net40/nunit.core.dll",
+              "Framework": ".NETFramework,Version=v4.0",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v4.0"
+              ]
+            },
+            {
+              "Name": "nunit.core.interfaces.dll",
+              "Path": "lib/net40/nunit.core.interfaces.dll",
+              "Framework": ".NETFramework,Version=v4.0",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v4.0"
+              ]
+            },
+            {
+              "Name": "nunit.util.dll",
+              "Path": "lib/net40/nunit.util.dll",
+              "Framework": ".NETFramework,Version=v4.0",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v4.0"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": "CommandLineParser",
       "Versions": [
         {

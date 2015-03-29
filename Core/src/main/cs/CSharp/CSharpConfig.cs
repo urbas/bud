@@ -1,12 +1,10 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Bud.Build;
 using NuGet;
 
 namespace Bud.CSharp {
   public static class CSharpConfig {
-
     public static Framework GetTargetFramework(this IConfig config, Key buildTarget) {
       return config.Evaluate(buildTarget / CSharpKeys.TargetFramework);
     }
@@ -39,8 +37,7 @@ namespace Bud.CSharp {
       return config.Evaluate(buildTarget / CSharpKeys.AssemblyReferences);
     }
 
-    public static IEnumerable<string> GetAssemblyReferencePaths(this IConfig config, Key buildTarget)
-    {
+    public static IEnumerable<string> GetAssemblyReferencePaths(this IConfig config, Key buildTarget) {
       return config.Evaluate(buildTarget / CSharpKeys.AssemblyReferencePaths);
     }
 

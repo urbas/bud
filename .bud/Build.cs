@@ -19,7 +19,8 @@ public class Build : IBuild {
         Cs.Dependency("Microsoft.Bcl.Immutable"),
         Cs.Dependency("Newtonsoft.Json"),
         Cs.Dependency("NuGet.Core"),
-        Cs.Dependency("Antlr4.StringTemplate")
+        Cs.Dependency("Antlr4.StringTemplate"),
+        Cs.Dependency("Bud.NUnit.ConsoleRunner")
       ), Cs.Test(
         CSharpKeys.RootNamespace.Modify("Bud"),
         Cs.Dependency("NUnit")

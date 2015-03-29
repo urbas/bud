@@ -30,7 +30,7 @@ namespace Bud.Build {
                BuildTargetSetup,
                ExtraBuildTargetSetup)
         .AddGlobally(BuildKeys.Test.Init(TaskUtils.NoOpTask),
-                     BuildKeys.Test.DependsOn(project / BuildKeys.Test),
+                     BuildKeys.Test.DependsOn(buildTargetKey / BuildKeys.Test),
                      BuildKeys.Build.Init(TaskUtils.NoOpTask),
                      BuildKeys.Build.DependsOn(BuildScope / BuildKeys.Build),
                      (BuildScope / BuildKeys.Build).Init(TaskUtils.NoOpTask),
