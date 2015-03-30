@@ -24,7 +24,7 @@ Chocolatey:
 
 ## TODO
 
-- Bud must be able to run tests.
+- test logs must be stored into a build target's output folder.
 
 - Bud needs a concept of "macros". A macro can take parameters, reload or temporarily modify settings and then run a sequence of tasks. For example, `bud release` would take in the version of the next release, change the version run-time, publish packages, commit the new version to a file, and return the new settings.
 
