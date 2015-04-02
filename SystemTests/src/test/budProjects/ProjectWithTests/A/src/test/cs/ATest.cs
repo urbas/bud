@@ -1,7 +1,9 @@
 ﻿using System;
+using NUnit.Framework;
 
 public class ATest {
+  [Test]
   public void Message_MUST_say_the_right_thing() {
-    Console.WriteLine(A.Message);
+    Assert.AreEqual("I am the A class!", A.Message);
   }
 }

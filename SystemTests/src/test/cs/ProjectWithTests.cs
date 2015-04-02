@@ -8,7 +8,7 @@ namespace Bud.SystemTests {
     [Test]
     public void compile_MUST_produce_the_main_and_test_libraries() {
       using (var buildCommander = TestProjects.LoadBuildCommander(this)) {
-        buildCommander.Evaluate("test/build");
+        buildCommander.Evaluate("test");
         FileAssertions.FilesExist(SystemTestUtils.OutputAssemblyPath(buildCommander, "A", BuildKeys.Main, "A.exe"),
                                   SystemTestUtils.OutputAssemblyPath(buildCommander, "A", BuildKeys.Test, "A.Test.dll"));
       }

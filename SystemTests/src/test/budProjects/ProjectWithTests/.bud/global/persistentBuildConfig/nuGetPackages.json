@@ -1,0 +1,18 @@
+{
+  "Packages": [
+    {
+      "Id": "NUnit",
+      "Versions": [
+        {
+          "Version": "2.6.4",
+          "Assemblies": [
+            {
+              "Name": "nunit.framework.dll",
+              "Path": "lib/nunit.framework.dll"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
