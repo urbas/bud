@@ -10,7 +10,7 @@ namespace Bud.Projects {
     }
 
     public static Settings BudPlugin(this Settings settings, string id, string baseDir, params Setup[] setups) {
-      return settings.Add(new Project(id, baseDir, Cs.Dll(BuildDefinitionPlugin.BudAssemblyReferences, setups.Merge())));
+      return settings.Add(new PluginProject(id, baseDir, setups));
     }
 
     public static Settings BuildDefinition(this Settings settings, params Setup[] setups) {

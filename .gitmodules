@@ -1,0 +1,3 @@
+[submodule "Examples/Bud.Examples.HelloWorldPlugin"]
+	path = Examples/Bud.Examples.HelloWorldPlugin
+	url = git@github.com:urbas/Bud.Examples.HelloWorldPlugin.git
