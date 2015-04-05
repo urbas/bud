@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Bud</id>
-    <version>0.0.1</version>
+    <version>0.0.3</version>
     <authors>Matej Urbas</authors>
     <owners>Matej Urbas</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
