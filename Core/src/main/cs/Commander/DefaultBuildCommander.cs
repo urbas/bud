@@ -1,8 +1,5 @@
-using System.IO;
 using Bud.Build;
-using Bud.CSharp;
 using Bud.Logging;
-using Bud.Projects;
 
 namespace Bud.Commander {
   public class DefaultBuildCommander : IBuildCommander {
@@ -25,8 +22,8 @@ namespace Bud.Commander {
     public void Dispose() {}
 
     private static Settings CreateDefaultSettings(string dirOfProjectToBeBuilt) {
-      return GlobalBuild.New(dirOfProjectToBeBuilt)
-                        .Project(Path.GetFileName(dirOfProjectToBeBuilt), dirOfProjectToBeBuilt, Cs.Exe(), Cs.Test());
+      var globalSettings = GlobalBuild.New(dirOfProjectToBeBuilt);
+      return new DefaultBuild().Setup(globalSettings, dirOfProjectToBeBuilt);
     }
   }
 }
