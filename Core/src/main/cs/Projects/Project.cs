@@ -7,6 +7,7 @@ namespace Bud.Projects {
     private readonly string ProjectId;
     private readonly string BaseDir;
     private readonly Setup[] Setups;
+    private static readonly Setup ProjectListInitialisation = ProjectKeys.Projects.Init(ImmutableDictionary<string, Key>.Empty);
 
     public Project(string projectId, string baseDir, params Setup[] setups) {
       ProjectId = projectId;
@@ -17,7 +18,7 @@ namespace Bud.Projects {
     public override Settings Setup(Settings settings) {
       var project = ProjectKey(ProjectId);
       return settings
-        .AddGlobally(ProjectKeys.Projects.Init(ImmutableDictionary<string, Key>.Empty),
+        .AddGlobally(ProjectListInitialisation,
                      ProjectKeys.Projects.Modify(allProjects => allProjects.Add(ProjectId, project)))
         .AddIn(project,
                new BuildDirsPlugin(BaseDir),
