@@ -2,20 +2,19 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Bud.Util;
 
 namespace Bud.SettingsConstruction {
   public class AddDependencies : TaskModifier {
-    private IEnumerable<TaskKey> extraDependencies;
+    private readonly IEnumerable<TaskKey> ExtraDependencies;
 
     public AddDependencies(TaskKey key, IEnumerable<TaskKey> extraDependencies) : base(key) {
-      this.extraDependencies = extraDependencies.Where(dependency => !dependency.Equals(key));
+      ExtraDependencies = extraDependencies.Where(dependency => !dependency.Equals(key));
     }
 
     public override void ApplyTo(ImmutableDictionary<Key, ITaskDefinition>.Builder buildConfigurationBuilder) {
       ITaskDefinition value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
-        buildConfigurationBuilder[Key] = value.WithDependencies(extraDependencies);
+        buildConfigurationBuilder[Key] = value.WithDependencies(ExtraDependencies);
       } else {
         throw new InvalidOperationException(string.Format("Cannot add dependencies to the task '{0}'. This task has not yet been defined.", Key));
       }

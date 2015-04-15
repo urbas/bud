@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Immutable;
-using Bud;
 
 namespace Bud.SettingsConstruction {
   public class ModifyConfig<T> : ConfigModifier {
-    Func<IConfig, T, T> ValueModifier;
+    private readonly Func<IConfig, T, T> ValueModifier;
 
     public ModifyConfig(ConfigKey<T> key, Func<IConfig, T, T> valueModifier) : base(key) {
-      this.ValueModifier = valueModifier;
+      ValueModifier = valueModifier;
     }
 
     public override void ApplyTo(ImmutableDictionary<Key, IConfigDefinition>.Builder buildConfigurationBuilder) {
@@ -16,7 +15,7 @@ namespace Bud.SettingsConstruction {
         ConfigDefinition<T> existingValue = (ConfigDefinition<T>)value;
         buildConfigurationBuilder[Key] = new ConfigDefinition<T>(b => ValueModifier(b, existingValue.Evaluate(b)));
       } else {
-        throw new InvalidOperationException(string.Format("Cannot modify the value of key '{0}'. This key has not yet been initialised.", Key));
+        throw new InvalidOperationException(string.Format("Cannot modify the value of config key '{0}'. This key has not yet been initialised.", Key));
       }
     }
   }

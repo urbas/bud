@@ -14,21 +14,15 @@ namespace Bud.Logging {
     }
 
     public void Info(string message) {
-      PrintMessageHeader(InfoLevelId, infoLevelWriter);
-      infoLevelWriter.WriteLine(message);
+      infoLevelWriter.WriteLine(FormatMessage(InfoLevelId, message));
     }
 
     public void Error(string message) {
-      PrintMessageHeader(ErrorLevelId, errorLevelWriter);
-      errorLevelWriter.WriteLine(message);
+      errorLevelWriter.WriteLine(FormatMessage(ErrorLevelId, message));
     }
 
-    private void PrintMessageHeader(string level, TextWriter writer) {
-      writer.Write("[");
-      writer.Write(level);
-      writer.Write(" ");
-      writer.Write(DateTime.Now.ToString("HH:mm:ss.fff"));
-      writer.Write("] ");
+    private string FormatMessage(string level, string message) {
+      return string.Format("[{0} {1}] {2}", level, DateTime.Now.ToString("HH:mm:ss.fff"), message);
     }
   }
 }

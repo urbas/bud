@@ -8,39 +8,26 @@ namespace Bud.CSharp {
     public static readonly Framework Net45 = new Framework("net45", @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe", "/usr/bin/mcs", new[] {"System.Runtime.dll"}, new[] {"Facades/System.Runtime.dll"}, new FrameworkName(".NETFramework,Version=v4.5"));
     public static readonly Framework Net46 = new Framework("net46", @"C:\Program Files (x86)\MSBuild\14.0\Bin\csc2.exe", "/usr/bin/mcs", new[] {"System.Runtime.dll"}, new[] {"Facades/System.Runtime.dll"}, new FrameworkName(".NETFramework,Version=v4.6"));
 
-    private readonly string windowsCSharpCompilerPath;
-    private readonly string linuxCSharpCompilerPath;
-    private readonly string[] windowsSystemRuntimeFacadeDll;
-    private readonly string[] linuxSystemRuntimeFacadeDll;
+    private readonly string WindowsCSharpCompilerPath;
+    private readonly string LinuxCSharpCompilerPath;
+    private readonly string[] WindowsSystemRuntimeFacadeDll;
+    private readonly string[] LinuxSystemRuntimeFacadeDll;
 
     private Framework(string identifier, string windowsCSharpCompilerPath, string linuxCSharpCompilerPath, string[] windowsSystemRuntimeFacadeDll, string[] linuxSystemRuntimeFacadeDll, FrameworkName frameworkName) {
       Identifier = identifier;
       FrameworkName = frameworkName;
-      this.windowsCSharpCompilerPath = windowsCSharpCompilerPath;
-      this.linuxCSharpCompilerPath = linuxCSharpCompilerPath;
-      this.windowsSystemRuntimeFacadeDll = windowsSystemRuntimeFacadeDll;
-      this.linuxSystemRuntimeFacadeDll = linuxSystemRuntimeFacadeDll;
+      WindowsCSharpCompilerPath = windowsCSharpCompilerPath;
+      LinuxCSharpCompilerPath = linuxCSharpCompilerPath;
+      WindowsSystemRuntimeFacadeDll = windowsSystemRuntimeFacadeDll;
+      LinuxSystemRuntimeFacadeDll = linuxSystemRuntimeFacadeDll;
     }
 
-    public string CSharpCompilerPath {
-      get {
-        if (Environment.OSVersion.Platform == PlatformID.Unix) {
-          return linuxCSharpCompilerPath;
-        }
-        return windowsCSharpCompilerPath;
-      }
-    }
+    public string CSharpCompilerPath => Environment.OSVersion.Platform == PlatformID.Unix ? LinuxCSharpCompilerPath : WindowsCSharpCompilerPath;
 
-    public IEnumerable<string> RuntimeAssemblies {
-      get {
-        if (Environment.OSVersion.Platform == PlatformID.Unix) {
-          return linuxSystemRuntimeFacadeDll;
-        }
-        return windowsSystemRuntimeFacadeDll;
-      }
-    }
+    public IEnumerable<string> RuntimeAssemblies => Environment.OSVersion.Platform == PlatformID.Unix ? LinuxSystemRuntimeFacadeDll : WindowsSystemRuntimeFacadeDll;
 
     public FrameworkName FrameworkName { get; private set; }
+
     public string Identifier { get; private set; }
   }
 }
