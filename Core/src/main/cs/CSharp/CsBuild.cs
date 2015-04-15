@@ -43,7 +43,7 @@ namespace Bud.CSharp {
       return Framework.Net45;
     }
 
-    private async Task BuildTaskImpl(IContext context, Func<Task> oldBuild, Key buildTarget) {
+    private static async Task BuildTaskImpl(IContext context, Func<Task> oldBuild, Key buildTarget) {
       await oldBuild();
       await CSharpCompiler.CompileBuildTarget(context, buildTarget);
     }
@@ -65,7 +65,7 @@ namespace Bud.CSharp {
       return Path.Combine(context.GetCSharpOutputAssemblyDir(buildTarget), String.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(buildTarget), GetAssemblyFileExtension(context, buildTarget)));
     }
 
-    private IEnumerable<string> FindSources(IContext context, Key buildTarget) {
+    private static IEnumerable<string> FindSources(IContext context, Key buildTarget) {
       var sourceDirectory = Path.Combine(context.GetBaseDir(buildTarget));
       if (Directory.Exists(sourceDirectory)) {
         return Directory.EnumerateFiles(sourceDirectory, "*.cs", SearchOption.AllDirectories);
@@ -95,7 +95,7 @@ namespace Bud.CSharp {
       throw new Exception(String.Format("Could not find a compatible assembly in dependency '{0}' for build target '{1}'. The build target requires target framework of '{2}'.", package.Id, buildTarget, targetFramework.FullName));
     }
 
-    private IPackageAssemblyReference GetAssemblyWithLatestTargetFramework(IEnumerable<IPackageAssemblyReference> compatibleAssemblyRereferences) {
+    private static IPackageAssemblyReference GetAssemblyWithLatestTargetFramework(IEnumerable<IPackageAssemblyReference> compatibleAssemblyRereferences) {
       IPackageAssemblyReference bestAssemblyReference = null;
       foreach (var assemblyReference in compatibleAssemblyRereferences) {
         if (bestAssemblyReference == null || HasNewerTargetFramework(bestAssemblyReference, assemblyReference)) {
@@ -126,11 +126,11 @@ namespace Bud.CSharp {
       }
     }
 
-    private string DefaultDistDir(IConfig context, Key buildTarget) {
+    private static string DefaultDistDir(IConfig context, Key buildTarget) {
       return Path.Combine(context.GetOutputDir(buildTarget), DistDirName);
     }
 
-    private async Task CreateDistributablePackage(IContext context, Key buildTarget) {
+    private static async Task CreateDistributablePackage(IContext context, Key buildTarget) {
       await context.Evaluate(buildTarget / BuildKeys.Build);
       var referencedAssemblies = context.GetAssemblyReferencePaths(buildTarget);
       var distributionPath = context.GetDistDir(buildTarget);

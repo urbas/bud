@@ -11,7 +11,7 @@ namespace Bud.Resources {
       return projectSettings.Add(BuildTargetKeys.SourceFiles.InitSync(FindResourceFiles));
     }
 
-    private IEnumerable<string> FindResourceFiles(IContext context, Key buildTarget) {
+    private static IEnumerable<string> FindResourceFiles(IContext context, Key buildTarget) {
       var sourceDirectory = Path.Combine(context.GetBaseDir(buildTarget));
       if (Directory.Exists(sourceDirectory)) {
         return Directory.EnumerateFiles(sourceDirectory, "*", SearchOption.AllDirectories);
