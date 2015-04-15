@@ -8,12 +8,10 @@ namespace Bud.Logging {
       TaskKey = taskKey;
     }
 
-    public void Info(string message) {
-      Logger.Info(TaskKey + "> " + message);
-    }
+    public void Info(string message) => Logger.Info(FormatScopedMessage(message));
 
-    public void Error(string message) {
-      Logger.Error(TaskKey + "> " + message);
-    }
+    public void Error(string message) => Logger.Error(FormatScopedMessage(message));
+
+    private string FormatScopedMessage(string message) => TaskKey + "> " + message;
   }
 }

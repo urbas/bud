@@ -7,8 +7,6 @@ namespace Bud.Logging {
       return new WriterLogger(infoLevelWriter, errorLevelWriter);
     }
 
-    public static ILogger CreateFromStandardOutputs() {
-      return CreateFromWriters(Console.Out, Console.Error);
-    }
+    public static ILogger CreateFromStandardOutputs() => CreateFromWriters(Console.Out, Console.Error);
   }
 }
