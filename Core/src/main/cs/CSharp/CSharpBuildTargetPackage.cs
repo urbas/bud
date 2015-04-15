@@ -9,11 +9,6 @@ using NuGet;
 
 namespace Bud.CSharp {
   public class CSharpBuildTargetPackage : IPackage {
-    public CSharpBuildTargetPackage(string id, SemanticVersion version) {
-      Id = id;
-      Version = version;
-    }
-
     public CSharpBuildTargetPackage(IConfig config, Key buildTarget) {
       var project = BuildTargetUtils.ProjectOf(buildTarget);
       Id = BuildTargetUtils.PackageIdOf(buildTarget);
