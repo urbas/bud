@@ -62,7 +62,10 @@ namespace Bud.CSharp {
     }
 
     private static string GetDefaultOutputAssemblyFile(IConfig context, Key buildTarget) {
-      return Path.Combine(context.GetCSharpOutputAssemblyDir(buildTarget), String.Format("{0}.{1}", context.GetCSharpOutputAssemblyName(buildTarget), GetAssemblyFileExtension(context, buildTarget)));
+      var assemblyDir = context.GetCSharpOutputAssemblyDir(buildTarget);
+      var assemblyName = context.GetCSharpOutputAssemblyName(buildTarget);
+      var assemblyExtension = GetAssemblyFileExtension(context, buildTarget);
+      return Path.Combine(assemblyDir, String.Format("{0}.{1}", assemblyName, assemblyExtension));
     }
 
     private static IEnumerable<string> FindSources(IContext context, Key buildTarget) {
