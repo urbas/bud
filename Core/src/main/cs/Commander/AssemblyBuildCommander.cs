@@ -15,7 +15,7 @@ namespace Bud.Commander {
     public void LoadBuildDefinition(string buildDefinitionAssemblyFile,
                                     string[] dependencyDlls,
                                     string baseDirectory,
-                                    int buildType,
+                                    int buildLevel,
                                     TextWriter standardOutputTextWriter,
                                     TextWriter standardErrorTextWriter) {
       Console.SetOut(standardOutputTextWriter);
@@ -23,12 +23,12 @@ namespace Bud.Commander {
       AppDomain.CurrentDomain.AssemblyResolve += AssemblyUtils.PathListAssemblyResolver(dependencyDlls);
       var assembly = AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(buildDefinitionAssemblyFile));
       var build = (IBuild) assembly.CreateInstance(BuildDefinitionClassName);
-      Settings = build.Setup(GetInitialSettings(baseDirectory, buildType), baseDirectory);
+      Settings = build.Setup(GetInitialSettings(baseDirectory, buildLevel), baseDirectory);
       Config = new Config(Settings.ConfigDefinitions, Logger.CreateFromWriters(standardOutputTextWriter, standardErrorTextWriter));
     }
 
-    private static Settings GetInitialSettings(string baseDirectory, int buildType) {
-      switch (buildType) {
+    private static Settings GetInitialSettings(string baseDirectory, int buildLevel) {
+      switch (buildLevel) {
         case BuildCommanderType.ProjectLevel:
           return GlobalBuild.New(baseDirectory);
         case BuildCommanderType.BuildLevel:
