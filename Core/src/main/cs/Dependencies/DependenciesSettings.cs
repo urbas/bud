@@ -50,7 +50,7 @@ namespace Bud.Dependencies {
       var transitiveDependencies = internalDependencies.SelectMany(dependency => config.GetDependencies(dependency.DependencyTarget));
       var directExternalDependencies = config.GetExternalDependencies(project);
       var fetchedDependencies = config.GetFetchedDependencies();
-      IEnumerable<Package> directExternalPackages = directExternalDependencies.Select(fetchedDependencies.GetPackage);
+      var directExternalPackages = directExternalDependencies.Select(fetchedDependencies.GetPackage);
       return internalDependencies.Concat(transitiveDependencies)
                                  .Concat(GetExternalDependenciesTransitive(directExternalPackages, fetchedDependencies))
                                  .Distinct(new DependencyEquality(config));
