@@ -5,10 +5,10 @@ namespace Bud.SettingsConstruction {
   public class InitializeConfig<T> : ConfigModifier {
     public Func<IConfig, T> InitialValue;
 
-    public InitializeConfig(ConfigKey<T> key, T initialValue) : this(key, b => initialValue) {}
+    public InitializeConfig(ConfigKey key, T initialValue) : this(key, b => initialValue) {}
 
-    public InitializeConfig(ConfigKey<T> key, Func<IConfig, T> initialValue) : base(key) {
-      this.InitialValue = initialValue;
+    public InitializeConfig(ConfigKey key, Func<IConfig, T> initialValue) : base(key) {
+      InitialValue = initialValue;
     }
 
     public override void Modify(IDictionary<ConfigKey, IConfigDefinition> buildConfigurationBuilder) {

@@ -5,7 +5,7 @@ namespace Bud.SettingsConstruction {
   public class ModifyConfig<T> : ConfigModifier {
     private readonly Func<IConfig, T, T> ValueModifier;
 
-    public ModifyConfig(ConfigKey<T> key, Func<IConfig, T, T> valueModifier) : base(key) {
+    public ModifyConfig(ConfigKey key, Func<IConfig, T, T> valueModifier) : base(key) {
       ValueModifier = valueModifier;
     }
 
