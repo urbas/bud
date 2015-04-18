@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction {
@@ -9,7 +10,7 @@ namespace Bud.SettingsConstruction {
       ValueModifier = valueModifier;
     }
 
-    public override void ApplyTo(ImmutableDictionary<Key, IConfigDefinition>.Builder buildConfigurationBuilder) {
+    public override void Modify(IDictionary<ConfigKey, IConfigDefinition> buildConfigurationBuilder) {
       IConfigDefinition value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
         ConfigDefinition<T> existingValue = (ConfigDefinition<T>)value;

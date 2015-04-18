@@ -1,13 +1,14 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction {
-  public abstract class ConfigModifier {
-    public readonly ConfigKey Key;
+  public abstract class ConfigModifier : IValueModifier<ConfigKey, IConfigDefinition> {
+    public ConfigKey Key { get; }
 
     protected ConfigModifier(ConfigKey key) {
       Key = key;
     }
 
-    public abstract void ApplyTo(ImmutableDictionary<Key, IConfigDefinition>.Builder buildConfigurationBuilder);
+    public abstract void Modify(IDictionary<ConfigKey, IConfigDefinition> buildConfigurationBuilder);
   }
 }

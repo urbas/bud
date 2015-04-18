@@ -20,57 +20,25 @@ namespace Bud {
       Scope = scope;
     }
 
-    public Settings AddIn(Key newScope, params Setup[] setups) {
-      return In(newScope).Add(setups).In(Scope);
-    }
+    public Settings AddIn(Key newScope, params Setup[] setups) => In(newScope).Add(setups).In(Scope);
 
-    public Settings Add(params Setup[] setups) {
-      return Add((IEnumerable<Setup>) setups);
-    }
+    public Settings Add(params Setup[] setups) => Add((IEnumerable<Setup>) setups);
 
-    public Settings Add(IEnumerable<Setup> setups) {
-      return setups.Aggregate(this, (oldSettings, plugin) => plugin(oldSettings)).In(Scope);
-    }
+    public Settings Add(IEnumerable<Setup> setups) => setups.Aggregate(this, (oldSettings, plugin) => plugin(oldSettings)).In(Scope);
 
-    public Settings AddGlobally(params Setup[] setups) {
-      return In(Key.Root).Add(setups).In(Scope);
-    }
+    public Settings AddGlobally(params Setup[] setups) => AddIn(Key.Root, setups);
 
-    public static Settings Create(params Setup[] setups) {
-      return Empty.Add(setups);
-    }
+    public static Settings Create(params Setup[] setups) => Empty.Add(setups);
 
-    public Settings Add(ConfigModifier configModifier) {
-      return new Settings(ConfigModifiers.Add(configModifier), TaskModifiers, Scope);
-    }
+    public Settings Add(ConfigModifier configModifier) => new Settings(ConfigModifiers.Add(configModifier), TaskModifiers, Scope);
 
-    public Settings Add(TaskModifier taskModifier) {
-      return new Settings(ConfigModifiers, TaskModifiers.Add(taskModifier), Scope);
-    }
+    public Settings Add(TaskModifier taskModifier) => new Settings(ConfigModifiers, TaskModifiers.Add(taskModifier), Scope);
 
-    public Settings Add(Settings settings) {
-      return new Settings(ConfigModifiers.AddRange(settings.ConfigModifiers), TaskModifiers.AddRange(settings.TaskModifiers), Scope);
-    }
+    public Settings Add(Settings settings) => new Settings(ConfigModifiers.AddRange(settings.ConfigModifiers), TaskModifiers.AddRange(settings.TaskModifiers), Scope);
 
-    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions {
-      get {
-        var configDefinitions = ImmutableDictionary.CreateBuilder<Key, IConfigDefinition>();
-        foreach (var configConstructor in ConfigModifiers) {
-          configConstructor.ApplyTo(configDefinitions);
-        }
-        return configDefinitions.ToImmutable();
-      }
-    }
+    public ImmutableDictionary<ConfigKey, IConfigDefinition> ConfigDefinitions => ConfigModifiers.CompileToImmutableDictionary();
 
-    public ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions {
-      get {
-        var taskDefinitions = ImmutableDictionary.CreateBuilder<Key, ITaskDefinition>();
-        foreach (var taskConstructor in TaskModifiers) {
-          taskConstructor.ApplyTo(taskDefinitions);
-        }
-        return taskDefinitions.ToImmutable();
-      }
-    }
+    public ImmutableDictionary<TaskKey, ITaskDefinition> TaskDefinitions => TaskModifiers.CompileToImmutableDictionary();
 
     private Settings In(Key newScope) {
       if (newScope.IsAbsolute) {

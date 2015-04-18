@@ -11,7 +11,7 @@ namespace Bud {
       Logger = new ScopedLogger(context.Logger, taskKey);
     }
 
-    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions => Context.ConfigDefinitions;
+    public ImmutableDictionary<ConfigKey, IConfigDefinition> ConfigDefinitions => Context.ConfigDefinitions;
 
     public ILogger Logger { get; }
 
@@ -27,7 +27,7 @@ namespace Bud {
       return ((IConfig)Context).EvaluateConfig(key);
     }
 
-    public ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions => Context.TaskDefinitions;
+    public ImmutableDictionary<TaskKey, ITaskDefinition> TaskDefinitions => Context.TaskDefinitions;
 
     public bool IsTaskDefined(Key key) {
       return Context.IsTaskDefined(key);

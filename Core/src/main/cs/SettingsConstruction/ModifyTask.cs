@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Bud.SettingsConstruction {
@@ -10,13 +10,17 @@ namespace Bud.SettingsConstruction {
       TaskModification = taskModification;
     }
 
-    public override void ApplyTo(ImmutableDictionary<Key, ITaskDefinition>.Builder buildConfigurationBuilder) {
+    public override void Modify(IDictionary<TaskKey, ITaskDefinition> buildConfigurationBuilder) {
       ITaskDefinition taskDefinition;
       if (buildConfigurationBuilder.TryGetValue(Key, out taskDefinition)) {
         buildConfigurationBuilder[Key] = new TaskDefinition(context => TaskModification(context, () => context.Evaluate(taskDefinition, Key)));
       } else {
-        throw new InvalidOperationException(string.Format("Cannot modify the task '{0}'. This task has not yet been defined.", Key));
+        throw new InvalidOperationException(TaskUndefinedErrorMessage(Key));
       }
+    }
+
+    internal static string TaskUndefinedErrorMessage(TaskKey taskKey) {
+      return string.Format("Cannot modify the task '{0}'. This task has not yet been defined.", taskKey);
     }
   }
 
@@ -27,15 +31,14 @@ namespace Bud.SettingsConstruction {
       TaskModification = taskModification;
     }
 
-    public override void ApplyTo(ImmutableDictionary<Key, ITaskDefinition>.Builder buildConfigurationBuilder) {
+    public override void Modify(IDictionary<TaskKey, ITaskDefinition> buildConfigurationBuilder) {
       ITaskDefinition value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
-        TaskDefinition<T> existingTaskDef = (TaskDefinition<T>)value;
+        var existingTaskDef = (TaskDefinition<T>) value;
         buildConfigurationBuilder[Key] = new TaskDefinition<T>(context => TaskModification(context, () => context.Evaluate(existingTaskDef, Key)));
       } else {
-        throw new InvalidOperationException(string.Format("Cannot modify the task '{0}'. This task has not yet been defined.", Key));
+        throw new InvalidOperationException(ModifyTask.TaskUndefinedErrorMessage(Key));
       }
     }
   }
 }
-

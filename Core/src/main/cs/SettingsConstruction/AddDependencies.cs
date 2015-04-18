@@ -11,7 +11,7 @@ namespace Bud.SettingsConstruction {
       ExtraDependencies = extraDependencies.Where(dependency => !dependency.Equals(key));
     }
 
-    public override void ApplyTo(ImmutableDictionary<Key, ITaskDefinition>.Builder buildConfigurationBuilder) {
+    public override void Modify(IDictionary<TaskKey, ITaskDefinition> buildConfigurationBuilder) {
       ITaskDefinition value;
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
         buildConfigurationBuilder[Key] = value.WithDependencies(ExtraDependencies);

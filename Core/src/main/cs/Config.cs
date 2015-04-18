@@ -7,26 +7,20 @@ namespace Bud {
   public class Config : IConfig {
     private readonly Dictionary<Key, object> ConfigEvaluationCache = new Dictionary<Key, object>();
 
-    public Config(ImmutableDictionary<Key, IConfigDefinition> configDefinitions, ILogger logger) {
+    public Config(ImmutableDictionary<ConfigKey, IConfigDefinition> configDefinitions, ILogger logger) {
       Logger = logger;
       ConfigDefinitions = configDefinitions;
     }
 
-    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions { get; }
+    public ImmutableDictionary<ConfigKey, IConfigDefinition> ConfigDefinitions { get; }
 
     public ILogger Logger { get; }
 
-    public bool IsConfigDefined(Key key) {
-      return ConfigDefinitions.ContainsKey(Key.Root / key);
-    }
+    public bool IsConfigDefined(Key key) => ConfigDefinitions.ContainsKey(Key.Root / key);
 
-    public object Evaluate(ConfigKey key) {
-      return EvaluateConfig(key);
-    }
+    public object Evaluate(ConfigKey key) => EvaluateConfig(key);
 
-    public T Evaluate<T>(ConfigKey<T> configKey) {
-      return (T) Evaluate((ConfigKey) configKey);
-    }
+    public T Evaluate<T>(ConfigKey<T> configKey) => (T) Evaluate((ConfigKey) configKey);
 
     public object EvaluateConfig(Key key) {
       object value;

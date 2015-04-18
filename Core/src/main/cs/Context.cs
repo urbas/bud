@@ -15,18 +15,18 @@ namespace Bud {
     private ImmutableDictionary<ITaskDefinition, Task> OverridenTaskValueCache = ImmutableDictionary<ITaskDefinition, Task>.Empty;
     private readonly SemaphoreSlim OverridenTaskValueCacheSemaphore = new SemaphoreSlim(1);
 
-    private Context(ImmutableDictionary<Key, IConfigDefinition> configDefinitions, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions, ILogger logger) : this(new Config(configDefinitions, logger), taskDefinitions) {}
+    private Context(ImmutableDictionary<ConfigKey, IConfigDefinition> configDefinitions, ImmutableDictionary<TaskKey, ITaskDefinition> taskDefinitions, ILogger logger) : this(new Config(configDefinitions, logger), taskDefinitions) {}
 
-    private Context(IConfig configuration, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) {
+    private Context(IConfig configuration, ImmutableDictionary<TaskKey, ITaskDefinition> taskDefinitions) {
       Configuration = configuration;
       TaskDefinitions = taskDefinitions;
     }
 
-    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions => Configuration.ConfigDefinitions;
+    public ImmutableDictionary<ConfigKey, IConfigDefinition> ConfigDefinitions => Configuration.ConfigDefinitions;
 
     public ILogger Logger => Configuration.Logger;
 
-    public ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions { get; }
+    public ImmutableDictionary<TaskKey, ITaskDefinition> TaskDefinitions { get; }
 
     public bool IsConfigDefined(Key key) => Configuration.IsConfigDefined(key);
 
@@ -72,7 +72,7 @@ namespace Bud {
       return FromSettings(settings, Logging.Logger.CreateFromStandardOutputs());
     }
 
-    public static Context FromConfig(IConfig config, ImmutableDictionary<Key, ITaskDefinition> taskDefinitions) {
+    public static Context FromConfig(IConfig config, ImmutableDictionary<TaskKey, ITaskDefinition> taskDefinitions) {
       return new Context(config, taskDefinitions);
     }
 
@@ -84,7 +84,7 @@ namespace Bud {
       return sb.Append("])").ToString();
     }
 
-    public static void ToString(StringBuilder sb, IEnumerable<Key> keys) {
+    public static void ToString(StringBuilder sb, IEnumerable<IKey> keys) {
       var enumerator = keys.GetEnumerator();
       if (enumerator.MoveNext()) {
         sb.Append(enumerator.Current);

@@ -10,7 +10,7 @@ namespace Bud {
       Logger = new ScopedLogger(config.Logger, key);
     }
 
-    public ImmutableDictionary<Key, IConfigDefinition> ConfigDefinitions => Config.ConfigDefinitions;
+    public ImmutableDictionary<ConfigKey, IConfigDefinition> ConfigDefinitions => Config.ConfigDefinitions;
 
     public ILogger Logger { get; }
 

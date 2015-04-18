@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 
@@ -12,7 +13,7 @@ namespace Bud.SettingsConstruction {
       InitialValue = initialValue;
     }
 
-    public override void ApplyTo(ImmutableDictionary<Key, ITaskDefinition>.Builder buildConfigurationBuilder) {
+    public override void Modify(IDictionary<TaskKey, ITaskDefinition> buildConfigurationBuilder) {
       if (!buildConfigurationBuilder.ContainsKey(Key)) {
         buildConfigurationBuilder[Key] = new TaskDefinition<T>(InitialValue);
       }
@@ -26,7 +27,7 @@ namespace Bud.SettingsConstruction {
       TaskDefinition = taskDefinition;
     }
 
-    public override void ApplyTo(ImmutableDictionary<Key, ITaskDefinition>.Builder buildConfigurationBuilder) {
+    public override void Modify(IDictionary<TaskKey, ITaskDefinition> buildConfigurationBuilder) {
       if (!buildConfigurationBuilder.ContainsKey(Key)) {
         buildConfigurationBuilder[Key] = new TaskDefinition(TaskDefinition);
       }

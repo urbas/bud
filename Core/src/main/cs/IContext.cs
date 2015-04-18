@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Bud {
   public interface IContext : IConfig {
-    ImmutableDictionary<Key, ITaskDefinition> TaskDefinitions { get; }
+    ImmutableDictionary<TaskKey, ITaskDefinition> TaskDefinitions { get; }
     bool IsTaskDefined(Key key);
     Task Evaluate(TaskKey key);
     Task<T> Evaluate<T>(TaskKey<T> key);
