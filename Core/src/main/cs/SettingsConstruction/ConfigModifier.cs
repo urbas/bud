@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction {
   public abstract class ConfigModifier : IValueModifier<ConfigKey, IConfigDefinition> {

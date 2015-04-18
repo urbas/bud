@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 
 namespace Bud.SettingsConstruction {
   public class InitializeConfig<T> : ConfigModifier {
@@ -19,4 +18,3 @@ namespace Bud.SettingsConstruction {
     }
   }
 }
-
