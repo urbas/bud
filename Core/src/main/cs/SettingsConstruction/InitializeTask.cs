@@ -6,9 +6,9 @@ namespace Bud.SettingsConstruction {
   public class InitializeTask<T> : TaskModifier {
     private readonly Func<IContext, Task<T>> InitialValue;
 
-    public InitializeTask(TaskKey<T> key, T initialValue) : this(key, b => Task.FromResult(initialValue)) {}
+    public InitializeTask(TaskKey key, T initialValue) : this(key, b => Task.FromResult(initialValue)) {}
 
-    public InitializeTask(TaskKey<T> key, Func<IContext, Task<T>> initialValue) : base(key) {
+    public InitializeTask(TaskKey key, Func<IContext, Task<T>> initialValue) : base(key) {
       InitialValue = initialValue;
     }
 

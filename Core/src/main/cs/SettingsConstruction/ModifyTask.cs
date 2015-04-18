@@ -27,7 +27,7 @@ namespace Bud.SettingsConstruction {
   public class ModifyTask<T> : TaskModifier {
     private readonly Func<IContext, Func<Task<T>>, Task<T>> TaskModification;
 
-    public ModifyTask(TaskKey<T> key, Func<IContext, Func<Task<T>>, Task<T>> taskModification) : base(key) {
+    public ModifyTask(TaskKey key, Func<IContext, Func<Task<T>>, Task<T>> taskModification) : base(key) {
       TaskModification = taskModification;
     }
 
