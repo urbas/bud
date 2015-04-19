@@ -7,6 +7,7 @@ using Bud.Build;
 using Bud.Cli;
 using Bud.Dependencies;
 using Bud.IO;
+using Bud.Resources;
 
 namespace Bud.CSharp.Compiler {
   public static class CSharpCompiler {
@@ -16,29 +17,57 @@ namespace Bud.CSharp.Compiler {
         var outputFile = context.GetCSharpOutputAssemblyFile(buildTarget);
         var framework = context.GetTargetFramework(buildTarget);
         var sourceFiles = await context.GetSourceFiles(buildTarget);
+        var resourceFiles = await CollectResourceFiles(context, buildTarget);
         var libraryDependencies = context.GetAssemblyReferencePaths(buildTarget);
         var frameworkAssemblies = framework.RuntimeAssemblies;
-        if (sourceFiles.Any() && Files.AreFilesNewer(sourceFiles, outputFile)) {
-          Compile(context, buildTarget, outputFile, framework, libraryDependencies, frameworkAssemblies, sourceFiles);
+        if (AreSourceFilesNewer(sourceFiles.Concat(resourceFiles), outputFile)) {
+          Compile(context, buildTarget, outputFile, framework, libraryDependencies, frameworkAssemblies, sourceFiles, resourceFiles);
         } else {
           context.Logger.Info("skipping build...");
         }
       });
     }
 
-    private static void Compile(IContext context, Key buildTarget, string outputFile, Framework framework, IEnumerable<string> libraryDependencies, IEnumerable<string> frameworkAssemblies, IEnumerable<string> sourceFiles) {
+    private static bool AreSourceFilesNewer(IEnumerable<string> sourceFiles, string outputFile) {
+      return sourceFiles.Any() && Files.AreFilesNewer(sourceFiles, outputFile);
+    }
+
+    private static Task<IEnumerable<string>> CollectResourceFiles(IContext context, Key buildTarget) {
+      var resourceBuildTarget = BuildTargetUtils.ScopeOf(buildTarget) / ResourcesBuildTarget.Resources;
+      return context.GetSourceFiles(resourceBuildTarget);
+    }
+
+    private static void Compile(IContext context, Key buildTarget, string outputFile, Framework framework, IEnumerable<string> libraryDependencies, IEnumerable<string> frameworkAssemblies, IEnumerable<string> sourceFiles, IEnumerable<string> resourceFiles) {
       Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
       var compilerProcess = ProcessBuilder.Executable(framework.CSharpCompilerPath)
-                                          .AddParamArgument("-out:", outputFile);
-      if (libraryDependencies.Any() || frameworkAssemblies.Any()) {
-        compilerProcess.AddParamArgument("-reference:", libraryDependencies.Concat(frameworkAssemblies));
-      }
-      compilerProcess.AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(buildTarget)))
-                     .AddArguments(sourceFiles);
+                                          .AddParamArgument("-out:", outputFile)
+                                          .AddReferences(libraryDependencies, frameworkAssemblies)
+                                          .AddResourceFiles(context.GetRootNamespace(buildTarget), resourceFiles)
+                                          .AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(buildTarget)))
+                                          .AddArguments(sourceFiles);
+      InvokeCompiler(compilerProcess);
+    }
+
+    private static void InvokeCompiler(ProcessBuilder compilerProcess) {
       var exitCode = compilerProcess.Start(Console.Out, Console.Error);
       if (exitCode != 0) {
         throw new Exception("Compilation failed.");
       }
+    }
+
+    private static ProcessBuilder AddReferences(this ProcessBuilder compilerProcess, IEnumerable<string> libraryDependencies, IEnumerable<string> frameworkAssemblies) {
+      if (libraryDependencies.Any() || frameworkAssemblies.Any()) {
+        compilerProcess.AddParamArgument("-reference:", libraryDependencies.Concat(frameworkAssemblies));
+      }
+      return compilerProcess;
+    }
+
+    private static ProcessBuilder AddResourceFiles(this ProcessBuilder compilerProcess, string rootNamespace, IEnumerable<string> resourceFiles) {
+      foreach (var resourceFile in resourceFiles) {
+        string resourceIdentifier = rootNamespace + "." + Path.GetFileName(resourceFile);
+        compilerProcess.AddParamArgument("-resource:", resourceFile, resourceIdentifier);
+      }
+      return compilerProcess;
     }
 
     public static string GetTargetKind(AssemblyType assemblyType) {

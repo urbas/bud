@@ -23,8 +23,8 @@ namespace Bud.Commander {
       }
     }
 
-    public object Evaluate(string command) {
-      return AssemblyBuildCommander.Evaluate(command);
+    public string EvaluateToJson(string command) {
+      return AssemblyBuildCommander.EvaluateToJson(command);
     }
 
     public void Dispose() {

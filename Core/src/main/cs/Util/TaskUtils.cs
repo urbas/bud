@@ -17,10 +17,10 @@ namespace Bud.Util {
                       .Unwrap();
     }
 
-    public static Task ExecuteGuarded(SemaphoreSlim semaphore, Func<Task> unguardedAction) {
+    public static Task ExecuteGuarded(SemaphoreSlim semaphore, Func<Task> actionToGuard) {
       return semaphore
         .WaitAsync()
-        .ContinueWith(t => unguardedAction())
+        .ContinueWith(t => actionToGuard())
         .ContinueWith(t => {
           semaphore.Release();
           return t.Result;

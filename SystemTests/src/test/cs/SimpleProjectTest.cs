@@ -8,7 +8,7 @@ namespace Bud.SystemTests {
     [Test]
     public void compile_MUST_produce_the_executable() {
       using (var buildCommander = TestProjects.LoadBuildCommander(this)) {
-        buildCommander.Evaluate("build");
+        buildCommander.EvaluateToJson("build");
         FileAssertions.FilesExist(SystemTestUtils.OutputAssemblyPath(buildCommander, BuildKeys.Main, "Foo.exe"));
       }
     }

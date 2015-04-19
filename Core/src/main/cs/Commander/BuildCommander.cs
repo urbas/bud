@@ -4,6 +4,7 @@ using Bud.Build;
 using Bud.BuildDefinition;
 using Bud.BuildDefinition.BuildDefinitionSettings;
 using Bud.CSharp;
+using Newtonsoft.Json;
 
 namespace Bud.Commander {
   public static class BuildCommander {
@@ -36,10 +37,10 @@ namespace Bud.Commander {
     private static bool TryLoadBuildDefinition(string budDir, out BuildDefinitionInfo buildDefinitionInfo) {
       if (Exists(BuildDefinitionSourceFile(budDir))) {
         using (var buildLevelCommander = LoadBuildLevelCommander(budDir)) {
-          buildLevelCommander.Evaluate(BuildKeys.Build);
+          buildLevelCommander.EvaluateToJson(BuildKeys.Build);
           buildDefinitionInfo = new BuildDefinitionInfo(
             BuildDefinitionAssemblyFile(budDir),
-            (string[]) buildLevelCommander.Evaluate(BuildDefinitionPlugin.BuildDefinitionProjectKey / BuildKeys.Main / CSharpKeys.CSharp / CSharpKeys.AssemblyReferencePaths));
+            JsonConvert.DeserializeObject<string[]>(buildLevelCommander.EvaluateToJson(BuildDefinitionPlugin.BuildDefinitionProjectKey / BuildKeys.Main / CSharpKeys.CSharp / CSharpKeys.AssemblyReferencePaths)));
         }
         return true;
       }

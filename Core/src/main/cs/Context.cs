@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Bud.Logging;
-using Bud.Util;
 
 namespace Bud {
   public class Context : IContext {
@@ -31,17 +30,16 @@ namespace Bud {
     public bool IsConfigDefined(Key key) => Configuration.IsConfigDefined(key);
 
     public T Evaluate<T>(ConfigKey<T> configKey) => Configuration.Evaluate(configKey);
+    public bool TryEvaluate<T>(ConfigKey<T> configKey, out T evaluatedValue) => Configuration.TryEvaluate(configKey, out evaluatedValue);
 
     public object EvaluateConfig(Key key) => Configuration.EvaluateConfig(key);
 
     public bool IsTaskDefined(Key key) => TaskDefinitions.ContainsKey(key);
 
-    public Task EvaluateKey(Key key) {
+    public object EvaluateKeySync(Key key) {
       var absoluteKey = Key.Root / key;
-      if (IsTaskDefined(absoluteKey)) {
-        return EvaluateTask(absoluteKey);
-      }
-      return Task.FromResult(Configuration.EvaluateConfig(absoluteKey));
+      object value;
+      return TryEvaluateTaskSync(absoluteKey, out value) ? value : Configuration.EvaluateConfig(absoluteKey);
     }
 
     public Task Evaluate(TaskKey key) => EvaluateTask(key);
@@ -49,19 +47,12 @@ namespace Bud {
     public Task<T> Evaluate<T>(TaskKey<T> key) => EvaluateTask<T>(key);
 
     public Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition, Key taskKey) {
-      Task existingEvaluation;
-      if (OverridenTaskValueCache.TryGetValue(taskDefinition, out existingEvaluation)) {
-        return (Task<T>) existingEvaluation;
-      }
-      return TaskUtils.ExecuteGuarded(OverridenTaskValueCacheSemaphore, () => (Task<T>) EvaluateOverridenTaskToCacheUnguarded(taskDefinition, taskKey));
+      return (Task<T>) (TryGetOverridenTaskValueFromCache(taskDefinition) ?? EvaluateOverridenTaskToCache(taskDefinition, taskKey));
     }
 
     public Task Evaluate(ITaskDefinition taskDefinition, Key taskKey) {
-      Task existingValue;
-      if (OverridenTaskValueCache.TryGetValue(taskDefinition, out existingValue)) {
-        return existingValue;
-      }
-      return TaskUtils.ExecuteGuarded(OverridenTaskValueCacheSemaphore, () => EvaluateOverridenTaskToCacheUnguarded(taskDefinition, taskKey));
+      return TryGetOverridenTaskValueFromCache(taskDefinition) ??
+             EvaluateOverridenTaskToCache(taskDefinition, taskKey);
     }
 
     public static Context FromSettings(Settings settings, ILogger logger) {
@@ -97,17 +88,55 @@ namespace Bud {
 
     private Task EvaluateTask(Key key) {
       var absoluteKey = Key.Root / key;
-      return TryGetTaskEvaluationFromCache(absoluteKey) ?? TaskUtils.ExecuteGuarded(TaskValueCacheSemaphore, () => EvaluateTaskToCacheUnguarded(absoluteKey));
+      return TryGetTaskValueFromCache(absoluteKey) ?? EvaluateTaskToCache(absoluteKey);
+    }
+
+    private bool TryEvaluateTaskSync(Key absoluteKey, out object value) {
+      ITaskDefinition taskDefinition;
+      if (TaskDefinitions.TryGetValue(absoluteKey, out taskDefinition)) {
+        var valueTask = EvaluateTask(absoluteKey);
+        valueTask.Wait();
+        value = taskDefinition.ExtractResult(valueTask);
+        return true;
+      }
+      value = null;
+      return false;
     }
 
     private Task<T> EvaluateTask<T>(Key key) {
       var absoluteKey = Key.Root / key;
-      return (Task<T>) (TryGetTaskEvaluationFromCache(absoluteKey) ?? TaskUtils.ExecuteGuarded(TaskValueCacheSemaphore, () => (Task<T>) EvaluateTaskToCacheUnguarded(absoluteKey)));
+      return (Task<T>) (TryGetTaskValueFromCache(absoluteKey) ?? EvaluateTaskToCache(absoluteKey));
     }
 
-    private Task TryGetTaskEvaluationFromCache(Key absoluteKey) {
+    private Task TryGetTaskValueFromCache(Key absoluteKey) {
       Task value;
       return TaskValueCache.TryGetValue(absoluteKey, out value) ? value : null;
+    }
+
+    private Task TryGetOverridenTaskValueFromCache(ITaskDefinition taskDefinition) {
+      Task existingValue;
+      OverridenTaskValueCache.TryGetValue(taskDefinition, out existingValue);
+      return existingValue;
+    }
+
+    private Task EvaluateTaskToCache(Key absoluteKey) {
+      ITaskDefinition taskDefinition;
+      if (TaskDefinitions.TryGetValue(absoluteKey, out taskDefinition)) {
+        return taskDefinition.EvaluateGuarded(new ScopedContext(this, absoluteKey),
+                                              absoluteKey,
+                                              TaskValueCacheSemaphore,
+                                              () => TryGetTaskValueFromCache(absoluteKey),
+                                              valueTask => TaskValueCache = TaskValueCache.Add(absoluteKey, valueTask));
+      }
+      throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. This task is not defined.", absoluteKey));
+    }
+
+    private Task EvaluateOverridenTaskToCache(ITaskDefinition taskDefinition, Key taskKey) {
+      return taskDefinition.EvaluateGuarded(new ScopedContext(this, taskKey),
+                                            taskKey,
+                                            OverridenTaskValueCacheSemaphore,
+                                            () => TryGetOverridenTaskValueFromCache(taskDefinition),
+                                            valueTask => OverridenTaskValueCache = OverridenTaskValueCache.Add(taskDefinition, valueTask));
     }
 
     private Task EvaluateTaskToCacheUnguarded(Key absoluteKey) {

@@ -38,9 +38,9 @@ namespace Bud.Commander {
       }
     }
 
-    public object Evaluate(string command) {
+    public string EvaluateToJson(string command) {
       var context = Context.FromConfig(Config, Settings.TaskDefinitions);
-      return CommandEvaluator.EvaluateSynchronously(context, command);
+      return CommandEvaluator.EvaluateToJsonSynchronously(context, command);
     }
 
     public void Dispose() {}

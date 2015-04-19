@@ -1,28 +1,19 @@
 using System;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Bud.Commander {
   public static class CommandEvaluator {
-    public static object EvaluateSynchronously(IContext context, string command) {
+    public static string EvaluateToJsonSynchronously(IContext context, string command) {
       try {
-        var evaluationOutput = Evaluate(context, command);
-        evaluationOutput.Wait();
-        return evaluationOutput.Result;
+        return JsonConvert.SerializeObject(EvaluateSync(context, command));
       } catch (Exception ex) {
         throw new OperationCanceledException(string.Format("Task '{0}' failed.", command), ex);
       }
     }
 
-    public static Task<object> Evaluate(IContext context, string command) {
-      Key keyToEvaluate = Key.Parse(command);
-      return context.EvaluateKey(keyToEvaluate)
-                    .ContinueWith(task => {
-                      if (task.Exception != null) {
-                        throw task.Exception;
-                      }
-                      var resultTask = task as Task<object>;
-                      return resultTask?.Result;
-                    });
+    public static object EvaluateSync(IContext context, string command) {
+      return context.EvaluateKeySync(Key.Parse(command));
     }
   }
 }

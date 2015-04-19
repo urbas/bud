@@ -31,6 +31,9 @@ public class Build : IBuild {
       ))
       .Project("Bud.SystemTests", Path.Combine(baseDir, "SystemTests"), Cs.Test(
         Cs.Dependency("Bud.Test")
+      ))
+      .Project("Bud.Examples.Snippets", Path.Combine(baseDir, "Bud.Examples.Snippets"), Cs.Dll(
+        Cs.Dependency("Bud.Core")
       ));
   }
 }

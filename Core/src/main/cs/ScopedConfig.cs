@@ -18,6 +18,8 @@ namespace Bud {
 
     public T Evaluate<T>(ConfigKey<T> configKey) => Config.Evaluate(configKey);
 
+    public bool TryEvaluate<T>(ConfigKey<T> configKey, out T evaluatedValue) => Config.TryEvaluate(configKey, out evaluatedValue);
+
     public object EvaluateConfig(Key key) => Config.EvaluateConfig(key);
   }
 }

@@ -98,7 +98,7 @@ namespace Bud.SolutionExporter {
     }
 
     private static async Task<IEnumerable<object>> CollectEmbeddedResourceFiles(IContext context, Key buildTarget, Uri csprojUri) {
-      var resourcesBuildTarget = buildTarget.Parent / ResourcesKeys.Resources;
+      var resourcesBuildTarget = buildTarget.Parent / ResourcesBuildTarget.Resources;
       if (context.IsBuildTargetDefined(resourcesBuildTarget)) {
         var embeddedResourceFiles = await context.GetSourceFiles(resourcesBuildTarget);
         return ToRelativePaths(csprojUri, embeddedResourceFiles);

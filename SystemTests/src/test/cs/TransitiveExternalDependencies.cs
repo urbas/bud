@@ -9,7 +9,7 @@ namespace Bud.SystemTests {
     [Test]
     public void compile_MUST_produce_the_executable() {
       using (var buildCommander = TestProjects.LoadBuildCommander(this)) {
-        buildCommander.Evaluate("build");
+        buildCommander.EvaluateToJson("build");
         FileAssertions.FileExists(SystemTestUtils.OutputAssemblyPath(buildCommander, BuildKeys.Main, "A.dll"));
       }
     }

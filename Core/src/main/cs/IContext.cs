@@ -7,7 +7,7 @@ namespace Bud {
     bool IsTaskDefined(Key key);
     Task Evaluate(TaskKey key);
     Task<T> Evaluate<T>(TaskKey<T> key);
-    Task EvaluateKey(Key key);
+    object EvaluateKeySync(Key key);
     Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition, Key taskKey);
     Task Evaluate(ITaskDefinition taskDefinition, Key taskKey);
   }

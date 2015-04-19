@@ -5,7 +5,9 @@ using Bud.Build;
 
 namespace Bud.Resources {
   public class ResourcesBuildTarget : BuildTargetPlugin {
-    public ResourcesBuildTarget(Key buildScope, params Setup[] extraBuildTargetSetup) : base(buildScope, ResourcesKeys.Resources, extraBuildTargetSetup) {}
+    public static readonly Key Resources = Key.Define("resources", "The scope of the resources build target.");
+
+    public ResourcesBuildTarget(Key buildScope, params Setup[] extraBuildTargetSetup) : base(buildScope, Resources, extraBuildTargetSetup) {}
 
     protected override Settings BuildTargetSetup(Settings projectSettings) {
       return projectSettings.Add(BuildTargetKeys.SourceFiles.InitSync(FindResourceFiles));

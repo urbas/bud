@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading;
 using System.Threading.Tasks;
 using Bud.Util;
 
 namespace Bud {
-  public interface ITaskDefinition {
-    ImmutableHashSet<TaskKey> Dependencies { get; }
-    Task Evaluate(IContext context, Key taskKey);
-    ITaskDefinition WithDependencies(IEnumerable<TaskKey> newDependencies);
-  }
-
   public class TaskDefinition : TaskDependencies, ITaskDefinition {
     public readonly Func<IContext, Task> TaskFunction;
 
@@ -24,9 +19,21 @@ namespace Bud {
       return new TaskDefinition(TaskFunction, Dependencies.Union(newDependencies));
     }
 
-    Task ITaskDefinition.Evaluate(IContext context, Key taskKey) {
-      return Evaluate(context, taskKey);
+    public Task EvaluateGuarded(IContext context, Key key, SemaphoreSlim semaphore, Func<Task> cachedValueGetter, Action<Task> valueCacher) {
+      return TaskUtils.ExecuteGuarded(semaphore, () => {
+        Task cachedValue = cachedValueGetter();
+        if (cachedValue == null) {
+          Task evaluationTask = Evaluate(context, key);
+          valueCacher(evaluationTask);
+          return evaluationTask;
+        }
+        return cachedValue;
+      });
     }
+
+    public object ExtractResult(Task completedTask) => null;
+
+    Task ITaskDefinition.Evaluate(IContext context, Key taskKey) => Evaluate(context, taskKey);
 
     public async Task Evaluate(IContext context, Key taskKey) {
       await InvokeDependencies(context);
@@ -37,9 +44,7 @@ namespace Bud {
       }
     }
 
-    public static string EvaluationErrorMessage(Key taskKey) {
-      return string.Format("Task '{0}' failed.", taskKey);
-    }
+    public static string EvaluationErrorMessage(Key taskKey) => string.Format("Task '{0}' failed.", taskKey);
   }
 
   public class TaskDefinition<T> : TaskDependencies, ITaskDefinition {
@@ -51,14 +56,6 @@ namespace Bud {
       TaskFunction = taskFunction;
     }
 
-    public ITaskDefinition WithDependencies(IEnumerable<TaskKey> newDependencies) {
-      return new TaskDefinition<T>(TaskFunction, Dependencies.Union(newDependencies));
-    }
-
-    Task ITaskDefinition.Evaluate(IContext context, Key taskKey) {
-      return Evaluate(context, taskKey);
-    }
-
     public async Task<T> Evaluate(IContext context, Key taskKey) {
       await InvokeDependencies(context);
       try {
@@ -67,5 +64,23 @@ namespace Bud {
         throw new Exception(TaskDefinition.EvaluationErrorMessage(taskKey), e);
       }
     }
+
+    public ITaskDefinition WithDependencies(IEnumerable<TaskKey> newDependencies) => new TaskDefinition<T>(TaskFunction, Dependencies.Union(newDependencies));
+
+    public Task EvaluateGuarded(IContext context, Key key, SemaphoreSlim semaphore, Func<Task> cachedValueGetter, Action<Task> valueCacher) {
+      return TaskUtils.ExecuteGuarded(semaphore, () => {
+        Task<T> cachedValue = (Task<T>) cachedValueGetter();
+        if (cachedValue == null) {
+          Task<T> evaluationTask = Evaluate(context, key);
+          valueCacher(evaluationTask);
+          return evaluationTask;
+        }
+        return cachedValue;
+      });
+    }
+
+    public object ExtractResult(Task completedTask) => ((Task<T>) completedTask).Result;
+
+    Task ITaskDefinition.Evaluate(IContext context, Key taskKey) => Evaluate(context, taskKey);
   }
 }

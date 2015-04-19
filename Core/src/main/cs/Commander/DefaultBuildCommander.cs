@@ -14,9 +14,9 @@ namespace Bud.Commander {
       Config = new Config(settings.ConfigDefinitions, Logger.CreateFromStandardOutputs());
     }
 
-    public object Evaluate(string command) {
+    public string EvaluateToJson(string command) {
       var context = Context.FromConfig(Config, Settings.TaskDefinitions);
-      return CommandEvaluator.EvaluateSynchronously(context, command);
+      return CommandEvaluator.EvaluateToJsonSynchronously(context, command);
     }
 
     public void Dispose() {}

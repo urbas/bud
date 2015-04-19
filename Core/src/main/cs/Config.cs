@@ -22,22 +22,39 @@ namespace Bud {
 
     public T Evaluate<T>(ConfigKey<T> configKey) => (T) Evaluate((ConfigKey) configKey);
 
-    public object EvaluateConfig(Key key) {
-      object value;
+    public bool TryEvaluate<T>(ConfigKey<T> configKey, out T evaluatedValue) {
+      object untypedEvaluatedValue;
+      if (TryEvaluateConfig(configKey, out untypedEvaluatedValue)) {
+        evaluatedValue = (T) untypedEvaluatedValue;
+        return true;
+      }
+      evaluatedValue = default(T);
+      return false;
+    }
+
+    private bool TryEvaluateConfig(Key key, out object untypedEvaluatedValue) {
       var absoluteKey = Key.Root / key;
       // TODO: verify whether we can do this optimistic fetching with dictionary. Can we read while someone is writing to the dictionary? Will we get concurrent access exceptions? Corruptions?
-      if (ConfigEvaluationCache.TryGetValue(absoluteKey, out value)) {
-        return value;
+      if (ConfigEvaluationCache.TryGetValue(absoluteKey, out untypedEvaluatedValue)) {
+        return true;
       }
       lock (ConfigEvaluationCache) {
         IConfigDefinition configDefinition;
         if (ConfigDefinitions.TryGetValue(absoluteKey, out configDefinition)) {
-          value = configDefinition.Evaluate(new ScopedConfig(this, key));
-          ConfigEvaluationCache.Add(absoluteKey, value);
-          return value;
+          untypedEvaluatedValue = configDefinition.Evaluate(new ScopedConfig(this, key));
+          ConfigEvaluationCache.Add(absoluteKey, untypedEvaluatedValue);
+          return true;
         }
       }
-      throw new ArgumentException(string.Format("Could not evaluate configuration '{0}'. The value for this configuration was not defined.", absoluteKey));
+      return false;
+    }
+
+    public object EvaluateConfig(Key key) {
+      object value;
+      if (TryEvaluateConfig(key, out value)) {
+        return value;
+      }
+      throw new ArgumentException(string.Format("Could not evaluate configuration '{0}'. The value for this configuration was not defined.", key));
     }
   }
 }

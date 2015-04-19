@@ -16,7 +16,7 @@ namespace Bud.Test.Util {
       }
     }
 
-    public object Evaluate(string command) => BuildCommander.Evaluate(command);
+    public string EvaluateToJson(string command) => BuildCommander.EvaluateToJson(command);
 
     public void Dispose() {
       Exception buildCommanderDisposeException = null;

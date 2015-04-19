@@ -13,7 +13,7 @@ namespace Bud.CSharp {
     }
 
     public static Setup Exe(params Setup[] setups) {
-      return new CsBuild(BuildKeys.Main, new CSharpExeRunnerPlugin(), setups.Merge());
+      return new CsBuild(BuildKeys.Main, CSharpExeRunnerPlugin.Instance, setups.Merge());
     }
 
     public static Setup Dll(params Setup[] setups) {

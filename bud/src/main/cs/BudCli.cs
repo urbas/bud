@@ -39,7 +39,7 @@ namespace Bud {
     private static void ExecuteCommands(IEnumerable<string> commandsToExecute, IBuildCommander buildCommander) {
       foreach (var command in commandsToExecute) {
         try {
-          buildCommander.Evaluate(command);
+          buildCommander.EvaluateToJson(command);
         } catch (Exception e) {
           Console.Error.WriteLine("An error occurred during the execution of command '{0}'. Error messages:", command);
           ExceptionUtils.PrintItemizedErrorMessages(new[] {e}, 0);

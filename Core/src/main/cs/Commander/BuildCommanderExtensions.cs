@@ -1,7 +1,17 @@
+using Newtonsoft.Json;
+
 namespace Bud.Commander {
   public static class BuildCommanderExtensions {
-    public static object Evaluate(this IBuildCommander buildCommander, Key command) {
-      return buildCommander.Evaluate(command.ToString());
+    public static string EvaluateToJson(this IBuildCommander buildCommander, Key command) {
+      return buildCommander.EvaluateToJson(command.ToString());
+    }
+
+    public static T Evaluate<T>(this IBuildCommander buildCommander, ConfigKey<T> command) => Evaluate<T>(buildCommander, command.ToString());
+
+    public static T Evaluate<T>(this IBuildCommander buildCommander, TaskKey<T> command) => Evaluate<T>(buildCommander, command.ToString());
+
+    private static T Evaluate<T>(IBuildCommander buildCommander, string commandString) {
+      return JsonConvert.DeserializeObject<T>(buildCommander.EvaluateToJson(commandString));
     }
   }
 }

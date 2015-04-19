@@ -16,41 +16,27 @@ namespace Bud {
     public ILogger Logger { get; }
 
     public bool IsConfigDefined(Key key) {
-      return ((IConfig)Context).IsConfigDefined(key);
+      return Context.IsConfigDefined(key);
     }
 
-    public T Evaluate<T>(ConfigKey<T> configKey) {
-      return ((IConfig)Context).Evaluate<T>(configKey);
-    }
+    public T Evaluate<T>(ConfigKey<T> configKey) => Context.Evaluate(configKey);
 
-    public object EvaluateConfig(Key key) {
-      return ((IConfig)Context).EvaluateConfig(key);
-    }
+    public bool TryEvaluate<T>(ConfigKey<T> configKey, out T evaluatedValue) => Context.TryEvaluate(configKey, out evaluatedValue);
+
+    public object EvaluateConfig(Key key) => Context.EvaluateConfig(key);
 
     public ImmutableDictionary<TaskKey, ITaskDefinition> TaskDefinitions => Context.TaskDefinitions;
 
-    public bool IsTaskDefined(Key key) {
-      return Context.IsTaskDefined(key);
-    }
+    public bool IsTaskDefined(Key key) => Context.IsTaskDefined(key);
 
-    public Task Evaluate(TaskKey key) {
-      return Context.Evaluate(key);
-    }
+    public Task Evaluate(TaskKey key) => Context.Evaluate(key);
 
-    public Task<T> Evaluate<T>(TaskKey<T> key) {
-      return Context.Evaluate(key);
-    }
+    public Task<T> Evaluate<T>(TaskKey<T> key) => Context.Evaluate(key);
 
-    public Task EvaluateKey(Key key) {
-      return Context.EvaluateKey(key);
-    }
+    public object EvaluateKeySync(Key key) => Context.EvaluateKeySync(key);
 
-    public Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition, Key taskKey) {
-      return Context.Evaluate(taskDefinition, taskKey);
-    }
+    public Task<T> Evaluate<T>(TaskDefinition<T> taskDefinition, Key taskKey) => Context.Evaluate(taskDefinition, taskKey);
 
-    public Task Evaluate(ITaskDefinition taskDefinition, Key taskKey) {
-      return Context.Evaluate(taskDefinition, taskKey);
-    }
+    public Task Evaluate(ITaskDefinition taskDefinition, Key taskKey) => Context.Evaluate(taskDefinition, taskKey);
   }
 }

@@ -50,7 +50,7 @@ namespace Bud.Test.Assertions {
     }
 
     public static void DirectoryExists(string path) {
-      var errorMsg = string.Format("The directory '{0}' does not exists but was expected to exist.", path);
+      var errorMsg = string.Format("The directory '{0}' does not exist but was expected to exist.", path);
       Assert.That(Directory.Exists(path), errorMsg);
     }
 
