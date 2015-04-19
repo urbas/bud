@@ -16,19 +16,13 @@ namespace Bud.Cli {
       ExecutablePath = executablePath;
     }
 
-    public string ExecutablePath { get; private set; }
+    public string ExecutablePath { get; }
 
-    public string Arguments {
-      get { return arguments.ToString(); }
-    }
+    public string Arguments => arguments.ToString();
 
-    public ProcessBuilder AddArgument(string argument) {
-      return AddParamArgument(argument, ImmutableList<string>.Empty);
-    }
+    public ProcessBuilder AddArgument(string argument) => AddParamArgument(argument, ImmutableList<string>.Empty);
 
-    public ProcessBuilder AddParamArgument(string argumentHead, params string[] argumentParams) {
-      return AddParamArgument(argumentHead, (IEnumerable<string>) argumentParams);
-    }
+    public ProcessBuilder AddParamArgument(string argumentHead, params string[] argumentParams) => AddParamArgument(argumentHead, (IEnumerable<string>) argumentParams);
 
     public ProcessBuilder AddParamArgument(string argumentHead, IEnumerable<string> argumentParams) {
       if (arguments.Length > 0) {
@@ -46,9 +40,7 @@ namespace Bud.Cli {
       return this;
     }
 
-    public ProcessBuilder AddArguments(params string[] arguments) {
-      return AddArguments((IEnumerable<string>) arguments);
-    }
+    public ProcessBuilder AddArguments(params string[] arguments) => AddArguments((IEnumerable<string>) arguments);
 
     public ProcessBuilder AddArguments(IEnumerable<string> arguments) {
       foreach (var argument in arguments) {
@@ -71,8 +63,8 @@ namespace Bud.Cli {
     public int Start(TextWriter output, TextWriter errorOutput) {
       using (var process = ToProcess()) {
         process.Start();
-        output.WriteLine(process.StandardOutput.ReadToEnd());
-        errorOutput.WriteLine(process.StandardError.ReadToEnd());
+        output.Write(process.StandardOutput.ReadToEnd());
+        errorOutput.Write(process.StandardError.ReadToEnd());
         process.WaitForExit();
         return process.ExitCode;
       }

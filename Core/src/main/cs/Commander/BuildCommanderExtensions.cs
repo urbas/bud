@@ -10,7 +10,7 @@ namespace Bud.Commander {
 
     public static T Evaluate<T>(this IBuildCommander buildCommander, TaskKey<T> command) => Evaluate<T>(buildCommander, command.ToString());
 
-    private static T Evaluate<T>(IBuildCommander buildCommander, string commandString) {
+    public static T Evaluate<T>(this IBuildCommander buildCommander, string commandString) {
       return JsonConvert.DeserializeObject<T>(buildCommander.EvaluateToJson(commandString));
     }
   }

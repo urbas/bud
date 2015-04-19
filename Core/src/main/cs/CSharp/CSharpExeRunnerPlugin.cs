@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 using Bud.Cli;
-using Bud.Util;
-using Newtonsoft.Json;
+using Bud.IO;
 
 namespace Bud.CSharp {
   public class CSharpExeRunnerPlugin : Plugin {
@@ -23,7 +21,7 @@ namespace Bud.CSharp {
                                   RunGlobal.Init(RunGlobalImpl));
     }
 
-    private async static Task<IEnumerable<ExecutionResult>>  RunGlobalImpl(IContext context) {
+    private static async Task<IEnumerable<ExecutionResult>> RunGlobalImpl(IContext context) {
       var runList = context.Evaluate(RunList);
       var executionResults = new List<ExecutionResult>();
       foreach (var taskKey in runList) {
@@ -38,8 +36,14 @@ namespace Bud.CSharp {
       var distributionPath = context.GetDistDir(buildTarget);
       var executable = Path.Combine(distributionPath, Path.GetFileName(context.GetCSharpOutputAssemblyFile(buildTarget)));
       context.Logger.Info(String.Format("Executing {0}...", executable));
-      ProcessBuilder.Executable(executable).Start(Console.Out, Console.Error);
-      return new ExecutionResult();
+      return ExecuteAssembly(executable);
+    }
+
+    private static ExecutionResult ExecuteAssembly(string executable) {
+      var recordedOutput = new RecordingTextWriter(Console.Out);
+      var recordedError = new RecordingTextWriter(Console.Error);
+      var exitCode = ProcessBuilder.Executable(executable).Start(recordedOutput, recordedError);
+      return new ExecutionResult(exitCode, recordedOutput.ToString(), recordedError.ToString());
     }
   }
 }
