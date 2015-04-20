@@ -17,7 +17,7 @@ namespace Bud {
     }
 
     public static string ExtractIdFromPath(string path) {
-      if (String.IsNullOrEmpty(path)) {
+      if (string.IsNullOrEmpty(path)) {
         throw new ArgumentException("Cannot extract the ID from an empty or null path.");
       }
       if (IsRootPath(path)) {
@@ -45,10 +45,10 @@ namespace Bud {
       if (IsAbsolutePath(pathB)) {
         throw new ArgumentException("Cannot join paths '" + pathA + "' and '" + pathB + "'. The second path must not be absolute.");
       }
-      if (String.IsNullOrEmpty(pathA)) {
+      if (string.IsNullOrEmpty(pathA)) {
         return pathB;
       }
-      if (String.IsNullOrEmpty(pathB)) {
+      if (string.IsNullOrEmpty(pathB)) {
         return pathA;
       }
       if (IsRootPath(pathA)) {
@@ -58,7 +58,7 @@ namespace Bud {
     }
 
     public static ImmutableList<string> ToPathComponents(string path) {
-      if (String.IsNullOrEmpty(path)) {
+      if (string.IsNullOrEmpty(path)) {
         throw new ArgumentException("Could not parse an empty string. An empty string is not a valid key.");
       }
       var keyIdChain = path.Split(KeySplitter, StringSplitOptions.RemoveEmptyEntries);
@@ -69,8 +69,7 @@ namespace Bud {
       for (int index = 0; index < keyIdChain.Length; index++) {
         parsedPath.Add(keyIdChain[index]);
       }
-      var pathComponents = parsedPath.ToImmutable();
-      return pathComponents;
+      return parsedPath.ToImmutable();
     }
 
     public static string ParseId(string id) {

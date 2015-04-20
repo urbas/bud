@@ -39,16 +39,16 @@ namespace Bud.CSharp.Compiler {
 
     private static void Compile(IContext context, Key buildTarget, string outputFile, Framework framework, IEnumerable<string> libraryDependencies, IEnumerable<string> frameworkAssemblies, IEnumerable<string> sourceFiles, IEnumerable<string> resourceFiles) {
       Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
-      var compilerProcess = ProcessBuilder.Executable(framework.CSharpCompilerPath)
-                                          .AddParamArgument("-out:", outputFile)
-                                          .AddReferences(libraryDependencies, frameworkAssemblies)
-                                          .AddResourceFiles(context.GetRootNamespace(buildTarget), resourceFiles)
-                                          .AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(buildTarget)))
-                                          .AddArguments(sourceFiles);
-      InvokeCompiler(compilerProcess);
+      ProcessBuilder.Executable(framework.CSharpCompilerPath)
+                    .AddParamArgument("-out:", outputFile)
+                    .AddReferences(libraryDependencies, frameworkAssemblies)
+                    .AddResourceFiles(context.GetRootNamespace(buildTarget), resourceFiles)
+                    .AddParamArgument("-target:", GetTargetKind(context.GetCSharpAssemblyType(buildTarget)))
+                    .AddArguments(sourceFiles)
+                    .InvokeCompiler();
     }
 
-    private static void InvokeCompiler(ProcessBuilder compilerProcess) {
+    private static void InvokeCompiler(this ProcessBuilder compilerProcess) {
       var exitCode = compilerProcess.Start(Console.Out, Console.Error);
       if (exitCode != 0) {
         throw new Exception("Compilation failed.");
