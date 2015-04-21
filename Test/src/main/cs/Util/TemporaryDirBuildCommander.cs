@@ -9,7 +9,7 @@ namespace Bud.Test.Util {
     public TemporaryDirBuildCommander(TemporaryDirectory temporaryDirectory) {
       TemporaryDirectory = temporaryDirectory;
       try {
-        BuildCommander = Commander.BuildCommander.LoadProjectLevelCommander(TemporaryDirectory.Path);
+        BuildCommander = Commander.BuildCommander.LoadProjectLevelCommander(TemporaryDirectory.Path, false);
       } catch (Exception) {
         TemporaryDirectory.Dispose();
         throw;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using Newtonsoft.Json;
 
 namespace Bud {
   // TODO: Store keys in a pool to speed up equality comparisons.
@@ -13,6 +14,7 @@ namespace Bud {
     private string CachedId;
     private Key CachedLeaf;
 
+    [JsonConstructor]
     internal Key(string path, string description = null) {
       Description = description;
       Path = KeyPathUtils.NormalizePath(path);
@@ -42,8 +44,10 @@ namespace Bud {
       return new Key(KeyPathUtils.JoinPath(parentKey.Path, KeyPathUtils.ParseId(id)), description);
     }
 
+    [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
     public string Description { get; }
 
+    [JsonIgnore]
     public Key Leaf {
       get {
         if (CachedLeaf == null) {
@@ -59,14 +63,19 @@ namespace Bud {
 
     public string Path { get; }
 
+    [JsonIgnore]
     public string Id => CachedId ?? (CachedId = KeyPathUtils.ExtractIdFromPath(Path));
 
+    [JsonIgnore]
     public ImmutableList<string> PathComponents => CachedPathComponents ?? (CachedPathComponents = KeyPathUtils.ToPathComponents(Path));
 
+    [JsonIgnore]
     public bool IsRoot => KeyPathUtils.IsRootPath(Path);
 
+    [JsonIgnore]
     public bool IsAbsolute => KeyPathUtils.IsAbsolutePath(Path);
 
+    [JsonIgnore]
     public Key Parent {
       get {
         if (CachedParent == null) {

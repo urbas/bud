@@ -8,24 +8,23 @@ using Newtonsoft.Json;
 
 namespace Bud.Commander {
   public static class BuildCommander {
-    public static IBuildCommander LoadBuildCommander(int buildLevel,
-                                                     string currentProjectBaseDir) {
+    public static IBuildCommander LoadBuildCommander(int buildLevel, bool isQuiet, string currentProjectBaseDir) {
       if (buildLevel <= 0) {
-        return LoadProjectLevelCommander(currentProjectBaseDir);
+        return LoadProjectLevelCommander(currentProjectBaseDir, isQuiet);
       }
       // TODO: descend to the target build level first (i.e., go to the directory .bud/.../.bud/)
-      return LoadBuildLevelCommander(BudDir(currentProjectBaseDir));
+      return LoadBuildLevelCommander(BudDir(currentProjectBaseDir), isQuiet);
     }
 
     /// <summary>
     ///   This method returns a build commander whose tasks are defined in <c>projectBaseDir/.bud/Build.cs</c>.
     /// </summary>
-    public static IBuildCommander LoadProjectLevelCommander(string projectBaseDir) {
+    public static IBuildCommander LoadProjectLevelCommander(string projectBaseDir, bool isQuiet) {
       BuildDefinitionInfo buildDefinitionInfo;
-      if (TryLoadBuildDefinition(BudDir(projectBaseDir), out buildDefinitionInfo)) {
-        return new AppDomainBuildCommander(buildDefinitionInfo, projectBaseDir, BuildCommanderType.ProjectLevel);
+      if (TryLoadBuildDefinition(BudDir(projectBaseDir), out buildDefinitionInfo, isQuiet)) {
+        return new AppDomainBuildCommander(buildDefinitionInfo, projectBaseDir, BuildCommanderType.ProjectLevel, isQuiet);
       }
-      return new DefaultBuildCommander(projectBaseDir);
+      return new DefaultBuildCommander(projectBaseDir, isQuiet);
     }
 
     /// <summary>
@@ -34,9 +33,9 @@ namespace Bud.Commander {
     ///   Otherwise, when this method returns <c>false</c>, the build assembly
     ///   file will be set to <c>null</c>.
     /// </summary>
-    private static bool TryLoadBuildDefinition(string budDir, out BuildDefinitionInfo buildDefinitionInfo) {
+    private static bool TryLoadBuildDefinition(string budDir, out BuildDefinitionInfo buildDefinitionInfo, bool isQuiet) {
       if (Exists(BuildDefinitionSourceFile(budDir))) {
-        using (var buildLevelCommander = LoadBuildLevelCommander(budDir)) {
+        using (var buildLevelCommander = LoadBuildLevelCommander(budDir, isQuiet)) {
           buildLevelCommander.EvaluateToJson(BuildKeys.Build);
           buildDefinitionInfo = new BuildDefinitionInfo(
             BuildDefinitionAssemblyFile(budDir),
@@ -48,12 +47,12 @@ namespace Bud.Commander {
       return false;
     }
 
-    private static IBuildCommander LoadBuildLevelCommander(string projectToBuildDir) {
+    private static IBuildCommander LoadBuildLevelCommander(string projectToBuildDir, bool isQuiet) {
       BuildDefinitionInfo buildDefinitionInfo;
-      if (TryLoadBuildDefinition(BudDir(projectToBuildDir), out buildDefinitionInfo)) {
-        return new AppDomainBuildCommander(buildDefinitionInfo, projectToBuildDir, BuildCommanderType.BuildLevel);
+      if (TryLoadBuildDefinition(BudDir(projectToBuildDir), out buildDefinitionInfo, isQuiet)) {
+        return new AppDomainBuildCommander(buildDefinitionInfo, projectToBuildDir, BuildCommanderType.BuildLevel, isQuiet);
       }
-      return new DefaultBuildCommander(DefaultBuildDefinitionProject(projectToBuildDir));
+      return new DefaultBuildCommander(DefaultBuildDefinitionProject(projectToBuildDir), isQuiet);
     }
 
     private static string BuildDefinitionAssemblyFile(string budDir) {

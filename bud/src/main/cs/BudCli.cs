@@ -22,24 +22,27 @@ namespace Bud {
     private static void ExecuteCommands(CliArguments cliArguments) {
       IBuildCommander buildCommander;
       try {
-        buildCommander = LoadBuildCommander(cliArguments.BuildLevel, Directory.GetCurrentDirectory());
+        buildCommander = LoadBuildCommander(cliArguments.BuildLevel, cliArguments.IsQuiet, Directory.GetCurrentDirectory());
       } catch (Exception e) {
         Console.Error.WriteLine("An error occurred during build initialiation. Error messages:");
         ExceptionUtils.PrintItemizedErrorMessages(new[] {e}, 0);
         return;
       }
       var commandsToExecute = GetCommandsToExecute(cliArguments);
-      ExecuteCommands(commandsToExecute, buildCommander);
+      ExecuteCommands(commandsToExecute, buildCommander, cliArguments.PrintJson);
     }
 
     private static IEnumerable<string> GetCommandsToExecute(CliArguments cliArguments) {
       return cliArguments.Commands.Count == 0 ? DefaultCommandsToExecute : cliArguments.Commands;
     }
 
-    private static void ExecuteCommands(IEnumerable<string> commandsToExecute, IBuildCommander buildCommander) {
+    private static void ExecuteCommands(IEnumerable<string> commandsToExecute, IBuildCommander buildCommander, bool printJsonValue) {
       foreach (var command in commandsToExecute) {
         try {
-          buildCommander.EvaluateToJson(command);
+          var valueAsJson = buildCommander.EvaluateToJson(command);
+          if (printJsonValue) {
+            Console.WriteLine(valueAsJson);
+          }
         } catch (Exception e) {
           Console.Error.WriteLine("An error occurred during the execution of command '{0}'. Error messages:", command);
           ExceptionUtils.PrintItemizedErrorMessages(new[] {e}, 0);

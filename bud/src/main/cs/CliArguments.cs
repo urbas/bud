@@ -7,6 +7,12 @@ namespace Bud {
     [Option('b', "build-level", DefaultValue = 0, HelpText = "The build configuration level at which to evaluate tasks. Level 0 corresponds to the build configuration defined in '.bud/Build.cs', level 1 to '.bud/.bud/Build.cs' and so on.")]
     public int BuildLevel { get; set; }
 
+    [Option('j', "json", DefaultValue = false, HelpText = "Prints the value of the evaluated task as JSON to the standard output.")]
+    public bool PrintJson { get; set; }
+
+    [Option('q', "quiet", DefaultValue = false, HelpText = "Surpresses logs.")]
+    public bool IsQuiet { get; set; }
+
     [ValueList(typeof(List<string>))]
     public IList<string> Commands { get; set; }
 

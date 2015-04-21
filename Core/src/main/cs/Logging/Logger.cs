@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using Bud.IO;
 
 namespace Bud.Logging {
   public class Logger {
@@ -8,5 +9,6 @@ namespace Bud.Logging {
     }
 
     public static ILogger CreateFromStandardOutputs() => CreateFromWriters(Console.Out, Console.Error);
+    public static readonly ILogger NullLogger = Logger.CreateFromWriters(NullTextWriter.Instance, NullTextWriter.Instance);
   }
 }

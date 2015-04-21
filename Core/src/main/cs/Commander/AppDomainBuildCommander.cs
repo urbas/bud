@@ -1,5 +1,6 @@
 using System;
 using System.Security.Policy;
+using Bud.IO;
 
 namespace Bud.Commander {
   public class AppDomainBuildCommander : IBuildCommander {
@@ -7,7 +8,7 @@ namespace Bud.Commander {
     private readonly AssemblyBuildCommander AssemblyBuildCommander;
     private readonly AppDomain AppDomain;
 
-    public AppDomainBuildCommander(BuildDefinitionInfo buildDefinitionInfo, string dirOfProjectToBeBuilt, int buildLevel) {
+    public AppDomainBuildCommander(BuildDefinitionInfo buildDefinitionInfo, string dirOfProjectToBeBuilt, int buildLevel, bool isQuiet) {
       AppDomain = AppDomain.CreateDomain(BuildConfigurationAppDomainName, new Evidence(), new AppDomainSetup {ApplicationBase = AppDomain.CurrentDomain.BaseDirectory});
       try {
         AssemblyBuildCommander = (AssemblyBuildCommander) AppDomain.CreateInstanceFromAndUnwrap(BudAssemblies.CoreAssembly.Location, typeof(AssemblyBuildCommander).FullName);
@@ -15,8 +16,8 @@ namespace Bud.Commander {
                                                    buildDefinitionInfo.DependencyDlls,
                                                    dirOfProjectToBeBuilt,
                                                    buildLevel,
-                                                   Console.Out,
-                                                   Console.Error);
+                                                   isQuiet ? NullTextWriter.Instance : Console.Out,
+                                                   isQuiet ? NullTextWriter.Instance : Console.Error);
       } catch (Exception) {
         Dispose();
         throw;

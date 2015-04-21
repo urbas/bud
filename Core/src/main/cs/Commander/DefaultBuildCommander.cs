@@ -1,4 +1,5 @@
 using Bud.Build;
+using Bud.IO;
 using Bud.Logging;
 
 namespace Bud.Commander {
@@ -6,12 +7,12 @@ namespace Bud.Commander {
     private readonly Settings Settings;
     private readonly Config Config;
 
-    public DefaultBuildCommander(string dirOfProjectToBeBuilt)
-      : this(CreateDefaultSettings(dirOfProjectToBeBuilt)) {}
+    public DefaultBuildCommander(string dirOfProjectToBeBuilt, bool isQuiet)
+      : this(CreateDefaultSettings(dirOfProjectToBeBuilt), isQuiet) {}
 
-    public DefaultBuildCommander(Settings settings) {
+    public DefaultBuildCommander(Settings settings, bool isQuiet) {
       Settings = settings;
-      Config = new Config(settings.ConfigDefinitions, Logger.CreateFromStandardOutputs());
+      Config = new Config(settings.ConfigDefinitions, isQuiet ? Logger.NullLogger : Logger.CreateFromStandardOutputs());
     }
 
     public string EvaluateToJson(string command) {
