@@ -1,4 +1,4 @@
-## 0.1.2
+## 0.1.2 (not released yet)
 
 - __New feature__: Added the `-q` flag, which suppresses logs.
 
@@ -7,3 +7,35 @@
     ```
     bud.exe -q -j projects
     ```
+
+## 0.1.1 (latest release)
+
+- __Bug fix__: Bud did not embed resources from the `Res.Main()` build target into the main C# build target.
+
+## 0.1.0
+
+- __Bug fix__: Task dependencies execution was not parallel.
+
+## 0.0.3
+
+- __New feature__: added the `run` task (executes executable projects).
+
+- __New feature__: added the `test` task (runs NUnit tests).
+
+- __API change__: Renamed `Settings.Do`, `Settings.Globally` and `Settings.In` to `Settings.Add`, `Settings.AddGlobally and `Settings.AddIn`.
+
+- __API change__: Ported `Setup` delegates to the `Plugin` class.
+
+## 0.0.2
+
+- __New feature__: Build-definition plugins are now downloaded from NuGet repositories.
+
+- __New feature__: Added support for plugin development.
+
+- __New feature__: Bud now parses command line arguments.
+
+- __New feature__: Added the `generateSolution` task. It generates `.sln` and `.csproj` files.
+
+## 0.0.1
+
+Initial release.
