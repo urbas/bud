@@ -8,6 +8,8 @@
     bud.exe -q -j projects
     ```
 
+- __New feature__: Bud now exits with exit code 1 when anything fails (such as failing tests). On success, Bud will exit with code 0.
+
 ## 0.1.1 (latest release)
 
 - __Bug fix__: Bud did not embed resources from the `Res.Main()` build target into the main C# build target.
