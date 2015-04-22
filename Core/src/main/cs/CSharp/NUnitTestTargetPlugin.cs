@@ -22,7 +22,10 @@ namespace Bud.CSharp {
       await context.Evaluate(buildTarget / CSharpKeys.Dist);
       var assemblyInDist = Path.Combine(context.GetDistDir(buildTarget), Path.GetFileName(context.GetCSharpOutputAssemblyFile(buildTarget)));
       context.Logger.Info(string.Format("Testing '{0}'...", assemblyInDist));
-      Runner.Main(new[] {assemblyInDist});
+      var testExitCode = Runner.Main(new[] {assemblyInDist});
+      if (testExitCode != 0) {
+        throw new Exception(string.Format("Failed tests in '{0}'...", assemblyInDist));
+      }
     }
   }
 }

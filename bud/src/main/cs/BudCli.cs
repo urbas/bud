@@ -13,30 +13,32 @@ namespace Bud {
     public static void Main(string[] args) {
       var cliArguments = new CliArguments();
       if (CommandLine.Parser.Default.ParseArguments(args, cliArguments)) {
-        ExecuteCommands(cliArguments);
+        if (!ExecuteCommands(cliArguments)) {
+          Environment.ExitCode = 1;
+        }
       } else {
         Console.Error.Write(cliArguments.GetUsage());
       }
     }
 
-    private static void ExecuteCommands(CliArguments cliArguments) {
+    private static bool ExecuteCommands(CliArguments cliArguments) {
       IBuildCommander buildCommander;
       try {
         buildCommander = LoadBuildCommander(cliArguments.BuildLevel, cliArguments.IsQuiet, Directory.GetCurrentDirectory());
       } catch (Exception e) {
         Console.Error.WriteLine("An error occurred during build initialiation. Error messages:");
         ExceptionUtils.PrintItemizedErrorMessages(new[] {e}, 0);
-        return;
+        return false;
       }
       var commandsToExecute = GetCommandsToExecute(cliArguments);
-      ExecuteCommands(commandsToExecute, buildCommander, cliArguments.PrintJson);
+      return ExecuteCommands(commandsToExecute, buildCommander, cliArguments.PrintJson);
     }
 
     private static IEnumerable<string> GetCommandsToExecute(CliArguments cliArguments) {
       return cliArguments.Commands.Count == 0 ? DefaultCommandsToExecute : cliArguments.Commands;
     }
 
-    private static void ExecuteCommands(IEnumerable<string> commandsToExecute, IBuildCommander buildCommander, bool printJsonValue) {
+    private static bool ExecuteCommands(IEnumerable<string> commandsToExecute, IBuildCommander buildCommander, bool printJsonValue) {
       foreach (var command in commandsToExecute) {
         try {
           var valueAsJson = buildCommander.EvaluateToJson(command);
@@ -46,9 +48,10 @@ namespace Bud {
         } catch (Exception e) {
           Console.Error.WriteLine("An error occurred during the execution of command '{0}'. Error messages:", command);
           ExceptionUtils.PrintItemizedErrorMessages(new[] {e}, 0);
-          break;
+          return false;
         }
       }
+      return true;
     }
   }
 }
