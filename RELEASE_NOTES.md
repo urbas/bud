@@ -1,6 +1,6 @@
 ## 0.1.3 (next release)
 
-- __New feature__: One can now pass custom arguments to NUnit via the key `Bud.CSharp.NUnitPlugin.NUnitArgumentsKey` in the `Cs.Test()` build target. For example:
+- __New feature__: One can now pass custom arguments to NUnit via the key `Bud.CSharp.NUnitPlugin.NUnitArgs` in the `Cs.Test()` build target. For example:
 
     ```language-csharp
     new Project("Foo.Project", baseDir, Cs.Test(
