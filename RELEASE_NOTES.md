@@ -5,7 +5,7 @@
 - __New feature__: Added the `-j` flag, which returns a JSON representation of the evaluated config or task. Example of usage:
 
     ```
-    bud.exe -q -j projects
+    bud.exe -qj projects
     ```
 
 - __New feature__: Bud now exits with exit code 1 when anything fails (such as failing tests). On success, Bud will exit with code 0.
