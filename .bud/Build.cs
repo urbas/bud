@@ -32,7 +32,7 @@ public class Build : IBuild {
       ))
       .Project("Bud.SystemTests", Path.Combine(baseDir, "SystemTests"), Cs.Test(
         Cs.Dependency("Bud.Test"),
-        NUnitTestTargetPlugin.NUnitArgumentsKey.Modify(list => list.Add("/noshadow"))
+        NUnitPlugin.NUnitArgs.Modify(list => list.Add("/noshadow"))
       ))
       .Project("Bud.Examples.Snippets", Path.Combine(baseDir, "Bud.Examples.Snippets"), Cs.Dll(
         Cs.Dependency("Bud.Core")

@@ -8,17 +8,17 @@ using Bud.Dependencies;
 using NUnit.ConsoleRunner;
 
 namespace Bud.CSharp {
-  public class NUnitTestTargetPlugin : CsBuild {
-    public static readonly ConfigKey<ImmutableList<string>> NUnitArgumentsKey = Key.Define("nunitArgs", "Arguments that will be passed to NUnit.");
+  public class NUnitPlugin : CsBuild {
+    public static readonly ConfigKey<ImmutableList<string>> NUnitArgs = Key.Define("nunitArgs", "Arguments that will be passed to NUnit.");
 
-    public NUnitTestTargetPlugin(Key buildScope, params Setup[] extraBuildTargetSetup) : base(buildScope, extraBuildTargetSetup) {}
+    public NUnitPlugin(Key buildScope, params Setup[] extraBuildTargetSetup) : base(buildScope, extraBuildTargetSetup) {}
 
     protected override Settings BuildTargetSetup(Settings buildTargetSettings) {
       var mainBuildTarget = BuildTargetUtils.ProjectOf(buildTargetSettings.Scope) / BuildKeys.Main / CSharpKeys.CSharp;
       return base.BuildTargetSetup(buildTargetSettings)
                  .Add(BuildKeys.Test.Modify(TestTaskImpl),
                       CSharpKeys.AssemblyType.Modify(AssemblyType.Library),
-                      NUnitArgumentsKey.Init(DefaultNUnitArguments),
+                      NUnitArgs.Init(DefaultNUnitArguments),
                       DependenciesSettings.AddDependency(new CSharpInternalDependency(mainBuildTarget), config => IsMainBuildTargetDefined(config, mainBuildTarget)));
     }
 
@@ -33,7 +33,7 @@ namespace Bud.CSharp {
       // NOTE: we perform 'dist' to ensure that all dependencies are in the same directory as the assembly under test.
       await context.Evaluate(buildTarget / CSharpKeys.Dist);
       context.Logger.Info(string.Format("Testing '{0}'...", buildTarget));
-      var nunitArguments = context.Evaluate(buildTarget / NUnitArgumentsKey);
+      var nunitArguments = context.Evaluate(buildTarget / NUnitArgs);
       var testExitCode = Runner.Main(nunitArguments.ToArray());
       if (testExitCode != 0) {
         throw new Exception(string.Format("Failed tests in '{0}'...", buildTarget));

@@ -23,7 +23,7 @@ namespace Bud.CSharp {
     }
 
     public static Setup Test(params Setup[] setups) {
-      return new NUnitTestTargetPlugin(BuildKeys.Test, setups.Merge());
+      return new NUnitPlugin(BuildKeys.Test, setups.Merge());
     }
   }
 }
