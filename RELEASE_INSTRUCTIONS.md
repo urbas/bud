@@ -2,21 +2,21 @@
 
 Chocolatey:
 
-- Didn't work... [One time]: Install the API key (has to be done in administrative console): `choco apikey -source https://chocolatey.org/ -k <your-key-here>`
+1. Install the API key (has to be done in administrative console): `choco apiKey -k <your-api-key-here> -source https://chocolatey.org/`
 
-- Change the version in the `chocolatey/bud.nuspec` file.
+2. Change the version in the `chocolatey/bud.nuspec` file.
 
-- Change the version in the `chocolatey/tools/chocolateyInstall.ps1` file.
+3. Change the version in the `chocolatey/tools/chocolateyInstall.ps1` file.
 
-- Invoke `bud project/bud/main/cs/dist`.
+4. Invoke `bud project/bud/main/cs/dist`.
 
-- Create a zip of the contents of the `bud\.bud\output\main\cs\dist` folder. The name of the zip file should be `bud-x.x.x.zip`
+5. Create a zip of the contents of the `bud\.bud\output\main\cs\dist` folder. The name of the zip file should be `bud-x.x.x.zip`
 
-- Place the zip into `/home/budpage/production-budpage/shared/public/packages`.
+6. Place the zip into `/home/budpage/production-budpage/shared/public/packages`.
 
-- Go to the folder `chocolatey` and run `cpack` there.
+7. Go to the folder `chocolatey` and run `cpack` there.
 
-- Didn't work. Upload manually for now on chocolatey. Now push the package with `choco push bud.x.x.x.nupkg`
+8. Upload manually for now on chocolatey. Now push the package with `choco push bud.x.x.x.nupkg`
 
 ## TODO
 
