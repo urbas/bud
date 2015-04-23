@@ -6,6 +6,8 @@ Here are the next top-priority goals for Bud.
 
 - Continuous task invocation
 
+- Release plugin
+
 - Integration with Kythe
 
 - Integration with Jenkins and TeamCity
@@ -62,6 +64,18 @@ __Proposed syntax__:
 ```
 bud @watch build
 ```
+
+## Release plugin
+
+The release plugin should:
+
+- publish libraries to NuGet
+
+- publish full applications to Chocolatey
+
+- publish release notes
+
+- bump versions
 
 ## Integration with Kythe
 
