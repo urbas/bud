@@ -22,10 +22,10 @@ namespace Bud.BuildDefinition {
                                  CSharpKeys.OutputAssemblyDir.Modify(BuildDirs.GetBaseDir),
                                  CSharpKeys.OutputAssemblyName.Modify(BuildDefinitionAssemblyName),
                                  CSharpKeys.DistDir.Modify(BuildDirs.GetBaseDir),
-                                 BudAssemblyReferences));
+                                 AddBudAssemblyReferences));
     }
 
-    public static Setup BudAssemblyReferences => CSharpKeys.AssemblyReferences.Modify(AddBudAssembliesImpl);
+    public static Setup AddBudAssemblyReferences => CSharpKeys.AssemblyReferences.Modify(AddBudAssembliesImpl);
 
     private static string GetDefaultBuildSourceFile(IConfig context) => Combine(context.GetBaseDir(), BuildDefinitionSourceFileName);
 
@@ -35,7 +35,7 @@ namespace Bud.BuildDefinition {
     }
 
     private static IEnumerable<IPackageAssemblyReference> AddBudAssembliesImpl(IConfig config, IEnumerable<IPackageAssemblyReference> existingAssemblies) {
-      return existingAssemblies.Concat(BudAssemblies.AssemblyReferences);
+      return existingAssemblies.Concat(BudAssemblies.AssemblyReferences).Concat(BudAssemblies.CoreDependenciesReferences);
     }
   }
 }

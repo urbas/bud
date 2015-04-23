@@ -32,15 +32,10 @@ public class Build : IBuild {
       ))
       .Project("Bud.SystemTests", Path.Combine(baseDir, "SystemTests"), Cs.Test(
         Cs.Dependency("Bud.Test"),
-        NUnitTestTargetPlugin.NUnitArgumentsKey.Modify(RunTestsWithouShadowDlls)
+        NUnitTestTargetPlugin.NUnitArgumentsKey.Modify(list => list.Add("/noshadow"))
       ))
       .Project("Bud.Examples.Snippets", Path.Combine(baseDir, "Bud.Examples.Snippets"), Cs.Dll(
         Cs.Dependency("Bud.Core")
       ));
-  }
-
-  private static List<string> RunTestsWithouShadowDlls(List<string> oldArgs) {
-    oldArgs.Add("/noshadow");
-    return oldArgs;
   }
 }

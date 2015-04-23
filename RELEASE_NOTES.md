@@ -4,10 +4,8 @@
 
     ```language-csharp
     new Project("Foo.Project", baseDir, Cs.Test(
-      NUnitTestTargetPlugin.NUnitArgumentsKey.Modify(list => {
-        list.Add("/noshadow");
-        return list;
-      })
+        Cs.Dependency("Bud.Test"),
+        NUnitTestTargetPlugin.NUnitArgumentsKey.Modify(list => list.Add("/noshadow"))
     ))
     ```
 

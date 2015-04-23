@@ -1,6 +1,7 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Bud.Build;
 using Bud.Dependencies;
@@ -8,7 +9,7 @@ using NUnit.ConsoleRunner;
 
 namespace Bud.CSharp {
   public class NUnitTestTargetPlugin : CsBuild {
-    public static readonly ConfigKey<List<string>> NUnitArgumentsKey = Key.Define("nunitArgs", "Arguments that will be passed to NUnit.");
+    public static readonly ConfigKey<ImmutableList<string>> NUnitArgumentsKey = Key.Define("nunitArgs", "Arguments that will be passed to NUnit.");
 
     public NUnitTestTargetPlugin(Key buildScope, params Setup[] extraBuildTargetSetup) : base(buildScope, extraBuildTargetSetup) {}
 
@@ -21,10 +22,10 @@ namespace Bud.CSharp {
                       DependenciesSettings.AddDependency(new CSharpInternalDependency(mainBuildTarget), config => IsMainBuildTargetDefined(config, mainBuildTarget)));
     }
 
-    private static List<string> DefaultNUnitArguments(IConfig config, Key buildTarget) {
+    private static ImmutableList<string> DefaultNUnitArguments(IConfig config, Key buildTarget) {
       var assemblyFileName = Path.GetFileName(config.GetCSharpOutputAssemblyFile(buildTarget));
       var assemblyInDist = Path.Combine(config.GetDistDir(buildTarget), assemblyFileName);
-      return new List<string> {assemblyInDist};
+      return ImmutableList.Create(assemblyInDist);
     }
 
     private static async Task TestTaskImpl(IContext context, Func<Task> oldTest, Key buildTarget) {
