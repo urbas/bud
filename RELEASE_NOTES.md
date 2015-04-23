@@ -1,4 +1,4 @@
-## 0.1.2 (not released yet)
+## 0.1.2
 
 - __New feature__: Added the `-q` flag, which suppresses logs.
 
@@ -10,7 +10,7 @@
 
 - __New feature__: Bud now exits with exit code 1 when anything fails (such as failing tests). On success, Bud will exit with code 0.
 
-## 0.1.1 (latest release)
+## 0.1.1
 
 - __Bug fix__: Bud did not embed resources from the `Res.Main()` build target into the main C# build target.
 
