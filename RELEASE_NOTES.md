@@ -1,4 +1,17 @@
-## 0.1.2
+## 0.1.3 (next release)
+
+- __New feature__: One can now pass custom arguments to NUnit via the key `Bud.CSharp.NUnitTestTargetPlugin.NUnitArgumentsKey` in the `Cs.Test()` build target. For example:
+
+    ```language-csharp
+    new Project("Foo.Project", baseDir, Cs.Test(
+      NUnitTestTargetPlugin.NUnitArgumentsKey.Modify(list => {
+        list.Add("/noshadow");
+        return list;
+      })
+    ))
+    ```
+
+## 0.1.2 (latest release)
 
 - __New feature__: Added the `-q` flag, which suppresses logs.
 
