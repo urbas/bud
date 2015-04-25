@@ -9,7 +9,7 @@ public class Build : IBuild {
   public Settings Setup(Settings settings, string baseDir) {
     return settings
       .AddGlobally(CSharpKeys.TargetFramework.Init(Framework.Net46))
-      .Version("0.1.0")
+      .Version("0.1.2")
       .Project("bud", Path.Combine(baseDir, "bud"), Cs.Exe(
         CSharpKeys.RootNamespace.Modify("Bud"),
         Cs.Dependency("Bud.Core"),

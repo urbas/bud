@@ -1,19 +1,40 @@
 #!/usr/bin/env python
 
 import sys
-import os
+import re
 from argparse import ArgumentParser
 from subprocess import call
 from os.path import join
+from tempfile import mkstemp
+from shutil import move
+from os import remove, close, getcwd, chdir
 
+
+
+BUD_BUILD_CS='.bud/Build.cs'
 CHOCOLATEY_PACKAGE_DIR='DevelopmentUtils/ChocolateyPackage'
 CHOCOLATEY_NUSPEC_FILE=join(CHOCOLATEY_PACKAGE_DIR, 'bud.nuspec')
 CHOCOLATEY_PS1_FILE=join(CHOCOLATEY_PACKAGE_DIR, 'tools', 'chocolateyInstall.ps1')
 BUD_DIST_DIR=join('bud', '.bud', 'output', 'main', 'cs', 'dist')
 
 
+def replace_lines(file_path, pattern, subst):
+    fh, abs_path = mkstemp()
+    with open(abs_path,'w') as new_file:
+        with open(file_path) as old_file:
+            for line in old_file:
+                new_file.write(re.sub(pattern, subst, line))
+    close(fh)
+    remove(file_path)
+    move(abs_path, file_path)
+
+
 def replace_in_file(file, regex_s_replacement):
   call(['sed', '-r', regex_s_replacement, '-i', file])
+
+
+def update_bud_version(version):
+  replace_lines(BUD_BUILD_CS, r'\.Version\(.*?\)', '.Version("{0}")'.format(version))
 
 
 def update_nuspec_version(version):
@@ -39,6 +60,10 @@ def create_dist():
   call(['bud', 'project/bud/main/cs/dist'])
 
 
+def publish_to_nuget():
+  call(['bud', 'publish'])
+
+
 def bud_dist_zip_name(version):
   return 'bud-{0}.zip'.format(version)
 
@@ -48,18 +73,18 @@ def bud_choco_package_name(version):
 
 
 def create_zip(version):
-  old_dir=os.getcwd()
-  os.chdir(BUD_DIST_DIR)
+  old_dir=getcwd()
+  chdir(BUD_DIST_DIR)
   call(['zip', '-r', bud_dist_zip_name(version), '.'])
-  os.chdir(old_dir)
+  chdir(old_dir)
 
 
 def chocolatey_push(version):
-  old_dir=os.getcwd()
-  os.chdir(CHOCOLATEY_PACKAGE_DIR)
+  old_dir=getcwd()
+  chdir(CHOCOLATEY_PACKAGE_DIR)
   call(['cpack'])
   call(['cpush', bud_choco_package_name(version)])
-  os.chdir(old_dir)
+  chdir(old_dir)
 
 
 def upload_package(version):
@@ -69,10 +94,15 @@ def upload_package(version):
 
 
 def prepare_release(version):
+  update_bud_version(version)
   update_nuspec_version(version)
   update_dist_zip_url(version)
+
   git_release_commit(version)
   git_tag_release(version)
+
+  publish_to_nuget()
+  
   create_dist()
   create_zip(version)
   upload_package(version)
