@@ -1,7 +1,7 @@
 using System.Reflection;
 
 [assembly: AssemblyTitle("Bud.Core")]
-[assembly: AssemblyDescription("0.1.2-alpha")]
+[assembly: AssemblyDescription("0.1.3-dev")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("")]

@@ -14,13 +14,15 @@
     new Project("Foo.Project", Cs.Exe())
     ```
 
+- __New feature__: Added the `-v` command-line flag. This flag tells Bud to print its version and exit immediately after.
+
 - __New feature__: You can now add macros to the build definition. See [documentation](http://bud.urbas.si/Docs/Guide#Macros) on how to use them.
 
 ## 0.1.2 (latest release)
 
-- __New feature__: Added the `-q` flag, which suppresses logs.
+- __New feature__: Added the `-q` command-line flag. It makes Bud suppress all logs.
 
-- __New feature__: Added the `-j` flag, which returns a JSON representation of the evaluated config or task. Example of usage:
+- __New feature__: Added the `-j` command-line flag. It makes Bud return a JSON representation of the evaluated config or task. Example of usage:
 
     ```
     bud.exe -qj projects

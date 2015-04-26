@@ -24,8 +24,8 @@ BUD_DIST_DIR=join('bud', '.bud', 'output', 'main', 'cs', 'dist')
 
 def perform_release(version):
   update_version(version)
-  # git_tag_release(version)
-  # publish(version)
+  git_tag_release(version)
+  publish(version)
 
 
 def update_version(version):

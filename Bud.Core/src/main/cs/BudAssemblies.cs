@@ -6,7 +6,6 @@ using NuGet;
 
 namespace Bud {
   public static class BudAssemblies {
-    public const string BudVersion = "0.1.3-alpha";
     private const string ImmutableCollectionsDependency = "System.Collections.Immutable";
 
     public static IEnumerable<Assembly> AllAssemblies { get; } = AppDomain.CurrentDomain
