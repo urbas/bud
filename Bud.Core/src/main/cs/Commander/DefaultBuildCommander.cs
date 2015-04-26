@@ -3,17 +3,17 @@ using Bud.Logging;
 
 namespace Bud.Commander {
   public class DefaultBuildCommander : IBuildCommander {
-    private BuildCommanderContext CommanderContext;
+    private BuildContext BuildContext;
 
     public DefaultBuildCommander(string dirOfProjectToBeBuilt, bool isQuiet)
       : this(CreateDefaultSettings(dirOfProjectToBeBuilt), isQuiet) {}
 
     public DefaultBuildCommander(Settings settings, bool isQuiet) {
       var logger = isQuiet ? Logger.NullLogger : Logger.CreateFromStandardOutputs();
-      CommanderContext = new BuildCommanderContext(settings, logger);
+      BuildContext = new BuildContext(settings, logger);
     }
 
-    public string EvaluateToJson(string command) => CommandEvaluator.EvaluateToJsonSync(command, ref CommanderContext);
+    public string EvaluateToJson(string command) => CommandEvaluator.EvaluateToJsonSync(command, ref BuildContext);
 
     public void Dispose() {}
 

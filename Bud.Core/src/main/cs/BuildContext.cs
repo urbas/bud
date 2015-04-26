@@ -1,23 +1,22 @@
 using Bud.Logging;
 
-namespace Bud.Commander {
-  public class BuildCommanderContext {
-    private readonly ILogger Logger;
+namespace Bud {
+  public class BuildContext {
     private IConfig CachedConfig;
 
-    public BuildCommanderContext(Settings settings, ILogger logger) {
+    public BuildContext(Settings settings, ILogger logger) {
       Settings = settings;
       Logger = logger;
     }
 
     public Settings Settings { get; }
 
+    public ILogger Logger { get; }
+
     public IConfig Config => CachedConfig ?? (CachedConfig = new Config(Settings.ConfigDefinitions, Logger));
 
     public IContext Context => Bud.Context.FromConfig(Config, Settings.TaskDefinitions);
 
-    public BuildCommanderContext UpdateSettings(Settings newSettings) {
-      return Settings == newSettings ? this : new BuildCommanderContext(newSettings, Logger);
-    }
+    public BuildContext WithSettings(Settings newSettings) => Settings == newSettings ? this : new BuildContext(newSettings, Logger);
   }
 }

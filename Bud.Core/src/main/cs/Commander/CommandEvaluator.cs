@@ -3,11 +3,11 @@ using Newtonsoft.Json;
 
 namespace Bud.Commander {
   public static class CommandEvaluator {
-    public static string EvaluateToJsonSync(string command, ref BuildCommanderContext buildCommanderContext) {
+    public static string EvaluateToJsonSync(string command, ref BuildContext buildContext) {
       if (IsMacroCommand(command)) {
-        return EvaluateMacroSync(command, ref buildCommanderContext);
+        return EvaluateMacroSync(command, ref buildContext);
       }
-      return EvaluateToJsonSync(buildCommanderContext.Context, command);
+      return EvaluateToJsonSync(buildContext.Context, command);
     }
 
     private static bool IsMacroCommand(string command) => command.StartsWith(Macro.MacroNamePrefix);
@@ -22,12 +22,12 @@ namespace Bud.Commander {
 
     private static object EvaluateSync(IContext context, string command) => context.EvaluateKeySync(Key.Parse(command));
 
-    private static string EvaluateMacroSync(string command, ref BuildCommanderContext buildCommanderContext) {
-      var macros = buildCommanderContext.Config.Evaluate(Macro.Macros);
+    private static string EvaluateMacroSync(string command, ref BuildContext buildContext) {
+      var macros = buildContext.Config.Evaluate(Macro.Macros);
       var macro = macros[command.Substring(1)];
-      var newSettings = macro.Function(buildCommanderContext.Settings, new string[] {});
-      buildCommanderContext = buildCommanderContext.UpdateSettings(newSettings);
-      return null;
+      var macroResult = macro.Function(buildContext, new string[] {});
+      buildContext = macroResult.BuildContext;
+      return JsonConvert.SerializeObject(macroResult.Value);
     }
   }
 }
