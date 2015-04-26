@@ -27,7 +27,7 @@ namespace Bud {
       }
     }
 
-    private static void PrintVersion() => Console.WriteLine(BudAssemblies.BudVersion);
+    private static void PrintVersion() => Console.WriteLine(BudVersion.Current);
 
     private static bool ExecuteCommands(CliArguments cliArguments) {
       IBuildCommander buildCommander;
