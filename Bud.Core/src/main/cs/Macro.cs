@@ -31,9 +31,5 @@ namespace Bud {
     public static Macro Valued<T>(string name, Func<BuildContext, string[], T> function, string description = "") {
       return new Macro(name, (context, arguments) => new MacroResult(function(context, arguments), context), description);
     }
-
-    public static Macro Valued<T>(string name, Func<Settings, string[], T> function, string description = "") {
-      return new Macro(name, (context, arguments) => new MacroResult(function(context.Settings, arguments), context), description);
-    }
   }
 }
