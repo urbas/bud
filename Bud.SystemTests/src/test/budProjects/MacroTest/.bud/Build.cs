@@ -3,29 +3,26 @@ using Bud.CSharp;
 using Bud.Projects;
 
 public class Build : IBuild {
-  public Settings Setup(Settings settings, string baseDir) {
-    return settings.Add(new Project("Foo", Cs.Exe()),
-                        new Macro("configKeyIntroductionMacro", ConfigKeyIntroductionMacroFunction, "this is a description of the macro."),
-                        new Macro("helloBuildContextMacroResultMacro", HelloBuildContextMacroResultMacro),
-                        Macro.Valued("helloMacro", HelloMacro),
-                        Macro.Valued("helloBuildContextMacro", HelloBuildContextMacro));
-  }
-
   private static readonly ConfigKey<string> IntroducedConfig = Key.Define("introducedConfig");
+  private static readonly ConfigKey<string> IntroducedConfig2 = Key.Define("introducedConfig2");
 
-  private static Settings ConfigKeyIntroductionMacroFunction(Settings settings, string[] commandLineArguments) {
-    return settings.AddGlobally(IntroducedConfig.Init("Foo bar value."));
+  public Settings Setup(Settings settings, string baseDir) {
+    return settings.Add(new Macro("mostGeneralDefinitionMacro", MostGeneralDefinitionMacro),
+                        new Macro("settingsModifierMacro", SettingsModifierMacro, "this is a description of the macro."),
+                        Macro.Valued("valueReturningMacro", ValueReturningMacro));
   }
 
-  private static string HelloMacro(Settings settings, string[] commandLineArguments) {
-    return "Hello, Macro World!";
+  private static MacroResult MostGeneralDefinitionMacro(BuildContext buildContext, string[] commandLineArguments) {
+    var newSettings = buildContext.Settings.AddGlobally(IntroducedConfig.Init("Something"));
+    return new MacroResult("Hello, BuildContext and MacroResult World!",
+                           buildContext.WithSettings(newSettings));
   }
 
-  private static string HelloBuildContextMacro(BuildContext buildContext, string[] commandLineArguments) {
+  private static Settings SettingsModifierMacro(Settings settings, string[] commandLineArguments) {
+    return settings.AddGlobally(IntroducedConfig2.Init("Foo bar value."));
+  }
+
+  private static string ValueReturningMacro(BuildContext buildContext, string[] commandLineArguments) {
     return "Hello, BuildContext Macro World!";
-  }
-
-  private static MacroResult HelloBuildContextMacroResultMacro(BuildContext buildContext, string[] commandLineArguments) {
-    return new MacroResult("Hello, BuildContext and MacroResult World!", buildContext);
   }
 }

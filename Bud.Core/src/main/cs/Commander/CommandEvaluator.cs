@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Immutable;
 using Newtonsoft.Json;
 
 namespace Bud.Commander {
@@ -16,18 +17,23 @@ namespace Bud.Commander {
       try {
         return JsonConvert.SerializeObject(EvaluateSync(context, command));
       } catch (Exception ex) {
-        throw new OperationCanceledException(String.Format("Task '{0}' failed.", command), ex);
+        throw new OperationCanceledException(string.Format("Task '{0}' failed.", command), ex);
       }
     }
 
     private static object EvaluateSync(IContext context, string command) => context.EvaluateKeySync(Key.Parse(command));
 
     private static string EvaluateMacroSync(string command, ref BuildContext buildContext) {
-      var macros = buildContext.Config.Evaluate(Macro.Macros);
-      var macro = macros[command.Substring(1)];
-      var macroResult = macro.Function(buildContext, new string[] {});
-      buildContext = macroResult.BuildContext;
-      return JsonConvert.SerializeObject(macroResult.Value);
+      var macroName = command.Substring(1);
+      ImmutableDictionary<string, Macro> macros;
+      Macro macro;
+      if (buildContext.Config.TryEvaluate(Macro.Macros, out macros)
+          && macros.TryGetValue(macroName, out macro)) {
+        var macroResult = macro.Function(buildContext, new string[] {});
+        buildContext = macroResult.BuildContext;
+        return JsonConvert.SerializeObject(macroResult.Value);
+      }
+      throw new ArgumentException(string.Format("Could not find macro '{0}'.", macroName));
     }
   }
 }

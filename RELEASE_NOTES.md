@@ -14,6 +14,8 @@
     new Project("Foo.Project", Cs.Exe())
     ```
 
+- __New feature__: You can now add macros to the build definition. See [documentation](http://bud.urbas.si/Docs/Guide#Macros) on how to use them.
+
 ## 0.1.2 (latest release)
 
 - __New feature__: Added the `-q` flag, which suppresses logs.
