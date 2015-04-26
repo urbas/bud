@@ -7,7 +7,7 @@ using Bud.Resources;
 public class Build : IBuild {
   public Settings Setup(Settings settings, string baseDir) {
     var budCore = new Project("Bud.Core",
-                              Path.Combine(baseDir, "Core"),
+                              Path.Combine(baseDir, "Bud.Core"),
                               Res.Main(),
                               Cs.Dll(CSharpKeys.RootNamespace.Modify("Bud"),
                                      Cs.Dependency("Microsoft.Bcl.Immutable"),
@@ -25,12 +25,12 @@ public class Build : IBuild {
                                  Cs.Dependency("CommandLineParser")));
 
     var budTest = new Project("Bud.Test",
-                              Path.Combine(baseDir, "Test"),
+                              Path.Combine(baseDir, "Bud.Test"),
                               Cs.Dll(Cs.Dependency("Bud.Core"),
                                      Cs.Dependency("NUnit")));
 
     var budSystemTests = new Project("Bud.SystemTests",
-                                     Path.Combine(baseDir, "SystemTests"),
+                                     Path.Combine(baseDir, "Bud.SystemTests"),
                                      Cs.Test(Cs.Dependency("Bud.Test"),
                                              NUnitPlugin.NUnitArgs.Modify(list => list.Add("/noshadow"))));
 
