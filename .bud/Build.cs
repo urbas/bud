@@ -34,7 +34,7 @@ public class Build : IBuild {
                                           Cs.Dll(Cs.Dependency("Bud.Core")));
 
     return settings.AddGlobally(CSharpKeys.TargetFramework.Init(Framework.Net46))
-                   .Version("0.1.2")
+                   .Version("0.1.3-dev")
                    .Add(bud, budCore, budTest, budSystemTests, budExamplesSnippets);
   }
 }
