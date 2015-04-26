@@ -13,13 +13,21 @@ namespace Bud {
     public static void Main(string[] args) {
       var cliArguments = new CliArguments();
       if (CommandLine.Parser.Default.ParseArguments(args, cliArguments)) {
-        if (!ExecuteCommands(cliArguments)) {
-          Environment.ExitCode = 1;
-        }
+        InterpretArguments(cliArguments);
       } else {
         Console.Error.Write(cliArguments.GetUsage());
       }
     }
+
+    private static void InterpretArguments(CliArguments cliArguments) {
+      if (cliArguments.IsShowVersion) {
+        PrintVersion();
+      } else if (!ExecuteCommands(cliArguments)) {
+        Environment.ExitCode = 1;
+      }
+    }
+
+    private static void PrintVersion() => Console.WriteLine(BudAssemblies.BudVersion);
 
     private static bool ExecuteCommands(CliArguments cliArguments) {
       IBuildCommander buildCommander;

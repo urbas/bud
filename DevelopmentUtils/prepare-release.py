@@ -18,6 +18,31 @@ CHOCOLATEY_PS1_FILE=join(CHOCOLATEY_PACKAGE_DIR, 'tools', 'chocolateyInstall.ps1
 BUD_DIST_DIR=join('bud', '.bud', 'output', 'main', 'cs', 'dist')
 
 
+def perform_release(version):
+  update_version(version)
+  git_tag_release(version)
+  publish(version)
+
+
+def update_version(version):
+  update_build_cs_version(version)
+  update_nuspec_version(version)
+  update_dist_zip_url(version)
+
+
+def git_tag_release(version):
+  git_release_commit(version)
+  git_tag_release(version)
+
+
+def publish(version):
+  publish_to_nuget()
+  create_dist()
+  create_zip(version)
+  upload_package(version)
+  chocolatey_push(version)
+
+
 def replace_lines(file_path, pattern, subst):
     fh, abs_path = mkstemp()
     with open(abs_path,'w') as new_file:
@@ -33,7 +58,7 @@ def replace_in_file(file, regex_s_replacement):
   call(['sed', '-r', regex_s_replacement, '-i', file])
 
 
-def update_bud_version(version):
+def update_build_cs_version(version):
   replace_lines(BUD_BUILD_CS, r'\.Version\(.*?\)', '.Version("{0}")'.format(version))
 
 
@@ -93,27 +118,11 @@ def upload_package(version):
   call(['scp', '-i', '~/.ssh/budpage_id_rsa', package_relative_path, 'budpage@54.154.215.159:/home/budpage/production-budpage/shared/public/packages/{0}'.format(package_name)])
 
 
-def prepare_release(version):
-  update_bud_version(version)
-  update_nuspec_version(version)
-  update_dist_zip_url(version)
-
-  git_release_commit(version)
-  git_tag_release(version)
-
-  publish_to_nuget()
-  
-  create_dist()
-  create_zip(version)
-  upload_package(version)
-  chocolatey_push(version)
-
-
 def run():
   parser = ArgumentParser(description="Prepares Bud for the release")
   parser.add_argument('version', metavar='VERSION', nargs=1, help="Version of Bud being released.")
   args = parser.parse_args(sys.argv[1:])
-  prepare_release(args.version[0])
+  perform_release(args.version[0])
 
 
 if __name__ == "__main__":

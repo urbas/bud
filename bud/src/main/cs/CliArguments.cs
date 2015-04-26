@@ -13,12 +13,15 @@ namespace Bud {
     [Option('q', "quiet", DefaultValue = false, HelpText = "Surpresses logs.")]
     public bool IsQuiet { get; set; }
 
+    [Option('v', "version", DefaultValue = false, HelpText = "Displays Bud's version.")]
+    public bool IsShowVersion { get; set; }
+
     [ValueList(typeof(List<string>))]
     public IList<string> Commands { get; set; }
 
     public string GetUsage() {
       var helpText = HelpText.AutoBuild(this, current => HelpText.DefaultParsingErrorsHandler(this, current));
-      helpText.Heading = new HeadingInfo("Bud: the build tool without the 'ill'.");
+      helpText.Heading = new HeadingInfo("Bud: the build tool without the 'ill'.", "v" + BudAssemblies.BudVersion);
       helpText.Copyright = new CopyrightInfo("Matej Urbas", 2015);
       helpText.AddPreOptionsLine("\nUsage: bud [Options] command1 command2 ... commandN");
       helpText.AddPreOptionsLine("\nOptions:");
