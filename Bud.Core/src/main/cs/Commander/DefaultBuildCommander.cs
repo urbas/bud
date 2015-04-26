@@ -1,24 +1,19 @@
 using Bud.Build;
-using Bud.IO;
 using Bud.Logging;
 
 namespace Bud.Commander {
   public class DefaultBuildCommander : IBuildCommander {
-    private readonly Settings Settings;
-    private readonly Config Config;
+    private BuildCommanderContext CommanderContext;
 
     public DefaultBuildCommander(string dirOfProjectToBeBuilt, bool isQuiet)
       : this(CreateDefaultSettings(dirOfProjectToBeBuilt), isQuiet) {}
 
     public DefaultBuildCommander(Settings settings, bool isQuiet) {
-      Settings = settings;
-      Config = new Config(settings.ConfigDefinitions, isQuiet ? Logger.NullLogger : Logger.CreateFromStandardOutputs());
+      var logger = isQuiet ? Logger.NullLogger : Logger.CreateFromStandardOutputs();
+      CommanderContext = new BuildCommanderContext(settings, logger);
     }
 
-    public string EvaluateToJson(string command) {
-      var context = Context.FromConfig(Config, Settings.TaskDefinitions);
-      return CommandEvaluator.EvaluateToJsonSynchronously(context, command);
-    }
+    public string EvaluateToJson(string command) => CommandEvaluator.EvaluateToJsonSync(command, ref CommanderContext);
 
     public void Dispose() {}
 

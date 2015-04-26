@@ -9,22 +9,30 @@ using Bud.Util;
 namespace Bud.Commander {
   public class AssemblyBuildCommander : MarshalByRefObject, IBuildCommander {
     public const string BuildDefinitionClassName = "Build";
-    private Settings Settings;
-    private IConfig Config;
+    private BuildCommanderContext CommanderContext;
 
     public void LoadBuildDefinition(string buildDefinitionAssemblyFile,
                                     string[] dependencyDlls,
                                     string baseDirectory,
                                     int buildLevel,
-                                    TextWriter standardOutputTextWriter,
-                                    TextWriter standardErrorTextWriter) {
-      Console.SetOut(standardOutputTextWriter);
-      Console.SetError(standardErrorTextWriter);
+                                    TextWriter outputTextWriter,
+                                    TextWriter errorTextWriter) {
+      Console.SetOut(outputTextWriter);
+      Console.SetError(errorTextWriter);
       AppDomain.CurrentDomain.AssemblyResolve += AssemblyUtils.PathListAssemblyResolver(dependencyDlls);
+      CommanderContext = CreateBuildCommanderContext(buildDefinitionAssemblyFile, baseDirectory, buildLevel, outputTextWriter, errorTextWriter);
+    }
+
+    public string EvaluateToJson(string command) => CommandEvaluator.EvaluateToJsonSync(command, ref CommanderContext);
+
+    public void Dispose() {}
+
+    private static BuildCommanderContext CreateBuildCommanderContext(string buildDefinitionAssemblyFile, string baseDirectory, int buildLevel, TextWriter outputTextWriter, TextWriter errorTextWriter) {
       var assembly = AppDomain.CurrentDomain.Load(AssemblyName.GetAssemblyName(buildDefinitionAssemblyFile));
       var build = (IBuild) assembly.CreateInstance(BuildDefinitionClassName);
-      Settings = build.Setup(GetInitialSettings(baseDirectory, buildLevel), baseDirectory);
-      Config = new Config(Settings.ConfigDefinitions, Logger.CreateFromWriters(standardOutputTextWriter, standardErrorTextWriter));
+      var settings = build.Setup(GetInitialSettings(baseDirectory, buildLevel), baseDirectory);
+      var logger = Logger.CreateFromWriters(outputTextWriter, errorTextWriter);
+      return new BuildCommanderContext(settings, logger);
     }
 
     private static Settings GetInitialSettings(string baseDirectory, int buildLevel) {
@@ -37,12 +45,5 @@ namespace Bud.Commander {
           throw new Exception("Unknown build type.");
       }
     }
-
-    public string EvaluateToJson(string command) {
-      var context = Context.FromConfig(Config, Settings.TaskDefinitions);
-      return CommandEvaluator.EvaluateToJsonSynchronously(context, command);
-    }
-
-    public void Dispose() {}
   }
 }
