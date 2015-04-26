@@ -17,7 +17,7 @@ namespace Bud.Build {
     public override Settings Setup(Settings settings) {
       return settings
         .Add(BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
-             BuildDirsKeys.BaseDir.Init(BaseDir),
+             BuildDirsKeys.BaseDir.Init(DefaultBaseDir),
              BuildDirsKeys.BudDir.Init(GetDefaultBudDir),
              BuildDirsKeys.OutputDir.Init(GetDefaultOutputDir),
              BuildDirsKeys.BuildConfigCacheDir.Init(GetDefaultBuildConfigCacheDir),
@@ -25,6 +25,10 @@ namespace Bud.Build {
              BuildDirsKeys.Clean.Modify(CleanBuildDirsImpl))
         .AddGlobally(BuildDirsKeys.Clean.Init(TaskUtils.NoOpTask),
                      BuildDirsKeys.Clean.DependsOn(settings.Scope / BuildDirsKeys.Clean));
+    }
+
+    private string DefaultBaseDir(IConfig config, Key scopeKey) {
+      return string.IsNullOrEmpty(BaseDir) ? Path.Combine(config.GetBaseDir(), scopeKey.Id) : BaseDir;
     }
 
     public static string GetDefaultBudDir(IConfig ctxt, Key key) {
