@@ -18,5 +18,10 @@ namespace Bud {
     public IContext Context => Bud.Context.FromConfig(Config, Settings.TaskDefinitions);
 
     public BuildContext WithSettings(Settings newSettings) => Settings == newSettings ? this : new BuildContext(newSettings, Logger);
+
+    public BuildContext ReloadConfig() {
+      CachedConfig = null;
+      return this;
+    } 
   }
 }
