@@ -15,6 +15,8 @@ namespace Bud.Projects {
       Setups = setups;
     }
 
+    public Project(string projectId, params Setup[] setups) : this(projectId, null, setups) {}
+
     public override Settings Setup(Settings settings) {
       var project = ProjectKey(ProjectId);
       return settings

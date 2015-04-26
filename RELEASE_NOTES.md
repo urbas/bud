@@ -8,6 +8,12 @@
     ))
     ```
 
+- __New feature__: You can now omit project's base directory. It will use `root/Project.Name` as the default. Here's an example:
+
+    ```language-csharp
+    new Project("Foo.Project", Cs.Exe())
+    ```
+
 ## 0.1.2 (latest release)
 
 - __New feature__: Added the `-q` flag, which suppresses logs.
