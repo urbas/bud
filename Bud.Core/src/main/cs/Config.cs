@@ -54,7 +54,11 @@ namespace Bud {
       if (TryEvaluateConfig(key, out value)) {
         return value;
       }
-      throw new ArgumentException(string.Format("Could not evaluate configuration '{0}'. The value for this configuration was not defined.", key));
+      throw new ArgumentException(KeyUndefinedEvaluationFailedMessage(key));
+    }
+
+    public static string KeyUndefinedEvaluationFailedMessage(Key key) {
+      return string.Format("Could not evaluate '{0}'. The value for this key was not defined.", key);
     }
   }
 }

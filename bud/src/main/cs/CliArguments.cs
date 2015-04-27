@@ -19,6 +19,7 @@ namespace Bud {
     [ValueList(typeof(List<string>))]
     public IList<string> Commands { get; set; }
 
+    [HelpOption]
     public string GetUsage() {
       var helpText = HelpText.AutoBuild(this, current => HelpText.DefaultParsingErrorsHandler(this, current));
       helpText.Heading = new HeadingInfo("Bud: the build tool without the 'ill'.", "v" + BudVersion.Current);

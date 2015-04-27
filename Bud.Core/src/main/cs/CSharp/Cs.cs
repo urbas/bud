@@ -40,8 +40,6 @@ namespace Bud.CSharp {
                          setups.Merge());
     }
 
-    public static Setup Test(params Setup[] setups) {
-      return new NUnitPlugin(BuildKeys.Test, setups.Merge());
-    }
+    public static Setup Test(params Setup[] setups) => new NUnitPlugin(BuildKeys.Test, setups);
   }
 }

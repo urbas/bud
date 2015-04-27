@@ -128,7 +128,7 @@ namespace Bud {
                                               () => TryGetTaskValueFromCache(absoluteKey),
                                               valueTask => TaskValueCache = TaskValueCache.Add(absoluteKey, valueTask));
       }
-      throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. This task is not defined.", absoluteKey));
+      throw new ArgumentException(Config.KeyUndefinedEvaluationFailedMessage(absoluteKey));
     }
 
     private Task EvaluateOverridenTaskToCache(ITaskDefinition taskDefinition, Key taskKey) {
@@ -137,26 +137,6 @@ namespace Bud {
                                             OverridenTaskValueCacheSemaphore,
                                             () => TryGetOverridenTaskValueFromCache(taskDefinition),
                                             valueTask => OverridenTaskValueCache = OverridenTaskValueCache.Add(taskDefinition, valueTask));
-    }
-
-    private Task EvaluateTaskToCacheUnguarded(Key absoluteKey) {
-      ITaskDefinition taskDefinition;
-      if (TaskDefinitions.TryGetValue(absoluteKey, out taskDefinition)) {
-        var value = EvaluateTaskDefinition(absoluteKey, taskDefinition);
-        TaskValueCache = TaskValueCache.Add(absoluteKey, value);
-        return value;
-      }
-      throw new ArgumentException(string.Format("Could not evaluate the task '{0}'. This task is not defined.", absoluteKey));
-    }
-
-    private Task EvaluateOverridenTaskToCacheUnguarded(ITaskDefinition taskDefinition, Key taskKey) {
-      Task freshEvaluation = EvaluateTaskDefinition(taskKey, taskDefinition);
-      OverridenTaskValueCache = OverridenTaskValueCache.Add(taskDefinition, freshEvaluation);
-      return freshEvaluation;
-    }
-
-    private Task EvaluateTaskDefinition(Key absoluteKey, ITaskDefinition taskDefinition) {
-      return taskDefinition.Evaluate(new ScopedContext(this, absoluteKey), absoluteKey);
     }
   }
 }
