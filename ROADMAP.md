@@ -2,7 +2,7 @@
 
 Here are the next top-priority goals for Bud.
 
-- Macros
+- Macros (to be released in 0.2.0)
 
 - Continuous task invocation
 
