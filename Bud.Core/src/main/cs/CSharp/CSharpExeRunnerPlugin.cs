@@ -32,7 +32,7 @@ namespace Bud.CSharp {
     }
 
     private static async Task<ExecutionResult> RunImpl(IContext context, Key buildTarget) {
-      await context.Evaluate(buildTarget / CSharpKeys.Dist);
+      await context.Evaluate(buildTarget / Cs.Dist);
       var distributionPath = context.GetDistDir(buildTarget);
       var executable = Path.Combine(distributionPath, Path.GetFileName(context.GetCSharpOutputAssemblyFile(buildTarget)));
       context.Logger.Info(String.Format("Executing {0}...", executable));

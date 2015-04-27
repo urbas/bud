@@ -16,27 +16,27 @@ namespace Bud.CSharp {
   public class CsBuild : BuildTargetPlugin {
     public const string DistDirName = "dist";
 
-    public CsBuild(Key buildScope, params Setup[] extraBuildTargetSetup) : base(buildScope, CSharpKeys.CSharp, extraBuildTargetSetup) {}
+    public CsBuild(Key buildScope, params Setup[] extraBuildTargetSetup) : base(buildScope, Cs.CSharp, extraBuildTargetSetup) {}
 
     protected override Settings BuildTargetSetup(Settings buildTargetSettings) {
       return buildTargetSettings.Add(BuildTargetKeys.SourceFiles.InitSync(FindSources),
-                                     CSharpKeys.TargetFramework.Init(GetDefaultFramework),
-                                     CSharpKeys.AssemblyType.Init(AssemblyType.Exe),
+                                     Cs.TargetFramework.Init(GetDefaultFramework),
+                                     Cs.AssemblyType.Init(AssemblyType.Exe),
                                      BuildKeys.Build.Modify(BuildTaskImpl),
-                                     CSharpKeys.AssemblyReferences.Init(AssemblyReferencesImpl),
-                                     CSharpKeys.AssemblyReferencePaths.Init(AssemblyReferencePathsImpl),
-                                     CSharpKeys.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
-                                     CSharpKeys.OutputAssemblyName.Init(GetDefaultOutputAssemblyName),
-                                     CSharpKeys.RootNamespace.Init(GetDefaultRootNamespace),
-                                     CSharpKeys.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile),
-                                     CSharpKeys.DistDir.Init(DefaultDistDir),
-                                     CSharpKeys.Dist.Init(CreateDistributablePackage),
+                                     Cs.AssemblyReferences.Init(AssemblyReferencesImpl),
+                                     Cs.AssemblyReferencePaths.Init(AssemblyReferencePathsImpl),
+                                     Cs.OutputAssemblyDir.Init(GetDefaultOutputAssemblyDir),
+                                     Cs.OutputAssemblyName.Init(GetDefaultOutputAssemblyName),
+                                     Cs.RootNamespace.Init(GetDefaultRootNamespace),
+                                     Cs.OutputAssemblyFile.Init(GetDefaultOutputAssemblyFile),
+                                     Cs.DistDir.Init(DefaultDistDir),
+                                     Cs.Dist.Init(CreateDistributablePackage),
                                      PublishingPlugin.Instance,
                                      SolutionExporterPlugin.Instance);
     }
 
     private static Framework GetDefaultFramework(IConfig config) {
-      var globalTargetFramework = Key.Root / CSharpKeys.TargetFramework;
+      var globalTargetFramework = Key.Root / Cs.TargetFramework;
       if (config.IsConfigDefined(globalTargetFramework)) {
         return config.Evaluate(globalTargetFramework);
       }
@@ -53,12 +53,12 @@ namespace Bud.CSharp {
     }
 
     private static string GetDefaultOutputAssemblyName(IConfig context, Key buildTarget) {
-      return BuildTargetUtils.PackageIdOf(buildTarget);
+      return context.PackageIdOf(buildTarget);
     }
 
     private static string GetDefaultRootNamespace(IConfig context, Key buildTarget) {
-      var mainCSharpBuildTarget = BuildTargetUtils.ProjectOf(buildTarget) / BuildKeys.Main / CSharpKeys.CSharp;
-      return BuildTargetUtils.PackageIdOf(mainCSharpBuildTarget);
+      var mainCSharpBuildTarget = BuildTargetUtils.ProjectOf(buildTarget) / BuildKeys.Main / Cs.CSharp;
+      return context.PackageIdOf(mainCSharpBuildTarget);
     }
 
     private static string GetDefaultOutputAssemblyFile(IConfig context, Key buildTarget) {
@@ -145,7 +145,7 @@ namespace Bud.CSharp {
     }
 
     public static bool IsMainBuildTargetDefined(IConfig context, Key dependencyBuildTargetKey) {
-      return context.IsConfigDefined(dependencyBuildTargetKey / CSharpKeys.OutputAssemblyFile);
+      return context.IsConfigDefined(dependencyBuildTargetKey / Cs.OutputAssemblyFile);
     }
   }
 }

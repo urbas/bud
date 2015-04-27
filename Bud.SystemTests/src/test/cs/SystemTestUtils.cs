@@ -20,7 +20,7 @@ namespace Bud.SystemTests {
     }
 
     private static string OutputAssemblyPath(Key buildScope, string projectBaseDir, string fileName) {
-      var projectOutputSubPath = Path.Combine(BudPaths.BudDirName, BuildDirsPlugin.OutputDirName, buildScope.Id, CSharpKeys.CSharp.Id, "debug", "bin", fileName);
+      var projectOutputSubPath = Path.Combine(BudPaths.BudDirName, BuildDirsPlugin.OutputDirName, buildScope.Id, Cs.CSharp.Id, "debug", "bin", fileName);
       return Path.Combine(projectBaseDir, projectOutputSubPath);
     }
   }

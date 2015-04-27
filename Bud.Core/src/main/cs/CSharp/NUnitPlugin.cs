@@ -14,10 +14,10 @@ namespace Bud.CSharp {
     public NUnitPlugin(Key buildScope, params Setup[] extraBuildTargetSetup) : base(buildScope, extraBuildTargetSetup) {}
 
     protected override Settings BuildTargetSetup(Settings buildTargetSettings) {
-      var mainBuildTarget = BuildTargetUtils.ProjectOf(buildTargetSettings.Scope) / BuildKeys.Main / CSharpKeys.CSharp;
+      var mainBuildTarget = BuildTargetUtils.ProjectOf(buildTargetSettings.Scope) / BuildKeys.Main / Cs.CSharp;
       return base.BuildTargetSetup(buildTargetSettings)
                  .Add(BuildKeys.Test.Modify(TestTaskImpl),
-                      CSharpKeys.AssemblyType.Modify(AssemblyType.Library),
+                      Cs.AssemblyType.Modify(AssemblyType.Library),
                       NUnitArgs.Init(DefaultNUnitArguments),
                       DependenciesSettings.AddDependency(new CSharpInternalDependency(mainBuildTarget), config => IsMainBuildTargetDefined(config, mainBuildTarget)));
     }
@@ -31,7 +31,7 @@ namespace Bud.CSharp {
     private static async Task TestTaskImpl(IContext context, Func<Task> oldTest, Key buildTarget) {
       await oldTest();
       // NOTE: we perform 'dist' to ensure that all dependencies are in the same directory as the assembly under test.
-      await context.Evaluate(buildTarget / CSharpKeys.Dist);
+      await context.Evaluate(buildTarget / Cs.Dist);
       context.Logger.Info(string.Format("Testing '{0}'...", buildTarget));
       var nunitArguments = context.Evaluate(buildTarget / NUnitArgs);
       var testExitCode = Runner.Main(nunitArguments.ToArray());

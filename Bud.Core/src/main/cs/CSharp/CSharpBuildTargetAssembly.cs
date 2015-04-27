@@ -13,7 +13,7 @@ namespace Bud.CSharp {
       Path = config.GetCSharpOutputAssemblyFile(buildTarget);
       targetFramework = config.GetTargetFramework(buildTarget);
       Name = config.GetCSharpOutputAssemblyName(buildTarget);
-      Id = BuildTargetUtils.PackageIdOf(buildTarget);
+      Id = config.PackageIdOf(buildTarget);
     }
 
     public string Id { get; }

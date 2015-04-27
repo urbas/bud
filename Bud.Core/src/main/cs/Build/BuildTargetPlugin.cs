@@ -19,6 +19,7 @@ namespace Bud.Build {
     public override Settings Setup(Settings projectSettings) {
       var project = projectSettings.Scope;
       var buildTargetKey = project / BuildScope / Language;
+      var globalBuildScopeTask = BuildScope / BuildKeys.Build;
       return projectSettings
         .Add(BuildKeys.BuildTargets.Init(ImmutableList<Key>.Empty),
              BuildKeys.BuildTargets.Modify((ctxt, oldBuildTargets) => oldBuildTargets.Add(buildTargetKey)))
@@ -27,21 +28,19 @@ namespace Bud.Build {
                BuildDirsKeys.OutputDir.Init(context => Path.Combine(context.GetOutputDir(project), BuildScope.Id, Language.Id)),
                BuildKeys.Build.Init(BuildTaskImpl),
                BuildKeys.Test.Init(TaskUtils.NoOpTask),
+               BuildTargetKeys.PackageId.Init(BuildTargetUtils.DefaultPackageId(project, BuildScope)),
                BuildTargetSetup,
                ExtraBuildTargetSetup)
         .AddGlobally(BuildKeys.Test.Init(TaskUtils.NoOpTask),
                      BuildKeys.Test.DependsOn(buildTargetKey / BuildKeys.Test),
                      BuildKeys.Build.Init(TaskUtils.NoOpTask),
-                     BuildKeys.Build.DependsOn(BuildScope / BuildKeys.Build),
-                     (BuildScope / BuildKeys.Build).Init(TaskUtils.NoOpTask),
-                     (BuildScope / BuildKeys.Build).DependsOn(buildTargetKey / BuildKeys.Build));
+                     BuildKeys.Build.DependsOn(globalBuildScopeTask),
+                     globalBuildScopeTask.Init(TaskUtils.NoOpTask),
+                     globalBuildScopeTask.DependsOn(buildTargetKey / BuildKeys.Build));
     }
 
     protected abstract Settings BuildTargetSetup(Settings projectSettings);
 
-    private Task BuildTaskImpl(IContext context, Key buildTarget) {
-      context.Logger.Info("building...");
-      return TaskUtils.NullAsyncResult;
-    }
+    private static Task BuildTaskImpl(IContext context, Key buildTarget) => TaskUtils.NullAsyncResult;
   }
 }
