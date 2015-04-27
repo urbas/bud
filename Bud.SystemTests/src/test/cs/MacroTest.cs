@@ -7,13 +7,13 @@ namespace Bud.SystemTests {
     [Test]
     public void settingsModifierMacro_MUST_introduce_a_new_config_key() {
       using (var buildCommander = TestProjects.LoadBuildCommander(this)) {
-        Assert.AreEqual("Hello, BuildContext and MacroResult World!", buildCommander.Evaluate<string>("@mostGeneralDefinitionMacro"));
-        Assert.AreEqual("Something", buildCommander.Evaluate<string>("introducedConfig"));
+        Assert.AreEqual("Hello, BuildContext and MacroResult World!", buildCommander.EvaluateMacro<string>("mostGeneralDefinitionMacro", "strange"));
+        Assert.AreEqual("strange", buildCommander.Evaluate<string>("introducedConfig"));
 
-        buildCommander.EvaluateToJson("@settingsModifierMacro");
+        buildCommander.EvaluateMacroToJson("settingsModifierMacro");
         Assert.AreEqual("Foo bar value.", buildCommander.Evaluate<string>("introducedConfig2"));
 
-        Assert.AreEqual("Hello, BuildContext Macro World!", buildCommander.Evaluate<string>("@valueReturningMacro"));
+        Assert.AreEqual("Hello, BuildContext Macro World!", buildCommander.EvaluateMacro<string>("valueReturningMacro"));
       }
     }
   }

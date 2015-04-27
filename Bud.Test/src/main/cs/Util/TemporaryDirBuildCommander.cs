@@ -18,6 +18,8 @@ namespace Bud.Test.Util {
 
     public string EvaluateToJson(string command) => BuildCommander.EvaluateToJson(command);
 
+    public string EvaluateMacroToJson(string macroName, params string[] commandLineParameters) => BuildCommander.EvaluateMacroToJson(macroName, commandLineParameters);
+
     public void Dispose() {
       Exception buildCommanderDisposeException = null;
       try {

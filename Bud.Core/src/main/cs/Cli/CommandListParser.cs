@@ -8,8 +8,7 @@ namespace Bud.Cli {
       if (commandLineArguments == null) {
         return ImmutableList<Command>.Empty;
       }
-      var argumentsEnumerator = commandLineArguments.GetEnumerator();
-      return ExtractCommands(argumentsEnumerator);
+      return ExtractCommands(commandLineArguments.GetEnumerator());
     }
 
     private static IEnumerable<Command> ExtractCommands(IEnumerator<string> argumentsEnumerator) {
@@ -35,7 +34,7 @@ namespace Bud.Cli {
       return keyCommand;
     }
 
-    public static MacroCommand FromCommandLineArguments(IEnumerator<string> argumentsEnumerator, out bool hasMoreArguments) {
+    private static MacroCommand FromCommandLineArguments(IEnumerator<string> argumentsEnumerator, out bool hasMoreArguments) {
       return new MacroCommand(argumentsEnumerator.Current.Substring(1), ExtractParameters(argumentsEnumerator, out hasMoreArguments));
     }
 

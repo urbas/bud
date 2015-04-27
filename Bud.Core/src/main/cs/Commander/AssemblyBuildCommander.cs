@@ -25,6 +25,8 @@ namespace Bud.Commander {
 
     public string EvaluateToJson(string command) => CommandEvaluator.EvaluateToJsonSync(command, ref BuildContext);
 
+    public string EvaluateMacroToJson(string macroName, params string[] commandLineParameters) => CommandEvaluator.EvaluateMacroToJsonSync(macroName, commandLineParameters, ref BuildContext);
+
     public void Dispose() {}
 
     private static BuildContext CreateBuildContext(string buildDefinitionAssemblyFile, string baseDirectory, int buildLevel, TextWriter outputTextWriter, TextWriter errorTextWriter) {

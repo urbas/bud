@@ -24,9 +24,9 @@ namespace Bud.Commander {
       }
     }
 
-    public string EvaluateToJson(string command) {
-      return AssemblyBuildCommander.EvaluateToJson(command);
-    }
+    public string EvaluateToJson(string command) => AssemblyBuildCommander.EvaluateToJson(command);
+
+    public string EvaluateMacroToJson(string macroName, params string[] commandLineParameters) => AssemblyBuildCommander.EvaluateMacroToJson(macroName, commandLineParameters);
 
     public void Dispose() {
       try {

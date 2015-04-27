@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Bud.Build;
+using Bud.Cli;
 using Bud.Commander;
 using Bud.Util;
 
@@ -26,22 +27,18 @@ namespace Bud {
         Console.WriteLine(BudVersion.Current);
         return;
       }
-      ExecuteCommands(GetCommandsToExecute(cliArguments),
+      ExecuteCommands(CommandListParser.ToCommandList(cliArguments.Commands),
                       LoadBuildCommander(cliArguments),
                       cliArguments.PrintJson);
     }
 
-    private static void ExecuteCommands(IEnumerable<string> commandsToExecute, IBuildCommander buildCommander, bool printJsonValue) {
+    private static void ExecuteCommands(IEnumerable<Command> commandsToExecute, IBuildCommander buildCommander, bool printJsonValue) {
       foreach (var command in commandsToExecute) {
-        var valueAsJson = buildCommander.EvaluateToJson(command);
+        var valueAsJson = command.EvaluateToJson(buildCommander);
         if (printJsonValue) {
           Console.WriteLine(valueAsJson);
         }
       }
-    }
-
-    private static IEnumerable<string> GetCommandsToExecute(CliArguments cliArguments) {
-      return cliArguments.Commands.Count == 0 ? DefaultCommandsToExecute : cliArguments.Commands;
     }
 
     private static IBuildCommander LoadBuildCommander(CliArguments cliArguments) {

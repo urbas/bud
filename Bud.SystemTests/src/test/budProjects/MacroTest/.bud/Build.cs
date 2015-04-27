@@ -13,7 +13,7 @@ public class Build : IBuild {
   }
 
   private static MacroResult MostGeneralDefinitionMacro(BuildContext buildContext, string[] commandLineArguments) {
-    var newSettings = buildContext.Settings.AddGlobally(IntroducedConfig.Init("Something"));
+    var newSettings = buildContext.Settings.AddGlobally(IntroducedConfig.Init(commandLineArguments[0]));
     return new MacroResult("Hello, BuildContext and MacroResult World!",
                            buildContext.WithSettings(newSettings));
   }
