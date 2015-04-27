@@ -46,7 +46,7 @@
 
 - __New feature__: added the `test` task (runs NUnit tests).
 
-- __API change__: Renamed `Settings.Do`, `Settings.Globally` and `Settings.In` to `Settings.Add`, `Settings.AddGlobally and `Settings.AddIn`.
+- __API change__: Renamed `Settings.Do`, `Settings.Globally` and `Settings.In` to `Settings.Add`, `Settings.AddGlobally` and `Settings.AddIn`.
 
 - __API change__: Ported `Setup` delegates to the `Plugin` class.
 
