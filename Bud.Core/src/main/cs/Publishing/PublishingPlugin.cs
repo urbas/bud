@@ -25,7 +25,7 @@ namespace Bud.Publishing {
       context.Logger.Info("preparing package...");
       await context.Evaluate(buildTarget / BuildKeys.Build);
       var project = BuildTargetUtils.ProjectOf(buildTarget);
-      var buildTargetId = BuildTargetUtils.PackageIdOf(buildTarget);
+      var buildTargetId = context.PackageIdOf(buildTarget);
       var targetFramework = context.GetTargetFramework(buildTarget);
       var packageDir = Path.Combine(context.GetOutputDir(project), "package");
       var packageFile = Path.Combine(packageDir, buildTargetId + ".nupkg");

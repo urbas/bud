@@ -1,65 +1,61 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using Bud.Build;
+using Bud.Cli;
 using Bud.Commander;
-using Bud.Commander.BuildCommander;
 using Bud.Util;
+using CommandLine;
 
 namespace Bud {
   public static class BudCli {
-    private static readonly string[] DefaultCommandsToExecute = {BuildKeys.Build.Id};
+    private static readonly ImmutableList<Command> DefaultCommands = ImmutableList.Create<Command>(new KeyCommand(BuildKeys.Build.Id));
 
     public static void Main(string[] args) {
       var cliArguments = new CliArguments();
-      if (CommandLine.Parser.Default.ParseArguments(args, cliArguments)) {
-        InterpretArguments(cliArguments);
-      } else {
-        Console.Error.Write(cliArguments.GetUsage());
+      if (Parser.Default.ParseArguments(args, cliArguments)) {
+        try {
+          InterpretArguments(cliArguments);
+        } catch (Exception e) {
+          ExceptionUtils.PrintItemizedErrorMessages(e);
+          Environment.ExitCode = 1;
+        }
       }
     }
 
     private static void InterpretArguments(CliArguments cliArguments) {
       if (cliArguments.IsShowVersion) {
-        PrintVersion();
-      } else if (!ExecuteCommands(cliArguments)) {
-        Environment.ExitCode = 1;
+        Console.WriteLine(BudVersion.Current);
+        return;
       }
+      ExecuteCommands(GetCommandsToExecute(cliArguments),
+                      LoadBuildCommander(cliArguments),
+                      cliArguments.PrintJson);
     }
 
-    private static void PrintVersion() => Console.WriteLine(BudVersion.Current);
-
-    private static bool ExecuteCommands(CliArguments cliArguments) {
-      IBuildCommander buildCommander;
-      try {
-        buildCommander = LoadBuildCommander(cliArguments.BuildLevel, cliArguments.IsQuiet, Directory.GetCurrentDirectory());
-      } catch (Exception e) {
-        Console.Error.WriteLine("An error occurred during build initialiation. Error messages:");
-        ExceptionUtils.PrintItemizedErrorMessages(new[] {e}, 0);
-        return false;
-      }
-      var commandsToExecute = GetCommandsToExecute(cliArguments);
-      return ExecuteCommands(commandsToExecute, buildCommander, cliArguments.PrintJson);
-    }
-
-    private static IEnumerable<string> GetCommandsToExecute(CliArguments cliArguments) {
-      return cliArguments.Commands.Count == 0 ? DefaultCommandsToExecute : cliArguments.Commands;
-    }
-
-    private static bool ExecuteCommands(IEnumerable<string> commandsToExecute, IBuildCommander buildCommander, bool printJsonValue) {
+    private static void ExecuteCommands(IEnumerable<Command> commandsToExecute, IBuildCommander buildCommander, bool printJsonValue) {
       foreach (var command in commandsToExecute) {
-        try {
-          var valueAsJson = buildCommander.EvaluateToJson(command);
-          if (printJsonValue) {
-            Console.WriteLine(valueAsJson);
-          }
-        } catch (Exception e) {
-          Console.Error.WriteLine("An error occurred during the execution of command '{0}'. Error messages:", command);
-          ExceptionUtils.PrintItemizedErrorMessages(new[] {e}, 0);
-          return false;
+        var valueAsJson = command.EvaluateToJson(buildCommander);
+        if (printJsonValue) {
+          Console.WriteLine(valueAsJson);
         }
       }
-      return true;
+    }
+
+    private static IEnumerable<Command> GetCommandsToExecute(CliArguments cliArguments) {
+      if (cliArguments.Commands.Count == 0) {
+        return DefaultCommands;
+      }
+      return CommandListParser.ToCommandList(cliArguments.Commands);
+    }
+
+    private static IBuildCommander LoadBuildCommander(CliArguments cliArguments) {
+      try {
+        return BuildCommander.LoadBuildCommander(cliArguments.BuildLevel, cliArguments.IsQuiet, Directory.GetCurrentDirectory());
+      } catch (Exception e) {
+        throw new Exception("An error occurred during build initialiation.", e);
+      }
     }
   }
 }

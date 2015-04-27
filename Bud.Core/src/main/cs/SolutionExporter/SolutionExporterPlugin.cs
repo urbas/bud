@@ -35,8 +35,8 @@ namespace Bud.SolutionExporter {
           var generatedSolutionPathUri = new Uri(generatedSolutionPath);
           template.Add("projects", generatedCsprojs.Select(buildTarget => new {
             BuildTarget = buildTarget,
-            Guid = GuidOf(buildTarget),
-            Id = PackageIdOf(buildTarget),
+            Guid = context.GuidOf(buildTarget),
+            Id = context.PackageIdOf(buildTarget),
             RelativeCsprojPath = generatedSolutionPathUri.MakeRelativeUri(new Uri(GetBuildTargetCsprojPath(context, buildTarget)))
           }));
           RenderTemplate(generatedSolutionPath, template);
@@ -63,7 +63,7 @@ namespace Bud.SolutionExporter {
             template.Add("outputType", context.GetCSharpAssemblyType(buildTarget));
             template.Add("assemblyReferences", CollectAssemblyReferences(context, buildTarget, csprojUri));
             template.Add("projectReferences", CollectProjectReferences(context, buildTarget, csprojUri));
-            template.Add("projectGuid", GuidOf(buildTarget));
+            template.Add("projectGuid", context.GuidOf(buildTarget));
             template.Add("builtTargetScope", ScopeOf(buildTarget).Id);
             template.Add("sourceFiles", sourceFiles);
             template.Add("embeddedResources", embeddedResourceFiles);
@@ -80,7 +80,7 @@ namespace Bud.SolutionExporter {
     }
 
     private static IEnumerable<Key> GetCSharpBuildTargets(IContext context) {
-      return GetAllBuildTargets(context).Where(buildTarget => buildTarget.Leaf.Equals(CSharpKeys.CSharp));
+      return GetAllBuildTargets(context).Where(buildTarget => buildTarget.Leaf.Equals(Cs.CSharp));
     }
 
     private static void RenderTemplate(string outputFilePath, Template template) {
@@ -129,7 +129,7 @@ namespace Bud.SolutionExporter {
                     .Select(ar => new {
                       Reference = ar,
                       RelativePath = csprojUri.MakeRelativeUri(new Uri(GetBuildTargetCsprojPath(context, ar.BuildTarget))),
-                      Guid = GuidOf(ar.BuildTarget)
+                      Guid = context.GuidOf(ar.BuildTarget)
                     });
     }
 

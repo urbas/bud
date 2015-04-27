@@ -39,7 +39,7 @@ namespace Bud.Commander {
           buildLevelCommander.EvaluateToJson(BuildKeys.Build);
           buildDefinitionInfo = new BuildDefinitionInfo(
             BuildDefinitionAssemblyFile(budDir),
-            JsonConvert.DeserializeObject<string[]>(buildLevelCommander.EvaluateToJson(BuildDefinitionPlugin.BuildDefinitionProjectKey / BuildKeys.Main / CSharpKeys.CSharp / CSharpKeys.AssemblyReferencePaths)));
+            JsonConvert.DeserializeObject<string[]>(buildLevelCommander.EvaluateToJson(BuildDefinitionPlugin.BuildDefinitionProjectKey / BuildKeys.Main / Cs.CSharp / Cs.AssemblyReferencePaths)));
         }
         return true;
       }

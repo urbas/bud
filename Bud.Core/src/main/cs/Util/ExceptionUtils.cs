@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Bud.Util {
   public static class ExceptionUtils {
+    public static void PrintItemizedErrorMessages(Exception exception) => PrintItemizedErrorMessages(new [] {exception}, 0);
 
     public static void PrintItemizedErrorMessages(IEnumerable<Exception> exceptions, int depth) {
       foreach (var exception in exceptions) {

@@ -1,4 +1,6 @@
-## 0.1.3 (next release)
+## 0.2.0 (next release)
+
+- __API-breaking change__: Key definitions from `CSharpKeys` have been moved to `Cs`.
 
 - __New feature__: One can now pass custom arguments to NUnit via the key `Bud.CSharp.NUnitPlugin.NUnitArgs` in the `Cs.Test()` build target. For example:
 
@@ -15,6 +17,8 @@
     ```
 
 - __New feature__: Added the `-v` command-line flag. This flag tells Bud to print its version and exit immediately after.
+
+- __New feature__: You can now add macros to the build definition. See [documentation](http://bud.urbas.si/Docs/Guide#Macros) on how to use them.
 
 ## 0.1.2 (latest release)
 

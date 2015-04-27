@@ -19,13 +19,13 @@ namespace Bud.BuildDefinition {
     public override Settings Setup(Settings settings) {
       return settings.Add(Cs.Dll(BuildDefinitionKeys.BuildConfigSourceFile.Init(GetDefaultBuildSourceFile),
                                  BuildTargetKeys.SourceFiles.Modify(AddBuildDefinitionSourceFile),
-                                 CSharpKeys.OutputAssemblyDir.Modify(BuildDirs.GetBaseDir),
-                                 CSharpKeys.OutputAssemblyName.Modify(BuildDefinitionAssemblyName),
-                                 CSharpKeys.DistDir.Modify(BuildDirs.GetBaseDir),
+                                 Cs.OutputAssemblyDir.Modify(BuildDirs.GetBaseDir),
+                                 Cs.OutputAssemblyName.Modify(BuildDefinitionAssemblyName),
+                                 Cs.DistDir.Modify(BuildDirs.GetBaseDir),
                                  AddBudAssemblyReferences));
     }
 
-    public static Setup AddBudAssemblyReferences => CSharpKeys.AssemblyReferences.Modify(AddBudAssembliesImpl);
+    public static Setup AddBudAssemblyReferences => Cs.AssemblyReferences.Modify(AddBudAssembliesImpl);
 
     private static string GetDefaultBuildSourceFile(IConfig context) => Combine(context.GetBaseDir(), BuildDefinitionSourceFileName);
 

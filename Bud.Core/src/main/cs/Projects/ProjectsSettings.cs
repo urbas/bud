@@ -14,7 +14,7 @@ namespace Bud.Projects {
     }
 
     public static Settings BuildDefinition(this Settings settings, params Setup[] setups) {
-      return settings.AddIn(Projects.Project.ProjectKey(BuildDefinitionPlugin.BuildDefinitionProjectId) / BuildKeys.Main / CSharpKeys.CSharp, setups);
+      return settings.AddIn(Projects.Project.ProjectKey(BuildDefinitionPlugin.BuildDefinitionProjectId) / BuildKeys.Main / Cs.CSharp, setups);
     }
 
     public static Settings Version(this Settings settings, string version) {
