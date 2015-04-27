@@ -39,6 +39,12 @@ namespace Bud.Cli {
                              CommandListParser.ToCommandList(new[] {"@foo", "@bar"}));
     }
 
+    [Test]
+    public void ToCommandList_MUST_return_a_separated_key_command_after_a_macro_WHEN_given_only_macros() {
+      AssertCommandsAreEqual(new Command[] {new MacroCommand("foo"), new KeyCommand("bar")},
+                             CommandListParser.ToCommandList(new[] {"@foo", "@", "bar"}));
+    }
+
     private void AssertCommandsAreEqual(IEnumerable<Command> expectedCommands,
                                         IEnumerable<Command> actualCommands) {
       Assert.AreEqual(expectedCommands.Count(), actualCommands.Count(), "Number of commands does not match.");

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Linq;
 
 namespace Bud.Cli {
   public static class CommandListParser {
@@ -14,25 +13,25 @@ namespace Bud.Cli {
     private static IEnumerable<Command> ExtractCommands(IEnumerator<string> argumentsEnumerator) {
       var commandList = new List<Command>();
       if (argumentsEnumerator.MoveNext()) {
-        while (true) {
-          bool hasMoreArguments;
-          commandList.Add(ExtractCommand(argumentsEnumerator, out hasMoreArguments));
-          if (!hasMoreArguments) {
-            break;
-          }
-        }
+        while (TryExtractCommand(argumentsEnumerator, commandList)) {}
       }
       return commandList;
     }
 
-    private static Command ExtractCommand(IEnumerator<string> argumentsEnumerator, out bool hasMoreArguments) {
-      if (MacroCommand.IsMacroCommand(argumentsEnumerator.Current)) {
-        return FromCommandLineArguments(argumentsEnumerator, out hasMoreArguments);
+    private static bool TryExtractCommand(IEnumerator<string> commandLineArguments, ICollection<Command> commands) {
+      if (IsMacroCommandSeparator(commandLineArguments.Current)) {
+        return commandLineArguments.MoveNext();
       }
-      var keyCommand = new KeyCommand(argumentsEnumerator.Current);
-      hasMoreArguments = argumentsEnumerator.MoveNext();
-      return keyCommand;
+      if (MacroCommand.IsMacroCommand(commandLineArguments.Current)) {
+        bool hasMoreArguments;
+        commands.Add(FromCommandLineArguments(commandLineArguments, out hasMoreArguments));
+        return hasMoreArguments;
+      }
+      commands.Add(new KeyCommand(commandLineArguments.Current));
+      return commandLineArguments.MoveNext();
     }
+
+    private static bool IsMacroCommandSeparator(string commandLineArgument) => Macro.MacroNamePrefix.Equals(commandLineArgument);
 
     private static MacroCommand FromCommandLineArguments(IEnumerator<string> argumentsEnumerator, out bool hasMoreArguments) {
       return new MacroCommand(argumentsEnumerator.Current.Substring(1), ExtractParameters(argumentsEnumerator, out hasMoreArguments));
