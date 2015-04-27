@@ -23,15 +23,13 @@ namespace Bud {
 
     private static void InterpretArguments(CliArguments cliArguments) {
       if (cliArguments.IsShowVersion) {
-        PrintVersion();
+        Console.WriteLine(BudVersion.Current);
         return;
       }
       ExecuteCommands(GetCommandsToExecute(cliArguments),
                       LoadBuildCommander(cliArguments),
                       cliArguments.PrintJson);
     }
-
-    private static void PrintVersion() => Console.WriteLine(BudVersion.Current);
 
     private static void ExecuteCommands(IEnumerable<string> commandsToExecute, IBuildCommander buildCommander, bool printJsonValue) {
       foreach (var command in commandsToExecute) {

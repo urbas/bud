@@ -10,10 +10,10 @@ namespace Bud {
     [Option('j', "json", DefaultValue = false, HelpText = "Prints the value of the evaluated task as JSON to the standard output.")]
     public bool PrintJson { get; set; }
 
-    [Option('q', "quiet", DefaultValue = false, HelpText = "Surpresses logs.")]
+    [Option('q', "quiet", DefaultValue = false, HelpText = "Suppresses logs.")]
     public bool IsQuiet { get; set; }
 
-    [Option('v', "version", DefaultValue = false, HelpText = "Displays Bud's version.")]
+    [Option('v', "version", HelpText = "Displays Bud's version and exits immediately after.")]
     public bool IsShowVersion { get; set; }
 
     [ValueList(typeof(List<string>))]
