@@ -1,4 +1,6 @@
-## 0.1.3 (next release)
+## 0.2.0 (next release)
+
+- __API-breaking change__: Key definitions from `CSharpKeys` have been moved to `Cs`.
 
 - __New feature__: One can now pass custom arguments to NUnit via the key `Bud.CSharp.NUnitPlugin.NUnitArgs` in the `Cs.Test()` build target. For example:
 
