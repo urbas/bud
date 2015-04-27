@@ -1,18 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using Bud.Build;
 using Bud.Cli;
 using Bud.Commander;
 using Bud.Util;
+using CommandLine;
 
 namespace Bud {
   public static class BudCli {
-    private static readonly string[] DefaultCommandsToExecute = {BuildKeys.Build.Id};
+    private static readonly ImmutableList<Command> DefaultCommands = ImmutableList.Create<Command>(new KeyCommand(BuildKeys.Build.Id));
 
     public static void Main(string[] args) {
       var cliArguments = new CliArguments();
-      if (CommandLine.Parser.Default.ParseArguments(args, cliArguments)) {
+      if (Parser.Default.ParseArguments(args, cliArguments)) {
         try {
           InterpretArguments(cliArguments);
         } catch (Exception e) {
@@ -27,7 +29,7 @@ namespace Bud {
         Console.WriteLine(BudVersion.Current);
         return;
       }
-      ExecuteCommands(CommandListParser.ToCommandList(cliArguments.Commands),
+      ExecuteCommands(GetCommandsToExecute(cliArguments),
                       LoadBuildCommander(cliArguments),
                       cliArguments.PrintJson);
     }
@@ -39,6 +41,13 @@ namespace Bud {
           Console.WriteLine(valueAsJson);
         }
       }
+    }
+
+    private static IEnumerable<Command> GetCommandsToExecute(CliArguments cliArguments) {
+      if (cliArguments.Commands.Count == 0) {
+        return DefaultCommands;
+      }
+      return CommandListParser.ToCommandList(cliArguments.Commands);
     }
 
     private static IBuildCommander LoadBuildCommander(CliArguments cliArguments) {

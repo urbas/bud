@@ -41,6 +41,9 @@ namespace Bud.Build {
 
     protected abstract Settings BuildTargetSetup(Settings projectSettings);
 
-    private static Task BuildTaskImpl(IContext context, Key buildTarget) => TaskUtils.NullAsyncResult;
+    private static Task BuildTaskImpl(IContext context, Key buildTarget) {
+      context.Logger.Info("building...");
+      return TaskUtils.NullAsyncResult;
+    }
   }
 }
