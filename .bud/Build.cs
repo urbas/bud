@@ -21,11 +21,7 @@ public class Build : IBuild {
     var bud = new Project("bud",
                           Cs.Exe(Cs.RootNamespace.Modify("Bud"),
                                  Cs.Dependency("Bud.Core"),
-                                 Cs.Dependency("CommandLineParser")),
-                          Cs.Test(
-                            Cs.RootNamespace.Modify("Bud"),
-                            BuildTargetKeys.PackageId.Modify("bud.exe.Test"),
-                            Cs.Dependency("Bud.Test")));
+                                 Cs.Dependency("CommandLineParser")));
 
     var budTest = new Project("Bud.Test", Cs.Dll(Cs.Dependency("Bud.Core"), Cs.Dependency("NUnit")));
 

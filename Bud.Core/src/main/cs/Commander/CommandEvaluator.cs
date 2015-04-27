@@ -1,17 +1,16 @@
 using System;
 using System.Collections.Immutable;
+using Bud.Cli;
 using Newtonsoft.Json;
 
 namespace Bud.Commander {
   public static class CommandEvaluator {
     public static string EvaluateToJsonSync(string command, ref BuildContext buildContext) {
-      if (IsMacroCommand(command)) {
+      if (MacroCommand.IsMacroCommand(command)) {
         return EvaluateMacroSync(command, ref buildContext);
       }
       return EvaluateToJsonSync(buildContext.Context, command);
     }
-
-    private static bool IsMacroCommand(string command) => command.StartsWith(Macro.MacroNamePrefix);
 
     private static string EvaluateToJsonSync(IContext context, string command) {
       try {
