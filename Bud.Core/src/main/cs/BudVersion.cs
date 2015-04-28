@@ -1,5 +1,15 @@
+using System.IO;
+
 namespace Bud {
   public static class BudVersion {
-    public const string Current = "0.1.3-dev";
+    public static readonly string Current = ReadVersionFromResourceFile();
+
+    private static string ReadVersionFromResourceFile() {
+      using (var versionFileStream = typeof(BudVersion).Assembly.GetManifestResourceStream("Bud.version")) {
+        using (var versionFileReader = new StreamReader(versionFileStream)) {
+          return versionFileReader.ReadToEnd().Trim();
+        }
+      }
+    }
   }
 }

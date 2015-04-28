@@ -1,11 +1,11 @@
 using System.Reflection;
 
 [assembly: AssemblyTitle ("Bud")]
-[assembly: AssemblyDescription("0.1.3-dev")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("")]
-[assembly: AssemblyProduct ("")]
+[assembly: AssemblyProduct ("bud v0.2.0")]
 [assembly: AssemblyCopyright ("Matej Urbas")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
-[assembly: AssemblyVersion ("0.1.3")]
+[assembly: AssemblyVersion ("0.2.0")]

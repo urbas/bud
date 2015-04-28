@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
@@ -10,6 +11,10 @@ namespace Bud.Cli {
 
     public static ProcessBuilder Executable(string executablePath) {
       return new ProcessBuilder(executablePath);
+    }
+
+    public static int Execute(string executable, params string[] commandLineArgs) {
+      return Executable(executable).AddArguments(commandLineArgs).Start();
     }
 
     public ProcessBuilder(string executablePath) {
@@ -59,6 +64,8 @@ namespace Bud.Cli {
       process.StartInfo.CreateNoWindow = true;
       return process;
     }
+
+    public int Start() => Start(Console.Out, Console.Error);
 
     public int Start(TextWriter output, TextWriter errorOutput) {
       using (var process = ToProcess()) {
