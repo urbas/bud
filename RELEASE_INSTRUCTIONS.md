@@ -6,8 +6,8 @@ __Release__:
 
 1. Edit release notes.
 
-1. Invoke this python script: 
+1. Invoke the following: 
 
     ```
-    ./DevelopmentUtils/perform-release.py x.y.z
+    bud -- @performRelease -v 0.2.0
     ```
