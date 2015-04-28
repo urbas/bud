@@ -29,7 +29,13 @@ namespace Bud {
 
     public bool IsConfigDefined(Key key) => Configuration.IsConfigDefined(key);
 
+    public Task Evaluate(Key key) {
+      object value;
+      return Configuration.TryEvaluate(key, out value) ? Task.FromResult(value) : Evaluate((TaskKey)key);
+    }
+
     public T Evaluate<T>(ConfigKey<T> configKey) => Configuration.Evaluate(configKey);
+
     public bool TryEvaluate<T>(ConfigKey<T> configKey, out T evaluatedValue) => Configuration.TryEvaluate(configKey, out evaluatedValue);
 
     public object EvaluateConfig(Key key) => Configuration.EvaluateConfig(key);

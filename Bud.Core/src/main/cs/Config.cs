@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 using Bud.Logging;
 
 namespace Bud {
@@ -17,6 +18,14 @@ namespace Bud {
     public ILogger Logger { get; }
 
     public bool IsConfigDefined(Key key) => ConfigDefinitions.ContainsKey(Key.Root / key);
+
+    public Task Evaluate(Key key) {
+      object value;
+      if (TryEvaluateConfig(key, out value)) {
+        return Task.FromResult(value);
+      }
+      throw new ArgumentException(KeyUndefinedEvaluationFailedMessage(key));
+    }
 
     public object Evaluate(ConfigKey key) => EvaluateConfig(key);
 

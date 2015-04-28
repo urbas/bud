@@ -18,7 +18,7 @@ namespace Bud {
         try {
           InterpretArguments(cliArguments);
         } catch (Exception e) {
-          ExceptionUtils.PrintItemizedErrorMessages(e);
+          ExceptionUtils.PrintItemizedErrorMessages(e, cliArguments.AreStackTracesEnabled);
           Environment.ExitCode = 1;
         }
       }

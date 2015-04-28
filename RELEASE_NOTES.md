@@ -18,6 +18,8 @@
 
 - __New feature__: Added the `-v` command-line flag. This flag tells Bud to print its version and exit immediately after.
 
+- __New feature__: Added the `-s` command-line flag. This flag tells Bud to print stack traces when exceptions occur.
+
 - __New feature__: Commands can now be separated from the flags with `--`. This allows the usage of command-line options in macros. For example, the command `bud -jq -- @myMacro -v --foo bar` will pass parameters `-v`, `--foo`, and `bar` to the macro. Without `--`, option `-v` would be passed to `bud` (which would print the version and exit).
 
 - __New feature__: You can now add macros to the build definition. See [documentation](http://bud.urbas.si/Docs/Guide#Macros) on how to use them.

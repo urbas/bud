@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Threading.Tasks;
 using Bud.Logging;
 
 namespace Bud {
@@ -15,6 +16,8 @@ namespace Bud {
     public ILogger Logger { get; }
 
     public bool IsConfigDefined(Key key) => Config.IsConfigDefined(key);
+
+    public Task Evaluate(Key key) => Config.Evaluate(key);
 
     public T Evaluate<T>(ConfigKey<T> configKey) => Config.Evaluate(configKey);
 
