@@ -9,5 +9,5 @@ __Release__:
 1. Invoke this python script: 
 
     ```
-    ./DevelopmentUtils/prepare-release.py x.y.z
+    ./DevelopmentUtils/perform-release.py x.y.z
     ```

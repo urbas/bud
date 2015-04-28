@@ -22,10 +22,24 @@ CHOCOLATEY_PS1_FILE=join(CHOCOLATEY_PACKAGE_DIR, 'tools', 'chocolateyInstall.ps1
 BUD_DIST_DIR=join('bud', '.bud', 'output', 'main', 'cs', 'dist')
 
 
+
+class BudInfo:
+  bud_exe_dir=None
+
+
 def perform_release(version):
   update_version(version)
   git_tag_release(version)
   publish(version)
+  next_dev_version=set_next_dev_version(version)
+  git_commit_next_dev(next_dev_version)
+
+
+def set_next_dev_version(version):
+  v=semver.parse(version)
+  next_dev_version='{0}.{1}.{2}-dev'.format(v['major'], v['minor'], v['patch']+1)
+  update_version(next_dev_version)
+  return next_dev_version
 
 
 def update_version(version):
@@ -101,13 +115,23 @@ def git_tag_release(version):
   call(['git', 'tag', 'v{0}'.format(version)])
 
 
+def git_commit_next_dev(version):
+  call(['git', 'commit', '-am', 'Setting next development version to {0}'.format(version)])
+
+
+def bud_exe():
+  if BudInfo.bud_exe_dir == None:
+    return 'bud.exe'
+  return join(BudInfo.bud_exe_dir, 'bud.exe')
+
+
 def create_dist():
-  call(['bud', 'project/bud/clean'])
-  call(['bud', 'project/bud/main/cs/dist'])
+  call([bud_exe(), 'project/bud/clean'])
+  call([bud_exe(), 'project/bud/main/cs/dist'])
 
 
 def publish_to_nuget():
-  call(['bud', 'publish'])
+  call([bud_exe(), 'publish'])
 
 
 def bud_dist_zip_name(version):
@@ -141,8 +165,10 @@ def upload_package(version):
 
 def run():
   parser = ArgumentParser(description="Prepares Bud for the release")
-  parser.add_argument('version', metavar='VERSION', nargs=1, help="Version of Bud being released.")
+  parser.add_argument('version', metavar='VERSION', nargs=1, help="Version of Bud being released")
+  parser.add_argument('--bud-dir', help="the directory containing Bud's executable")
   args = parser.parse_args(sys.argv[1:])
+  BudInfo.bud_exe_dir = args.bud_dir
   perform_release(args.version[0])
 
 

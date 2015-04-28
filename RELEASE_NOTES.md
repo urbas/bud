@@ -1,4 +1,4 @@
-## 0.2.0 (next release)
+## 0.2.0
 
 - __API-breaking change__: Key definitions from `CSharpKeys` have been moved to `Cs`.
 
@@ -20,7 +20,7 @@
 
 - __New feature__: You can now add macros to the build definition. See [documentation](http://bud.urbas.si/Docs/Guide#Macros) on how to use them.
 
-## 0.1.2 (latest release)
+## 0.1.2
 
 - __New feature__: Added the `-q` command-line flag. It makes Bud suppress all logs.
 
