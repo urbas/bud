@@ -20,6 +20,8 @@
 
 - __New feature__: You can now add macros to the build definition. See [documentation](http://bud.urbas.si/Docs/Guide#Macros) on how to use them.
 
+- __Improvement__: Build definition projects file `./bud/src/main/cs/.bud.csproj` now includes assembly references that come with Bud: `System.Collections.Immutable`, `Newtonsoft.Json`, `CommandLine`, `NuGet.Core`, and `Antlr4.StringTemplate`.
+
 ## 0.1.2
 
 - __New feature__: Added the `-q` command-line flag. It makes Bud suppress all logs.

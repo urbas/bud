@@ -6,7 +6,13 @@ using NuGet;
 
 namespace Bud {
   public static class BudAssemblies {
-    private const string ImmutableCollectionsDependency = "System.Collections.Immutable";
+    private static readonly HashSet<string> CoreDependencyAssemblyNames = new HashSet<string> {
+      "CommandLine",
+      "Newtonsoft.Json",
+      "NuGet.Core",
+      "Antlr4.StringTemplate",
+      "System.Collections.Immutable"
+    };
 
     public static IEnumerable<Assembly> AllAssemblies { get; } = AppDomain.CurrentDomain
                                                                           .GetAssemblies()
@@ -16,14 +22,14 @@ namespace Bud {
 
     public static IEnumerable<Assembly> CoreDependencies { get; } = AppDomain.CurrentDomain
                                                                              .GetAssemblies()
-                                                                             .Where(IsImmutableCollectionsAssembly);
+                                                                             .Where(IsCoreDependency);
 
     public static IEnumerable<IPackageAssemblyReference> AssemblyReferences { get; } = AllAssemblies.Select(ToAssembyReference);
 
     public static IEnumerable<IPackageAssemblyReference> CoreDependenciesReferences { get; } = CoreDependencies.Select(ToAssembyReference);
 
-    private static bool IsImmutableCollectionsAssembly(Assembly assembly) {
-      return ImmutableCollectionsDependency.Equals(assembly.GetName().Name);
+    private static bool IsCoreDependency(Assembly assembly) {
+      return CoreDependencyAssemblyNames.Contains(assembly.GetName().Name);
     }
 
     private static bool IsBudAssembly(Assembly assembly) {
