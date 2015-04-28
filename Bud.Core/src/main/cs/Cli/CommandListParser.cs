@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Bud.Cli {
   public static class CommandListParser {
+    public const string OptionsAndCommandsSeparator = "--";
+
     public static IEnumerable<Command> ToCommandList(IEnumerable<string> commandLineArguments) {
       if (commandLineArguments == null) {
         return ImmutableList<Command>.Empty;
@@ -48,6 +51,19 @@ namespace Bud.Cli {
       }
       hasMoreArguments = false;
       return macroParameters.ToArray();
+    }
+
+    public static void ExtractOptionsAndCommands(string[] commandLineArgs, out string[] options, out string[] commands) {
+      int indexOfSeparator = Array.FindIndex(commandLineArgs, arg => OptionsAndCommandsSeparator.Equals(arg));
+      if (indexOfSeparator < 0) {
+        options = commandLineArgs;
+        commands = new string[] {};
+      } else {
+        options = new string[indexOfSeparator];
+        Array.Copy(commandLineArgs, options, options.Length);
+        commands = new string[commandLineArgs.Length - indexOfSeparator - 1];
+        Array.Copy(commandLineArgs, indexOfSeparator + 1, commands, 0, commands.Length);
+      }
     }
   }
 }

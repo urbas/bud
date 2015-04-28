@@ -45,6 +45,39 @@ namespace Bud.Cli {
                              CommandListParser.ToCommandList(new[] {"@foo", "@", "bar"}));
     }
 
+    [Test]
+    public void ExtractOptionsAndCommands_MUST_produce_empty_arrays_WHEN_given_an_empty_array() {
+      string[] options;
+      string[] commands;
+      CommandListParser.ExtractOptionsAndCommands(new string[] {}, out options, out commands);
+      Assert.IsEmpty(options);
+      Assert.IsEmpty(commands);
+    }
+
+    [Test]
+    public void ExtractOptionsAndCommands_MUST_produce_some_options_and_empty_commands_WHEN_given_options_only() {
+      string[] options;
+      string[] commands;
+      var commandLineArgs = new[] {"-a", "--dsa", "some option"};
+      CommandListParser.ExtractOptionsAndCommands(commandLineArgs, out options, out commands);
+      Assert.AreSame(commandLineArgs, options);
+      Assert.IsEmpty(commands);
+    }
+
+    [Test]
+    public void ExtractOptionsAndCommands_MUST_produce_some_options_and_some_commands_WHEN_some_options_are_separated__from_some_commands() {
+      string[] options;
+      string[] commands;
+      var expectedOptions = new[] {"-a", "--dsa", "some option"};
+      var separator = new[] {"--"};
+      var expectedCommands = new[] {"command1", "--foo", "-b"};
+      CommandListParser.ExtractOptionsAndCommands(expectedOptions.Concat(separator).Concat(expectedCommands).ToArray(),
+                                                  out options,
+                                                  out commands);
+      Assert.AreEqual(expectedOptions, options);
+      Assert.AreEqual(expectedCommands, commands);
+    }
+
     private void AssertCommandsAreEqual(IEnumerable<Command> expectedCommands,
                                         IEnumerable<Command> actualCommands) {
       Assert.AreEqual(expectedCommands.Count(), actualCommands.Count(), "Number of commands does not match.");

@@ -14,7 +14,7 @@ namespace Bud {
 
     public static void Main(string[] args) {
       var cliArguments = new CliArguments();
-      if (Parser.Default.ParseArguments(args, cliArguments)) {
+      if (ParseArguments(args, cliArguments)) {
         try {
           InterpretArguments(cliArguments);
         } catch (Exception e) {
@@ -22,6 +22,15 @@ namespace Bud {
           Environment.ExitCode = 1;
         }
       }
+    }
+
+    private static bool ParseArguments(string[] args, CliArguments cliArguments) {
+      string[] options;
+      string[] commands;
+      CommandListParser.ExtractOptionsAndCommands(args, out options, out commands);
+      var wasParseSuccessful = Parser.Default.ParseArguments(options, cliArguments);
+      cliArguments.Commands.AddRange(commands);
+      return wasParseSuccessful;
     }
 
     private static void InterpretArguments(CliArguments cliArguments) {

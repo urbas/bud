@@ -35,19 +35,13 @@ namespace Bud {
     }
 
     [Test]
-    public async void Evaluating_an_initialized_task_MUST_invoke_the_task_of_initialization() {
+    public async void Evaluate_MUST_return_the_value_of_the_initialized_task() {
       var settings = Settings.Create(TestTaskKey.InitSync("foo"));
       Assert.AreEqual("foo", await Context.FromSettings(settings).Evaluate(TestTaskKey));
     }
 
     [Test]
     public async void Init_MUST_keep_the_value_of_the_first_initialization() {
-      var settings = Settings.Create(TestTaskKey.InitSync("boo"), TestTaskKey.InitSync("foo"));
-      Assert.AreEqual("boo", await Context.FromSettings(settings).Evaluate(TestTaskKey));
-    }
-
-    [Test]
-    public async void Init_MUST_keep_the_value_of_the_first_ensure_initialization() {
       var settings = Settings.Create(TestTaskKey.InitSync("boo"), TestTaskKey.InitSync("foo"));
       Assert.AreEqual("boo", await Context.FromSettings(settings).Evaluate(TestTaskKey));
     }
