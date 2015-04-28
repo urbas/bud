@@ -2,8 +2,6 @@
 
 Here are the next top-priority goals for Bud.
 
-- Macros (to be released in 0.2.0)
-
 - Continuous task invocation
 
 - Release plugin
@@ -21,39 +19,6 @@ Here are the next top-priority goals for Bud.
 - Incremental compilation
 
 - Packages for Linux and OS X
-
-## Macros
-
-Users should be able to write __macros__ and invoke them from the command line.
-
-Macros are functions that can manipulate settings and invoke tasks. These functions also take input
-from the command line.
-
-__Proposed command-line syntax__:
-
-```language-bash
-bud @myMacroName param1 param2 ...
-```
-
-__Macro definition__:
-
-```language-csharp
-Settings MyMacroFunction(Settings currentSettings, string[] commandLineArgs) {
-  var newSettings = currentSettings.Add(MyConfigurationModification);
-  var evalContext = newSettings.ToEvaluationContext();
-  evalContext.Evaluate(MyTask);
-  return newSettings;
-}
-```
-
-__Macro registration__:
-
-```language-csharp
-settings.Add(new Macro("myMacroName", MyMacroFunction));
-
-// or with a description:
-settings.Add(new Macro("myMacroName", MyMacroFunction, "This macro does this and that."));
-```
 
 ## Continuous task invocation
 
