@@ -1,6 +1,6 @@
 ## Next release
 
-- __CLI__: Removed the '--' command-line separator. You can now invoke macros with parameters like this: `bud @myMacro -v --foo bar`.
+- __CLI__ (breaking change): Removed the '--' command-line separator. You can now invoke macros with parameters like this: `bud @myMacro -v --foo bar`.
 
 ## 0.2.0
 

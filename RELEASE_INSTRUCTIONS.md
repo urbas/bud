@@ -9,5 +9,5 @@ __Release__:
 1. Invoke the following: 
 
     ```
-    bud -- @performRelease -v 0.2.0
+    bud @performRelease -v x.y.z
     ```
