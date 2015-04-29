@@ -96,7 +96,8 @@ public static class ReleaseMacro {
   }
 
   private static SemanticVersion GetNextDevelopmentVersion(PerformReleaseArguments cliArguments, SemanticVersion releaseVersion) {
-    return string.IsNullOrEmpty(cliArguments.NextDevelopmentVersion) ? GetNextDevelopmentVersion(releaseVersion) :
+    return string.IsNullOrEmpty(cliArguments.NextDevelopmentVersion) ?
+      GetNextDevelopmentVersion(releaseVersion) :
       SemanticVersion.Parse(cliArguments.NextDevelopmentVersion);
   }
 

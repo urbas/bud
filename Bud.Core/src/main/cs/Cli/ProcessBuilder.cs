@@ -70,8 +70,10 @@ namespace Bud.Cli {
     public int Start(TextWriter output, TextWriter errorOutput) {
       using (var process = ToProcess()) {
         process.Start();
-        output.Write(process.StandardOutput.ReadToEnd());
-        errorOutput.Write(process.StandardError.ReadToEnd());
+        process.OutputDataReceived += (sender, args) => output.WriteLine(args.Data);
+        process.BeginOutputReadLine();
+        process.ErrorDataReceived += (sender, args) => errorOutput.WriteLine(args.Data);
+        process.BeginErrorReadLine();
         process.WaitForExit();
         return process.ExitCode;
       }

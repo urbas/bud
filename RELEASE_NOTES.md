@@ -1,6 +1,8 @@
-## Next release
+## Upcoming release
 
 - __CLI__ (breaking change): Removed the '--' command-line separator. You can now invoke macros with parameters like this: `bud @myMacro -v --foo bar`.
+
+- __Improvement__: Output from spawned processes is now read asynchronously. Output will be printed during the execution instead of after the process terminates.
 
 ## 0.2.0
 
