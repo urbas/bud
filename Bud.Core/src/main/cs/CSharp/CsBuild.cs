@@ -65,11 +65,12 @@ namespace Bud.CSharp {
       var assemblyDir = context.GetCSharpOutputAssemblyDir(buildTarget);
       var assemblyName = context.GetCSharpOutputAssemblyName(buildTarget);
       var assemblyExtension = GetAssemblyFileExtension(context, buildTarget);
-      return Path.Combine(assemblyDir, String.Format("{0}.{1}", assemblyName, assemblyExtension));
+      return Path.Combine(assemblyDir, string.Format("{0}.{1}", assemblyName, assemblyExtension));
     }
 
+
     private static IEnumerable<string> FindSources(IContext context, Key buildTarget) {
-      var sourceDirectory = Path.Combine(context.GetBaseDir(buildTarget));
+      var sourceDirectory = context.GetBaseDir(buildTarget);
       if (Directory.Exists(sourceDirectory)) {
         return Directory.EnumerateFiles(sourceDirectory, "*.cs", SearchOption.AllDirectories);
       }
