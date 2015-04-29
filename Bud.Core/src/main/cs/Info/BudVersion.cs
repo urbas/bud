@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace Bud {
+namespace Bud.Info {
   public static class BudVersion {
     public static readonly string Current = ReadVersionFromResourceFile();
 

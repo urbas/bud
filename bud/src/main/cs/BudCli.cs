@@ -5,6 +5,7 @@ using System.IO;
 using Bud.Build;
 using Bud.Cli;
 using Bud.Commander;
+using Bud.Info;
 using Bud.Util;
 using CommandLine;
 
