@@ -69,9 +69,8 @@ namespace Bud.Cli {
       string[] options;
       string[] commands;
       var expectedOptions = new[] {"-a", "--dsa", "some option"};
-      var separator = new[] {"--"};
-      var expectedCommands = new[] {"command1", "--foo", "-b"};
-      CommandListParser.ExtractOptionsAndCommands(expectedOptions.Concat(separator).Concat(expectedCommands).ToArray(),
+      var expectedCommands = new[] {"@command1", "--foo", "-b"};
+      CommandListParser.ExtractOptionsAndCommands(expectedOptions.Concat(expectedCommands).ToArray(),
                                                   out options,
                                                   out commands);
       Assert.AreEqual(expectedOptions, options);

@@ -1,3 +1,7 @@
+## Next release
+
+- __CLI__: Removed the '--' command-line separator. You can now invoke macros with parameters like this: `bud @myMacro -v --foo bar`.
+
 ## 0.2.0
 
 - __API-breaking change__: Key definitions from `CSharpKeys` have been moved to `Cs`.
