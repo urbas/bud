@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Bud.BuildDefinition;
 using Bud.Util;
 
 namespace Bud.Build {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using NuGet;
 
-namespace Bud {
+namespace Bud.BuildDefinition {
   public static class BudAssemblies {
     private static readonly HashSet<string> CoreDependencyAssemblyNames = new HashSet<string> {
       "CommandLine",

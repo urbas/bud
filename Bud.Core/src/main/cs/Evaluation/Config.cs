@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Bud.Logging;
+using Bud.SettingsConstruction;
 
-namespace Bud {
+namespace Bud.Evaluation {
   public class Config : IConfig {
     private readonly Dictionary<Key, object> ConfigEvaluationCache = new Dictionary<Key, object>();
 

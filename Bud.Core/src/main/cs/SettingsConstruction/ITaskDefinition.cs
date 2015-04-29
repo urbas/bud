@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Bud {
+namespace Bud.SettingsConstruction {
   public interface ITaskDefinition {
     ImmutableHashSet<TaskKey> Dependencies { get; }
     Task Evaluate(IContext context, Key taskKey);

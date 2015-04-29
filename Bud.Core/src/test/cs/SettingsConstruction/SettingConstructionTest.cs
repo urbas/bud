@@ -1,4 +1,5 @@
 using System;
+using Bud.Evaluation;
 using NUnit.Framework;
 
 namespace Bud {

@@ -1,8 +1,9 @@
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Bud.Logging;
+using Bud.SettingsConstruction;
 
-namespace Bud {
+namespace Bud.Evaluation {
   internal class ScopedConfig : IConfig {
     private readonly Config Config;
 

@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bud.Util;
 
-namespace Bud {
+namespace Bud.SettingsConstruction {
   public class TaskDefinition : TaskDependencies, ITaskDefinition {
     public readonly Func<IContext, Task> TaskFunction;
 

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Bud.Build;
+using Bud.Evaluation;
 using Bud.Projects;
 using NUnit.Framework;
 

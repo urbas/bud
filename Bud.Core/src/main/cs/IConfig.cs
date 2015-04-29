@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Bud.Logging;
+using Bud.SettingsConstruction;
 
 namespace Bud {
   public interface IConfig {

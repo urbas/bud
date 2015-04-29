@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Bud {
+namespace Bud.SettingsConstruction {
   public abstract class TaskDependencies {
     public ImmutableHashSet<TaskKey> Dependencies { get; }
 

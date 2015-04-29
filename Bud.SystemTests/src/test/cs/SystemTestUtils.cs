@@ -1,5 +1,6 @@
 using System.IO;
 using Bud.Build;
+using Bud.BuildDefinition;
 using Bud.CSharp;
 using Bud.Test.Util;
 

@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Bud.Logging;
+using Bud.SettingsConstruction;
 
-namespace Bud {
+namespace Bud.Evaluation {
   public class Context : IContext {
     private readonly IConfig Configuration;
     private ImmutableDictionary<Key, Task> TaskValueCache = ImmutableDictionary<Key, Task>.Empty;

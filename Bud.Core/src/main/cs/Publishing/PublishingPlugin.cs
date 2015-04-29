@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Bud.Build;
+using Bud.BuildDefinition;
 using Bud.CSharp;
 using Bud.Dependencies;
 using Bud.Projects;

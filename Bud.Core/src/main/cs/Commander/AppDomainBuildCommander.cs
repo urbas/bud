@@ -1,5 +1,6 @@
 using System;
 using System.Security.Policy;
+using Bud.BuildDefinition;
 using Bud.IO;
 
 namespace Bud.Commander {

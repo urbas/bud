@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
 using System.Threading.Tasks;
+using Bud.Evaluation;
 using Bud.Logging;
+using Bud.SettingsConstruction;
 
 namespace Bud {
   public class BuildContext : IContext {
@@ -33,7 +35,7 @@ namespace Bud {
 
     public IConfig Config => CachedConfig ?? (CachedConfig = new Config(Settings.ConfigDefinitions, Logger));
 
-    public IContext Context => Bud.Context.FromConfig(Config, Settings.TaskDefinitions);
+    public IContext Context => Evaluation.Context.FromConfig(Config, Settings.TaskDefinitions);
 
     public BuildContext WithSettings(Settings newSettings) => Settings == newSettings ? this : new BuildContext(newSettings, Logger);
 
