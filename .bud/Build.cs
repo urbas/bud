@@ -53,6 +53,6 @@ public class Build : IBuild {
   }
 
   private static string GetBudCoreProjectBaseDir(IConfig config) {
-    return config.GetBaseDir(Key.Parse(string.Format("project/{0}/main/resources", BudCoreProjectId)));
+    return config.GetBaseDir(Project.ProjectKey(BudCoreProjectId) / "main/resources");
   }
 }

@@ -40,8 +40,8 @@ namespace Bud {
       throw new ArgumentException("Cannot add a parent to an absolute key.");
     }
 
-    public static Key Define(Key parentKey, string id, string description = null) {
-      return new Key(KeyPathUtils.JoinPath(parentKey.Path, KeyPathUtils.ParseId(id)), description);
+    public static Key Define(Key parentKey, string childKey, string description = null) {
+      return new Key(KeyPathUtils.JoinPath(parentKey.Path, childKey), description);
     }
 
     [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore, NullValueHandling = NullValueHandling.Ignore)]
@@ -116,8 +116,8 @@ namespace Bud {
       return Define(parent, child);
     }
 
-    public static Key operator /(Key parent, string id) {
-      return Define(parent, id);
+    public static Key operator /(Key parent, string child) {
+      return Define(parent, child);
     }
   }
 }

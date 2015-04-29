@@ -4,6 +4,8 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
+using Bud.IO;
 
 namespace Bud.Cli {
   public class ProcessBuilder {
@@ -70,10 +72,9 @@ namespace Bud.Cli {
     public int Start(TextWriter output, TextWriter errorOutput) {
       using (var process = ToProcess()) {
         process.Start();
-        process.OutputDataReceived += (sender, args) => output.WriteLine(args.Data);
-        process.BeginOutputReadLine();
-        process.ErrorDataReceived += (sender, args) => errorOutput.WriteLine(args.Data);
-        process.BeginErrorReadLine();
+        Task asyncOutputPipe = TextWriterUtils.PipeReadAsyncWriteSync(process.StandardOutput, output);
+        Task asyncErrorOutputPipe = TextWriterUtils.PipeReadAsyncWriteSync(process.StandardError, errorOutput);
+        Task.WaitAll(asyncOutputPipe, asyncErrorOutputPipe);
         process.WaitForExit();
         return process.ExitCode;
       }

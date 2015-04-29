@@ -35,7 +35,7 @@ namespace Bud.CSharp {
       await context.Evaluate(buildTarget / Cs.Dist);
       var distributionPath = context.GetDistDir(buildTarget);
       var executable = Path.Combine(distributionPath, Path.GetFileName(context.GetCSharpOutputAssemblyFile(buildTarget)));
-      context.Logger.Info(String.Format("Executing {0}...", executable));
+      context.Logger.Info(string.Format("Executing {0}...", executable));
       return ExecuteAssembly(executable);
     }
 
