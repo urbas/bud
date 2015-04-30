@@ -25,7 +25,7 @@ namespace Bud {
 
     public override Settings Setup(Settings settings) {
       return settings.AddGlobally(Macros.Init(ImmutableDictionary<string, Macro>.Empty),
-                                  Macros.Modify(macros => macros.Add(Name, this)));
+                                  Macros.Modify(macros => macros.SetItem(Name, this)));
     }
 
     public static Macro Valued<T>(string name, Func<BuildContext, string[], T> function, string description = "") {
