@@ -11,7 +11,7 @@ namespace Bud.Build.Macros {
     private const int WatchReactPeriodMillis = 300;
     private readonly IEnumerable<string> WatchedDirs;
     private readonly IEnumerable<string> WatchedTasks;
-    private bool IsFileChanged;
+    private bool HasFolderChanged;
 
     public WatchingTaskEvaluator(IEnumerable<string> watchedDirs, IEnumerable<string> watchedTasks) {
       WatchedDirs = watchedDirs;
@@ -30,16 +30,16 @@ namespace Bud.Build.Macros {
       });
 
       foreach (var watcher in watchers) {
-        watcher.Changed += (sender, args) => IsFileChanged = true;
-        watcher.Created += (sender, args) => IsFileChanged = true;
-        watcher.Deleted += (sender, args) => IsFileChanged = true;
+        watcher.Changed += (sender, args) => HasFolderChanged = true;
+        watcher.Created += (sender, args) => HasFolderChanged = true;
+        watcher.Deleted += (sender, args) => HasFolderChanged = true;
       }
     }
 
     private void SpinWatch(IContext context) {
       while (true) {
-        if (IsFileChanged) {
-          IsFileChanged = false;
+        if (HasFolderChanged) {
+          HasFolderChanged = false;
           try {
             Task.WaitAll(WatchedTasks.Select(context.Evaluate).ToArray());
           } catch (Exception e) {
