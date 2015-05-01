@@ -8,7 +8,7 @@ namespace Bud.SystemTests {
   public class TransitiveExternalDependencies {
     [Test]
     public void compile_MUST_produce_the_executable() {
-      using (var buildCommander = TestProjects.LoadBuildCommander(this)) {
+      using (var buildCommander = TestProjects.Load(this)) {
         buildCommander.EvaluateToJson("build");
         FileAssertions.FileExists(SystemTestUtils.OutputAssemblyPath(buildCommander, BuildKeys.Main, "A.dll"));
       }

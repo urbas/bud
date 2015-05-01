@@ -8,7 +8,7 @@ namespace Bud.SystemTests {
   public class CleanExternalDependenciesTest {
     [Test]
     public void compile_MUST_produce_the_executable() {
-      using (var buildCommander = TestProjects.LoadBuildCommander(this)) {
+      using (var buildCommander = TestProjects.Load(this)) {
         FileAssertions.DirectoryExists(buildCommander.Evaluate(DependenciesKeys.FetchedDependenciesDir));
         buildCommander.EvaluateToJson(DependenciesKeys.CleanDependencies);
         FileAssertions.DirectoryDoesNotExist(buildCommander.Evaluate(DependenciesKeys.FetchedDependenciesDir));
