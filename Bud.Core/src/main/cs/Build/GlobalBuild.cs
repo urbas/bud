@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using Bud.BuildDefinition;
+using Bud.Cli.Macros;
 using Bud.Dependencies;
 using Bud.Projects;
 
@@ -11,7 +12,8 @@ namespace Bud.Build {
       return Settings.Create(new BuildDirsPlugin(globalBuildDir),
                              DependenciesPlugin.Instance,
                              BuildDirsKeys.BudDir.Modify(GetDefaultGlobalBudDir),
-                             ProjectKeys.Version.Init(GlobalBuildSettings.DefaultBuildVersion));
+                             ProjectKeys.Version.Init(GlobalBuildSettings.DefaultBuildVersion),
+                             new Macro("interactiveMode", InteractiveModeMacro.InteractiveModeMacroImpl, "Executes Bud in the interactive command line mode."));
     }
 
     private static string GetDefaultGlobalBudDir(IConfig ctxt) {
