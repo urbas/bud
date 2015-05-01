@@ -34,7 +34,7 @@ namespace Bud.Build {
       return context.IsTaskDefined(buildTarget / BuildKeys.Build);
     }
 
-    public static IEnumerable<Key> GetAllBuildTargets(IContext context) {
+    public static IEnumerable<Key> GetAllBuildTargets(this IContext context) {
       return context.GetAllProjects()
                     .Select(idToProject => idToProject.Value)
                     .SelectMany(projectKey => context.Evaluate(projectKey / BuildKeys.BuildTargets));

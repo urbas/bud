@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Threading.Tasks;
+using Bud.Build.Macros;
 using Bud.Util;
 
 namespace Bud.Build {
@@ -22,7 +23,8 @@ namespace Bud.Build {
       var globalBuildScopeTask = BuildScope / BuildKeys.Build;
       return projectSettings
         .Add(BuildKeys.BuildTargets.Init(ImmutableList<Key>.Empty),
-             BuildKeys.BuildTargets.Modify((ctxt, oldBuildTargets) => oldBuildTargets.Add(buildTargetKey)))
+             BuildKeys.BuildTargets.Modify((ctxt, oldBuildTargets) => oldBuildTargets.Add(buildTargetKey)),
+             new Macro("watch", WatchMacro.WatchMacroImpl, WatchMacro.WatchMacroDescription))
         .AddIn(buildTargetKey,
                BuildDirsKeys.BaseDir.Init(context => Path.Combine(context.GetBaseDir(project), "src", BuildScope.Id, Language.Id)),
                BuildDirsKeys.OutputDir.Init(context => Path.Combine(context.GetOutputDir(project), BuildScope.Id, Language.Id)),

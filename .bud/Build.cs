@@ -19,14 +19,14 @@ public class Build : IBuild {
                                      Cs.Dependency("Newtonsoft.Json"),
                                      Cs.Dependency("NuGet.Core"),
                                      Cs.Dependency("Antlr4.StringTemplate"),
-                                     Cs.Dependency("Bud.NUnit.ConsoleRunner")),
+                                     Cs.Dependency("Bud.NUnit.ConsoleRunner"),
+                                     Cs.Dependency("CommandLineParser")),
                               Cs.Test(Cs.RootNamespace.Modify("Bud"),
                                       Cs.Dependency("NUnit")));
 
     var bud = new Project(BudProjectId,
                           Cs.Exe(Cs.RootNamespace.Modify("Bud"),
-                                 Cs.Dependency(BudCoreProjectId),
-                                 Cs.Dependency("CommandLineParser")));
+                                 Cs.Dependency(BudCoreProjectId)));
 
     var budTest = new Project("Bud.Test", Cs.Dll(Cs.Dependency(BudCoreProjectId), Cs.Dependency("NUnit")));
 

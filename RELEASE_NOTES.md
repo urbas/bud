@@ -1,5 +1,14 @@
 ## Upcoming release
 
+- __New feature__: Introduced the `@watch` macro. This macro watches sources in the `src` folder and evaluates given tasks whenever the sources change. Example of usage:
+
+
+    ```language-bash
+    bud @watch test
+    ```
+
+    The example above will run test whenever a source file changes.
+
 - __CLI__ (breaking change): Removed the '--' command-line separator. You can now invoke macros with parameters like this: `bud @myMacro -v --foo bar`.
 
 - __Improvement__: Output from spawned processes is now read asynchronously. Output will be printed during the execution instead of after the process terminates.
