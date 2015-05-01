@@ -7,7 +7,7 @@ namespace Bud.SystemTests {
   public class ProjectWithoutConfiguration {
     [Test]
     public void compile_MUST_produce_the_executable() {
-      using (var buildCommander = TestProjects.LoadBuildCommander(this)) {
+      using (var buildCommander = TestProjects.Load(this)) {
         buildCommander.EvaluateToJson("build");
         FileAssertions.FileExists(OutputAssemblyPath(buildCommander));
         buildCommander.EvaluateToJson("clean");
@@ -17,7 +17,7 @@ namespace Bud.SystemTests {
 
     [Test]
     public void compile_MUST_produce_no_executable_WHEN_the_project_folder_is_empty() {
-      using (var buildCommander = TestProjects.LoadBuildCommander()) {
+      using (var buildCommander = TestProjects.Load()) {
         buildCommander.EvaluateToJson("build");
         FileAssertions.FileDoesNotExist(OutputAssemblyPath(buildCommander));
       }
