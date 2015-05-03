@@ -10,7 +10,7 @@ using NuGet;
 
 namespace Bud.Dependencies {
   public class DependenciesPlugin : Plugin {
-    public readonly static DependenciesPlugin Instance = new DependenciesPlugin();
+    public static readonly DependenciesPlugin Instance = new DependenciesPlugin();
     public const string NuGetRemoteRepoUri = "http://packages.nuget.org/api/v2";
 
     public override Settings Setup(Settings settings) {
@@ -91,7 +91,7 @@ namespace Bud.Dependencies {
           foundPackage = packageManager.LocalRepository.FindPackage(dependency.Id, dependency.Version, false, false);
         }
         if (foundPackage == null) {
-          throw new Exception(String.Format("Could not download dependency '{0}'. Please verify your build configuration.", dependency));
+          throw new Exception(string.Format("Could not download dependency '{0}'. Please verify your build configuration.", dependency));
         }
       }
     }

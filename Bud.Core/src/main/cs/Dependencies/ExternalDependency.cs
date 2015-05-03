@@ -13,10 +13,7 @@ namespace Bud.Dependencies {
     }
 
     public override string ToString() {
-      if (Version != null) {
-        return string.Format("{0}@{1}", Id, Version);
-      }
-      return Id;
+      return Version == null ? Id : string.Format("{0}@{1}", Id, Version);
     }
   }
 }
