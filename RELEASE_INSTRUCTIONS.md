@@ -11,3 +11,18 @@ __Release__:
     ```
     bud @performRelease -v x.y.z
     ```
+
+
+## Notes
+
+### Ubuntu packaging
+
+How to create a Ubuntu package:
+
+1. Install package development tools:
+
+    ```bash
+    sudo apt-get install devscripts build-essential lintian dh-make
+    ```
+
+1. Run the `DevelopmentUtils/UbuntuPackage/create-package.sh` script.

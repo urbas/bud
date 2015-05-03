@@ -1,0 +1,14 @@
+Source: bud
+Section: devel
+Priority: optional
+Maintainer: Matej Urbas <matej.urbas@gmail.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.4
+Homepage: http://bud.urbas.si
+Vcs-Git: https://github.com/urbas/bud
+
+Package: bud
+Architecture: i386
+Depends: mono-runtime (>=3.8.0)
+Description: Bud: Build tool without the 'ill'
+  Bud is a build and project automation tool for C# projects. Bud builds, tests, and publishes C# applications and libraries.
