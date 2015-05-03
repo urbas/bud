@@ -6,7 +6,3 @@
 
 %:
 	dh $@
-
-override_dh_fixperms:
-	dh_fixperms
-	echo "Imma fixing perms" 
