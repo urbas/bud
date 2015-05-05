@@ -1,4 +1,0 @@
-#! /bin/bash
-
-
-/usr/bin/mono /usr/lib/bud/bud.exe $@

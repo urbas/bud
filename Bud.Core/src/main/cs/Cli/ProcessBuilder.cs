@@ -16,6 +16,10 @@ namespace Bud.Cli {
     }
 
     public static int Execute(string executable, params string[] commandLineArgs) {
+      return Execute(executable, (IEnumerable<string>)commandLineArgs);
+    }
+
+    public static int Execute(string executable, IEnumerable<string> commandLineArgs) {
       return Executable(executable).AddArguments(commandLineArgs).Start();
     }
 
