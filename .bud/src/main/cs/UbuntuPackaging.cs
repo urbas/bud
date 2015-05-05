@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
 using Antlr4.StringTemplate;
 using Bud;
 using Bud.Build;
