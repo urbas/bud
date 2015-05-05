@@ -1,8 +1,7 @@
 using System;
 using System.IO;
-using Bud.IO;
 
-namespace Bud.Test.Util {
+namespace Bud.IO {
   public class TemporaryDirectory : IDisposable {
 
     private readonly string TempDirPath;

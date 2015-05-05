@@ -1,0 +1,59 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using Bud;
+using Bud.Build;
+using NuGet;
+
+static internal class Versioning {
+  public static void SetVersion(BuildContext buildContext, SemanticVersion releaseVersion) {
+    File.WriteAllText(Build.GetVersionFile(buildContext.Config), releaseVersion.ToString());
+    UpdateAssemblyInfoVersion(buildContext, Build.BudCoreProjectId, releaseVersion);
+    UpdateAssemblyInfoVersion(buildContext, Build.BudProjectId, releaseVersion);
+    UpdateNuspecVersion(buildContext, releaseVersion);
+    UpdateDistZipUrl(buildContext, releaseVersion);
+    buildContext.ReloadConfig();
+  }
+
+  public static SemanticVersion GetNextDevelopmentVersion(PerformReleaseArguments cliArguments, SemanticVersion releaseVersion) {
+    return string.IsNullOrEmpty(cliArguments.NextDevelopmentVersion) ? GetNextDevelopmentVersion(releaseVersion) :
+      SemanticVersion.Parse(cliArguments.NextDevelopmentVersion);
+  }
+
+  public static SemanticVersion GetNextDevelopmentVersion(SemanticVersion releaseVersion) {
+    return new SemanticVersion(releaseVersion.Version.Major,
+                               releaseVersion.Version.Minor,
+                               releaseVersion.Version.Build + 1,
+                               "dev");
+  }
+
+  public static void UpdateAssemblyInfoVersion(BuildContext buildContext, string projectId, SemanticVersion version) {
+    var versionMatcher = new Regex(@"(?<prefix>AssemblyVersion\s*\("").*?(?<suffix>""\))");
+    var versionReplacement = string.Format("${{prefix}}{0}.{1}.{2}${{suffix}}", version.Version.Major, version.Version.Minor, version.Version.Build);
+    var productMatcher = new Regex(@"(?<prefix>AssemblyProduct\s*\("").*?(?<suffix>""\))");
+    var productReplacement = string.Format("${{prefix}}{0} v{1}${{suffix}}", projectId, version);
+    ReplaceLinesInFile(GetAssemblyInfoFile(buildContext, projectId), line => productMatcher.Replace(versionMatcher.Replace(line, versionReplacement), productReplacement));
+  }
+
+  public static void UpdateDistZipUrl(BuildContext buildContext, SemanticVersion version) {
+    var versionMatcher = new Regex(@"bud-.+?\.zip");
+    var versionReplacement = string.Format("bud-{0}.zip", version);
+    ReplaceLinesInFile(Path.Combine(ChocolateyPackaging.GetChocolateySpecDir(buildContext), "tools", "chocolateyInstall.ps1"), line => versionMatcher.Replace(line, versionReplacement));
+  }
+
+  public static void UpdateNuspecVersion(BuildContext buildContext, SemanticVersion version) {
+    var versionMatcher = new Regex(@"<version>.+?</version>");
+    var versionReplacement = string.Format("<version>{0}</version>", version);
+    ReplaceLinesInFile(Path.Combine(ChocolateyPackaging.GetChocolateySpecDir(buildContext), "bud.nuspec"), line => versionMatcher.Replace(line, versionReplacement));
+  }
+
+  public static void ReplaceLinesInFile(string file, Func<string, string> lineReplacer) {
+    File.WriteAllLines(file, File.ReadAllLines(file).Select(lineReplacer).ToArray());
+  }
+
+  public static string GetAssemblyInfoFile(BuildContext buildContext, string projectId) {
+    var mainSourcesDir = buildContext.Config.GetBaseDir(Key.Parse(string.Format("/project/{0}/main/cs", projectId)));
+    return Path.Combine(mainSourcesDir, "Properties", "AssemblyInfo.cs");
+  }
+}
