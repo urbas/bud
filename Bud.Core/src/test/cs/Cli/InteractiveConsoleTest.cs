@@ -23,6 +23,13 @@ namespace Bud.Cli {
     }
 
     [Test]
+    public void Pressing_enter_should_start_a_new_line() {
+      EnterKeySequence(ConsoleKey.Enter);
+      Assert.AreEqual(ToBuffer(InteractiveConsole.Prompt, InteractiveConsole.Prompt),
+                      ConsoleBuffer.CharBuffer);
+    }
+
+    [Test]
     public void Pressing_enter_should_clear_the_line() {
       EnterKeySequence(ConsoleKey.A, ConsoleKey.Enter);
       Assert.IsEmpty(InteractiveConsole.Editor.Line);
@@ -72,7 +79,12 @@ namespace Bud.Cli {
       InteractiveConsole.Serve();
     }
 
-    public static ConsoleKeyInfo QuitKey
+    private static ConsoleKeyInfo QuitKey
       => ToConsoleKeyInfo(ConsoleKey.Q, ConsoleModifiers.Control);
+
+    private char[] ToBuffer(params string[] bufferRows)
+      => ConsoleBufferTestUtils.ToCharBuffer(ConsoleBuffer.BufferWidth,
+                                             ConsoleBuffer.BufferHeight,
+                                             bufferRows);
   }
 }

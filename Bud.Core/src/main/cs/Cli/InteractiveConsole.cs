@@ -6,6 +6,7 @@ using Bud.Util;
 
 namespace Bud.Cli {
   public class InteractiveConsole : IBuildCommander {
+    public const string Prompt = "bud> ";
     private IBuildContext Context;
     private readonly IConsoleInput ConsoleInput;
     private readonly IConsoleBuffer ConsoleBuffer;
@@ -44,9 +45,7 @@ namespace Bud.Cli {
       }
       switch (consoleKeyInfo.Key) {
         case ConsoleKey.Enter:
-          ConsoleHistory.StoreAsLastEntry(Editor);
-          EvaluateCommands();
-          ConsoleHistory.AddEntry(Editor);
+          ProcessLine();
           break;
         case ConsoleKey.Tab:
           SuggestCompletions();
@@ -64,16 +63,22 @@ namespace Bud.Cli {
       return true;
     }
 
-    private void EvaluateCommands() {
+    private void ProcessLine() {
+      ConsoleHistory.StoreAsLastEntry(Editor);
+      ConsoleBuffer.WriteLine();
+      EvaluateLine();
+      StartNewInputLine();
+      ConsoleHistory.AddEntry(Editor);
+    }
+
+    private void EvaluateLine() {
       var commands = CommandListParser.ParseCommandLine(Editor.Line);
       foreach (var command in commands) {
         EvaluateCommand(command);
       }
-      StartNewInputLine();
     }
 
     private void EvaluateCommand(Command command) {
-      ConsoleBuffer.WriteLine();
       var evaluationResult = EvaluateInputToJson(command);
       if (evaluationResult != null) {
         ConsoleBuffer.WriteLine(command.Name + " = " + evaluationResult);
@@ -141,7 +146,7 @@ namespace Bud.Cli {
       Editor.ResetOrigin();
     }
 
-    private void PrintPrompt() => ConsoleBuffer.Write("bud> ");
+    private void PrintPrompt() => ConsoleBuffer.Write(Prompt);
 
     private static bool IsExitKeyCombination(ConsoleKeyInfo consoleKeyInfo)
       => consoleKeyInfo.Key == ConsoleKey.Q &&
