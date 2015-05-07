@@ -2,29 +2,29 @@ using System.Collections.Generic;
 
 namespace Bud.Cli {
   public class ConsoleHistory {
-    private readonly List<string> History = new List<string>();
+    private readonly List<string> History = new List<string> {string.Empty};
     private int CurrentHistoryIndex;
-    public ConsoleHistory() {}
 
-    public void AddHistoryEntry() {
-      if (CurrentHistoryIndex < History.Count - 1) {
-        History[History.Count - 1] = History[CurrentHistoryIndex];
-      }
+    public void StoreAsLastEntry(LineEditor lineEditor)
+      => History[History.Count - 1] = lineEditor.Line;
+
+    public void AddEntry(LineEditor lineEditor) {
       CurrentHistoryIndex = History.Count;
-      History.Add(string.Empty);
+      History.Add(lineEditor.Line);
     }
 
-    public void RecordHistoryEntry(LineEditor lineEditor) {
-      History[CurrentHistoryIndex] = lineEditor.Line;
-    }
+    public void UpdateCurrentEntry(LineEditor lineEditor) 
+      => History[CurrentHistoryIndex] = lineEditor.Line;
 
-    public void ShowPreviousHistoryEntry(LineEditor lineEditor) {
+    public void GoToPreviousEntry(LineEditor lineEditor) {
+      UpdateCurrentEntry(lineEditor);
       if (CurrentHistoryIndex > 0) {
         lineEditor.Line = History[--CurrentHistoryIndex];
       }
     }
 
-    public void ShowNextHistoryEntry(LineEditor lineEditor) {
+    public void GoToNextEntry(LineEditor lineEditor) {
+      UpdateCurrentEntry(lineEditor);
       if (CurrentHistoryIndex < History.Count - 1) {
         lineEditor.Line = History[++CurrentHistoryIndex];
       }

@@ -26,7 +26,6 @@ namespace Bud.Cli {
 
     public void Serve() {
       StartNewInputLine();
-      ConsoleHistory.AddHistoryEntry();
       while (ActOnUserInput()) {}
     }
 
@@ -45,23 +44,21 @@ namespace Bud.Cli {
       }
       switch (consoleKeyInfo.Key) {
         case ConsoleKey.Enter:
-          ConsoleHistory.AddHistoryEntry();
+          ConsoleHistory.StoreAsLastEntry(Editor);
           EvaluateCommands();
+          ConsoleHistory.AddEntry(Editor);
           break;
         case ConsoleKey.Tab:
           SuggestCompletions();
-          ConsoleHistory.RecordHistoryEntry(Editor);
           break;
         case ConsoleKey.UpArrow:
-          ConsoleHistory.ShowPreviousHistoryEntry(Editor);
-          ConsoleHistory.RecordHistoryEntry(Editor);
+          ConsoleHistory.GoToPreviousEntry(Editor);
           break;
         case ConsoleKey.DownArrow:
-          ConsoleHistory.ShowNextHistoryEntry(Editor);
+          ConsoleHistory.GoToNextEntry(Editor);
           break;
         default:
           Editor.ProcessInput(consoleKeyInfo);
-          ConsoleHistory.RecordHistoryEntry(Editor);
           break;
       }
       return true;

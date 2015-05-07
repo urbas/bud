@@ -58,6 +58,12 @@ namespace Bud.Cli {
       Assert.AreEqual("BC", InteractiveConsole.Editor.Line);
     }
 
+    [Test]
+    public void Pressing_up_and_invoking_the_command_MUST_not_change_the_old_history_entry() {
+      EnterKeySequence(ConsoleKey.B, ConsoleKey.Enter, ConsoleKey.UpArrow, ConsoleKey.C, ConsoleKey.Enter, ConsoleKey.UpArrow, ConsoleKey.UpArrow);
+      Assert.AreEqual("B", InteractiveConsole.Editor.Line);
+    }
+
     private void EnterKeySequence(params ConsoleKey[] consoleKeys) {
       var keySequenceBuilder = ConsoleInput.SetupSequence(self => self.ReadKey());
       consoleKeys
