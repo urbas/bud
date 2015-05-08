@@ -1,44 +1,27 @@
-using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reflection;
+using Antlr4.StringTemplate;
+using CommandLine;
+using Newtonsoft.Json;
 using NuGet;
 
 namespace Bud.BuildDefinition {
   public static class BudAssemblies {
-    private static readonly HashSet<string> CoreDependencyAssemblyNames = new HashSet<string> {
-      "CommandLine",
-      "Newtonsoft.Json",
-      "NuGet.Core",
-      "Antlr4.StringTemplate",
-      "System.Collections.Immutable"
-    };
+    static BudAssemblies() {}
 
-    public static IEnumerable<Assembly> AllAssemblies { get; } = AppDomain.CurrentDomain
-                                                                          .GetAssemblies()
-                                                                          .Where(IsBudAssembly);
+    public static Assembly CoreAssembly { get; } = typeof(Settings).Assembly;
 
-    public static Assembly CoreAssembly { get; } = AllAssemblies.Single(IsCoreAssembly);
+    public static IEnumerable<IPackageAssemblyReference> AssemblyReferences { get; }
+      = ImmutableList.Create(ToAssembyReference(CoreAssembly));
 
-    public static IEnumerable<Assembly> CoreDependencies { get; } = AppDomain.CurrentDomain
-                                                                             .GetAssemblies()
-                                                                             .Where(IsCoreDependency);
-
-    public static IEnumerable<IPackageAssemblyReference> AssemblyReferences { get; } = AllAssemblies.Select(ToAssembyReference);
-
-    public static IEnumerable<IPackageAssemblyReference> CoreDependenciesReferences { get; } = CoreDependencies.Select(ToAssembyReference);
-
-    private static bool IsCoreDependency(Assembly assembly) {
-      return CoreDependencyAssemblyNames.Contains(assembly.GetName().Name);
-    }
-
-    private static bool IsBudAssembly(Assembly assembly) {
-      return assembly.GetName().Name.StartsWith("Bud.");
-    }
-
-    private static bool IsCoreAssembly(Assembly assembly) {
-      return assembly.GetName().Name.EndsWith(".Core");
-    }
+    public static IEnumerable<IPackageAssemblyReference> CoreDependenciesReferences { get; }
+      = ImmutableList.Create(ToAssembyReference(typeof(Parser).Assembly),
+                             ToAssembyReference(typeof(JsonConvert).Assembly),
+                             ToAssembyReference(typeof(PackageManager).Assembly),
+                             ToAssembyReference(typeof(Template).Assembly),
+                             ToAssembyReference(typeof(ImmutableList).Assembly));
 
     private static PhysicalPackageAssemblyReference ToAssembyReference(Assembly assembly) {
       return new PhysicalPackageAssemblyReference {SourcePath = assembly.Location, TargetPath = assembly.Location};

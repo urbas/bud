@@ -1,5 +1,6 @@
 using System;
 using Bud.Commander;
+using Bud.IO;
 
 namespace Bud.Test.Util {
   public class TemporaryDirBuildCommander : IBuildCommander {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Bud.Build;
 using Bud.CSharp;
 using Bud.Projects;
+using Newtonsoft.Json;
 using NuGet;
 
 namespace Bud.BuildDefinition {

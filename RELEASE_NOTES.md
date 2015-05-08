@@ -1,6 +1,6 @@
-## Upcoming release
+## 0.3.0
 
-- __New feature__: Introduced the `@watch` macro. This macro watches sources in the `src` folder and evaluates tasks specified in the command line. Example of usage:
+- __New feature__: Introduced the `@watch` macro. This macro watches sources in the `src` folder and evaluates given tasks whenever the sources change. Example of usage:
 
 
     ```language-bash

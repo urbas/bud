@@ -2,23 +2,23 @@
 
 Here are the next top-priority goals for Bud.
 
-- Continuous task invocation
+- [x] Continuous task invocation
 
-- Release plugin
+- [ ] Release plugin
+ 
+- [ ] Integration with Kythe
 
-- Integration with Kythe
+- [ ] Integration with Jenkins and TeamCity
 
-- Integration with Jenkins and TeamCity
+- [ ] Integration with Visual Studio
 
-- Integration with Visual Studio
+- [ ] Interactive mode
 
-- Interactive mode
+- [ ] Compilation with Roslyn
 
-- Compilation with Roslyn
+- [ ] Incremental compilation
 
-- Incremental compilation
-
-- Packages for Linux and OS X
+- [ ] Packages for Linux and OS X
 
 ## Continuous task invocation
 

@@ -39,7 +39,8 @@ public class Build : IBuild {
     return settings.AddGlobally(Cs.TargetFramework.Init(Framework.Net46))
                    .Add(ProjectKeys.Version.Modify(ReadFromBudCoreVersionResourceFile))
                    .Add(bud, budCore, budTest, budSystemTests, budExamplesSnippets)
-                   .Add(new Macro("performRelease", ReleaseMacro.PerformRelease));
+                   .Add(new Macro("performRelease", ReleaseMacro.PerformRelease))
+                   .Add(new Macro("createUbuntuPackage", UbuntuPackaging.CreateUbuntuPackageMacro));
   }
 
   private static SemanticVersion ReadFromBudCoreVersionResourceFile(IConfig config) {
@@ -54,5 +55,9 @@ public class Build : IBuild {
 
   private static string GetBudCoreProjectBaseDir(IConfig config) {
     return config.GetBaseDir(Project.ProjectKey(BudCoreProjectId) / "main/resources");
+  }
+
+  public static string GetBudDistDir(IConfig context) {
+    return context.GetDistDir(Key.Parse("/project/bud/main/cs"));
   }
 }

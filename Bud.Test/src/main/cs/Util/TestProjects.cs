@@ -1,4 +1,5 @@
 using System.IO;
+using Bud.IO;
 
 namespace Bud.Test.Util {
   public static class TestProjects {
