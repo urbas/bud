@@ -131,6 +131,40 @@
       ]
     },
     {
+      "Id": "Moq",
+      "Versions": [
+        {
+          "Version": "4.2.1502.0911",
+          "Assemblies": [
+            {
+              "Name": "Moq.dll",
+              "Path": "lib/net35/Moq.dll",
+              "Framework": ".NETFramework,Version=v3.5",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v3.5"
+              ]
+            },
+            {
+              "Name": "Moq.dll",
+              "Path": "lib/net40/Moq.dll",
+              "Framework": ".NETFramework,Version=v4.0",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v4.0"
+              ]
+            },
+            {
+              "Name": "Moq.Silverlight.dll",
+              "Path": "lib/sl4/Moq.Silverlight.dll",
+              "Framework": "Silverlight,Version=v4.0",
+              "SupportedFrameworks": [
+                "Silverlight,Version=v4.0"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
       "Id": "Newtonsoft.Json",
       "Versions": [
         {
@@ -199,6 +233,25 @@
     {
       "Id": "NuGet.Core",
       "Versions": [
+        {
+          "Version": "2.8.5",
+          "Assemblies": [
+            {
+              "Name": "NuGet.Core.dll",
+              "Path": "lib/net40-Client/NuGet.Core.dll",
+              "Framework": ".NETFramework,Version=v4.0,Profile=Client",
+              "SupportedFrameworks": [
+                ".NETFramework,Version=v4.0,Profile=Client"
+              ]
+            }
+          ],
+          "Dependencies": [
+            {
+              "Id": "Microsoft.Web.Xdt",
+              "Version": "2.1.0"
+            }
+          ]
+        },
         {
           "Version": "2.8.3",
           "Assemblies": [
