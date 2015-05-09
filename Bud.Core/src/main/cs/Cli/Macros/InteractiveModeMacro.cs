@@ -16,7 +16,7 @@ namespace Bud.Cli.Macros {
 
     public InteractiveConsole(BuildContext context) {
       Context = context;
-      SingleLineEditor = new SingleLineEditor(new ConsoleBuffer());
+      SingleLineEditor = SingleLineEditor.Create();
     }
 
     public void DisplayInstructions() {
@@ -34,7 +34,8 @@ namespace Bud.Cli.Macros {
       }
       if (consoleKeyInfo.Key == ConsoleKey.Enter) {
         Console.WriteLine();
-        Console.WriteLine("Got the following input: " + SingleLineEditor.Line);
+        Console.WriteLine(SingleLineEditor.Line);
+        SingleLineEditor = SingleLineEditor.Create();
       } else {
         SingleLineEditor.ProcessInput(consoleKeyInfo);
       }
