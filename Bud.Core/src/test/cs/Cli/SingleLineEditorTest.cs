@@ -65,6 +65,30 @@ namespace Bud.Cli {
     }
 
     [Test]
+    public void moving_right_AFTER_some_character_input_MUST_not_move_the_cursor() {
+      Input(ConsoleKey.A, ConsoleKey.RightArrow);
+      Assert.AreEqual(1, ConsoleBuffer.CursorLeft);
+    }
+
+    [Test]
+    public void moving_right_AFTER_some_character_input_and_moving_left_MUST_move_the_cursor_to_the_end() {
+      Input(ConsoleKey.A, ConsoleKey.LeftArrow, ConsoleKey.RightArrow);
+      Assert.AreEqual(1, ConsoleBuffer.CursorLeft);
+    }
+
+    [Test]
+    public void pressing_home_AFTER_some_character_input_MUST_move_the_cursor_to_the_front() {
+      Input(ConsoleKey.A, ConsoleKey.B, ConsoleKey.Home);
+      Assert.AreEqual(0, ConsoleBuffer.CursorLeft);
+    }
+
+    [Test]
+    public void pressing_end_AFTER_some_character_input_and_going_left_MUST_move_the_cursor_to_the_end() {
+      Input(ConsoleKey.A, ConsoleKey.B, ConsoleKey.LeftArrow, ConsoleKey.LeftArrow, ConsoleKey.End);
+      Assert.AreEqual(2, ConsoleBuffer.CursorLeft);
+    }
+
+    [Test]
     public void Input_character_after_left_MUST_move_the_trailing_characters_to_right() {
       Input(ConsoleKey.A, ConsoleKey.LeftArrow, ConsoleKey.C);
       Assert.AreEqual(ToBuffer("CA"), ConsoleBuffer.ToArray());

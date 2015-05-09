@@ -16,7 +16,7 @@ namespace Bud.Cli {
       if (consoleKeyInfo.Key == ConsoleKey.Backspace) {
         DeleteCurrentCharacter();
       } else if (IsKeyInRange(consoleKeyInfo.Key, ConsoleKey.PageUp, ConsoleKey.DownArrow)) {
-        MoveCursorBackwards();
+        MoveCursor(consoleKeyInfo);
       } else {
         AppendCharacter(consoleKeyInfo.KeyChar);
       }
@@ -38,10 +38,9 @@ namespace Bud.Cli {
     }
 
     private void PushCharactersAfterCursor() {
-      var numberOfCharactersToMove = LineBuffer.Length - ConsoleBuffer.CursorLeft;
       ConsoleBuffer.MoveArea(ConsoleBuffer.CursorLeft,
                              ConsoleBuffer.CursorTop,
-                             numberOfCharactersToMove,
+                             LineBuffer.Length - ConsoleBuffer.CursorLeft,
                              1,
                              ConsoleBuffer.CursorLeft + 1, ConsoleBuffer.CursorTop);
     }
@@ -60,11 +59,35 @@ namespace Bud.Cli {
                              ConsoleBuffer.CursorTop);
     }
 
+    private void MoveCursor(ConsoleKeyInfo consoleKeyInfo) {
+      switch (consoleKeyInfo.Key) {
+        case ConsoleKey.LeftArrow:
+          MoveCursorBackwards();
+          break;
+        case ConsoleKey.RightArrow:
+          MoveCursorForwards();
+          break;
+        case ConsoleKey.Home:
+          ConsoleBuffer.CursorLeft = 0;
+          break;
+        case ConsoleKey.End:
+          ConsoleBuffer.CursorLeft = LineBuffer.Length;
+          break;
+      }
+    }
+
     private void MoveCursorBackwards() {
       if (ConsoleBuffer.CursorLeft <= 0) {
         return;
       }
-      ConsoleBuffer.CursorLeft = ConsoleBuffer.CursorLeft - 1;
+      --ConsoleBuffer.CursorLeft;
+    }
+
+    private void MoveCursorForwards() {
+      if (ConsoleBuffer.CursorLeft >= LineBuffer.Length) {
+        return;
+      }
+      ++ConsoleBuffer.CursorLeft;
     }
 
     public static SingleLineEditor Create() => new SingleLineEditor(new ConsoleBuffer());
