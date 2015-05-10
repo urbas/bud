@@ -1,10 +1,14 @@
 namespace Bud.Cli {
   public class MemoryConsoleBuffer : IConsoleBuffer {
-    private const int DefaultBufferWidth = 80;
-    private const int DefaultBufferHeight = 1;
-    private readonly char[][] CharBuffer = CreateCharacterBuffer(DefaultBufferWidth, DefaultBufferHeight);
+    private readonly char[][] CharBuffer;
 
-    public virtual void Write(char character) {
+    public MemoryConsoleBuffer(int bufferWidth, int bufferHeight) {
+      BufferWidth = bufferWidth;
+      BufferHeight = bufferHeight;
+      CharBuffer = CreateCharacterBuffer(BufferWidth, BufferHeight);
+    }
+
+    public void Write(char character) {
       CharBuffer[CursorTop][CursorLeft] = character;
       ++CursorLeft;
       if (CursorLeft >= BufferWidth) {
@@ -13,20 +17,20 @@ namespace Bud.Cli {
       }
     }
 
-    public virtual int CursorLeft { get; set; }
+    public int BufferWidth { get; }
 
-    public virtual int CursorTop { get; set; }
+    public int BufferHeight { get; }
 
-    public virtual int BufferWidth => DefaultBufferWidth;
+    public int CursorLeft { get; set; }
 
-    public virtual int BufferHeight => DefaultBufferHeight;
+    public int CursorTop { get; set; }
 
-    public virtual void MoveArea(int sourceLeft,
-                                 int sourceTop,
-                                 int sourceWidth,
-                                 int sourceHeight,
-                                 int targetLeft,
-                                 int targetTop) {
+    public void MoveArea(int sourceLeft,
+                         int sourceTop,
+                         int sourceWidth,
+                         int sourceHeight,
+                         int targetLeft,
+                         int targetTop) {
       var tempBuffer = CopyAreaToNewArray(sourceLeft, sourceTop, sourceWidth, sourceHeight);
       ZeroArea(sourceLeft, sourceTop, sourceWidth, sourceHeight);
       CopyFrom(tempBuffer, sourceWidth, sourceHeight, targetLeft, targetTop);

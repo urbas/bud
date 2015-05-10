@@ -16,7 +16,6 @@ namespace Bud.Cli.Macros {
 
     public InteractiveConsole(BuildContext context) {
       Context = context;
-      SingleLineEditor = SingleLineEditor.Create();
     }
 
     public void DisplayInstructions() {
@@ -24,6 +23,7 @@ namespace Bud.Cli.Macros {
     }
 
     public void Serve() {
+      StartNewInputLine();
       while (ActOnUserInput()) {}
     }
 
@@ -35,12 +35,21 @@ namespace Bud.Cli.Macros {
       if (consoleKeyInfo.Key == ConsoleKey.Enter) {
         Console.WriteLine();
         Console.WriteLine(SingleLineEditor.Line);
-        SingleLineEditor = SingleLineEditor.Create();
+        StartNewInputLine();
       } else {
         SingleLineEditor.ProcessInput(consoleKeyInfo);
       }
 
       return true;
+    }
+
+    private void StartNewInputLine() {
+      PrintPromptPrefix();
+      SingleLineEditor = SingleLineEditor.Create();
+    }
+
+    private static void PrintPromptPrefix() {
+      Console.Write("bud> ");
     }
 
     private static bool IsExitKeyCombination(ConsoleKeyInfo consoleKeyInfo) {
