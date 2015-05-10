@@ -49,20 +49,12 @@ namespace Bud.Cli {
 
     private void AppendCharacter(char character) {
       if (IsCursorInsideLine) {
-        PushCharactersAfterCursor();
+        ConsoleBuffer.ShiftBufferRight(ConsoleBuffer.CursorTop,
+                                       ConsoleBuffer.CursorLeft,
+                                       LineLength - CursorPosition);
       }
       LineBuffer.Insert(CursorPosition, character);
       ConsoleBuffer.Write(character);
-    }
-
-    private void PushCharactersAfterCursor() {
-      var lengthAfterCursor = LineLength - CursorPosition;
-      var lastRow = ConsoleBuffer.CursorTop + (ConsoleBuffer.CursorLeft + lengthAfterCursor) / ConsoleBuffer.BufferWidth;
-      var lastColumn = (ConsoleBuffer.CursorLeft + lengthAfterCursor) % ConsoleBuffer.BufferWidth;
-      if (lastRow == ConsoleBuffer.CursorTop) {
-        ConsoleBuffer.ShiftBufferRight(lastRow, ConsoleBuffer.CursorLeft, lengthAfterCursor);
-      }
-      // TODO: Transform the buffer also in the case when the region to push spans multiple lines
     }
 
     private void DeleteCurrentCharacter() {

@@ -44,8 +44,16 @@ namespace Bud.Cli {
     }
 
     public char this[int column, int row] {
-      get { return CharBuffer[column + BufferWidth * row]; }
-      private set { CharBuffer[column + BufferWidth * row] = value; }
+      get {
+        AssertWidthIsInRange(column);
+        AssertHeightIsInRange(row);
+        return CharBuffer[column + BufferWidth * row];
+      }
+      private set {
+        AssertWidthIsInRange(column);
+        AssertHeightIsInRange(row);
+        CharBuffer[column + BufferWidth * row] = value;
+      }
     }
 
     public void MoveArea(int sourceLeft,
