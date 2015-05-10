@@ -36,7 +36,7 @@ namespace Bud.Cli {
     [Test]
     public void Input_a_character_MUST_write_the_character_to_the_console_buffer() {
       Input("a");
-      Assert.AreEqual('a', ConsoleBuffer[0, 0]);
+      Assert.AreEqual(ToBuffer("a"), ConsoleBuffer.ToArray());
     }
 
     [Test]
@@ -137,7 +137,7 @@ namespace Bud.Cli {
     [Test]
     public void Deleting_characters_at_the_end_MUST_clear_the_trailing_character() {
       Input(ConsoleKey.A, ConsoleKey.Backspace);
-      Assert.AreEqual('\0', ConsoleBuffer[0, 0]);
+      VerifyConsoleBufferHasInitialState();
     }
 
     [Test]
@@ -186,6 +186,27 @@ namespace Bud.Cli {
       Assert.AreEqual(TwoRowLine.Length, SingleLineEditor.CursorPosition);
       Assert.AreEqual(TwoRowLine, SingleLineEditor.Line);
       Assert.AreEqual(expectedBuffer, ConsoleBuffer.ToArray());
+    }
+
+    [Test]
+    public void Going_left_to_the_start_and_back_again_MUST_move_the_cursor_to_the_end() {
+      Input(TwoRowLine);
+      var cursorLeft = ConsoleBuffer.CursorLeft;
+      var cursorTop = ConsoleBuffer.CursorTop;
+      Input(ConsoleKey.LeftArrow, TwoRowLine.Length);
+      Assert.AreEqual(0, ConsoleBuffer.CursorLeft);
+      Assert.AreEqual(0, ConsoleBuffer.CursorTop);
+      Input(ConsoleKey.RightArrow, TwoRowLine.Length);
+      Assert.AreEqual(cursorLeft, ConsoleBuffer.CursorLeft);
+      Assert.AreEqual(cursorTop, ConsoleBuffer.CursorTop);
+    }
+
+    [Test]
+    public void Deleting_a_character_at_the_start_of_the_second_row_MUST_move_the_cursor_up_to_the_first_row() {
+      Input(TwoRowLine.Substring(0, ConsoleBuffer.BufferWidth));
+      Input(ConsoleKey.Backspace);
+      Assert.AreEqual(0, ConsoleBuffer.CursorTop);
+      Assert.AreEqual(ConsoleBuffer.BufferWidth - 1, ConsoleBuffer.CursorLeft);
     }
 
     private void SetCursorPosition(int cursorLeft, int cursorTop) {

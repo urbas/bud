@@ -74,7 +74,6 @@ namespace Bud.Cli {
       LineBuffer.Remove(CursorPosition - 1, 1);
       MoveCursorLeft();
       ShiftBufferRowLeft(ConsoleBuffer.CursorTop, ConsoleBuffer.CursorLeft + 1, LineLength - CursorPosition + 1);
-      
     }
 
     private void ShiftBufferRowRight(int row, int startColumn, int length) {
@@ -89,14 +88,24 @@ namespace Bud.Cli {
       if (CursorPosition == 0) {
         return;
       }
-      --ConsoleBuffer.CursorLeft;
+      if (ConsoleBuffer.CursorLeft == 0) {
+        --ConsoleBuffer.CursorTop;
+        ConsoleBuffer.CursorLeft = ConsoleBuffer.BufferWidth - 1;
+      } else {
+        --ConsoleBuffer.CursorLeft;
+      }
     }
 
     private void MoveCursorRight() {
       if (CursorPosition >= LineLength) {
         return;
       }
-      ++ConsoleBuffer.CursorLeft;
+      if (ConsoleBuffer.CursorLeft >= ConsoleBuffer.BufferWidth - 1) {
+        ++ConsoleBuffer.CursorTop;
+        ConsoleBuffer.CursorLeft = 0;
+      } else {
+        ++ConsoleBuffer.CursorLeft;
+      }
     }
   }
 }

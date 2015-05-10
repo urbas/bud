@@ -16,6 +16,8 @@ namespace Bud.Cli {
 
     public int BufferWidth => Console.BufferWidth;
 
+    public int BufferHeight => Console.BufferHeight;
+
     public void MoveArea(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight, int targetLeft, int targetTop) {
       Console.MoveBufferArea(sourceLeft, sourceTop, sourceWidth, sourceHeight, targetLeft, targetTop);
     }

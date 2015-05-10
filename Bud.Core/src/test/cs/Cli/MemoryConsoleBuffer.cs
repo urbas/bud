@@ -1,6 +1,10 @@
+using System;
+
 namespace Bud.Cli {
   public class MemoryConsoleBuffer : IConsoleBuffer {
     private readonly char[][] CharBuffer;
+    private int CursorX;
+    private int CursorY;
 
     public MemoryConsoleBuffer(int bufferWidth, int bufferHeight) {
       BufferWidth = bufferWidth;
@@ -10,10 +14,11 @@ namespace Bud.Cli {
 
     public void Write(char character) {
       CharBuffer[CursorTop][CursorLeft] = character;
-      ++CursorLeft;
-      if (CursorLeft >= BufferWidth) {
+      if (CursorLeft >= BufferWidth - 1) {
         CursorLeft = 0;
         ++CursorTop;
+      } else {
+        ++CursorLeft;
       }
     }
 
@@ -21,9 +26,21 @@ namespace Bud.Cli {
 
     public int BufferHeight { get; }
 
-    public int CursorLeft { get; set; }
+    public int CursorLeft {
+      get { return CursorX; }
+      set {
+        AssertWidthIsInRange(value);
+        CursorX = value;
+      }
+    }
 
-    public int CursorTop { get; set; }
+    public int CursorTop {
+      get { return CursorY; }
+      set {
+        AssertHeightIsInRange(value);
+        CursorY = value;
+      }
+    }
 
     public void MoveArea(int sourceLeft,
                          int sourceTop,
@@ -35,8 +52,6 @@ namespace Bud.Cli {
       ZeroArea(sourceLeft, sourceTop, sourceWidth, sourceHeight);
       CopyFrom(tempBuffer, sourceWidth, sourceHeight, targetLeft, targetTop);
     }
-
-    public char this[int left, int top] => CharBuffer[top][left];
 
     public char[] ToArray() => CopyAreaToNewArray(0, 0, BufferWidth, BufferHeight);
 
@@ -72,6 +87,18 @@ namespace Bud.Cli {
         for (int column = 0; column < sourceWidth; ++column) {
           CharBuffer[row + sourceTop][column + sourceLeft] = '\0';
         }
+      }
+    }
+
+    private void AssertWidthIsInRange(int width) {
+      if (width < 0 || width >= BufferWidth) {
+        throw new IndexOutOfRangeException();
+      }
+    }
+
+    private void AssertHeightIsInRange(int height) {
+      if (height < 0 || height >= BufferHeight) {
+        throw new IndexOutOfRangeException();
       }
     }
   }
