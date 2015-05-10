@@ -50,7 +50,7 @@ namespace Bud.Cli.Macros {
 
     private void StartNewInputLine() {
       PrintPrompt();
-      SingleLineEditor = SingleLineEditor.Create();
+      SingleLineEditor = new SingleLineEditor(new ConsoleBuffer());
     }
 
     private static void PrintPrompt() => Console.Write("bud> ");

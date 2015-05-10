@@ -12,8 +12,6 @@ namespace Bud.Cli {
       CursorStartTop = consoleBuffer.CursorTop;
     }
 
-    public static SingleLineEditor Create() => new SingleLineEditor(new ConsoleBuffer());
-
     public string Line => LineBuffer.ToString();
 
     public int LineLength => LineBuffer.Length;
@@ -62,7 +60,7 @@ namespace Bud.Cli {
       var lastRow = ConsoleBuffer.CursorTop + (ConsoleBuffer.CursorLeft + lengthAfterCursor) / ConsoleBuffer.BufferWidth;
       var lastColumn = (ConsoleBuffer.CursorLeft + lengthAfterCursor) % ConsoleBuffer.BufferWidth;
       if (lastRow == ConsoleBuffer.CursorTop) {
-        ShiftBufferRowRight(lastRow, ConsoleBuffer.CursorLeft, lengthAfterCursor);
+        ConsoleBuffer.ShiftBufferRight(lastRow, ConsoleBuffer.CursorLeft, lengthAfterCursor);
       }
       // TODO: Transform the buffer also in the case when the region to push spans multiple lines
     }
@@ -73,39 +71,21 @@ namespace Bud.Cli {
       }
       LineBuffer.Remove(CursorPosition - 1, 1);
       MoveCursorLeft();
-      ShiftBufferRowLeft(ConsoleBuffer.CursorTop, ConsoleBuffer.CursorLeft + 1, LineLength - CursorPosition + 1);
-    }
-
-    private void ShiftBufferRowRight(int row, int startColumn, int length) {
-      ConsoleBuffer.MoveArea(startColumn, row, length, 1, startColumn + 1, row);
-    }
-
-    private void ShiftBufferRowLeft(int row, int startColumn, int length) {
-      ConsoleBuffer.MoveArea(startColumn, row, length, 1, startColumn - 1, row);
+      ConsoleBuffer.ShiftBufferLeft(ConsoleBuffer.CursorTop, ConsoleBuffer.CursorLeft + 1, LineLength - CursorPosition + 1);
     }
 
     private void MoveCursorLeft() {
       if (CursorPosition == 0) {
         return;
       }
-      if (ConsoleBuffer.CursorLeft == 0) {
-        --ConsoleBuffer.CursorTop;
-        ConsoleBuffer.CursorLeft = ConsoleBuffer.BufferWidth - 1;
-      } else {
-        --ConsoleBuffer.CursorLeft;
-      }
+      ConsoleBuffer.DecrementCursorPosition();
     }
 
     private void MoveCursorRight() {
       if (CursorPosition >= LineLength) {
         return;
       }
-      if (ConsoleBuffer.CursorLeft >= ConsoleBuffer.BufferWidth - 1) {
-        ++ConsoleBuffer.CursorTop;
-        ConsoleBuffer.CursorLeft = 0;
-      } else {
-        ++ConsoleBuffer.CursorLeft;
-      }
+      ConsoleBuffer.IncrementCursorPosition();
     }
   }
 }
