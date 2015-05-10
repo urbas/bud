@@ -43,6 +43,7 @@ namespace Bud.Cli.Macros {
     }
 
     private void EchoInput() {
+      Console.WriteLine();
       PrintPrompt();
       Console.WriteLine(SingleLineEditor.Line);
     }

@@ -24,17 +24,28 @@ namespace Bud.Cli {
 
     private int CursorStartTop { get; }
 
-    private bool IsLineEmpty => LineLength == 0;
-
-    private bool IsCursorInsideLine => ConsoleBuffer.CursorLeft < LineLength;
+    private bool IsCursorInsideLine => CursorPosition < LineLength;
 
     public void ProcessInput(ConsoleKeyInfo consoleKeyInfo) {
-      if (consoleKeyInfo.Key == ConsoleKey.Backspace) {
-        DeleteCurrentCharacter();
-      } else if (IsKeyInRange(consoleKeyInfo.Key, ConsoleKey.PageUp, ConsoleKey.DownArrow)) {
-        MoveCursor(consoleKeyInfo);
-      } else {
-        AppendCharacter(consoleKeyInfo.KeyChar);
+      switch (consoleKeyInfo.Key) {
+        case ConsoleKey.Backspace:
+          DeleteCurrentCharacter();
+          break;
+        case ConsoleKey.LeftArrow:
+          MoveCursorLeft();
+          break;
+        case ConsoleKey.RightArrow:
+          MoveCursorRight();
+          break;
+        case ConsoleKey.Home:
+          ConsoleBuffer.CursorLeft = 0;
+          break;
+        case ConsoleKey.End:
+          ConsoleBuffer.CursorLeft = LineLength;
+          break;
+        default:
+          AppendCharacter(consoleKeyInfo.KeyChar);
+          break;
       }
     }
 
@@ -51,63 +62,41 @@ namespace Bud.Cli {
       var lastRow = ConsoleBuffer.CursorTop + (ConsoleBuffer.CursorLeft + lengthAfterCursor) / ConsoleBuffer.BufferWidth;
       var lastColumn = (ConsoleBuffer.CursorLeft + lengthAfterCursor) % ConsoleBuffer.BufferWidth;
       if (lastRow == ConsoleBuffer.CursorTop) {
-        PushBufferLineByOne(lastRow, ConsoleBuffer.CursorLeft, lengthAfterCursor);
+        ShiftBufferRowRight(lastRow, ConsoleBuffer.CursorLeft, lengthAfterCursor);
       }
       // TODO: Transform the buffer also in the case when the region to push spans multiple lines
     }
 
-    private void PushBufferLineByOne(int row, int startColumn, int length) {
+    private void DeleteCurrentCharacter() {
+      if (CursorPosition == 0) {
+        return;
+      }
+      LineBuffer.Remove(CursorPosition - 1, 1);
+      MoveCursorLeft();
+      ShiftBufferRowLeft(ConsoleBuffer.CursorTop, ConsoleBuffer.CursorLeft + 1, LineLength - CursorPosition + 1);
+      
+    }
+
+    private void ShiftBufferRowRight(int row, int startColumn, int length) {
       ConsoleBuffer.MoveArea(startColumn, row, length, 1, startColumn + 1, row);
     }
 
-    private void DeleteCurrentCharacter() {
-      if (IsLineEmpty) {
-        return;
-      }
-      LineBuffer.Remove(ConsoleBuffer.CursorLeft - 1, 1);
-      MoveCursorBackwards();
-      ConsoleBuffer.MoveArea(ConsoleBuffer.CursorLeft + 1,
-                             ConsoleBuffer.CursorTop,
-                             LineLength - ConsoleBuffer.CursorLeft + 1,
-                             1,
-                             ConsoleBuffer.CursorLeft,
-                             ConsoleBuffer.CursorTop);
+    private void ShiftBufferRowLeft(int row, int startColumn, int length) {
+      ConsoleBuffer.MoveArea(startColumn, row, length, 1, startColumn - 1, row);
     }
 
-    private void MoveCursor(ConsoleKeyInfo consoleKeyInfo) {
-      switch (consoleKeyInfo.Key) {
-        case ConsoleKey.LeftArrow:
-          MoveCursorBackwards();
-          break;
-        case ConsoleKey.RightArrow:
-          MoveCursorForwards();
-          break;
-        case ConsoleKey.Home:
-          ConsoleBuffer.CursorLeft = 0;
-          break;
-        case ConsoleKey.End:
-          ConsoleBuffer.CursorLeft = LineLength;
-          break;
-      }
-    }
-
-    private void MoveCursorBackwards() {
-      if (ConsoleBuffer.CursorLeft <= CursorStartLeft) {
+    private void MoveCursorLeft() {
+      if (CursorPosition == 0) {
         return;
       }
       --ConsoleBuffer.CursorLeft;
     }
 
-    private void MoveCursorForwards() {
-      if (ConsoleBuffer.CursorLeft >= LineLength) {
+    private void MoveCursorRight() {
+      if (CursorPosition >= LineLength) {
         return;
       }
       ++ConsoleBuffer.CursorLeft;
     }
-
-    private static bool IsKeyInRange(ConsoleKey key,
-                                     ConsoleKey lowerBound,
-                                     ConsoleKey upperBound)
-      => lowerBound <= key && key <= upperBound;
   }
 }

@@ -6,7 +6,6 @@ namespace Bud.Cli {
     private const int DefaultTestBufferWidth = 30;
     private SingleLineEditor SingleLineEditor;
     private MemoryConsoleBuffer ConsoleBuffer;
-    private readonly ConsoleKey[] NavigationKeys = {ConsoleKey.PageUp, ConsoleKey.PageDown, ConsoleKey.Home, ConsoleKey.End, ConsoleKey.LeftArrow, ConsoleKey.UpArrow, ConsoleKey.RightArrow, ConsoleKey.DownArrow};
 
     [SetUp]
     public void SetUp() {
@@ -62,7 +61,7 @@ namespace Bud.Cli {
 
     [Test]
     public void Input_navigation_keys_WHEN_line_is_empty_MUST_not_interact_with_console_buffer() {
-      Input(NavigationKeys);
+      Input(ConsoleKey.Home, ConsoleKey.End, ConsoleKey.LeftArrow, ConsoleKey.RightArrow);
       VerifyConsoleBufferHasInitialState();
     }
 
@@ -144,7 +143,7 @@ namespace Bud.Cli {
 
     [Test]
     public void Going_left_before_input_character_WHEN_non_zero_start_position_MUST_produce_a_single_character_line() {
-      DislocateBufferCursor();
+      SetCursorPosition(5, 1);
       Input(ConsoleKey.LeftArrow, ConsoleKey.A);
       Assert.AreEqual("A", SingleLineEditor.Line);
       Assert.AreEqual(1, SingleLineEditor.CursorPosition);
@@ -152,10 +151,24 @@ namespace Bud.Cli {
 
     [Test]
     public void Input_characters_WHEN_non_zero_start_position_MUST_produce_line_made_of_the_characters() {
-      DislocateBufferCursor();
+      SetCursorPosition(5, 1);
       Input("foo");
       Assert.AreEqual("foo", SingleLineEditor.Line);
       Assert.AreEqual(3, SingleLineEditor.CursorPosition);
+    }
+
+    [Test]
+    public void Deleting_a_character_WHEN_non_zero_start_position_MUST_produce_an_empty_line() {
+      SetCursorPosition(5, 1);
+      Input(ConsoleKey.A, ConsoleKey.Backspace);
+      Assert.IsEmpty(SingleLineEditor.Line);
+    }
+
+    [Test]
+    public void Inserting_a_character_WHEN_non_zero_start_position_MUST_push_the_buffer_correctly() {
+      SetCursorPosition(5, 1);
+      Input(ConsoleKey.A, ConsoleKey.LeftArrow, ConsoleKey.B);
+      Assert.AreEqual(ToBuffer("", "\0\0\0\0\0BA"), ConsoleBuffer.ToArray());
     }
 
     [Test]
@@ -184,7 +197,7 @@ namespace Bud.Cli {
       SingleLineEditor = new SingleLineEditor(ConsoleBuffer);
     }
 
-    private void DislocateBufferCursor() => InitializeSingleLineEditor(20, 3, 5, 1);
+    private void SetCursorPosition(int cursorLeft, int cursorTop) => InitializeSingleLineEditor(20, 3, cursorLeft, cursorTop);
 
     private void Input(ConsoleKeyInfo consoleKey, int repeatCount) {
       for (int i = 0; i < repeatCount; i++) {
