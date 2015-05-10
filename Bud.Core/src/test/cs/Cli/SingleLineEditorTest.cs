@@ -1,16 +1,15 @@
 ﻿using System;
+using System.Linq;
 using NUnit.Framework;
 
 namespace Bud.Cli {
   public class SingleLineEditorTest {
-    private const int DefaultTestBufferWidth = 30;
+    private const string TwoRowLine = "This is a two-row line. I am not lying.";
     private SingleLineEditor SingleLineEditor;
     private MemoryConsoleBuffer ConsoleBuffer;
 
     [SetUp]
-    public void SetUp() {
-      InitializeSingleLineEditor(DefaultTestBufferWidth, 2, 0, 0);
-    }
+    public void SetUp() => SetCursorPosition(0, 0);
 
     [Test]
     public void Input_nothing_MUST_return_an_empty_line() {
@@ -117,14 +116,14 @@ namespace Bud.Cli {
 
     [Test]
     public void Deleting_characters_in_the_middle_MUST_return_the_edited_line() {
-      Input("This is madness, right?");
-      Input(ConsoleKey.LeftArrow, 8);
-      Input(ConsoleKey.Backspace, 7);
-      Input("Sparta");
-      const string expectedLine = "This is Sparta, right?";
+      Input("This is madness.");
+      Input(ConsoleKey.LeftArrow, 9);
+      Input(ConsoleKey.Backspace, 2);
+      Input("was");
+      const string expectedLine = "This was madness.";
       Assert.AreEqual(expectedLine, SingleLineEditor.Line);
       Assert.AreEqual(ToBuffer(expectedLine), ConsoleBuffer.ToArray());
-      Assert.AreEqual(14, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(8, SingleLineEditor.CursorPosition);
     }
 
     [Test]
@@ -173,7 +172,7 @@ namespace Bud.Cli {
 
     [Test]
     public void Entering_a_line_that_matches_the_buffer_width_MUST_produce_the_correct_line() {
-      const string bufferWidthLine = "This is a very long line that ";
+      var bufferWidthLine = TwoRowLine.Substring(0, ConsoleBuffer.BufferWidth);
       Input(bufferWidthLine);
       Assert.AreEqual(bufferWidthLine, SingleLineEditor.Line);
       Assert.AreEqual(ToBuffer(bufferWidthLine), ConsoleBuffer.ToArray());
@@ -182,22 +181,19 @@ namespace Bud.Cli {
 
     [Test]
     public void Long_input_MUST_result_in_a_long_line() {
-      const string longLine = "This is a very long line that spans multiple rows.";
-      Input(longLine);
-      var expectedBuffer = ToBuffer(longLine.Substring(0, DefaultTestBufferWidth), longLine.Substring(DefaultTestBufferWidth, longLine.Length - DefaultTestBufferWidth));
-      Assert.AreEqual(longLine.Length, SingleLineEditor.CursorPosition);
-      Assert.AreEqual(longLine, SingleLineEditor.Line);
+      Input(TwoRowLine);
+      var expectedBuffer = ToBuffer(TwoRowLine.Substring(0, ConsoleBuffer.BufferWidth), TwoRowLine.Substring(ConsoleBuffer.BufferWidth));
+      Assert.AreEqual(TwoRowLine.Length, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(TwoRowLine, SingleLineEditor.Line);
       Assert.AreEqual(expectedBuffer, ConsoleBuffer.ToArray());
     }
 
-    private void InitializeSingleLineEditor(int bufferWidth, int bufferHeight, int startingCursorLeft, int startingCursorTop) {
-      ConsoleBuffer = new MemoryConsoleBuffer(bufferWidth, bufferHeight);
-      ConsoleBuffer.CursorLeft = startingCursorLeft;
-      ConsoleBuffer.CursorTop = startingCursorTop;
+    private void SetCursorPosition(int cursorLeft, int cursorTop) {
+      ConsoleBuffer = new MemoryConsoleBuffer(20, 3);
+      ConsoleBuffer.CursorLeft = cursorLeft;
+      ConsoleBuffer.CursorTop = cursorTop;
       SingleLineEditor = new SingleLineEditor(ConsoleBuffer);
     }
-
-    private void SetCursorPosition(int cursorLeft, int cursorTop) => InitializeSingleLineEditor(20, 3, cursorLeft, cursorTop);
 
     private void Input(ConsoleKeyInfo consoleKey, int repeatCount) {
       for (int i = 0; i < repeatCount; i++) {
