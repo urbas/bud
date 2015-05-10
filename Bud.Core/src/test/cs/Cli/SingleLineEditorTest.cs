@@ -36,7 +36,7 @@ namespace Bud.Cli {
     [Test]
     public void Input_a_character_MUST_write_the_character_to_the_console_buffer() {
       Input("a");
-      Assert.AreEqual(ToBuffer("a"), ConsoleBuffer.ToArray());
+      Assert.AreEqual(ToBuffer("a"), ConsoleBuffer.CharBuffer);
     }
 
     [Test]
@@ -111,7 +111,7 @@ namespace Bud.Cli {
     [Test]
     public void Input_character_after_left_MUST_move_the_trailing_characters_to_right() {
       Input(ConsoleKey.A, ConsoleKey.LeftArrow, ConsoleKey.C);
-      Assert.AreEqual(ToBuffer("CA"), ConsoleBuffer.ToArray());
+      Assert.AreEqual(ToBuffer("CA"), ConsoleBuffer.CharBuffer);
     }
 
     [Test]
@@ -122,7 +122,7 @@ namespace Bud.Cli {
       Input("was");
       const string expectedLine = "This was madness.";
       Assert.AreEqual(expectedLine, SingleLineEditor.Line);
-      Assert.AreEqual(ToBuffer(expectedLine), ConsoleBuffer.ToArray());
+      Assert.AreEqual(ToBuffer(expectedLine), ConsoleBuffer.CharBuffer);
       Assert.AreEqual(8, SingleLineEditor.CursorPosition);
     }
 
@@ -130,7 +130,7 @@ namespace Bud.Cli {
     public void Deleting_characters_in_the_middle_MUST_move_the_buffer() {
       Input("012345");
       Input(ConsoleKey.LeftArrow, ConsoleKey.LeftArrow, ConsoleKey.Backspace);
-      Assert.AreEqual(ToBuffer("01245"), ConsoleBuffer.ToArray());
+      Assert.AreEqual(ToBuffer("01245"), ConsoleBuffer.CharBuffer);
       Assert.AreEqual(3, SingleLineEditor.CursorPosition);
     }
 
@@ -167,7 +167,7 @@ namespace Bud.Cli {
     public void Inserting_a_character_WHEN_non_zero_start_position_MUST_push_the_buffer_correctly() {
       SetCursorPosition(5, 1);
       Input(ConsoleKey.A, ConsoleKey.LeftArrow, ConsoleKey.B);
-      Assert.AreEqual(ToBuffer("", "\0\0\0\0\0BA"), ConsoleBuffer.ToArray());
+      Assert.AreEqual(ToBuffer("", "\0\0\0\0\0BA"), ConsoleBuffer.CharBuffer);
     }
 
     [Test]
@@ -175,7 +175,7 @@ namespace Bud.Cli {
       var bufferWidthLine = TwoRowLine.Substring(0, ConsoleBuffer.BufferWidth);
       Input(bufferWidthLine);
       Assert.AreEqual(bufferWidthLine, SingleLineEditor.Line);
-      Assert.AreEqual(ToBuffer(bufferWidthLine), ConsoleBuffer.ToArray());
+      Assert.AreEqual(ToBuffer(bufferWidthLine), ConsoleBuffer.CharBuffer);
       Assert.AreEqual(bufferWidthLine.Length, SingleLineEditor.CursorPosition);
     }
 
@@ -185,7 +185,7 @@ namespace Bud.Cli {
       var expectedBuffer = ToBuffer(TwoRowLine.Substring(0, ConsoleBuffer.BufferWidth), TwoRowLine.Substring(ConsoleBuffer.BufferWidth));
       Assert.AreEqual(TwoRowLine.Length, SingleLineEditor.CursorPosition);
       Assert.AreEqual(TwoRowLine, SingleLineEditor.Line);
-      Assert.AreEqual(expectedBuffer, ConsoleBuffer.ToArray());
+      Assert.AreEqual(expectedBuffer, ConsoleBuffer.CharBuffer);
     }
 
     [Test]
@@ -228,9 +228,9 @@ namespace Bud.Cli {
       }
     }
 
-    private void Input(ConsoleKey consoleKey, int repeatCount) => Input(ToInput(consoleKey), repeatCount);
+    private void Input(ConsoleKey consoleKey, int repeatCount) => Input(ConsoleBufferTestUtils.ToInput(consoleKey), repeatCount);
 
-    private void Input(ConsoleKey consoleKey) => Input(ToInput(consoleKey), 1);
+    private void Input(ConsoleKey consoleKey) => Input(ConsoleBufferTestUtils.ToInput(consoleKey), 1);
 
     private void Input(string str) {
       foreach (var chr in str) {
@@ -238,22 +238,12 @@ namespace Bud.Cli {
       }
     }
 
-    private static ConsoleKeyInfo ToInput(ConsoleKey consoleKey) {
-      return new ConsoleKeyInfo((char) consoleKey, consoleKey, false, false, false);
-    }
-
     private void VerifyConsoleBufferHasInitialState() {
-      Assert.That(ConsoleBuffer.ToArray(), Is.All.EqualTo('\0'));
+      Assert.That(ConsoleBuffer.CharBuffer, Is.All.EqualTo('\0'));
       Assert.AreEqual(0, ConsoleBuffer.CursorLeft);
       Assert.AreEqual(0, ConsoleBuffer.CursorTop);
     }
 
-    private char[] ToBuffer(params string[] bufferRows) {
-      var buffer = new char[ConsoleBuffer.BufferWidth * ConsoleBuffer.BufferHeight];
-      for (int rowIndex = 0; rowIndex < bufferRows.Length; rowIndex++) {
-        Array.Copy(bufferRows[rowIndex].ToCharArray(), 0, buffer, rowIndex * ConsoleBuffer.BufferWidth, bufferRows[rowIndex].Length);
-      }
-      return buffer;
-    }
+    private char[] ToBuffer(params string[] bufferRows) => ConsoleBufferTestUtils.ToCharBuffer(ConsoleBuffer.BufferWidth, ConsoleBuffer.BufferHeight, bufferRows);
   }
 }

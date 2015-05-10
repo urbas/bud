@@ -2,24 +2,25 @@ using System;
 
 namespace Bud.Cli {
   public class MemoryConsoleBuffer : IConsoleBuffer {
-    private readonly char[][] CharBuffer;
+    public readonly char[] CharBuffer;
     private int CursorX;
     private int CursorY;
 
-    public MemoryConsoleBuffer(int bufferWidth, int bufferHeight) {
+    private MemoryConsoleBuffer(int bufferWidth, int bufferHeight, char[] charBuffer) {
       BufferWidth = bufferWidth;
       BufferHeight = bufferHeight;
-      CharBuffer = CreateCharacterBuffer(BufferWidth, BufferHeight);
+      CharBuffer = charBuffer;
     }
 
+    public MemoryConsoleBuffer(int bufferWidth, int bufferHeight)
+      : this(bufferWidth, bufferHeight, new char[bufferHeight * bufferWidth]) {}
+
+    public MemoryConsoleBuffer(int bufferWidth, int bufferHeight, params string[] contentRows)
+      : this(bufferWidth, bufferHeight, ConsoleBufferTestUtils.ToCharBuffer(bufferWidth, bufferHeight, contentRows)) {}
+
     public void Write(char character) {
-      CharBuffer[CursorTop][CursorLeft] = character;
-      if (CursorLeft >= BufferWidth - 1) {
-        CursorLeft = 0;
-        ++CursorTop;
-      } else {
-        ++CursorLeft;
-      }
+      CharBuffer[CursorLeft + CursorTop * BufferWidth] = character;
+      this.IncrementCursorPosition();
     }
 
     public int BufferWidth { get; }
@@ -42,6 +43,11 @@ namespace Bud.Cli {
       }
     }
 
+    public char this[int column, int row] {
+      get { return CharBuffer[column + BufferWidth * row]; }
+      private set { CharBuffer[column + BufferWidth * row] = value; }
+    }
+
     public void MoveArea(int sourceLeft,
                          int sourceTop,
                          int sourceWidth,
@@ -53,31 +59,21 @@ namespace Bud.Cli {
       CopyFrom(tempBuffer, sourceWidth, sourceHeight, targetLeft, targetTop);
     }
 
-    public char[] ToArray() => CopyAreaToNewArray(0, 0, BufferWidth, BufferHeight);
-
     private char[] CopyAreaToNewArray(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight) {
       var tempBuffer = new char[sourceHeight * sourceWidth];
       for (int row = 0; row < sourceHeight; ++row) {
         for (int column = 0; column < sourceWidth; ++column) {
-          tempBuffer[column + row * sourceWidth] = CharBuffer[row + sourceTop][column + sourceLeft];
-          CharBuffer[row + sourceTop][column + sourceLeft] = '\0';
+          tempBuffer[column + row * sourceWidth] = this[column + sourceLeft, row + sourceTop];
+          this[column + sourceLeft, row + sourceTop] = '\0';
         }
       }
       return tempBuffer;
     }
 
-    private static char[][] CreateCharacterBuffer(int bufferWidth, int bufferHeight) {
-      var characterBuffer = new char[bufferHeight][];
-      for (int bufferRow = 0; bufferRow < bufferHeight; bufferRow++) {
-        characterBuffer[bufferRow] = new char[bufferWidth];
-      }
-      return characterBuffer;
-    }
-
     private void CopyFrom(char[] sourceArray, int sourceWidth, int sourceHeight, int targetLeft, int targetTop) {
       for (int row = 0; row < sourceHeight; ++row) {
         for (int column = 0; column < sourceWidth; ++column) {
-          CharBuffer[row + targetTop][column + targetLeft] = sourceArray[column + row * sourceWidth];
+          this[column + targetLeft, row + targetTop] = sourceArray[column + row * sourceWidth];
         }
       }
     }
@@ -85,7 +81,7 @@ namespace Bud.Cli {
     private void ZeroArea(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight) {
       for (int row = 0; row < sourceHeight; ++row) {
         for (int column = 0; column < sourceWidth; ++column) {
-          CharBuffer[row + sourceTop][column + sourceLeft] = '\0';
+          this[column + sourceLeft, row + sourceTop] = '\0';
         }
       }
     }
