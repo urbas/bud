@@ -22,8 +22,7 @@ public class Build : IBuild {
                                      Cs.Dependency("Bud.NUnit.ConsoleRunner"),
                                      Cs.Dependency("CommandLineParser")),
                               Cs.Test(Cs.RootNamespace.Modify("Bud"),
-                                      Cs.Dependency("NUnit"),
-                                      Cs.Dependency("Moq")));
+                                      Cs.Dependency("NUnit")));
 
     var bud = new Project(BudProjectId,
                           Cs.Exe(Cs.RootNamespace.Modify("Bud"),

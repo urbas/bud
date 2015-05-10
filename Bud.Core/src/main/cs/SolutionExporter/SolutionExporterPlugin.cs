@@ -87,7 +87,7 @@ namespace Bud.SolutionExporter {
       Directory.CreateDirectory(Path.GetDirectoryName(outputFilePath));
       using (var fileStream = new FileStream(outputFilePath, FileMode.Create, FileAccess.Write)) {
         using (var streamWriter = new StreamWriter(fileStream)) {
-          template.Write(new AutoIndentWriter(streamWriter));
+          template.Write(new AutoIndentWriter(streamWriter), new TemplateErrorListener());
         }
       }
     }
