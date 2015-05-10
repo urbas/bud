@@ -33,8 +33,7 @@ namespace Bud.Cli.Macros {
         return false;
       }
       if (consoleKeyInfo.Key == ConsoleKey.Enter) {
-        Console.WriteLine();
-        Console.WriteLine(SingleLineEditor.Line);
+        EchoInput();
         StartNewInputLine();
       } else {
         SingleLineEditor.ProcessInput(consoleKeyInfo);
@@ -43,14 +42,17 @@ namespace Bud.Cli.Macros {
       return true;
     }
 
+    private void EchoInput() {
+      PrintPrompt();
+      Console.WriteLine(SingleLineEditor.Line);
+    }
+
     private void StartNewInputLine() {
-      PrintPromptPrefix();
+      PrintPrompt();
       SingleLineEditor = SingleLineEditor.Create();
     }
 
-    private static void PrintPromptPrefix() {
-      Console.Write("bud> ");
-    }
+    private static void PrintPrompt() => Console.Write("bud> ");
 
     private static bool IsExitKeyCombination(ConsoleKeyInfo consoleKeyInfo) {
       return consoleKeyInfo.Key == ConsoleKey.Q &&

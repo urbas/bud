@@ -144,7 +144,7 @@ namespace Bud.Cli {
 
     [Test]
     public void Going_left_before_input_character_WHEN_non_zero_start_position_MUST_produce_a_single_character_line() {
-      InitializeSingleLineEditor(20, 3, 5, 0);
+      DislocateBufferCursor();
       Input(ConsoleKey.LeftArrow, ConsoleKey.A);
       Assert.AreEqual("A", SingleLineEditor.Line);
       Assert.AreEqual(1, SingleLineEditor.CursorPosition);
@@ -152,7 +152,7 @@ namespace Bud.Cli {
 
     [Test]
     public void Input_characters_WHEN_non_zero_start_position_MUST_produce_line_made_of_the_characters() {
-      InitializeSingleLineEditor(20, 3, 5, 0);
+      DislocateBufferCursor();
       Input("foo");
       Assert.AreEqual("foo", SingleLineEditor.Line);
       Assert.AreEqual(3, SingleLineEditor.CursorPosition);
@@ -184,6 +184,8 @@ namespace Bud.Cli {
       SingleLineEditor = new SingleLineEditor(ConsoleBuffer);
     }
 
+    private void DislocateBufferCursor() => InitializeSingleLineEditor(20, 3, 5, 1);
+
     private void Input(ConsoleKeyInfo consoleKey, int repeatCount) {
       for (int i = 0; i < repeatCount; i++) {
         SingleLineEditor.ProcessInput(consoleKey);
@@ -196,17 +198,15 @@ namespace Bud.Cli {
       }
     }
 
-    private void Input(ConsoleKey consoleKey, int repeatCount) {
-      Input(ToInput(consoleKey), repeatCount);
-    }
+    private void Input(ConsoleKey consoleKey, int repeatCount) => Input(ToInput(consoleKey), repeatCount);
+
+    private void Input(ConsoleKey consoleKey) => Input(ToInput(consoleKey), 1);
 
     private void Input(string str) {
       foreach (var chr in str) {
         Input(new ConsoleKeyInfo(chr, (ConsoleKey) char.ToUpperInvariant(chr), false, false, false), 1);
       }
     }
-
-    private void Input(ConsoleKey consoleKey) => Input(ToInput(consoleKey), 1);
 
     private static ConsoleKeyInfo ToInput(ConsoleKey consoleKey) {
       return new ConsoleKeyInfo((char) consoleKey, consoleKey, false, false, false);
