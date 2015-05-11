@@ -102,7 +102,35 @@ namespace Bud.Cli {
     }
 
     [Test]
-    public void pressing_end_AFTER_some_character_input_and_going_left_MUST_move_the_cursor_to_the_end() {
+    public void Going_home_MUST_move_the_cursor_to_the_front_WHEN_in_a_multi_row_scenario() {
+      SetCursorPosition(5, 1);
+      Input(TwoRowLine);
+      Input(ConsoleKey.Home);
+      Assert.AreEqual(0, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(5, ConsoleBuffer.CursorLeft);
+      Assert.AreEqual(1, ConsoleBuffer.CursorTop);
+    }
+
+    [Test]
+    public void Pressing_end_MUST_move_the_cursor_to_the_back_WHEN_in_a_multi_row_scenario() {
+      SetCursorPosition(5, 1);
+      Input(TwoRowLine);
+      Input(ConsoleKey.Home, ConsoleKey.End);
+      Assert.AreEqual(TwoRowLine.Length, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(4, ConsoleBuffer.CursorLeft);
+      Assert.AreEqual(3, ConsoleBuffer.CursorTop);
+    }
+
+    [Test]
+    public void Pressing_end_WHEN_line_ends_just_before_the_end_of_the_row_MUST_place_the_cursor_at_the_end_of_that_row() {
+      Input(TwoRowLine);
+      Input(ConsoleKey.Home, ConsoleKey.End, ConsoleKey.A);
+      Assert.AreEqual(0, ConsoleBuffer.CursorLeft);
+      Assert.AreEqual(2, ConsoleBuffer.CursorTop);
+    }
+
+    [Test]
+    public void Pressing_end_AFTER_some_character_input_and_going_left_MUST_move_the_cursor_to_the_end() {
       Input(ConsoleKey.A, ConsoleKey.B, ConsoleKey.LeftArrow, ConsoleKey.LeftArrow, ConsoleKey.End);
       Assert.AreEqual(2, ConsoleBuffer.CursorLeft);
     }
@@ -209,7 +237,7 @@ namespace Bud.Cli {
     }
 
     private void SetCursorPosition(int cursorLeft, int cursorTop) {
-      ConsoleBuffer = new MemoryConsoleBuffer(20, 3);
+      ConsoleBuffer = new MemoryConsoleBuffer(20, 5);
       ConsoleBuffer.CursorLeft = cursorLeft;
       ConsoleBuffer.CursorTop = cursorTop;
       SingleLineEditor = new SingleLineEditor(ConsoleBuffer);

@@ -36,10 +36,12 @@ namespace Bud.Cli {
           MoveCursorRight();
           break;
         case ConsoleKey.Home:
-          ConsoleBuffer.CursorLeft = 0;
+          ConsoleBuffer.CursorLeft = CursorStartLeft;
+          ConsoleBuffer.CursorTop = CursorStartTop;
           break;
         case ConsoleKey.End:
-          ConsoleBuffer.CursorLeft = LineLength;
+          ConsoleBuffer.CursorLeft = (CursorStartLeft + LineLength) % ConsoleBuffer.BufferWidth;
+          ConsoleBuffer.CursorTop = CursorStartTop + (CursorStartLeft + LineLength) / ConsoleBuffer.BufferWidth;
           break;
         default:
           AppendCharacter(consoleKeyInfo.KeyChar);
