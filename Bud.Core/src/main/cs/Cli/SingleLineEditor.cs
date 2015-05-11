@@ -49,8 +49,8 @@ namespace Bud.Cli {
 
     private void AppendCharacter(char character) {
       if (IsCursorInsideLine) {
-        ConsoleBuffer.ShiftBufferRight(ConsoleBuffer.CursorTop,
-                                       ConsoleBuffer.CursorLeft,
+        ConsoleBuffer.ShiftBufferRight(ConsoleBuffer.CursorLeft,
+                                       ConsoleBuffer.CursorTop,
                                        LineLength - CursorPosition);
       }
       LineBuffer.Insert(CursorPosition, character);
@@ -63,7 +63,9 @@ namespace Bud.Cli {
       }
       LineBuffer.Remove(CursorPosition - 1, 1);
       MoveCursorLeft();
-      ConsoleBuffer.ShiftBufferLeft(ConsoleBuffer.CursorTop, ConsoleBuffer.CursorLeft + 1, LineLength - CursorPosition + 1);
+      ConsoleBuffer.ShiftBufferLeft(ConsoleBuffer.CursorLeft + 1,
+                                    ConsoleBuffer.CursorTop,
+                                    LineLength - CursorPosition + 1);
     }
 
     private void MoveCursorLeft() {
