@@ -27,7 +27,10 @@ namespace Bud.Cli {
     public void ProcessInput(ConsoleKeyInfo consoleKeyInfo) {
       switch (consoleKeyInfo.Key) {
         case ConsoleKey.Backspace:
-          DeleteCurrentCharacter();
+          DeleteCharacterBeforeCursor();
+          break;
+        case ConsoleKey.Delete:
+          DeleteCharacterAtCursor();
           break;
         case ConsoleKey.LeftArrow:
           MoveCursorLeft();
@@ -59,12 +62,22 @@ namespace Bud.Cli {
       ConsoleBuffer.Write(character);
     }
 
-    private void DeleteCurrentCharacter() {
+    private void DeleteCharacterBeforeCursor() {
       if (CursorPosition == 0) {
         return;
       }
       LineBuffer.Remove(CursorPosition - 1, 1);
       MoveCursorLeft();
+      ConsoleBuffer.ShiftBufferLeft(ConsoleBuffer.CursorLeft + 1,
+                                    ConsoleBuffer.CursorTop,
+                                    LineLength - CursorPosition + 1);
+    }
+
+    private void DeleteCharacterAtCursor() {
+      if (CursorPosition >= LineLength) {
+        return;
+      }
+      LineBuffer.Remove(CursorPosition, 1);
       ConsoleBuffer.ShiftBufferLeft(ConsoleBuffer.CursorLeft + 1,
                                     ConsoleBuffer.CursorTop,
                                     LineLength - CursorPosition + 1);

@@ -39,22 +39,39 @@ namespace Bud.Cli {
     }
 
     [Test]
-    public void Input_backspace_MUST_remove_the_character_from_the_line() {
-      Input("a");
-      Input(ConsoleKey.Backspace);
+    public void Backspacing_the_single_character_MUST_produce_an_empty_line() {
+      Input(ConsoleKey.A, ConsoleKey.Backspace);
       Assert.IsEmpty(SingleLineEditor.Line);
     }
 
     [Test]
-    public void WHEN_removing_single_character_THEN_cursor_position_must_be_0() {
+    public void Backspacing_the_single_character_MUST_move_the_cursor_position_to_0() {
       Input(ConsoleKey.A, ConsoleKey.Backspace);
       Assert.AreEqual(0, SingleLineEditor.CursorPosition);
     }
 
     [Test]
-    public void Input_backspace_WHEN_line_is_empty_MUST_not_interact_with_console_buffer() {
+    public void Backspacing_WHEN_line_is_empty_MUST_not_interact_with_console_buffer() {
       Input(ConsoleKey.Backspace);
       VerifyConsoleBufferHasInitialState();
+    }
+
+    [Test]
+    public void Deleting_the_single_character_MUST_produce_an_empty_line() {
+      Input(ConsoleKey.A, ConsoleKey.Home, ConsoleKey.Delete);
+      Assert.IsEmpty(SingleLineEditor.Line);
+    }
+
+    [Test]
+    public void Deleting_the_single_character_MUST_move_the_cursor_position_to_0() {
+      Input(ConsoleKey.A, ConsoleKey.Home, ConsoleKey.Delete);
+      Assert.AreEqual(0, SingleLineEditor.CursorPosition);
+    }
+
+    [Test]
+    public void Deleting_WHEN_at_the_end_of_line_MUST_not_change_the_buffer() {
+      Input(ConsoleKey.A, ConsoleKey.Delete);
+      Assert.AreEqual(ToBuffer("A"), ConsoleBuffer.CharBuffer);
     }
 
     [Test]
@@ -142,7 +159,7 @@ namespace Bud.Cli {
     }
 
     [Test]
-    public void Deleting_characters_in_the_middle_MUST_return_the_edited_line() {
+    public void Backspacing_characters_in_the_middle_MUST_return_the_edited_line() {
       Input("This is madness.");
       Input(ConsoleKey.LeftArrow, 9);
       Input(ConsoleKey.Backspace, 2);
@@ -154,7 +171,7 @@ namespace Bud.Cli {
     }
 
     [Test]
-    public void Deleting_characters_in_the_middle_MUST_move_the_buffer() {
+    public void Backspacing_characters_in_the_middle_MUST_move_the_buffer() {
       Input("012345");
       Input(ConsoleKey.LeftArrow, ConsoleKey.LeftArrow, ConsoleKey.Backspace);
       Assert.AreEqual(ToBuffer("01245"), ConsoleBuffer.CharBuffer);
@@ -162,7 +179,7 @@ namespace Bud.Cli {
     }
 
     [Test]
-    public void Deleting_characters_at_the_end_MUST_clear_the_trailing_character() {
+    public void Backspacing_characters_at_the_end_MUST_clear_the_trailing_character() {
       Input(ConsoleKey.A, ConsoleKey.Backspace);
       VerifyConsoleBufferHasInitialState();
     }
@@ -184,7 +201,7 @@ namespace Bud.Cli {
     }
 
     [Test]
-    public void Deleting_a_character_WHEN_non_zero_start_position_MUST_produce_an_empty_line() {
+    public void Backspacing_a_character_WHEN_non_zero_start_position_MUST_produce_an_empty_line() {
       SetCursorPosition(5, 1);
       Input(ConsoleKey.A, ConsoleKey.Backspace);
       Assert.IsEmpty(SingleLineEditor.Line);
@@ -229,7 +246,7 @@ namespace Bud.Cli {
     }
 
     [Test]
-    public void Deleting_a_character_at_the_start_of_the_second_row_MUST_move_the_cursor_up_to_the_first_row() {
+    public void Backspacing_a_character_at_the_start_of_the_second_row_MUST_move_the_cursor_up_to_the_first_row() {
       Input(TwoRowLine.Substring(0, ConsoleBuffer.BufferWidth));
       Input(ConsoleKey.Backspace);
       Assert.AreEqual(0, ConsoleBuffer.CursorTop);
@@ -261,8 +278,12 @@ namespace Bud.Cli {
 
     private void Input(string str) {
       foreach (var chr in str) {
-        Input(new ConsoleKeyInfo(chr, (ConsoleKey) char.ToUpperInvariant(chr), false, false, false), 1);
+        Input(new ConsoleKeyInfo(chr, ToConsoleKey(chr), false, false, false), 1);
       }
+    }
+
+    private static ConsoleKey ToConsoleKey(char chr) {
+      return chr == '.' ? ConsoleKey.OemPeriod : (ConsoleKey) char.ToUpperInvariant(chr);
     }
 
     private void VerifyConsoleBufferHasInitialState() {
