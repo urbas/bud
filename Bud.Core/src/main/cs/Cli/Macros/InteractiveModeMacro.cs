@@ -1,4 +1,6 @@
 ﻿using System;
+using Bud.Commander;
+using Bud.Util;
 
 namespace Bud.Cli.Macros {
   public static class InteractiveModeMacro {
@@ -11,7 +13,7 @@ namespace Bud.Cli.Macros {
   }
 
   public class InteractiveConsole {
-    private readonly BuildContext Context;
+    private BuildContext Context;
     private SingleLineEditor SingleLineEditor;
 
     public InteractiveConsole(BuildContext context) {
@@ -33,8 +35,7 @@ namespace Bud.Cli.Macros {
         return false;
       }
       if (consoleKeyInfo.Key == ConsoleKey.Enter) {
-        EchoInput();
-        StartNewInputLine();
+        EvaluateInputAsTask();
       } else {
         SingleLineEditor.ProcessInput(consoleKeyInfo);
       }
@@ -42,10 +43,17 @@ namespace Bud.Cli.Macros {
       return true;
     }
 
-    private void EchoInput() {
+    private void EvaluateInputAsTask() {
       Console.WriteLine();
-      PrintPrompt();
-      Console.WriteLine(SingleLineEditor.Line);
+      try {
+        var evaluationResult = CommandEvaluator.EvaluateToJsonSync(SingleLineEditor.Line, ref Context);
+        if (!"null".Equals(evaluationResult)) {
+          Console.WriteLine(SingleLineEditor.Line + " = " + evaluationResult);
+        }
+      } catch (Exception e) {
+        ExceptionUtils.PrintItemizedErrorMessages(e, true);
+      }
+      StartNewInputLine();
     }
 
     private void StartNewInputLine() {
