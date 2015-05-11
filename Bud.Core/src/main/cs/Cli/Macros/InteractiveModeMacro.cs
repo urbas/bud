@@ -34,26 +34,33 @@ namespace Bud.Cli.Macros {
       if (IsExitKeyCombination(consoleKeyInfo)) {
         return false;
       }
-      if (consoleKeyInfo.Key == ConsoleKey.Enter) {
-        EvaluateInputAsTask();
-      } else {
-        SingleLineEditor.ProcessInput(consoleKeyInfo);
+      switch (consoleKeyInfo.Key) {
+        case ConsoleKey.Enter:
+          EvaluateLine();
+          break;
+        default:
+          SingleLineEditor.ProcessInput(consoleKeyInfo);
+          break;
       }
 
       return true;
     }
 
-    private void EvaluateInputAsTask() {
+    private void EvaluateLine() {
       Console.WriteLine();
+      var evaluationResult = EvaluateInputToJson();
+      Console.WriteLine(SingleLineEditor.Line + " = " + evaluationResult);
+      StartNewInputLine();
+    }
+
+    private string EvaluateInputToJson() {
       try {
         var evaluationResult = CommandEvaluator.EvaluateToJsonSync(SingleLineEditor.Line, ref Context);
-        if (!"null".Equals(evaluationResult)) {
-          Console.WriteLine(SingleLineEditor.Line + " = " + evaluationResult);
-        }
+        return "null".Equals(evaluationResult) ? null : evaluationResult;
       } catch (Exception e) {
         ExceptionUtils.PrintItemizedErrorMessages(e, true);
+        return null;
       }
-      StartNewInputLine();
     }
 
     private void StartNewInputLine() {
