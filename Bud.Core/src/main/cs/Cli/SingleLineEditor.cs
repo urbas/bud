@@ -22,8 +22,6 @@ namespace Bud.Cli {
 
     private int CursorStartTop { get; }
 
-    private bool IsCursorInsideLine => CursorPosition < LineLength;
-
     public void ProcessInput(ConsoleKeyInfo consoleKeyInfo) {
       switch (consoleKeyInfo.Key) {
         case ConsoleKey.Backspace:
@@ -39,25 +37,21 @@ namespace Bud.Cli {
           MoveCursorRight();
           break;
         case ConsoleKey.Home:
-          ConsoleBuffer.CursorLeft = CursorStartLeft;
-          ConsoleBuffer.CursorTop = CursorStartTop;
+          MoveCursorToStart();
           break;
         case ConsoleKey.End:
-          ConsoleBuffer.CursorLeft = (CursorStartLeft + LineLength) % ConsoleBuffer.BufferWidth;
-          ConsoleBuffer.CursorTop = CursorStartTop + (CursorStartLeft + LineLength) / ConsoleBuffer.BufferWidth;
+          MoveCursorToEnd();
           break;
         default:
-          AppendCharacter(consoleKeyInfo.KeyChar);
+          InsertCharacterAtCursor(consoleKeyInfo.KeyChar);
           break;
       }
     }
 
-    private void AppendCharacter(char character) {
-      if (IsCursorInsideLine) {
-        ConsoleBuffer.ShiftBufferRight(ConsoleBuffer.CursorLeft,
-                                       ConsoleBuffer.CursorTop,
-                                       LineLength - CursorPosition);
-      }
+    private void InsertCharacterAtCursor(char character) {
+      ConsoleBuffer.ShiftBufferRight(ConsoleBuffer.CursorLeft,
+                                     ConsoleBuffer.CursorTop,
+                                     LineLength - CursorPosition);
       LineBuffer.Insert(CursorPosition, character);
       ConsoleBuffer.Write(character);
     }
@@ -95,6 +89,16 @@ namespace Bud.Cli {
         return;
       }
       ConsoleBuffer.IncrementCursorPosition();
+    }
+
+    private void MoveCursorToStart() {
+      ConsoleBuffer.CursorLeft = CursorStartLeft;
+      ConsoleBuffer.CursorTop = CursorStartTop;
+    }
+
+    private void MoveCursorToEnd() {
+      ConsoleBuffer.CursorLeft = (CursorStartLeft + LineLength) % ConsoleBuffer.BufferWidth;
+      ConsoleBuffer.CursorTop = CursorStartTop + (CursorStartLeft + LineLength) / ConsoleBuffer.BufferWidth;
     }
   }
 }
