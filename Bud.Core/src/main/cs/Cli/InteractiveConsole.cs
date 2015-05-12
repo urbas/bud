@@ -22,7 +22,7 @@ namespace Bud.Cli {
       while (ActOnUserInput()) {}
     }
 
-    public bool ActOnUserInput() {
+    private bool ActOnUserInput() {
       var consoleKeyInfo = Console.ReadKey(true);
       if (IsExitKeyCombination(consoleKeyInfo)) {
         return false;
@@ -45,7 +45,9 @@ namespace Bud.Cli {
     private void EvaluateLine() {
       Console.WriteLine();
       var evaluationResult = EvaluateInputToJson();
-      Console.WriteLine(CurrentInput.Line + " = " + evaluationResult);
+      if (evaluationResult != null) {
+        Console.WriteLine(CurrentInput.Line + " = " + evaluationResult);
+      }
       StartNewInputLine();
     }
 
