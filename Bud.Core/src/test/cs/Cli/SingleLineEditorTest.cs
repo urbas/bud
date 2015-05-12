@@ -208,6 +208,33 @@ namespace Bud.Cli {
     }
 
     [Test]
+    public void Changing_the_width_of_the_buffer_MUST_not_affect_the_cursor_position() {
+      Input("0123456789012345");
+      SetBufferWidth(10);
+      Assert.AreEqual(16, SingleLineEditor.CursorPosition);
+    }
+
+    [Test]
+    public void Changing_the_width_of_the_buffer_MUST_recalculate_layout_on_next_input() {
+      Input("0123456789012345");
+      SetBufferWidth(10);
+      Input(ConsoleKey.A);
+      Assert.AreEqual(1, ConsoleBuffer.CursorTop);
+      Assert.AreEqual(7, ConsoleBuffer.CursorLeft);
+      Assert.AreEqual(ToBuffer("0123456789", "012345A"), ConsoleBuffer.CharBuffer);
+    }
+
+    [Test]
+    public void Cursor_start_left_position_MUST_be_reset_to_zero_WHEN_the_width_of_the_buffer_shrinks_below_cursor_start_position() {
+      SetCursorPosition(12, 0);
+      SetBufferWidth(10);
+      Input(ConsoleKey.A);
+      Assert.AreEqual(0, ConsoleBuffer.CursorTop);
+      Assert.AreEqual(1, ConsoleBuffer.CursorLeft);
+      Assert.AreEqual(ToBuffer("A"), ConsoleBuffer.CharBuffer);
+    }
+
+    [Test]
     public void Inserting_a_character_WHEN_non_zero_start_position_MUST_push_the_buffer_correctly() {
       SetCursorPosition(5, 1);
       Input(ConsoleKey.A, ConsoleKey.LeftArrow, ConsoleKey.B);
@@ -258,6 +285,10 @@ namespace Bud.Cli {
       ConsoleBuffer.CursorLeft = cursorLeft;
       ConsoleBuffer.CursorTop = cursorTop;
       SingleLineEditor = new SingleLineEditor(ConsoleBuffer);
+    }
+
+    private void SetBufferWidth(int newBufferWidth) {
+      ConsoleBuffer.BufferWidth = newBufferWidth;
     }
 
     private void Input(ConsoleKeyInfo consoleKey, int repeatCount) {

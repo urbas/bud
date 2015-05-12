@@ -2,9 +2,9 @@ using System;
 
 namespace Bud.Cli {
   public class MemoryConsoleBuffer : IConsoleBuffer {
-    public readonly char[] CharBuffer;
-    private int CursorX;
-    private int CursorY;
+    private int cursorLeft;
+    private int cursorTop;
+    private int bufferWidth;
 
     private MemoryConsoleBuffer(int bufferWidth, int bufferHeight, char[] charBuffer) {
       BufferWidth = bufferWidth;
@@ -23,23 +23,36 @@ namespace Bud.Cli {
       this.IncrementCursorPosition();
     }
 
-    public int BufferWidth { get; }
+    public char[] CharBuffer { get; private set; }
+
+    public int BufferWidth {
+      get { return bufferWidth; }
+      set {
+        if (bufferWidth != value) {
+          if (value < bufferWidth) {
+            DecreaseBufferWidth(value);
+          } else {
+            IncreaseBufferWidth(value);
+          }
+        }
+      }
+    }
 
     public int BufferHeight { get; }
 
     public int CursorLeft {
-      get { return CursorX; }
+      get { return cursorLeft; }
       set {
         AssertWidthIsInRange(value);
-        CursorX = value;
+        cursorLeft = value;
       }
     }
 
     public int CursorTop {
-      get { return CursorY; }
+      get { return cursorTop; }
       set {
         AssertHeightIsInRange(value);
-        CursorY = value;
+        cursorTop = value;
       }
     }
 
@@ -62,12 +75,12 @@ namespace Bud.Cli {
                          int sourceHeight,
                          int targetLeft,
                          int targetTop) {
-      var tempBuffer = CopyAreaToNewArray(sourceLeft, sourceTop, sourceWidth, sourceHeight);
-      ZeroArea(sourceLeft, sourceTop, sourceWidth, sourceHeight);
+      var tempBuffer = CopyToNewArray(sourceLeft, sourceTop, sourceWidth, sourceHeight);
+      ZeroFill(sourceLeft, sourceTop, sourceWidth, sourceHeight);
       CopyFrom(tempBuffer, sourceWidth, sourceHeight, targetLeft, targetTop);
     }
 
-    private char[] CopyAreaToNewArray(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight) {
+    private char[] CopyToNewArray(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight) {
       var tempBuffer = new char[sourceHeight * sourceWidth];
       for (int row = 0; row < sourceHeight; ++row) {
         for (int column = 0; column < sourceWidth; ++column) {
@@ -86,12 +99,29 @@ namespace Bud.Cli {
       }
     }
 
-    private void ZeroArea(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight) {
+    private void ZeroFill(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight) {
       for (int row = 0; row < sourceHeight; ++row) {
         for (int column = 0; column < sourceWidth; ++column) {
           this[column + sourceLeft, row + sourceTop] = '\0';
         }
       }
+    }
+
+    private void DecreaseBufferWidth(int newBufferWidth) {
+      CharBuffer = CopyToNewArray(0, 0, newBufferWidth, BufferHeight);
+      bufferWidth = newBufferWidth;
+      if (CursorLeft >= newBufferWidth) {
+        CursorLeft = 0;
+        ++CursorTop;
+      }
+    }
+
+    private void IncreaseBufferWidth(int newBufferWidth) {
+      var oldBuffer = CharBuffer;
+      var oldBufferWidth = BufferWidth;
+      bufferWidth = newBufferWidth;
+      CharBuffer = new char[BufferHeight * BufferWidth];
+      CopyFrom(oldBuffer, oldBufferWidth, BufferHeight, 0, 0);
     }
 
     private void AssertWidthIsInRange(int width) {

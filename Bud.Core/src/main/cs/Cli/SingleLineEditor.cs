@@ -5,24 +5,27 @@ namespace Bud.Cli {
   public class SingleLineEditor {
     private readonly IConsoleBuffer ConsoleBuffer;
     private readonly StringBuilder LineBuffer = new StringBuilder();
+    private int LastKnownBufferWidth;
 
     public SingleLineEditor(IConsoleBuffer consoleBuffer) {
       ConsoleBuffer = consoleBuffer;
       CursorStartLeft = consoleBuffer.CursorLeft;
       CursorStartTop = consoleBuffer.CursorTop;
+      LastKnownBufferWidth = consoleBuffer.BufferWidth;
     }
 
     public string Line => LineBuffer.ToString();
 
     public int LineLength => LineBuffer.Length;
 
-    public int CursorPosition => (ConsoleBuffer.CursorTop - CursorStartTop + 1) * ConsoleBuffer.BufferWidth - CursorStartLeft - (ConsoleBuffer.BufferWidth - ConsoleBuffer.CursorLeft);
+    public int CursorPosition { get; private set; }
 
-    private int CursorStartLeft { get; }
+    private int CursorStartLeft { get; set; }
 
     private int CursorStartTop { get; }
 
     public void ProcessInput(ConsoleKeyInfo consoleKeyInfo) {
+      RefreshBufferLayout();
       switch (consoleKeyInfo.Key) {
         case ConsoleKey.Backspace:
           DeleteCharacterBeforeCursor();
@@ -52,8 +55,9 @@ namespace Bud.Cli {
       ConsoleBuffer.ShiftBufferRight(ConsoleBuffer.CursorLeft,
                                      ConsoleBuffer.CursorTop,
                                      LineLength - CursorPosition);
-      LineBuffer.Insert(CursorPosition, character);
       ConsoleBuffer.Write(character);
+      LineBuffer.Insert(CursorPosition, character);
+      ++CursorPosition;
     }
 
     private void DeleteCharacterBeforeCursor() {
@@ -81,6 +85,7 @@ namespace Bud.Cli {
       if (CursorPosition == 0) {
         return;
       }
+      --CursorPosition;
       ConsoleBuffer.DecrementCursorPosition();
     }
 
@@ -88,17 +93,37 @@ namespace Bud.Cli {
       if (CursorPosition >= LineLength) {
         return;
       }
+      ++CursorPosition;
       ConsoleBuffer.IncrementCursorPosition();
     }
 
     private void MoveCursorToStart() {
-      ConsoleBuffer.CursorLeft = CursorStartLeft;
-      ConsoleBuffer.CursorTop = CursorStartTop;
+      CursorPosition = 0;
+      ResetBufferCursor(CursorPosition);
     }
 
     private void MoveCursorToEnd() {
-      ConsoleBuffer.CursorLeft = (CursorStartLeft + LineLength) % ConsoleBuffer.BufferWidth;
-      ConsoleBuffer.CursorTop = CursorStartTop + (CursorStartLeft + LineLength) / ConsoleBuffer.BufferWidth;
+      CursorPosition = LineLength;
+      ResetBufferCursor(CursorPosition);
+    }
+
+    private void ResetBufferCursor(int cursorPosition) {
+      ConsoleBuffer.CursorLeft = (CursorStartLeft + cursorPosition) % ConsoleBuffer.BufferWidth;
+      ConsoleBuffer.CursorTop = CursorStartTop + (CursorStartLeft + cursorPosition) / ConsoleBuffer.BufferWidth;
+    }
+
+    private void RefreshBufferLayout() {
+      if (ConsoleBuffer.BufferWidth != LastKnownBufferWidth) {
+        if (CursorStartLeft >= ConsoleBuffer.BufferWidth - 1) {
+          CursorStartLeft = 0;
+        }
+        ResetBufferCursor(0);
+        for (int charIndex = 0; charIndex < LineLength; charIndex++) {
+          ConsoleBuffer.Write(LineBuffer[charIndex]);
+        }
+        ResetBufferCursor(CursorPosition);
+        LastKnownBufferWidth = ConsoleBuffer.BufferWidth;
+      }
     }
   }
 }
