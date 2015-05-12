@@ -14,9 +14,6 @@ namespace Bud {
     [Option('q', "quiet", HelpText = "Suppresses logs.")]
     public bool IsQuiet { get; set; }
 
-    [Option('i', "interactive", HelpText = "Starts Bud in interactive mode.")]
-    public bool IsInteractiveMode { get; set; }
-
     [Option('s', "enable-stack-traces", HelpText = "Prints exception stack traces.")]
     public bool AreStackTracesEnabled { get; set; }
 

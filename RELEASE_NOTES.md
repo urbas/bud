@@ -1,10 +1,6 @@
 ## Upcoming release
 
-- __CLI__ (new feature): Bud can now run in interactive mode. Here's how you start Bud in interactive mode:
-
-    ``language-bash
-    bud -i
-    ```
+- __CLI__ (breaking change): Bud will now run in interactive mode by default.
 
 ## 0.3.0
 
