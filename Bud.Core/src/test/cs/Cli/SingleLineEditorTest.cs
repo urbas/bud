@@ -4,11 +4,14 @@ using NUnit.Framework;
 namespace Bud.Cli {
   public class SingleLineEditorTest {
     private const string TwoRowLine = "This is a two-row line. I am not lying.";
-    private SingleLineEditor SingleLineEditor;
     private MemoryConsoleBuffer ConsoleBuffer;
+    private SingleLineEditor SingleLineEditor;
 
     [SetUp]
-    public void SetUp() => SetCursorPosition(0, 0);
+    public void SetUp() {
+      ConsoleBuffer = new MemoryConsoleBuffer(20, 5);
+      SingleLineEditor = new SingleLineEditor(ConsoleBuffer);
+    }
 
     [Test]
     public void Input_nothing_MUST_return_an_empty_line() {
@@ -280,11 +283,20 @@ namespace Bud.Cli {
       Assert.AreEqual(ConsoleBuffer.BufferWidth - 1, ConsoleBuffer.CursorLeft);
     }
 
+    [Test]
+    public void Resetting_the_origin_MUST_copy_the_line_to_the_new_place_in_the_buffer() {
+      Input("foo bar");
+      ConsoleBuffer.CursorLeft = ConsoleBuffer.BufferWidth - 1;
+      ConsoleBuffer.CursorTop = 1;
+      SingleLineEditor.ResetOrigin();
+      Assert.AreEqual(6, ConsoleBuffer.CursorLeft);
+      Assert.AreEqual(2, ConsoleBuffer.CursorTop);
+    }
+
     private void SetCursorPosition(int cursorLeft, int cursorTop) {
-      ConsoleBuffer = new MemoryConsoleBuffer(20, 5);
       ConsoleBuffer.CursorLeft = cursorLeft;
       ConsoleBuffer.CursorTop = cursorTop;
-      SingleLineEditor = new SingleLineEditor(ConsoleBuffer);
+      SingleLineEditor.ResetOrigin();
     }
 
     private void SetBufferWidth(int newBufferWidth) {

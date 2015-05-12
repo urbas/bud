@@ -57,7 +57,7 @@ namespace Bud.Cli {
       foreach (var suggestion in GetSuggestions(partialCommand)) {
         Console.WriteLine(suggestion.ToString());
       }
-      StartNewInputLine();
+      RedrawInputLine();
     }
 
     private IEnumerable<IKey> GetSuggestions(string partialCommand) {
@@ -82,6 +82,11 @@ namespace Bud.Cli {
     private void StartNewInputLine() {
       PrintPrompt();
       CurrentInput = new SingleLineEditor(new ConsoleBuffer());
+    }
+
+    private void RedrawInputLine() {
+      PrintPrompt();
+      CurrentInput.ResetOrigin();
     }
 
     private static void PrintPrompt() => Console.Write("bud> ");
