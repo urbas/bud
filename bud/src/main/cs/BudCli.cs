@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using Bud.Build;
 using Bud.Cli;
+using Bud.Cli.Macros;
 using Bud.Commander;
 using Bud.Info;
 using Bud.Util;
@@ -12,6 +13,7 @@ using CommandLine;
 namespace Bud {
   public static class BudCli {
     private static readonly ImmutableList<Command> DefaultCommands = ImmutableList.Create<Command>(new KeyCommand(BuildKeys.Build.Id));
+    private static readonly ImmutableList<MacroCommand> InteractiveModeCommand = ImmutableList.Create(new MacroCommand(InteractiveModeMacro.InteractiveModeMacroName));
 
     public static void Main(string[] args) {
       var cliArguments = new CliArguments();
@@ -54,6 +56,9 @@ namespace Bud {
     }
 
     private static IEnumerable<Command> GetCommandsToExecute(CliArguments cliArguments) {
+      if (cliArguments.IsInteractiveMode) {
+        return InteractiveModeCommand;
+      }
       if (cliArguments.Commands.Count == 0) {
         return DefaultCommands;
       }

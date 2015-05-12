@@ -13,7 +13,7 @@ namespace Bud.Build {
                              DependenciesPlugin.Instance,
                              BuildDirsKeys.BudDir.Modify(GetDefaultGlobalBudDir),
                              ProjectKeys.Version.Init(GlobalBuildSettings.DefaultBuildVersion),
-                             new Macro("interactiveMode", InteractiveModeMacro.InteractiveModeMacroImpl, "Executes Bud in the interactive command line mode."));
+                             new Macro(InteractiveModeMacro.InteractiveModeMacroName, InteractiveModeMacro.InteractiveModeMacroImpl, "Executes Bud in the interactive command line mode."));
     }
 
     private static string GetDefaultGlobalBudDir(IConfig ctxt) {
