@@ -8,16 +8,16 @@ namespace Bud {
     [Option('b', "build-level", DefaultValue = 0, HelpText = "The build configuration level at which to evaluate tasks. Level 0 corresponds to the build configuration defined in '.bud/Build.cs', level 1 to '.bud/.bud/Build.cs' and so on.")]
     public int BuildLevel { get; set; }
 
-    [Option('j', "json", DefaultValue = false, HelpText = "Prints the value of the evaluated task as JSON to the standard output.")]
+    [Option('j', "json", HelpText = "Prints the value of the evaluated task as JSON to the standard output.")]
     public bool PrintJson { get; set; }
 
-    [Option('q', "quiet", DefaultValue = false, HelpText = "Suppresses logs.")]
+    [Option('q', "quiet", HelpText = "Suppresses logs.")]
     public bool IsQuiet { get; set; }
 
-    [Option('i', "interactive", DefaultValue = false, HelpText = "Starts Bud in interactive mode.")]
+    [Option('i', "interactive", HelpText = "Starts Bud in interactive mode.")]
     public bool IsInteractiveMode { get; set; }
 
-    [Option('s', "enable-stack-traces", DefaultValue = false, HelpText = "Prints exception stack traces.")]
+    [Option('s', "enable-stack-traces", HelpText = "Prints exception stack traces.")]
     public bool AreStackTracesEnabled { get; set; }
 
     [Option('v', "version", HelpText = "Displays Bud's version and exits immediately after.")]
