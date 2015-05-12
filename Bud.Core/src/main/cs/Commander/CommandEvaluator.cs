@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Immutable;
-using Bud.Cli;
 using Newtonsoft.Json;
 
 namespace Bud.Commander {

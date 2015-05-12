@@ -200,7 +200,7 @@
       "Id": "NuGet.Core",
       "Versions": [
         {
-          "Version": "2.8.3",
+          "Version": "2.8.5",
           "Assemblies": [
             {
               "Name": "NuGet.Core.dll",

@@ -37,5 +37,31 @@ namespace Bud.Util {
       Assert.AreEqual("0123456789abcdef",
                       ToHexString(new byte[] {0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef}, new StringWriter()).ToString());
     }
+
+    [Test]
+    public void CommonPrefix_returns_empty_string_WHEN_given_an_empty_list() {
+      Assert.IsEmpty(CommonPrefix());
+    }
+
+    [Test]
+    public void CommonPrefix_returns_the_only_string_in_the_list() {
+      Assert.AreEqual("foo", CommonPrefix("foo"));
+    }
+
+    [Test]
+    public void CommonPrefix_returns_empty_string_WHEN_strings_in_list_do_not_share_a_common_prefix() {
+      Assert.IsEmpty(CommonPrefix("foo", "bar"));
+    }
+
+    [Test]
+    public void CommonPrefix_returns_part_of_the_first_word_WHEN_the_second_word_starts_with_that_part() {
+      Assert.AreEqual("fo", CommonPrefix("foo", "fod"));
+    }
+
+    [Test]
+    public void CommonPrefix_returns_the_shortest_word_WHEN_the_list_contains_progressively_smaller_words() {
+      Assert.AreEqual("fo", CommonPrefix("foobar", "foob", "foe"));
+      Assert.AreEqual("lo", CommonPrefix("love", "lov", "lo"));
+    }
   }
 }

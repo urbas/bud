@@ -12,23 +12,13 @@ Here are the next top-priority goals for Bud.
 
 - [ ] Integration with Visual Studio
 
-- [ ] Interactive mode
+- [x] Interactive mode
 
 - [ ] Compilation with Roslyn
 
 - [ ] Incremental compilation
 
 - [ ] Packages for Linux and OS X
-
-## Continuous task invocation
-
-Bud must automatically re-invoke a selected task when any file in a watched directory changes.
-
-__Proposed syntax__:
-
-```
-bud @watch build
-```
 
 ## Release plugin
 
@@ -53,24 +43,6 @@ Make Bud easily usable from CI servers.
 ## Integration with Visual Studio
 
 Bud should provide project definition to Visual Studio and hook into Visual Studio's build flow.
-
-## Interactive mode
-
-Bud should be able to start once and then listen for commands.
-
-__Proposed command-line syntax__:
-
-If implemented with macros:
-
-```language-bash
-bud @interactive
-```
-
-if implemented otherwise:
-
-```language-bash
-bud -i
-```
 
 ## Compilation with Roslyn
 

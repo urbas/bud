@@ -1,3 +1,7 @@
+## Upcoming release
+
+- __CLI__ (breaking change): Bud will now run in interactive mode by default.
+
 ## 0.3.0
 
 - __New feature__: Introduced the `@watch` macro. This macro watches sources in the `src` folder and evaluates given tasks whenever the sources change. Example of usage:
