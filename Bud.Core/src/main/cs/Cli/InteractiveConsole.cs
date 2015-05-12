@@ -7,7 +7,7 @@ using Bud.Util;
 namespace Bud.Cli {
   public class InteractiveConsole {
     private BuildContext Context;
-    private SingleLineEditor CurrentInput;
+    private LineEditor LineEditor;
 
     public InteractiveConsole(BuildContext context) {
       Context = context;
@@ -35,7 +35,7 @@ namespace Bud.Cli {
           SuggestCompletions();
           break;
         default:
-          CurrentInput.ProcessInput(consoleKeyInfo);
+          LineEditor.ProcessInput(consoleKeyInfo);
           break;
       }
 
@@ -46,14 +46,14 @@ namespace Bud.Cli {
       Console.WriteLine();
       var evaluationResult = EvaluateInputToJson();
       if (evaluationResult != null) {
-        Console.WriteLine(CurrentInput.Line + " = " + evaluationResult);
+        Console.WriteLine(LineEditor.Line + " = " + evaluationResult);
       }
       StartNewInputLine();
     }
 
     private void SuggestCompletions() {
       Console.WriteLine();
-      var partialCommand = CurrentInput.Line.Substring(0, CurrentInput.CursorPosition);
+      var partialCommand = LineEditor.Line.Substring(0, LineEditor.CursorPosition);
       var suggestions = GetSuggestions(partialCommand);
       PrintSuggestions(suggestions);
       RedrawInputLine();
@@ -62,8 +62,8 @@ namespace Bud.Cli {
 
     private void ApplyCompletion(IEnumerable<string> suggestions, string partialCommand) {
       var completionString = GetCompletionString(suggestions, partialCommand);
-      if (CurrentInput.LineLength < completionString.Length) {
-        CurrentInput.InsertText(completionString.Substring(CurrentInput.Line.Length));
+      if (LineEditor.LineLength < completionString.Length) {
+        LineEditor.InsertText(completionString.Substring(LineEditor.Line.Length));
       }
     }
 
@@ -93,7 +93,7 @@ namespace Bud.Cli {
 
     private string EvaluateInputToJson() {
       try {
-        var evaluationResult = CommandEvaluator.EvaluateToJsonSync(CurrentInput.Line, ref Context);
+        var evaluationResult = CommandEvaluator.EvaluateToJsonSync(LineEditor.Line, ref Context);
         return "null".Equals(evaluationResult) ? null : evaluationResult;
       } catch (Exception e) {
         ExceptionUtils.PrintItemizedErrorMessages(e, true);
@@ -103,12 +103,12 @@ namespace Bud.Cli {
 
     private void StartNewInputLine() {
       PrintPrompt();
-      CurrentInput = new SingleLineEditor(new ConsoleBuffer());
+      LineEditor = new LineEditor(new ConsoleBuffer());
     }
 
     private void RedrawInputLine() {
       PrintPrompt();
-      CurrentInput.ResetOrigin();
+      LineEditor.ResetOrigin();
     }
 
     private static void PrintPrompt() => Console.Write("bud> ");

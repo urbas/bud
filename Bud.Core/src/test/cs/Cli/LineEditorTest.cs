@@ -2,37 +2,37 @@
 using NUnit.Framework;
 
 namespace Bud.Cli {
-  public class SingleLineEditorTest {
+  public class LineEditorTest {
     private const string TwoRowLine = "This is a two-row line. I am not lying.";
     private MemoryConsoleBuffer ConsoleBuffer;
-    private SingleLineEditor SingleLineEditor;
+    private LineEditor LineEditor;
 
     [SetUp]
     public void SetUp() {
       ConsoleBuffer = new MemoryConsoleBuffer(20, 5);
-      SingleLineEditor = new SingleLineEditor(ConsoleBuffer);
+      LineEditor = new LineEditor(ConsoleBuffer);
     }
 
     [Test]
     public void Input_nothing_MUST_return_an_empty_line() {
-      Assert.IsEmpty(SingleLineEditor.Line);
+      Assert.IsEmpty(LineEditor.Line);
     }
 
     [Test]
     public void Initial_cursor_position_must_be_0() {
-      Assert.AreEqual(0, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(0, LineEditor.CursorPosition);
     }
 
     [Test]
     public void WHEN_single_character_entered_THEN_cursor_position_must_be_1() {
       Input("a");
-      Assert.AreEqual(1, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(1, LineEditor.CursorPosition);
     }
 
     [Test]
     public void Input_a_character_MUST_return_single_character_line() {
       Input("a");
-      Assert.AreEqual("a", SingleLineEditor.Line);
+      Assert.AreEqual("a", LineEditor.Line);
     }
 
     [Test]
@@ -44,13 +44,13 @@ namespace Bud.Cli {
     [Test]
     public void Backspacing_the_single_character_MUST_produce_an_empty_line() {
       Input(ConsoleKey.A, ConsoleKey.Backspace);
-      Assert.IsEmpty(SingleLineEditor.Line);
+      Assert.IsEmpty(LineEditor.Line);
     }
 
     [Test]
     public void Backspacing_the_single_character_MUST_move_the_cursor_position_to_0() {
       Input(ConsoleKey.A, ConsoleKey.Backspace);
-      Assert.AreEqual(0, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(0, LineEditor.CursorPosition);
     }
 
     [Test]
@@ -62,13 +62,13 @@ namespace Bud.Cli {
     [Test]
     public void Deleting_the_single_character_MUST_produce_an_empty_line() {
       Input(ConsoleKey.A, ConsoleKey.Home, ConsoleKey.Delete);
-      Assert.IsEmpty(SingleLineEditor.Line);
+      Assert.IsEmpty(LineEditor.Line);
     }
 
     [Test]
     public void Deleting_the_single_character_MUST_move_the_cursor_position_to_0() {
       Input(ConsoleKey.A, ConsoleKey.Home, ConsoleKey.Delete);
-      Assert.AreEqual(0, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(0, LineEditor.CursorPosition);
     }
 
     [Test]
@@ -86,39 +86,39 @@ namespace Bud.Cli {
     [Test]
     public void Input_character_A_AND_left_AND_character_B_MUST_return_line_BA() {
       Input(ConsoleKey.A, ConsoleKey.LeftArrow, ConsoleKey.B);
-      Assert.AreEqual("BA", SingleLineEditor.Line);
+      Assert.AreEqual("BA", LineEditor.Line);
     }
 
     [Test]
     public void Input_character_AND_go_left_AND_input_character_MUST_set_cursor_position_to_1() {
       Input(ConsoleKey.A, ConsoleKey.LeftArrow, ConsoleKey.B);
-      Assert.AreEqual(1, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(1, LineEditor.CursorPosition);
     }
 
     [Test]
     public void Input_some_character_AND_left_MUST_move_the_cursor_back() {
       Input(ConsoleKey.A);
-      Assert.AreEqual(1, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(1, LineEditor.CursorPosition);
       Input(ConsoleKey.LeftArrow);
-      Assert.AreEqual(0, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(0, LineEditor.CursorPosition);
     }
 
     [Test]
     public void Going_right_at_the_end_of_line_MUST_not_move_the_cursor() {
       Input(ConsoleKey.A, ConsoleKey.RightArrow);
-      Assert.AreEqual(1, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(1, LineEditor.CursorPosition);
     }
 
     [Test]
     public void Going_left_and_right_MUST_move_the_cursor_to_the_same_position() {
       Input(ConsoleKey.A, ConsoleKey.LeftArrow, ConsoleKey.RightArrow);
-      Assert.AreEqual(1, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(1, LineEditor.CursorPosition);
     }
 
     [Test]
     public void Going_home_MUST_move_the_cursor_to_the_front() {
       Input(ConsoleKey.A, ConsoleKey.B, ConsoleKey.Home);
-      Assert.AreEqual(0, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(0, LineEditor.CursorPosition);
     }
 
     [Test]
@@ -126,7 +126,7 @@ namespace Bud.Cli {
       SetCursorPosition(5, 1);
       Input(TwoRowLine);
       Input(ConsoleKey.Home);
-      Assert.AreEqual(0, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(0, LineEditor.CursorPosition);
       Assert.AreEqual(5, ConsoleBuffer.CursorLeft);
       Assert.AreEqual(1, ConsoleBuffer.CursorTop);
     }
@@ -136,7 +136,7 @@ namespace Bud.Cli {
       SetCursorPosition(5, 1);
       Input(TwoRowLine);
       Input(ConsoleKey.Home, ConsoleKey.End);
-      Assert.AreEqual(TwoRowLine.Length, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(TwoRowLine.Length, LineEditor.CursorPosition);
       Assert.AreEqual(4, ConsoleBuffer.CursorLeft);
       Assert.AreEqual(3, ConsoleBuffer.CursorTop);
     }
@@ -168,9 +168,9 @@ namespace Bud.Cli {
       Input(ConsoleKey.Backspace, 2);
       Input("was");
       const string expectedLine = "This was madness.";
-      Assert.AreEqual(expectedLine, SingleLineEditor.Line);
+      Assert.AreEqual(expectedLine, LineEditor.Line);
       Assert.AreEqual(ToBuffer(expectedLine), ConsoleBuffer.CharBuffer);
-      Assert.AreEqual(8, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(8, LineEditor.CursorPosition);
     }
 
     [Test]
@@ -178,7 +178,7 @@ namespace Bud.Cli {
       Input("012345");
       Input(ConsoleKey.LeftArrow, ConsoleKey.LeftArrow, ConsoleKey.Backspace);
       Assert.AreEqual(ToBuffer("01245"), ConsoleBuffer.CharBuffer);
-      Assert.AreEqual(3, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(3, LineEditor.CursorPosition);
     }
 
     [Test]
@@ -191,30 +191,30 @@ namespace Bud.Cli {
     public void Going_left_before_input_character_WHEN_non_zero_start_position_MUST_produce_a_single_character_line() {
       SetCursorPosition(5, 1);
       Input(ConsoleKey.LeftArrow, ConsoleKey.A);
-      Assert.AreEqual("A", SingleLineEditor.Line);
-      Assert.AreEqual(1, SingleLineEditor.CursorPosition);
+      Assert.AreEqual("A", LineEditor.Line);
+      Assert.AreEqual(1, LineEditor.CursorPosition);
     }
 
     [Test]
     public void Input_characters_WHEN_non_zero_start_position_MUST_produce_line_made_of_the_characters() {
       SetCursorPosition(5, 1);
       Input("foo");
-      Assert.AreEqual("foo", SingleLineEditor.Line);
-      Assert.AreEqual(3, SingleLineEditor.CursorPosition);
+      Assert.AreEqual("foo", LineEditor.Line);
+      Assert.AreEqual(3, LineEditor.CursorPosition);
     }
 
     [Test]
     public void Backspacing_a_character_WHEN_non_zero_start_position_MUST_produce_an_empty_line() {
       SetCursorPosition(5, 1);
       Input(ConsoleKey.A, ConsoleKey.Backspace);
-      Assert.IsEmpty(SingleLineEditor.Line);
+      Assert.IsEmpty(LineEditor.Line);
     }
 
     [Test]
     public void Changing_the_width_of_the_buffer_MUST_not_affect_the_cursor_position() {
       Input("0123456789012345");
       SetBufferWidth(10);
-      Assert.AreEqual(16, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(16, LineEditor.CursorPosition);
     }
 
     [Test]
@@ -248,17 +248,17 @@ namespace Bud.Cli {
     public void Entering_a_line_that_matches_the_buffer_width_MUST_produce_the_correct_line() {
       var bufferWidthLine = TwoRowLine.Substring(0, ConsoleBuffer.BufferWidth);
       Input(bufferWidthLine);
-      Assert.AreEqual(bufferWidthLine, SingleLineEditor.Line);
+      Assert.AreEqual(bufferWidthLine, LineEditor.Line);
       Assert.AreEqual(ToBuffer(bufferWidthLine), ConsoleBuffer.CharBuffer);
-      Assert.AreEqual(bufferWidthLine.Length, SingleLineEditor.CursorPosition);
+      Assert.AreEqual(bufferWidthLine.Length, LineEditor.CursorPosition);
     }
 
     [Test]
     public void Long_input_MUST_result_in_a_long_line() {
       Input(TwoRowLine);
       var expectedBuffer = ToBuffer(TwoRowLine.Substring(0, ConsoleBuffer.BufferWidth), TwoRowLine.Substring(ConsoleBuffer.BufferWidth));
-      Assert.AreEqual(TwoRowLine.Length, SingleLineEditor.CursorPosition);
-      Assert.AreEqual(TwoRowLine, SingleLineEditor.Line);
+      Assert.AreEqual(TwoRowLine.Length, LineEditor.CursorPosition);
+      Assert.AreEqual(TwoRowLine, LineEditor.Line);
       Assert.AreEqual(expectedBuffer, ConsoleBuffer.CharBuffer);
     }
 
@@ -288,26 +288,26 @@ namespace Bud.Cli {
       Input("foo bar");
       ConsoleBuffer.CursorLeft = ConsoleBuffer.BufferWidth - 1;
       ConsoleBuffer.CursorTop = 1;
-      SingleLineEditor.ResetOrigin();
+      LineEditor.ResetOrigin();
       Assert.AreEqual(6, ConsoleBuffer.CursorLeft);
       Assert.AreEqual(2, ConsoleBuffer.CursorTop);
     }
 
     [Test]
     public void Inserting_text_MUST_change_the_line_contents() {
-      SingleLineEditor.InsertText("foo");
-      Assert.AreEqual("foo", SingleLineEditor.Line);
+      LineEditor.InsertText("foo");
+      Assert.AreEqual("foo", LineEditor.Line);
     }
 
     [Test]
     public void Inserting_text_MUST_change_the_cursor_position() {
-      SingleLineEditor.InsertText("foo");
-      Assert.AreEqual(3, SingleLineEditor.CursorPosition);
+      LineEditor.InsertText("foo");
+      Assert.AreEqual(3, LineEditor.CursorPosition);
     }
 
     [Test]
     public void Inserting_text_MUST_add_the_text_into_the_buffer() {
-      SingleLineEditor.InsertText("foo");
+      LineEditor.InsertText("foo");
       Assert.AreEqual(ToBuffer("foo"), ConsoleBuffer.CharBuffer);
       Assert.AreEqual(3, ConsoleBuffer.CursorLeft);
     }
@@ -315,7 +315,7 @@ namespace Bud.Cli {
     private void SetCursorPosition(int cursorLeft, int cursorTop) {
       ConsoleBuffer.CursorLeft = cursorLeft;
       ConsoleBuffer.CursorTop = cursorTop;
-      SingleLineEditor.ResetOrigin();
+      LineEditor.ResetOrigin();
     }
 
     private void SetBufferWidth(int newBufferWidth) {
@@ -324,7 +324,7 @@ namespace Bud.Cli {
 
     private void Input(ConsoleKeyInfo consoleKey, int repeatCount) {
       for (int i = 0; i < repeatCount; i++) {
-        SingleLineEditor.ProcessInput(consoleKey);
+        LineEditor.ProcessInput(consoleKey);
       }
     }
 

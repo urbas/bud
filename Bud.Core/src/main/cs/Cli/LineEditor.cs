@@ -2,12 +2,12 @@ using System;
 using System.Text;
 
 namespace Bud.Cli {
-  public class SingleLineEditor {
+  public class LineEditor {
     private readonly IConsoleBuffer ConsoleBuffer;
     private readonly StringBuilder LineBuffer = new StringBuilder();
     private int LastKnownBufferWidth;
 
-    public SingleLineEditor(IConsoleBuffer consoleBuffer) {
+    public LineEditor(IConsoleBuffer consoleBuffer) {
       ConsoleBuffer = consoleBuffer;
       CursorStartLeft = consoleBuffer.CursorLeft;
       CursorStartTop = consoleBuffer.CursorTop;
