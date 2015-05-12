@@ -20,7 +20,12 @@ namespace Bud.Cli {
 
     public void Write(char character) {
       CharBuffer[CursorLeft + CursorTop * BufferWidth] = character;
-      this.IncrementCursorPosition();
+      if (CursorLeft >= BufferWidth - 1) {
+        ++CursorTop;
+        CursorLeft = 0;
+      } else {
+        ++CursorLeft;
+      }
     }
 
     public char[] CharBuffer { get; private set; }

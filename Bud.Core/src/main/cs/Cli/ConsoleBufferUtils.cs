@@ -2,24 +2,6 @@ using System;
 
 namespace Bud.Cli {
   public static class ConsoleBufferUtils {
-    public static void DecrementCursorPosition(this IConsoleBuffer consoleBuffer) {
-      if (consoleBuffer.CursorLeft == 0) {
-        --consoleBuffer.CursorTop;
-        consoleBuffer.CursorLeft = consoleBuffer.BufferWidth - 1;
-      } else {
-        --consoleBuffer.CursorLeft;
-      }
-    }
-
-    public static void IncrementCursorPosition(this IConsoleBuffer consoleBuffer) {
-      if (consoleBuffer.CursorLeft >= consoleBuffer.BufferWidth - 1) {
-        ++consoleBuffer.CursorTop;
-        consoleBuffer.CursorLeft = 0;
-      } else {
-        ++consoleBuffer.CursorLeft;
-      }
-    }
-
     public static void ShiftBufferRight(this IConsoleBuffer consoleBuffer, int startColumn, int startRow, int numberOfCharsToShift) {
       int currentRow = startRow + (startColumn + numberOfCharsToShift - 1) / consoleBuffer.BufferWidth;
       if (currentRow != startRow) {

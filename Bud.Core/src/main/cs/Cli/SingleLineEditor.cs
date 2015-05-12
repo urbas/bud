@@ -57,7 +57,7 @@ namespace Bud.Cli {
                                      LineLength - CursorPosition);
       ConsoleBuffer.Write(character);
       LineBuffer.Insert(CursorPosition, character);
-      ++CursorPosition;
+      ResetBufferCursor(++CursorPosition);
     }
 
     private void DeleteCharacterBeforeCursor() {
@@ -85,16 +85,14 @@ namespace Bud.Cli {
       if (CursorPosition == 0) {
         return;
       }
-      --CursorPosition;
-      ConsoleBuffer.DecrementCursorPosition();
+      ResetBufferCursor(--CursorPosition);
     }
 
     private void MoveCursorRight() {
       if (CursorPosition >= LineLength) {
         return;
       }
-      ++CursorPosition;
-      ConsoleBuffer.IncrementCursorPosition();
+      ResetBufferCursor(++CursorPosition);
     }
 
     private void MoveCursorToStart() {
