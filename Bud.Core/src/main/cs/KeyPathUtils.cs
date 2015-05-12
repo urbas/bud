@@ -17,7 +17,7 @@ namespace Bud {
     }
 
     public static string ExtractIdFromPath(string path) {
-      if (string.IsNullOrEmpty(path)) {
+      if (String.IsNullOrEmpty(path)) {
         throw new ArgumentException("Cannot extract the ID from an empty or null path.");
       }
       if (IsRootPath(path)) {
@@ -45,10 +45,10 @@ namespace Bud {
       if (IsAbsolutePath(pathB)) {
         throw new ArgumentException("Cannot join paths '" + pathA + "' and '" + pathB + "'. The second path must not be absolute.");
       }
-      if (string.IsNullOrEmpty(pathA)) {
+      if (String.IsNullOrEmpty(pathA)) {
         return pathB;
       }
-      if (string.IsNullOrEmpty(pathB)) {
+      if (String.IsNullOrEmpty(pathB)) {
         return pathA;
       }
       if (IsRootPath(pathA)) {
@@ -58,7 +58,7 @@ namespace Bud {
     }
 
     public static ImmutableList<string> ToPathComponents(string path) {
-      if (string.IsNullOrEmpty(path)) {
+      if (String.IsNullOrEmpty(path)) {
         throw new ArgumentException("Could not parse an empty string. An empty string is not a valid key.");
       }
       var keyIdChain = path.Split(KeySplitter, StringSplitOptions.RemoveEmptyEntries);
@@ -80,10 +80,22 @@ namespace Bud {
     }
 
     public static string NormalizePath(string path) {
-      if (string.IsNullOrEmpty(path)) {
+      if (String.IsNullOrEmpty(path)) {
         throw new ArgumentException("The key path cannot be empty.");
       }
       return path;
+    }
+
+    public static string PrependKeySeparator(string keyPath) {
+      return StartsWithKeySeparator(keyPath) ? keyPath : Key.KeySeparatorAsString + keyPath;
+    }
+
+    public static bool StartsWithKeySeparator(string keyPath) {
+      return keyPath.StartsWith(Key.KeySeparatorAsString);
+    }
+
+    public static string RemoveKeySeparatorPrefix(string keyPath) {
+      return StartsWithKeySeparator(keyPath) ? keyPath.Substring(Key.KeySeparatorAsString.Length) : keyPath;
     }
   }
 }

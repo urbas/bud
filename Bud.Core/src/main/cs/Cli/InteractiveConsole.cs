@@ -53,20 +53,42 @@ namespace Bud.Cli {
 
     private void SuggestCompletions() {
       Console.WriteLine();
-      var partialCommand = CommandCompletions.ExtractPartialCommand(CurrentInput.Line, CurrentInput.CursorPosition);
-      foreach (var suggestion in GetSuggestions(partialCommand)) {
-        Console.WriteLine(suggestion.ToString());
-      }
+      var partialCommand = CurrentInput.Line.Substring(0, CurrentInput.CursorPosition);
+      var suggestions = GetSuggestions(partialCommand);
+      PrintSuggestions(suggestions);
       RedrawInputLine();
+      ApplyCompletion(suggestions, partialCommand);
     }
 
-    private IEnumerable<IKey> GetSuggestions(string partialCommand) {
-      partialCommand = partialCommand.StartsWith(Key.KeySeparatorAsString) ? partialCommand : Key.KeySeparatorAsString + partialCommand;
+    private void ApplyCompletion(IEnumerable<string> suggestions, string partialCommand) {
+      var completionString = GetCompletionString(suggestions, partialCommand);
+      if (CurrentInput.LineLength < completionString.Length) {
+        CurrentInput.InsertText(completionString.Substring(CurrentInput.Line.Length));
+      }
+    }
+
+    private static string GetCompletionString(IEnumerable<string> suggestions, string partialCommand) {
+      var commonPrefix = StringUtils.CommonPrefix(suggestions);
+      if (!KeyPathUtils.StartsWithKeySeparator(partialCommand)) {
+        commonPrefix = KeyPathUtils.RemoveKeySeparatorPrefix(commonPrefix);
+      }
+      return commonPrefix;
+    }
+
+    private static void PrintSuggestions(IEnumerable<string> suggestions) {
+      foreach (var suggestion in suggestions) {
+        Console.WriteLine(suggestion);
+      }
+    }
+
+    private IEnumerable<string> GetSuggestions(string partialCommand) {
+      partialCommand = KeyPathUtils.PrependKeySeparator(partialCommand);
       IEnumerable<IKey> configs = Context.ConfigDefinitions.Keys;
       IEnumerable<IKey> tasks = Context.TaskDefinitions.Keys;
       return configs.Concat(tasks)
-                    .Where(key => key.Path.StartsWith(partialCommand))
-                    .OrderBy(key => key.Path);
+                    .Select(key => key.Path)
+                    .Where(key => key.StartsWith(partialCommand))
+                    .OrderBy(key => key);
     }
 
     private string EvaluateInputToJson() {

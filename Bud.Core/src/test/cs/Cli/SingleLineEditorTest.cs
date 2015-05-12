@@ -293,6 +293,25 @@ namespace Bud.Cli {
       Assert.AreEqual(2, ConsoleBuffer.CursorTop);
     }
 
+    [Test]
+    public void Inserting_text_MUST_change_the_line_contents() {
+      SingleLineEditor.InsertText("foo");
+      Assert.AreEqual("foo", SingleLineEditor.Line);
+    }
+
+    [Test]
+    public void Inserting_text_MUST_change_the_cursor_position() {
+      SingleLineEditor.InsertText("foo");
+      Assert.AreEqual(3, SingleLineEditor.CursorPosition);
+    }
+
+    [Test]
+    public void Inserting_text_MUST_add_the_text_into_the_buffer() {
+      SingleLineEditor.InsertText("foo");
+      Assert.AreEqual(ToBuffer("foo"), ConsoleBuffer.CharBuffer);
+      Assert.AreEqual(3, ConsoleBuffer.CursorLeft);
+    }
+
     private void SetCursorPosition(int cursorLeft, int cursorTop) {
       ConsoleBuffer.CursorLeft = cursorLeft;
       ConsoleBuffer.CursorTop = cursorTop;

@@ -57,6 +57,12 @@ namespace Bud.Cli {
       RefillBuffer();
     }
 
+    public void InsertText(string text) {
+      LineBuffer.Insert(CursorPosition, text);
+      CursorPosition += text.Length;
+      RefillBuffer();
+    }
+
     private void InsertCharacterAtCursor(char character) {
       ConsoleBuffer.ShiftBufferRight(ConsoleBuffer.CursorLeft,
                                      ConsoleBuffer.CursorTop,

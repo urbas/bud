@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Bud.Util {
   public static class StringUtils {
@@ -32,5 +34,21 @@ namespace Bud.Util {
     private static char NibbleToHex(byte nibble) {
       return nibble > 9 ? (char) ('a' + (nibble - 10)) : (char) ('0' + nibble);
     }
+
+    public static string CommonPrefix(string str1, string str2) {
+      var minLength = Math.Min(str1.Length, str2.Length);
+      for (int i = 0; i < minLength; i++) {
+        if (str1[i] != str2[i]) {
+          return str1.Substring(0, i);
+        }
+      }
+      return str1.Substring(0, minLength);
+    }
+
+    public static string CommonPrefix(params string[] suggestions)
+      => CommonPrefix((IEnumerable<string>)suggestions);
+
+    public static string CommonPrefix(IEnumerable<string> suggestions)
+      => suggestions.Any() ? suggestions.Aggregate(CommonPrefix) : string.Empty;
   }
 }
