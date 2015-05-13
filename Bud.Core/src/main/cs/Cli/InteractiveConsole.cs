@@ -69,10 +69,10 @@ namespace Bud.Cli {
 
     private static string GetCompletionString(IEnumerable<string> suggestions, string partialCommand) {
       var commonPrefix = StringUtils.CommonPrefix(suggestions);
-      if (!KeyPathUtils.StartsWithKeySeparator(partialCommand)) {
-        commonPrefix = KeyPathUtils.RemoveKeySeparatorPrefix(commonPrefix);
+      if (KeyPathUtils.StartsWithKeySeparator(partialCommand)) {
+        return commonPrefix;
       }
-      return commonPrefix;
+      return KeyPathUtils.RemoveKeySeparatorPrefix(commonPrefix);
     }
 
     private static void PrintSuggestions(IEnumerable<string> suggestions) {
@@ -82,12 +82,13 @@ namespace Bud.Cli {
     }
 
     private IEnumerable<string> GetSuggestions(string partialCommand) {
-      partialCommand = KeyPathUtils.PrependKeySeparator(partialCommand);
-      IEnumerable<IKey> configs = Context.ConfigDefinitions.Keys;
-      IEnumerable<IKey> tasks = Context.TaskDefinitions.Keys;
+      var absoluteKey = KeyPathUtils.PrependKeySeparator(partialCommand);
+      IEnumerable<string> configs = Context.ConfigDefinitions.Keys.Select(key => key.Path);
+      IEnumerable<string> tasks = Context.TaskDefinitions.Keys.Select(key => key.Path);
+      IEnumerable<string> macroNames = Context.Evaluate(Macro.Macros).Values.Select(macro => Macro.MacroNamePrefix + macro.Name);
       return configs.Concat(tasks)
-                    .Select(key => key.Path)
-                    .Where(key => key.StartsWith(partialCommand))
+                    .Concat(macroNames)
+                    .Where(suggestion => suggestion.StartsWith(partialCommand) || suggestion.StartsWith(absoluteKey))
                     .OrderBy(key => key);
     }
 
