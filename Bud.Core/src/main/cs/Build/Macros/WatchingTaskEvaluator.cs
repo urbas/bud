@@ -14,6 +14,9 @@ namespace Bud.Build.Macros {
     private bool HasFolderChanged;
 
     public WatchingTaskEvaluator(IEnumerable<string> watchedDirs, IEnumerable<string> watchedTasks) {
+      if (!watchedTasks.Any()) {
+        throw new ArgumentException("No tasks to watch.");
+      }
       WatchedDirs = watchedDirs;
       WatchedTasks = watchedTasks.ToArray();
     }

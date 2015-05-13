@@ -2,12 +2,12 @@
 
 namespace Bud.Cli {
   public class KeyCommand : Command {
-    public string Key { get; }
+    public override string Name { get; }
 
-    public KeyCommand(string key) {
-      Key = key;
+    public KeyCommand(string name) {
+      Name = name;
     }
 
-    public override string EvaluateToJson(IBuildCommander buildCommander) => buildCommander.EvaluateToJson(Key);
+    public override string EvaluateToJson(IBuildCommander buildCommander) => buildCommander.EvaluateToJson(Name);
   }
 }

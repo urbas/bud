@@ -88,13 +88,13 @@ namespace Bud.Cli {
       if (expectedCommand is MacroCommand) {
         AssertCommandsAreEqual((MacroCommand) expectedCommand, (MacroCommand) actualCommand);
       } else {
-        Assert.AreEqual(((KeyCommand) expectedCommand).Key, ((KeyCommand) actualCommand).Key);
+        Assert.AreEqual(((KeyCommand) expectedCommand).Name, ((KeyCommand) actualCommand).Name);
       }
       return true;
     }
 
     private static void AssertCommandsAreEqual(MacroCommand expectedCommand, MacroCommand actualCommand) {
-      Assert.AreEqual(expectedCommand.MacroName, actualCommand.MacroName);
+      Assert.AreEqual(expectedCommand.Name, actualCommand.Name);
       Assert.AreEqual(expectedCommand.Parameters, actualCommand.Parameters);
     }
   }

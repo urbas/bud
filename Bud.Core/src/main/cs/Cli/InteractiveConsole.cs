@@ -5,7 +5,7 @@ using Bud.Commander;
 using Bud.Util;
 
 namespace Bud.Cli {
-  public class InteractiveConsole {
+  public class InteractiveConsole : IBuildCommander {
     private BuildContext Context;
     private LineEditor LineEditor;
 
@@ -22,6 +22,12 @@ namespace Bud.Cli {
       while (ActOnUserInput()) {}
     }
 
+    public void Dispose() {}
+
+    public string EvaluateToJson(string command) => CommandEvaluator.EvaluateToJsonSync(command, ref Context);
+
+    public string EvaluateMacroToJson(string macroName, params string[] commandLineParameters) => CommandEvaluator.EvaluateMacroToJsonSync(macroName, commandLineParameters, ref Context);
+
     private bool ActOnUserInput() {
       var consoleKeyInfo = Console.ReadKey(true);
       if (IsExitKeyCombination(consoleKeyInfo)) {
@@ -29,7 +35,7 @@ namespace Bud.Cli {
       }
       switch (consoleKeyInfo.Key) {
         case ConsoleKey.Enter:
-          EvaluateLine();
+          EvaluateCommands();
           break;
         case ConsoleKey.Tab:
           SuggestCompletions();
@@ -42,11 +48,18 @@ namespace Bud.Cli {
       return true;
     }
 
-    private void EvaluateLine() {
+    private void EvaluateCommands() {
+      var commands = CommandListParser.ToCommandList(new[] {LineEditor.Line});
+      foreach (var command in commands) {
+        EvaluateCommand(command);
+      }
+    }
+
+    private void EvaluateCommand(Command command) {
       Console.WriteLine();
-      var evaluationResult = EvaluateInputToJson();
+      var evaluationResult = EvaluateInputToJson(command);
       if (evaluationResult != null) {
-        Console.WriteLine(LineEditor.Line + " = " + evaluationResult);
+        Console.WriteLine(command.Name + " = " + evaluationResult);
       }
       StartNewInputLine();
     }
@@ -92,9 +105,9 @@ namespace Bud.Cli {
                     .OrderBy(key => key);
     }
 
-    private string EvaluateInputToJson() {
+    private string EvaluateInputToJson(Command command) {
       try {
-        var evaluationResult = CommandEvaluator.EvaluateToJsonSync(LineEditor.Line, ref Context);
+        var evaluationResult = command.EvaluateToJson(this);
         return "null".Equals(evaluationResult) ? null : evaluationResult;
       } catch (Exception e) {
         ExceptionUtils.PrintItemizedErrorMessages(e, true);
