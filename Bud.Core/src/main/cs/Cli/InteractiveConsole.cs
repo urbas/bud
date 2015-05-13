@@ -49,7 +49,7 @@ namespace Bud.Cli {
     }
 
     private void EvaluateCommands() {
-      var commands = CommandListParser.ToCommandList(new[] {LineEditor.Line});
+      var commands = CommandListParser.ParseCommandLine(LineEditor.Line);
       foreach (var command in commands) {
         EvaluateCommand(command);
       }
