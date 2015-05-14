@@ -28,7 +28,7 @@ namespace Bud {
                                   Macros.Modify(macros => macros.SetItem(Name, this)));
     }
 
-    public static Macro Valued<T>(string name, Func<BuildContext, string[], T> function, string description = "") {
+    public static Macro Valued<T>(string name, Func<IBuildContext, string[], T> function, string description = "") {
       return new Macro(name, (context, arguments) => new MacroResult(function(context, arguments), context), description);
     }
   }

@@ -2,8 +2,6 @@ using System;
 
 namespace Bud.Cli {
   public class ConsoleBuffer : IConsoleBuffer {
-    public void Write(char character) => Console.Write(character);
-
     public int CursorLeft {
       get { return Console.CursorLeft; }
       set { Console.CursorLeft = value; }
@@ -18,8 +16,29 @@ namespace Bud.Cli {
 
     public int BufferHeight => Console.BufferHeight;
 
-    public void MoveArea(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight, int targetLeft, int targetTop) {
+    public IConsoleBuffer MoveArea(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight, int targetLeft, int targetTop) {
       Console.MoveBufferArea(sourceLeft, sourceTop, sourceWidth, sourceHeight, targetLeft, targetTop);
+      return this;
+    }
+
+    public IConsoleBuffer Write(char character) {
+      Console.Write(character);
+      return this;
+    }
+
+    public IConsoleBuffer WriteLine(string str) {
+      Console.WriteLine(str);
+      return this;
+    }
+
+    public IConsoleBuffer Write(string str) {
+      Console.Write(str);
+      return this;
+    }
+
+    public IConsoleBuffer WriteLine() {
+      Console.WriteLine();
+      return this;
     }
   }
 }

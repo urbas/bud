@@ -312,6 +312,28 @@ namespace Bud.Cli {
       Assert.AreEqual(3, ConsoleBuffer.CursorLeft);
     }
 
+    [Test]
+    public void Setting_the_line_MUST_be_reflected_in_the_getter() {
+      LineEditor.InsertText("foo");
+      LineEditor.Line = "sparta";
+      Assert.AreEqual("sparta", LineEditor.Line);
+    }
+
+    [Test]
+    public void Setting_the_line_MUST_update_the_cursor_position() {
+      LineEditor.InsertText("foo");
+      LineEditor.Line = "sparta";
+      Assert.AreEqual(6, LineEditor.CursorPosition);
+    }
+
+    [Test]
+    public void Setting_the_line_MUST_add_it_into_the_buffer() {
+      LineEditor.InsertText("sparta");
+      LineEditor.Line = "foo";
+      Assert.AreEqual(ToBuffer("foo"), ConsoleBuffer.CharBuffer);
+      Assert.AreEqual(3, ConsoleBuffer.CursorLeft);
+    }
+
     private void SetCursorPosition(int cursorLeft, int cursorTop) {
       ConsoleBuffer.CursorLeft = cursorLeft;
       ConsoleBuffer.CursorTop = cursorTop;
@@ -340,12 +362,8 @@ namespace Bud.Cli {
 
     private void Input(string str) {
       foreach (var chr in str) {
-        Input(new ConsoleKeyInfo(chr, ToConsoleKey(chr), false, false, false), 1);
+        Input(ConsoleTestUtils.ToConsoleKeyInfo(chr), 1);
       }
-    }
-
-    private static ConsoleKey ToConsoleKey(char chr) {
-      return chr == '.' ? ConsoleKey.OemPeriod : (ConsoleKey) char.ToUpperInvariant(chr);
     }
 
     private void VerifyConsoleBufferHasInitialState() {

@@ -63,5 +63,13 @@ namespace Bud.Cli {
         Array.Copy(commandLineArgs, indexOfSeparator, commands, 0, commands.Length);
       }
     }
+
+    public static IEnumerable<Command> ParseCommandLine(string commandLine) {
+      if (string.IsNullOrEmpty(commandLine)) {
+        return ImmutableList<Command>.Empty;
+      }
+      var commandStrings = commandLine.Split(new[] {" "}, StringSplitOptions.RemoveEmptyEntries);
+      return ToCommandList(commandStrings);
+    }
   }
 }

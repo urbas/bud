@@ -3,7 +3,8 @@ using Bud.Logging;
 
 namespace Bud.Commander {
   public class DefaultBuildCommander : IBuildCommander {
-    private BuildContext BuildContext;
+    private IBuildContext BuildContext;
+    private ICommandEvaluator CommandEvaluator = new CommandEvaluator();
 
     public DefaultBuildCommander(string dirOfProjectToBeBuilt, bool isQuiet)
       : this(CreateDefaultSettings(dirOfProjectToBeBuilt), isQuiet) {}
@@ -13,9 +14,11 @@ namespace Bud.Commander {
       BuildContext = new BuildContext(settings, logger);
     }
 
-    public string EvaluateToJson(string command) => CommandEvaluator.EvaluateToJsonSync(command, ref BuildContext);
+    public string EvaluateToJson(string command)
+      => CommandEvaluator.EvaluateToJsonSync(command, ref BuildContext);
 
-    public string EvaluateMacroToJson(string macroName, params string[] commandLineParameters) => CommandEvaluator.EvaluateMacroToJsonSync(macroName, commandLineParameters, ref BuildContext);
+    public string EvaluateMacroToJson(string macroName, params string[] commandLineParameters)
+      => CommandEvaluator.EvaluateMacroToJsonSync(macroName, commandLineParameters, ref BuildContext);
 
     public void Dispose() {}
 

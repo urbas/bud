@@ -12,7 +12,7 @@ public class Build : IBuild {
                         Macro.Valued("valueReturningMacro", ValueReturningMacro));
   }
 
-  private static MacroResult MostGeneralDefinitionMacro(BuildContext buildContext, string[] commandLineArguments) {
+  private static MacroResult MostGeneralDefinitionMacro(IBuildContext buildContext, string[] commandLineArguments) {
     var newSettings = buildContext.Settings.AddGlobally(IntroducedConfig.Init(commandLineArguments[0]));
     return new MacroResult("Hello, BuildContext and MacroResult World!",
                            buildContext.WithSettings(newSettings));
@@ -22,7 +22,7 @@ public class Build : IBuild {
     return settings.AddGlobally(IntroducedConfig2.Init("Foo bar value."));
   }
 
-  private static string ValueReturningMacro(BuildContext buildContext, string[] commandLineArguments) {
+  private static string ValueReturningMacro(IBuildContext buildContext, string[] commandLineArguments) {
     return "Hello, BuildContext Macro World!";
   }
 }

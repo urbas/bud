@@ -9,7 +9,8 @@ using Bud.Util;
 namespace Bud.Commander {
   public class AssemblyBuildCommander : MarshalByRefObject, IBuildCommander {
     public const string BuildDefinitionClassName = "Build";
-    private BuildContext BuildContext;
+    private IBuildContext BuildContext;
+    private ICommandEvaluator CommandEvaluator = new CommandEvaluator();
 
     public void LoadBuildDefinition(string buildDefinitionAssemblyFile,
                                     string[] dependencyDlls,
@@ -23,9 +24,11 @@ namespace Bud.Commander {
       BuildContext = CreateBuildContext(buildDefinitionAssemblyFile, baseDirectory, buildLevel, outputTextWriter, errorTextWriter);
     }
 
-    public string EvaluateToJson(string command) => CommandEvaluator.EvaluateToJsonSync(command, ref BuildContext);
+    public string EvaluateToJson(string command)
+      => CommandEvaluator.EvaluateToJsonSync(command, ref BuildContext);
 
-    public string EvaluateMacroToJson(string macroName, params string[] commandLineParameters) => CommandEvaluator.EvaluateMacroToJsonSync(macroName, commandLineParameters, ref BuildContext);
+    public string EvaluateMacroToJson(string macroName, params string[] commandLineParameters)
+      => CommandEvaluator.EvaluateMacroToJsonSync(macroName, commandLineParameters, ref BuildContext);
 
     public void Dispose() {}
 

@@ -14,7 +14,16 @@ namespace Bud.Cli {
       LastKnownBufferWidth = consoleBuffer.BufferWidth;
     }
 
-    public string Line => LineBuffer.ToString();
+    public string Line {
+      get { return LineBuffer.ToString(); }
+      set {
+        ClearBuffer(value.Length);
+        LineBuffer.Length = 0;
+        LineBuffer.Append(value);
+        CursorPosition = value.Length;
+        RefillBuffer();
+      }
+    }
 
     public int LineLength => LineBuffer.Length;
 
@@ -136,6 +145,14 @@ namespace Bud.Cli {
       ResetBufferCursor(0);
       for (int charIndex = 0; charIndex < LineLength; charIndex++) {
         ConsoleBuffer.Write(LineBuffer[charIndex]);
+      }
+      ResetBufferCursor(CursorPosition);
+    }
+
+    private void ClearBuffer(int startIndex) {
+      ResetBufferCursor(startIndex);
+      for (int charIndex = startIndex; charIndex < LineLength; charIndex++) {
+        ConsoleBuffer.Write('\0');
       }
       ResetBufferCursor(CursorPosition);
     }

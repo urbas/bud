@@ -9,6 +9,8 @@ namespace Bud {
     public readonly Key Scope;
     public readonly ImmutableList<ConfigModifier> ConfigModifiers;
     public readonly ImmutableList<TaskModifier> TaskModifiers;
+    private ImmutableDictionary<ConfigKey, IConfigDefinition> CachedConfigDefinitions;
+    private ImmutableDictionary<TaskKey, ITaskDefinition> CachedTaskDefinitions;
 
     private Settings() : this(Key.Root) {}
 
@@ -36,9 +38,11 @@ namespace Bud {
 
     public Settings Add(Settings settings) => new Settings(ConfigModifiers.AddRange(settings.ConfigModifiers), TaskModifiers.AddRange(settings.TaskModifiers), Scope);
 
-    public ImmutableDictionary<ConfigKey, IConfigDefinition> ConfigDefinitions => ConfigModifiers.CompileToImmutableDictionary();
+    public ImmutableDictionary<ConfigKey, IConfigDefinition> ConfigDefinitions
+      => CachedConfigDefinitions ?? (CachedConfigDefinitions = ConfigModifiers.CompileToImmutableDictionary());
 
-    public ImmutableDictionary<TaskKey, ITaskDefinition> TaskDefinitions => TaskModifiers.CompileToImmutableDictionary();
+    public ImmutableDictionary<TaskKey, ITaskDefinition> TaskDefinitions
+      => CachedTaskDefinitions ?? (CachedTaskDefinitions = TaskModifiers.CompileToImmutableDictionary());
 
     private Settings In(Key newScope) {
       if (newScope.IsAbsolute) {
