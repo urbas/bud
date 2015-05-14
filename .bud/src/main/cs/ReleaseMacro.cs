@@ -24,23 +24,23 @@ public static class ReleaseMacro {
   private static void PerformRelease(IBuildContext context, SemanticVersion releaseVersion, SemanticVersion nextDevelopmentVersion) {
     Versioning.SetVersion(context, releaseVersion);
     GitTasks.GitTagRelease(releaseVersion);
-    Publish(context.Config, releaseVersion).Wait();
+    Publish(context.Context, releaseVersion).Wait();
     Versioning.SetVersion(context, nextDevelopmentVersion);
     GitTasks.GitCommitNextDevelopmentVersion(nextDevelopmentVersion);
   }
 
-  private static async Task Publish(IConfig context, SemanticVersion version) {
+  private static async Task Publish(IContext context, SemanticVersion version) {
     await BuildBudDistFiles(context);
     await PublishNuGetPackages(context);
     ChocolateyPackaging.PublishToChocolatey(context, version);
     UbuntuPackaging.CreateUbuntuPackage(context, version);
   }
 
-  private static async Task PublishNuGetPackages(IConfig context) {
+  private static async Task PublishNuGetPackages(IContext context) {
     await context.Evaluate("publish");
   }
 
-  private static async Task BuildBudDistFiles(IConfig context) {
+  private static async Task BuildBudDistFiles(IContext context) {
     await context.Evaluate("clean");
     await context.Evaluate("project/bud/main/cs/dist");
   }

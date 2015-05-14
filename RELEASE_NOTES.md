@@ -1,4 +1,4 @@
-## Upcoming release
+## 0.4.0
 
 - __CLI__ (new feature): Bud can now run in interactive mode. The interactive mode supports some rudamentary tab-completion and a simple history of commands.
 
