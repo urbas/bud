@@ -11,7 +11,7 @@ using CommandLine;
 using NuGet;
 
 public static class ReleaseMacro {
-  public static MacroResult PerformRelease(BuildContext context, string[] commandLineArgs) {
+  public static MacroResult PerformRelease(IBuildContext context, string[] commandLineArgs) {
     var cliArguments = new PerformReleaseArguments();
     if (Parser.Default.ParseArguments(commandLineArgs, cliArguments)) {
       var releaseVersion = SemanticVersion.Parse(cliArguments.Version);
@@ -21,10 +21,10 @@ public static class ReleaseMacro {
     return new MacroResult(context.Config.Evaluate(Key.Root / ProjectKeys.Version), context);
   }
 
-  private static void PerformRelease(BuildContext context, SemanticVersion releaseVersion, SemanticVersion nextDevelopmentVersion) {
+  private static void PerformRelease(IBuildContext context, SemanticVersion releaseVersion, SemanticVersion nextDevelopmentVersion) {
     Versioning.SetVersion(context, releaseVersion);
     GitTasks.GitTagRelease(releaseVersion);
-    Publish(context, releaseVersion).Wait();
+    Publish(context.Config, releaseVersion).Wait();
     Versioning.SetVersion(context, nextDevelopmentVersion);
     GitTasks.GitCommitNextDevelopmentVersion(nextDevelopmentVersion);
   }

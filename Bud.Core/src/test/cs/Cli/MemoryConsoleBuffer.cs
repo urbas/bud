@@ -18,7 +18,7 @@ namespace Bud.Cli {
     public MemoryConsoleBuffer(int bufferWidth, int bufferHeight, params string[] contentRows)
       : this(bufferWidth, bufferHeight, ConsoleBufferTestUtils.ToCharBuffer(bufferWidth, bufferHeight, contentRows)) {}
 
-    public void Write(char character) {
+    public IConsoleBuffer Write(char character) {
       CharBuffer[CursorLeft + CursorTop * BufferWidth] = character;
       if (CursorLeft >= BufferWidth - 1) {
         ++CursorTop;
@@ -26,9 +26,27 @@ namespace Bud.Cli {
       } else {
         ++CursorLeft;
       }
+      return this;
     }
 
-    public char[] CharBuffer { get; private set; }
+    public IConsoleBuffer WriteLine(string str) {
+      Write(str);
+      ++CursorTop;
+      CursorLeft = 0;
+      return this;
+    }
+
+    public IConsoleBuffer Write(string str) {
+      foreach (char chr in str) {
+        Write(chr);
+      }
+      return this;
+    }
+
+    public IConsoleBuffer WriteLine() {
+      WriteLine(string.Empty);
+      return this;
+    }
 
     public int BufferWidth {
       get { return bufferWidth; }
@@ -61,6 +79,20 @@ namespace Bud.Cli {
       }
     }
 
+    public IConsoleBuffer MoveArea(int sourceLeft,
+                                   int sourceTop,
+                                   int sourceWidth,
+                                   int sourceHeight,
+                                   int targetLeft,
+                                   int targetTop) {
+      var tempBuffer = CopyToNewArray(sourceLeft, sourceTop, sourceWidth, sourceHeight);
+      ZeroFill(sourceLeft, sourceTop, sourceWidth, sourceHeight);
+      CopyFrom(tempBuffer, sourceWidth, sourceHeight, targetLeft, targetTop);
+      return this;
+    }
+
+    public char[] CharBuffer { get; private set; }
+
     public char this[int column, int row] {
       get {
         AssertWidthIsInRange(column);
@@ -72,17 +104,6 @@ namespace Bud.Cli {
         AssertHeightIsInRange(row);
         CharBuffer[column + BufferWidth * row] = value;
       }
-    }
-
-    public void MoveArea(int sourceLeft,
-                         int sourceTop,
-                         int sourceWidth,
-                         int sourceHeight,
-                         int targetLeft,
-                         int targetTop) {
-      var tempBuffer = CopyToNewArray(sourceLeft, sourceTop, sourceWidth, sourceHeight);
-      ZeroFill(sourceLeft, sourceTop, sourceWidth, sourceHeight);
-      CopyFrom(tempBuffer, sourceWidth, sourceHeight, targetLeft, targetTop);
     }
 
     private char[] CopyToNewArray(int sourceLeft, int sourceTop, int sourceWidth, int sourceHeight) {

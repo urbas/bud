@@ -121,10 +121,10 @@ internal static class UbuntuPackaging {
     return string.Format("bud_{0}_i386.deb", version);
   }
 
-  public static MacroResult CreateUbuntuPackageMacro(BuildContext context, string[] cmdArgs) {
+  public static MacroResult CreateUbuntuPackageMacro(IBuildContext context, string[] cmdArgs) {
     var cliArguments = new PerformReleaseArguments();
     if (Parser.Default.ParseArguments(cmdArgs, cliArguments)) {
-      return new MacroResult(CreateUbuntuPackage(context, SemanticVersion.Parse(cliArguments.Version)), context);
+      return new MacroResult(CreateUbuntuPackage(context.Config, SemanticVersion.Parse(cliArguments.Version)), context);
     }
     return new MacroResult(null, context);
   }

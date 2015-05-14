@@ -6,67 +6,86 @@ using Bud.Util;
 
 namespace Bud.Cli {
   public class InteractiveConsole : IBuildCommander {
-    private BuildContext Context;
-    private LineEditor LineEditor;
+    private IBuildContext Context;
+    private readonly IConsoleInput ConsoleInput;
+    private readonly IConsoleBuffer ConsoleBuffer;
+    private readonly ICommandEvaluator CommandEvaluator;
+    private readonly ConsoleHistory ConsoleHistory = new ConsoleHistory();
+    public LineEditor Editor { get; private set; }
 
-    public InteractiveConsole(BuildContext context) {
+    public InteractiveConsole(IBuildContext context, IConsoleInput consoleInput, IConsoleBuffer consoleBuffer, ICommandEvaluator commandEvaluator) {
       Context = context;
+      ConsoleInput = consoleInput;
+      ConsoleBuffer = consoleBuffer;
+      CommandEvaluator = commandEvaluator;
     }
 
     public void DisplayInstructions() {
-      Console.WriteLine(string.Format("Press '{0} + {1}' to quit the interactive console.", ConsoleModifiers.Control, ConsoleKey.Q));
+      ConsoleBuffer.WriteLine(string.Format("Press '{0} + {1}' to quit the interactive console.", ConsoleModifiers.Control, ConsoleKey.Q));
     }
 
     public void Serve() {
       StartNewInputLine();
+      ConsoleHistory.AddHistoryEntry();
       while (ActOnUserInput()) {}
     }
 
     public void Dispose() {}
 
-    public string EvaluateToJson(string command) => CommandEvaluator.EvaluateToJsonSync(command, ref Context);
+    public string EvaluateToJson(string command)
+      => CommandEvaluator.EvaluateToJsonSync(command, ref Context);
 
-    public string EvaluateMacroToJson(string macroName, params string[] commandLineParameters) => CommandEvaluator.EvaluateMacroToJsonSync(macroName, commandLineParameters, ref Context);
+    public string EvaluateMacroToJson(string macroName, params string[] commandLineParameters)
+      => CommandEvaluator.EvaluateMacroToJsonSync(macroName, commandLineParameters, ref Context);
 
     private bool ActOnUserInput() {
-      var consoleKeyInfo = Console.ReadKey(true);
+      var consoleKeyInfo = ConsoleInput.ReadKey();
       if (IsExitKeyCombination(consoleKeyInfo)) {
         return false;
       }
       switch (consoleKeyInfo.Key) {
         case ConsoleKey.Enter:
+          ConsoleHistory.AddHistoryEntry();
           EvaluateCommands();
           break;
         case ConsoleKey.Tab:
           SuggestCompletions();
+          ConsoleHistory.RecordHistoryEntry(Editor);
+          break;
+        case ConsoleKey.UpArrow:
+          ConsoleHistory.ShowPreviousHistoryEntry(Editor);
+          ConsoleHistory.RecordHistoryEntry(Editor);
+          break;
+        case ConsoleKey.DownArrow:
+          ConsoleHistory.ShowNextHistoryEntry(Editor);
           break;
         default:
-          LineEditor.ProcessInput(consoleKeyInfo);
+          Editor.ProcessInput(consoleKeyInfo);
+          ConsoleHistory.RecordHistoryEntry(Editor);
           break;
       }
-
       return true;
     }
 
     private void EvaluateCommands() {
-      var commands = CommandListParser.ParseCommandLine(LineEditor.Line);
+      var commands = CommandListParser.ParseCommandLine(Editor.Line);
       foreach (var command in commands) {
         EvaluateCommand(command);
-      }
-    }
-
-    private void EvaluateCommand(Command command) {
-      Console.WriteLine();
-      var evaluationResult = EvaluateInputToJson(command);
-      if (evaluationResult != null) {
-        Console.WriteLine(command.Name + " = " + evaluationResult);
       }
       StartNewInputLine();
     }
 
+    private void EvaluateCommand(Command command) {
+      ConsoleBuffer.WriteLine();
+      var evaluationResult = EvaluateInputToJson(command);
+      if (evaluationResult != null) {
+        ConsoleBuffer.WriteLine(command.Name + " = " + evaluationResult);
+      }
+    }
+
     private void SuggestCompletions() {
-      Console.WriteLine();
-      var partialCommand = LineEditor.Line.Substring(0, LineEditor.CursorPosition);
+      ConsoleBuffer.WriteLine();
+      var partialCommand = Editor.Line.Substring(0, Editor.CursorPosition);
       var suggestions = GetSuggestions(partialCommand);
       PrintSuggestions(suggestions);
       RedrawInputLine();
@@ -75,8 +94,8 @@ namespace Bud.Cli {
 
     private void ApplyCompletion(IEnumerable<string> suggestions, string partialCommand) {
       var completionString = GetCompletionString(suggestions, partialCommand);
-      if (LineEditor.LineLength < completionString.Length) {
-        LineEditor.InsertText(completionString.Substring(LineEditor.Line.Length));
+      if (Editor.LineLength < completionString.Length) {
+        Editor.InsertText(completionString.Substring(Editor.Line.Length));
       }
     }
 
@@ -96,9 +115,9 @@ namespace Bud.Cli {
 
     private IEnumerable<string> GetSuggestions(string partialCommand) {
       var absoluteKey = KeyPathUtils.PrependKeySeparator(partialCommand);
-      IEnumerable<string> configs = Context.ConfigDefinitions.Keys.Select(key => key.Path);
-      IEnumerable<string> tasks = Context.TaskDefinitions.Keys.Select(key => key.Path);
-      IEnumerable<string> macroNames = Context.Evaluate(Macro.Macros).Values.Select(macro => Macro.MacroNamePrefix + macro.Name);
+      IEnumerable<string> configs = Context.Settings.ConfigDefinitions.Keys.Select(key => key.Path);
+      IEnumerable<string> tasks = Context.Settings.TaskDefinitions.Keys.Select(key => key.Path);
+      IEnumerable<string> macroNames = Context.Config.Evaluate(Macro.Macros).Values.Select(macro => Macro.MacroNamePrefix + macro.Name);
       return configs.Concat(tasks)
                     .Concat(macroNames)
                     .Where(suggestion => suggestion.StartsWith(partialCommand) || suggestion.StartsWith(absoluteKey))
@@ -117,15 +136,15 @@ namespace Bud.Cli {
 
     private void StartNewInputLine() {
       PrintPrompt();
-      LineEditor = new LineEditor(new ConsoleBuffer());
+      Editor = new LineEditor(ConsoleBuffer);
     }
 
     private void RedrawInputLine() {
       PrintPrompt();
-      LineEditor.ResetOrigin();
+      Editor.ResetOrigin();
     }
 
-    private static void PrintPrompt() => Console.Write("bud> ");
+    private void PrintPrompt() => ConsoleBuffer.Write("bud> ");
 
     private static bool IsExitKeyCombination(ConsoleKeyInfo consoleKeyInfo)
       => consoleKeyInfo.Key == ConsoleKey.Q &&

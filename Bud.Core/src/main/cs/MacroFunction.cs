@@ -1,3 +1,3 @@
 namespace Bud {
-  public delegate MacroResult MacroFunction(BuildContext context, string[] commandLineArguments);
+  public delegate MacroResult MacroFunction(IBuildContext context, string[] commandLineArguments);
 }

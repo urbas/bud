@@ -1,6 +1,10 @@
 ## Upcoming release
 
+- __CLI__ (new feature): Bud can now run in interactive mode. The interactive mode supports some rudamentary tab-completion and a simple history of commands.
+
 - __CLI__ (breaking change): Bud will now run in interactive mode by default.
+
+- __API__ (breaking change): Macro functions now take `IBuildContext` as the first parameter (instead of `BuildContext`). Also, the build context interface has been stripped down.
 
 ## 0.3.0
 

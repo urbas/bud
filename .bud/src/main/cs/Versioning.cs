@@ -6,14 +6,14 @@ using Bud;
 using Bud.Build;
 using NuGet;
 
-static internal class Versioning {
-  public static void SetVersion(BuildContext buildContext, SemanticVersion releaseVersion) {
+internal static class Versioning {
+  public static void SetVersion(IBuildContext buildContext, SemanticVersion releaseVersion) {
     File.WriteAllText(Build.GetVersionFile(buildContext.Config), releaseVersion.ToString());
     UpdateAssemblyInfoVersion(buildContext, Build.BudCoreProjectId, releaseVersion);
     UpdateAssemblyInfoVersion(buildContext, Build.BudProjectId, releaseVersion);
     UpdateNuspecVersion(buildContext, releaseVersion);
     UpdateDistZipUrl(buildContext, releaseVersion);
-    buildContext.ReloadConfig();
+    buildContext.Reset();
   }
 
   public static SemanticVersion GetNextDevelopmentVersion(PerformReleaseArguments cliArguments, SemanticVersion releaseVersion) {
@@ -28,31 +28,39 @@ static internal class Versioning {
                                "dev");
   }
 
-  public static void UpdateAssemblyInfoVersion(BuildContext buildContext, string projectId, SemanticVersion version) {
+  public static void UpdateAssemblyInfoVersion(IBuildContext buildContext, string projectId, SemanticVersion version) {
     var versionMatcher = new Regex(@"(?<prefix>AssemblyVersion\s*\("").*?(?<suffix>""\))");
     var versionReplacement = string.Format("${{prefix}}{0}.{1}.{2}${{suffix}}", version.Version.Major, version.Version.Minor, version.Version.Build);
     var productMatcher = new Regex(@"(?<prefix>AssemblyProduct\s*\("").*?(?<suffix>""\))");
     var productReplacement = string.Format("${{prefix}}{0} v{1}${{suffix}}", projectId, version);
-    ReplaceLinesInFile(GetAssemblyInfoFile(buildContext, projectId), line => productMatcher.Replace(versionMatcher.Replace(line, versionReplacement), productReplacement));
+    var assemblyInfoFile = GetAssemblyInfoFile(buildContext, projectId);
+    ReplaceLinesInFile(assemblyInfoFile,
+                       line => productMatcher.Replace(versionMatcher.Replace(line, versionReplacement), productReplacement));
   }
 
-  public static void UpdateDistZipUrl(BuildContext buildContext, SemanticVersion version) {
+  public static void UpdateDistZipUrl(IBuildContext buildContext, SemanticVersion version) {
     var versionMatcher = new Regex(@"bud-.+?\.zip");
     var versionReplacement = string.Format("bud-{0}.zip", version);
-    ReplaceLinesInFile(Path.Combine(ChocolateyPackaging.GetChocolateySpecDir(buildContext), "tools", "chocolateyInstall.ps1"), line => versionMatcher.Replace(line, versionReplacement));
+    var chocolateySpecDir = ChocolateyPackaging.GetChocolateySpecDir(buildContext.Config);
+    var installationScriptTemplate = Path.Combine(chocolateySpecDir, "tools", "chocolateyInstall.ps1");
+    ReplaceLinesInFile(installationScriptTemplate,
+                       line => versionMatcher.Replace(line, versionReplacement));
   }
 
-  public static void UpdateNuspecVersion(BuildContext buildContext, SemanticVersion version) {
+  public static void UpdateNuspecVersion(IBuildContext buildContext, SemanticVersion version) {
     var versionMatcher = new Regex(@"<version>.+?</version>");
     var versionReplacement = string.Format("<version>{0}</version>", version);
-    ReplaceLinesInFile(Path.Combine(ChocolateyPackaging.GetChocolateySpecDir(buildContext), "bud.nuspec"), line => versionMatcher.Replace(line, versionReplacement));
+    var chocolateySpecDir = ChocolateyPackaging.GetChocolateySpecDir(buildContext.Config);
+    var budNuspecTemplate = Path.Combine(chocolateySpecDir, "bud.nuspec");
+    ReplaceLinesInFile(budNuspecTemplate,
+                       line => versionMatcher.Replace(line, versionReplacement));
   }
 
   public static void ReplaceLinesInFile(string file, Func<string, string> lineReplacer) {
     File.WriteAllLines(file, File.ReadAllLines(file).Select(lineReplacer).ToArray());
   }
 
-  public static string GetAssemblyInfoFile(BuildContext buildContext, string projectId) {
+  public static string GetAssemblyInfoFile(IBuildContext buildContext, string projectId) {
     var mainSourcesDir = buildContext.Config.GetBaseDir(Key.Parse(string.Format("/project/{0}/main/cs", projectId)));
     return Path.Combine(mainSourcesDir, "Properties", "AssemblyInfo.cs");
   }
