@@ -6,7 +6,7 @@ __Release__:
 
 1. Edit release notes.
 
-1. Invoke the following: 
+1. Close Visual Studio and anything that could be locking the files and invoke the following: 
 
     ```
     bud @performRelease -v x.y.z
