@@ -11,7 +11,7 @@ namespace Bud.Build.Macros {
     private const int WatchReactPeriodMillis = 300;
     private readonly IEnumerable<string> WatchedDirs;
     private readonly IEnumerable<string> WatchedTasks;
-    private bool HasFolderChanged;
+    private bool HasFolderChanged = true;
 
     public WatchingTaskEvaluator(IEnumerable<string> watchedDirs, IEnumerable<string> watchedTasks) {
       if (!watchedTasks.Any()) {
@@ -21,7 +21,7 @@ namespace Bud.Build.Macros {
       WatchedTasks = watchedTasks.ToArray();
     }
 
-    public void StartWatching(IContext context) {
+    public void StartWatching(IBuildContext context) {
       InitializeFileWatchers();
       SpinWatch(context);
     }
@@ -39,11 +39,13 @@ namespace Bud.Build.Macros {
       }
     }
 
-    private void SpinWatch(IContext context) {
+
+    private void SpinWatch(IBuildContext buildContext) {
       while (true) {
         if (HasFolderChanged) {
           HasFolderChanged = false;
           try {
+            var context = buildContext.Context;
             Task.WaitAll(WatchedTasks.Select(context.Evaluate).ToArray());
           } catch (Exception e) {
             ExceptionUtils.PrintItemizedErrorMessages(e, false);

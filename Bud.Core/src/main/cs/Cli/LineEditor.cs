@@ -21,7 +21,7 @@ namespace Bud.Cli {
         LineBuffer.Length = 0;
         LineBuffer.Append(value);
         CursorPosition = value.Length;
-        RefillBuffer();
+        RefillBuffer(0);
       }
     }
 
@@ -63,13 +63,14 @@ namespace Bud.Cli {
     public void ResetOrigin() {
       CursorStartLeft = ConsoleBuffer.CursorLeft;
       CursorStartTop = ConsoleBuffer.CursorTop;
-      RefillBuffer();
+      RefillBuffer(0);
     }
 
     public void InsertText(string text) {
-      LineBuffer.Insert(CursorPosition, text);
+      var insertionIndex = CursorPosition;
       CursorPosition += text.Length;
-      RefillBuffer();
+      LineBuffer.Insert(insertionIndex, text);
+      RefillBuffer(insertionIndex);
     }
 
     private void InsertCharacterAtCursor(char character) {
@@ -136,14 +137,14 @@ namespace Bud.Cli {
         if (CursorStartLeft >= ConsoleBuffer.BufferWidth - 1) {
           CursorStartLeft = 0;
         }
-        RefillBuffer();
+        RefillBuffer(0);
         LastKnownBufferWidth = ConsoleBuffer.BufferWidth;
       }
     }
 
-    private void RefillBuffer() {
-      ResetBufferCursor(0);
-      for (int charIndex = 0; charIndex < LineLength; charIndex++) {
+    private void RefillBuffer(int startIndex) {
+      ResetBufferCursor(startIndex);
+      for (int charIndex = startIndex; charIndex < LineLength; charIndex++) {
         ConsoleBuffer.Write(LineBuffer[charIndex]);
       }
       ResetBufferCursor(CursorPosition);

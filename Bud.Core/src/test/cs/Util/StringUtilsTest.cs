@@ -1,6 +1,6 @@
-﻿using System;
+﻿using static Bud.Util.StringUtils;
+using System;
 using System.IO;
-using Bud.Util.StringUtils;
 using NUnit.Framework;
 
 namespace Bud.Util {

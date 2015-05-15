@@ -10,7 +10,7 @@ namespace Bud.Build.Macros {
       if (Parser.Default.ParseArguments(commandLineArgs, cliArguments)) {
         var watchedDirs = context.Config.GetAllBuildTargets().Select(context.Config.GetBaseDir);
         var watchingTaskEvaluator = new WatchingTaskEvaluator(watchedDirs, cliArguments.WatchedTasks);
-        watchingTaskEvaluator.StartWatching(context.Context);
+        watchingTaskEvaluator.StartWatching(context);
       }
       return new MacroResult(null, context);
     }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO.Path;
+using static System.IO.Path;
 using System.Linq;
 using System.Threading.Tasks;
 using Bud.Build;

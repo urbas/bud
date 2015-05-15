@@ -1,6 +1,6 @@
+using static Bud.Cli.ConsoleTestUtils;
 using System;
 using System.Linq;
-using Bud.Cli.ConsoleTestUtils;
 using Bud.Commander;
 using Moq;
 using NUnit.Framework;

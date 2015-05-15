@@ -1,15 +1,15 @@
-﻿using System;
+﻿using static System.IO.Path;
+using static Bud.Build.BuildTargetUtils;
+using static Bud.IO.Paths;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.IO.Path;
 using System.Linq;
 using System.Threading.Tasks;
 using Antlr4.StringTemplate;
 using Bud.Build;
-using Bud.Build.BuildTargetUtils;
 using Bud.CSharp;
-using Bud.IO.Paths;
 using Bud.Resources;
 using NuGet;
 
@@ -80,7 +80,7 @@ namespace Bud.SolutionExporter {
     }
 
     private static IEnumerable<Key> GetCSharpBuildTargets(IContext context) {
-      return GetAllBuildTargets(context).Where(buildTarget => buildTarget.Leaf.Equals(Cs.CSharp));
+      return context.GetAllBuildTargets().Where(buildTarget => buildTarget.Leaf.Equals(Cs.CSharp));
     }
 
     private static void RenderTemplate(string outputFilePath, Template template) {

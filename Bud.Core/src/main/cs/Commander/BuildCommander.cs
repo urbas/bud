@@ -1,8 +1,8 @@
-using System.IO.File;
-using System.IO.Path;
+using static System.IO.File;
+using static System.IO.Path;
+using static Bud.BuildDefinition.BuildDefinitionSettings;
 using Bud.Build;
 using Bud.BuildDefinition;
-using Bud.BuildDefinition.BuildDefinitionSettings;
 using Bud.CSharp;
 using Newtonsoft.Json;
 

@@ -1,3 +1,9 @@
+## Next release
+
+- __Bugfix__: the `@watch` macro would not reinvoke tasks. Also, `@watch` macro would not invoke tasks at start.
+
+- __CLI__ (improvement): history does not overwrite entries in the past when the user modifies it and presses enter.
+
 ## 0.4.0
 
 - __CLI__ (new feature): Bud can now run in interactive mode. The interactive mode supports some rudamentary tab-completion and a simple history of commands.

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using static Bud.Cli.CommandListParser;
+using System.Collections.Generic;
 using System.Linq;
-using Bud.Cli.CommandListParser;
 using NUnit.Framework;
 
 namespace Bud.Cli {
