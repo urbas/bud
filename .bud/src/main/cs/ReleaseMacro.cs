@@ -26,6 +26,7 @@ public static class ReleaseMacro {
     private static async Task Publish(IContext context, SemanticVersion version) {
         await BuildBudDistFiles(context);
         await PublishNuGetPackages(context);
+        DistributionZipPackaging.UploadDistZip(context, version);
         ChocolateyPackaging.PublishToChocolatey(context, version);
         UbuntuPackaging.CreateUbuntuPackage(context, version);
     }
