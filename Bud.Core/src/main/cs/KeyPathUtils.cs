@@ -28,7 +28,7 @@ namespace Bud {
         return path;
       }
       if (lastIndexOfKeySeparator == path.Length - 1) {
-        throw new ArgumentException("Cannot extract the ID from the path '" + path + "'. The path must not end with a path component separator.");
+        throw new ArgumentException($"Cannot extract the ID from the path '{path}'. The path must not end with a path component separator.");
       }
       return path.Substring(lastIndexOfKeySeparator + 1);
     }
@@ -43,7 +43,7 @@ namespace Bud {
 
     public static string JoinPath(string pathA, string pathB) {
       if (IsAbsolutePath(pathB)) {
-        throw new ArgumentException("Cannot join paths '" + pathA + "' and '" + pathB + "'. The second path must not be absolute.");
+        throw new ArgumentException($"Cannot join paths '{pathA}' and '{pathB}'. The second path must not be absolute.");
       }
       if (String.IsNullOrEmpty(pathA)) {
         return pathB;
@@ -74,7 +74,7 @@ namespace Bud {
 
     public static string ParseId(string id) {
       if (id.IndexOf(Key.KeySeparator) >= 0) {
-        throw new ArgumentException("Could not parse the id '" + id + "'. It contains a key separator.");
+        throw new ArgumentException($"Could not parse the id '{id}'. It contains a key separator.");
       }
       return id;
     }

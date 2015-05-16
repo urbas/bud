@@ -25,7 +25,7 @@ namespace Bud.Util {
       }
       Console.Error.Write("- ");
       if (areStackTracesEnabled) {
-        Console.Error.WriteLine(exception.Message + "\n" + exception.StackTrace);
+        Console.Error.WriteLine($"{exception.Message}\n{exception.StackTrace}");
       } else {
         Console.Error.WriteLine(exception.Message);
       }

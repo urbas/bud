@@ -63,7 +63,7 @@ namespace Bud.Publishing {
           packageBuilder.Save(nupkgFileStream);
         }
       } catch (Exception e) {
-        context.Logger.Error("Failed to create the package: " + e);
+        context.Logger.Error($"Failed to create the package: {e}");
       }
       return packageFile;
     }
@@ -76,7 +76,7 @@ namespace Bud.Publishing {
           var packageServer = new PackageServer("https://www.nuget.org", "IE");
           packageServer.PushPackage(context.Evaluate(PublishKeys.PublishApiKey), new ZipPackage(packageFile), new FileInfo(packageFile).Length, 3600000, false);
         } catch (Exception e) {
-          context.Logger.Error("publishing failed: " + e);
+          context.Logger.Error($"publishing failed: {e}");
         }
       });
     }

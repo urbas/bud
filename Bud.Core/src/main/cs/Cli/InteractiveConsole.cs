@@ -81,7 +81,7 @@ namespace Bud.Cli {
     private void EvaluateCommand(Command command) {
       var evaluationResult = EvaluateInputToJson(command);
       if (evaluationResult != null) {
-        ConsoleBuffer.WriteLine(command.Name + " = " + evaluationResult);
+        ConsoleBuffer.WriteLine($"{command.Name} = {evaluationResult}");
       }
     }
 

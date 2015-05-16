@@ -17,7 +17,7 @@ namespace Bud.IO {
 
     public static void Copy(string sourceDir, string destDir) {
       if (!Directory.Exists(sourceDir)) {
-        throw new DirectoryNotFoundException("Source directory does not exist or could not be found: " + sourceDir);
+        throw new DirectoryNotFoundException($"Source directory does not exist or could not be found: {sourceDir}");
       }
 
       Directory.CreateDirectory(destDir);

@@ -12,6 +12,6 @@ namespace Bud.Logging {
 
     public void Error(string message) => Logger.Error(FormatScopedMessage(message));
 
-    private string FormatScopedMessage(string message) => TaskKey + "> " + message;
+    private string FormatScopedMessage(string message) => $"{TaskKey}> {message}";
   }
 }

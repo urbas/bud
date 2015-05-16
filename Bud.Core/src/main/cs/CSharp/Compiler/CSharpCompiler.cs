@@ -8,6 +8,7 @@ using Bud.Cli;
 using Bud.Dependencies;
 using Bud.IO;
 using Bud.Resources;
+using static System.IO.Path;
 
 namespace Bud.CSharp.Compiler {
   public static class CSharpCompiler {
@@ -38,7 +39,7 @@ namespace Bud.CSharp.Compiler {
     }
 
     private static void Compile(IContext context, Key buildTarget, string outputFile, Framework framework, IEnumerable<string> libraryDependencies, IEnumerable<string> frameworkAssemblies, IEnumerable<string> sourceFiles, IEnumerable<string> resourceFiles) {
-      Directory.CreateDirectory(Path.GetDirectoryName(outputFile));
+      Directory.CreateDirectory(GetDirectoryName(outputFile));
       ProcessBuilder.Executable(framework.CSharpCompilerPath)
                     .AddParamArgument("-out:", outputFile)
                     .AddReferences(libraryDependencies, frameworkAssemblies)
@@ -64,7 +65,7 @@ namespace Bud.CSharp.Compiler {
 
     private static ProcessBuilder AddResourceFiles(this ProcessBuilder compilerProcess, string rootNamespace, IEnumerable<string> resourceFiles) {
       foreach (var resourceFile in resourceFiles) {
-        string resourceIdentifier = rootNamespace + "." + Path.GetFileName(resourceFile);
+        string resourceIdentifier = $"{rootNamespace}.{GetFileName(resourceFile)}";
         compilerProcess.AddParamArgument("-resource:", resourceFile, resourceIdentifier);
       }
       return compilerProcess;

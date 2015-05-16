@@ -4,21 +4,23 @@ using Bud;
 using Bud.Build;
 using Bud.Cli;
 using Bud.IO;
+using CommandLine;
 using NuGet;
 
-static internal class ChocolateyPackaging {
+internal static class ChocolateyPackaging {
   public static void PublishToChocolatey(IConfig context, SemanticVersion version) {
-    var budZipFileName = CreateBudDistZip(context, version);
+    var budDistZipFile = CreateBudDistZip(context, version);
+    PlaceZipIntoDropbox(context, budDistZipFile);
     UploadChocolateyNupkg(context, version);
-    UploadZipToServer(context, budZipFileName);
   }
 
   public static string CreateBudDistZip(IConfig context, SemanticVersion version) {
-    var budZipFileName = String.Format("bud-{0}.zip", version);
-    using (new TemporaryDirChange(Build.GetBudDistDir(context))) {
+    var budZipFileName = string.Format("bud-{0}.zip", version);
+    var budDistDir = Build.GetBudDistDir(context);
+    using (new TemporaryDirChange(budDistDir)) {
       ProcessBuilder.Execute("zip", "-r", budZipFileName, ".");
     }
-    return budZipFileName;
+    return Path.Combine(budDistDir, budZipFileName);
   }
 
   public static void UploadChocolateyNupkg(IConfig context, SemanticVersion version) {
@@ -28,16 +30,23 @@ static internal class ChocolateyPackaging {
     }
   }
 
-  public static void UploadZipToServer(IConfig context, string budZipFileName) {
-    var baseDir = context.GetBaseDir();
-    using (new TemporaryDirChange(baseDir)) {
-      var sshKeyPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".ssh", "budpage_id_rsa");
-      var relativeZipPath = Paths.MakeRelative(Path.Combine(Build.GetBudDistDir(context), budZipFileName), baseDir + "/");
-      ProcessBuilder.Execute("scp", "-i", sshKeyPath, relativeZipPath, string.Format("budpage@54.154.215.159:/home/budpage/production-budpage/shared/public/packages/{0}", budZipFileName));
-    }
+  public static void PlaceZipIntoDropbox(IConfig config, string budZipDistFile) {
+    var homeFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+    var dropBoxDestination = Path.Combine(homeFolder, "Dropbox", "Public", "bud", Path.GetFileName(budZipDistFile));
+    File.Copy(budZipDistFile, dropBoxDestination);
   }
 
-  public static string GetChocolateySpecDir(IConfig context) {
-    return Path.Combine(context.GetBaseDir(), "DevelopmentUtils", "ChocolateyPackage");
+  public static string GetChocolateySpecDir(IConfig config) {
+    return Path.Combine(config.GetBaseDir(), "DevelopmentUtils", "ChocolateyPackage");
+  }
+
+  public static MacroResult UploadDistZip(IBuildContext context, string[] cliArgs) {
+    var parsedArgs = new PerformReleaseArguments();
+    if (Parser.Default.ParseArguments(cliArgs, parsedArgs)) {
+      var releaseVersion = SemanticVersion.Parse(parsedArgs.Version);
+      var budDistZipFile = CreateBudDistZip(context.Config, releaseVersion);
+      PlaceZipIntoDropbox(context.Config, budDistZipFile);
+    }
+    return new MacroResult(null, context);
   }
 }

@@ -10,7 +10,7 @@ namespace Bud.Dependencies {
     }
 
     public static string FetchedAssemblyAbsolutePath(string fetchedDependenciesDir, string packageId, string version, string assemblyRelativePath) {
-      return Path.Combine(fetchedDependenciesDir, packageId + "." + version, assemblyRelativePath);
+      return Path.Combine(fetchedDependenciesDir, $"{packageId}.{version}", assemblyRelativePath);
     }
   }
 }

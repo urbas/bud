@@ -26,7 +26,7 @@ namespace Bud {
     [HelpOption]
     public string GetUsage() {
       var helpText = HelpText.AutoBuild(this, current => HelpText.DefaultParsingErrorsHandler(this, current));
-      helpText.Heading = new HeadingInfo("Bud: the build tool without the 'ill'.", "v" + BudVersion.Current);
+      helpText.Heading = new HeadingInfo("Bud: the build tool without the 'ill'.", $"v{BudVersion.Current}");
       helpText.Copyright = new CopyrightInfo("Matej Urbas", 2015);
       helpText.AddPreOptionsLine("\nUsage: bud [Options] [--] command1 command2 ... commandN");
       helpText.AddPreOptionsLine("\nOptions:");

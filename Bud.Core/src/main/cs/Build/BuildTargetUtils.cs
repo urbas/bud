@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using Bud.Projects;
-using Bud.Util;
+using static Bud.Util.StringUtils;
 
 namespace Bud.Build {
   public static class BuildTargetUtils {
@@ -43,7 +43,7 @@ namespace Bud.Build {
     public static string DefaultPackageId(Key project, Key buildScope) {
       return buildScope.Leaf.Equals(BuildKeys.Main) ?
         project.Id :
-        project.Id + "." + StringUtils.Capitalize(buildScope.Id);
+          $"{project.Id}.{Capitalize(buildScope.Id)}";
     }
 
     private static string DefaultPackageId(Key buildTarget) => DefaultPackageId(ProjectOf(buildTarget), ScopeOf(buildTarget));
