@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace Bud.Test.Assertions {
   public static class FileAssertions {
     public static void FileExists(string absolutePath) {
-      var errorMsg = string.Format("The file '{0}' does not exist but was expected to exist.", absolutePath);
+      var errorMsg = $"The file '{absolutePath}' does not exist but was expected to exist.";
       Assert.That(File.Exists(absolutePath), errorMsg);
     }
 
@@ -20,7 +20,7 @@ namespace Bud.Test.Assertions {
     }
 
     public static void FileDoesNotExist(string absolutePath) {
-      var errorMsg = string.Format("The file '{0}' exists but was expected not to exist.", absolutePath);
+      var errorMsg = $"The file '{absolutePath}' exists but was expected not to exist.";
       Assert.That(!File.Exists(absolutePath), errorMsg);
     }
 
@@ -45,12 +45,12 @@ namespace Bud.Test.Assertions {
     }
 
     public static void DirectoryDoesNotExist(string path) {
-      var errorMsg = string.Format("The directory '{0}' exists but was expected not to exist.", path);
+      var errorMsg = $"The directory '{path}' exists but was expected not to exist.";
       Assert.That(!Directory.Exists(path), errorMsg);
     }
 
     public static void DirectoryExists(string path) {
-      var errorMsg = string.Format("The directory '{0}' does not exist but was expected to exist.", path);
+      var errorMsg = $"The directory '{path}' does not exist but was expected to exist.";
       Assert.That(Directory.Exists(path), errorMsg);
     }
 

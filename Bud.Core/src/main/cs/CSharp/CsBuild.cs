@@ -65,7 +65,7 @@ namespace Bud.CSharp {
       var assemblyDir = context.GetCSharpOutputAssemblyDir(buildTarget);
       var assemblyName = context.GetCSharpOutputAssemblyName(buildTarget);
       var assemblyExtension = GetAssemblyFileExtension(context, buildTarget);
-      return Path.Combine(assemblyDir, string.Format("{0}.{1}", assemblyName, assemblyExtension));
+      return Path.Combine(assemblyDir, $"{assemblyName}.{assemblyExtension}");
     }
 
 
@@ -96,7 +96,7 @@ namespace Bud.CSharp {
         return compatibleAssemblyRereferences.GroupBy(assemblyReference => assemblyReference.Name)
                                              .Select(GetAssemblyWithLatestTargetFramework);
       }
-      throw new Exception(String.Format("Could not find a compatible assembly in dependency '{0}' for build target '{1}'. The build target requires target framework of '{2}'.", package.Id, buildTarget, targetFramework.FullName));
+      throw new Exception($"Could not find a compatible assembly in dependency '{package.Id}' for build target '{buildTarget}'. The build target requires target framework of '{targetFramework.FullName}'.");
     }
 
     private static IPackageAssemblyReference GetAssemblyWithLatestTargetFramework(IEnumerable<IPackageAssemblyReference> compatibleAssemblyRereferences) {

@@ -20,7 +20,7 @@ namespace Bud.SettingsConstruction {
     }
 
     internal static string TaskUndefinedErrorMessage(TaskKey taskKey) {
-      return string.Format("Cannot modify the task '{0}'. This task has not yet been defined.", taskKey);
+      return $"Cannot modify the task '{taskKey}'. This task has not yet been defined.";
     }
   }
 

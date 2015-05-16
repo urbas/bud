@@ -22,7 +22,7 @@ namespace Bud.Cli {
     }
 
     public void DisplayInstructions() {
-      ConsoleBuffer.WriteLine(string.Format("Press '{0} + {1}' to quit the interactive console.", ConsoleModifiers.Control, ConsoleKey.Q));
+      ConsoleBuffer.WriteLine($"Press '{ConsoleModifiers.Control} + {ConsoleKey.Q}' to quit the interactive console.");
     }
 
     public void Serve() {

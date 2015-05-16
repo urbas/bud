@@ -8,7 +8,7 @@ namespace Bud {
     public static string ExtractParentPath(string path) {
       var lastIndexOfKeySeparator = path.LastIndexOf(Key.KeySeparator);
       if (lastIndexOfKeySeparator < 0 || IsRootPath(path)) {
-        throw new ArgumentException("Cannot extract parent. The path '" + path + "' does not have a parent.");
+        throw new ArgumentException($"Cannot extract parent. The path '{path}' does not have a parent.");
       }
       if (lastIndexOfKeySeparator == 0) {
         return Key.KeySeparatorAsString;

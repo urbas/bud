@@ -15,7 +15,7 @@ namespace Bud.SettingsConstruction {
       if (buildConfigurationBuilder.TryGetValue(Key, out value)) {
         buildConfigurationBuilder[Key] = value.WithDependencies(ExtraDependencies);
       } else {
-        throw new InvalidOperationException(string.Format("Cannot add dependencies to the task '{0}'. This task has not yet been defined.", Key));
+        throw new InvalidOperationException($"Cannot add dependencies to the task '{Key}'. This task has not yet been defined.");
       }
     }
   }

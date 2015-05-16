@@ -18,7 +18,7 @@ namespace Bud.Logging {
     public void Error(string message) => ErrorLevelWriter.WriteLine(FormatMessage(ErrorLevelId, message));
 
     private static string FormatMessage(string level, string message) {
-      return string.Format("[{0} {1}] {2}", level, DateTime.Now.ToString("HH:mm:ss.fff"), message);
+      return $"[{level} {DateTime.Now.ToString("HH:mm:ss.fff")}] {message}";
     }
   }
 }

@@ -26,7 +26,7 @@ namespace Bud.Dependencies {
 
     public IPackage AsPackage(IConfig config) => this;
 
-    public override string ToString() => Version != null ? string.Format("{0}@{1}", Id, Version) : Id;
+    public override string ToString() => Version != null ? $"{Id}@{Version}" : Id;
 
     public string Title {
       get { throw new NotImplementedException(); }

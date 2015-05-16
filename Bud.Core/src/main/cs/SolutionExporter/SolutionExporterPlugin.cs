@@ -30,7 +30,7 @@ namespace Bud.SolutionExporter {
       using (var solutionTemplateStream = typeof(SolutionExporterPlugin).Assembly.GetManifestResourceStream("Bud.SolutionTemplate.sln")) {
         try {
           var generatedSolutionPath = Combine(context.GetBaseDir(), GetFileName(context.GetBaseDir()) + ".sln");
-          context.Logger.Info(string.Format("Generating '{0}'...", generatedSolutionPath));
+          context.Logger.Info($"Generating '{generatedSolutionPath}'...");
           var template = new Template(solutionTemplateStream.ReadToEnd(), '%', '%');
           var generatedSolutionPathUri = new Uri(generatedSolutionPath);
           template.Add("projects", generatedCsprojs.Select(buildTarget => new {
@@ -57,7 +57,7 @@ namespace Bud.SolutionExporter {
             var csprojUri = new Uri(buildTargetCsprojFile);
             var sourceFiles = await CollectSourceFiles(context, buildTarget, csprojUri);
             var embeddedResourceFiles = await CollectEmbeddedResourceFiles(context, buildTarget, csprojUri);
-            context.Logger.Info(string.Format("Generating '{0}'...", buildTargetCsprojFile));
+            context.Logger.Info($"Generating '{buildTargetCsprojFile}'...");
             var template = new Template(csprojTemplateAsString, '%', '%');
             template.Add("assemblyName", context.GetCSharpOutputAssemblyName(buildTarget));
             template.Add("outputType", context.GetCSharpAssemblyType(buildTarget));

@@ -68,7 +68,7 @@ namespace Bud.Evaluation {
     }
 
     public static string KeyUndefinedEvaluationFailedMessage(Key key) {
-      return string.Format("Could not evaluate '{0}'. The value for this key was not defined.", key);
+      return $"Could not evaluate '{key}'. The value for this key was not defined.";
     }
   }
 }

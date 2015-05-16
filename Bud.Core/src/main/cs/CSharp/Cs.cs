@@ -17,7 +17,7 @@ namespace Bud.CSharp {
     public static readonly ConfigKey<string> DistDir = Key.Define("distDir", "The directory where Bud will place the output assembly and all the referenced assemblies.");
     public static readonly ConfigKey<IEnumerable<IPackageAssemblyReference>> AssemblyReferences = Key.Define("assemblyReferences");
     public static readonly ConfigKey<string[]> AssemblyReferencePaths = Key.Define("assemblyReferencePaths");
-    public static readonly TaskKey Dist = Key.Define("dist", String.Format("Places the output assembly and all its references into the '{0}' folder.", DistDir));
+    public static readonly TaskKey Dist = Key.Define("dist", $"Places the output assembly and all its references into the '{DistDir}' folder.");
 
     public static Setup Dependency(string packageName, string packageVersion = null) {
       var dependencyProject = Project.ProjectKey(packageName);

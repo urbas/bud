@@ -32,11 +32,11 @@ namespace Bud.CSharp {
       await oldTest();
       // NOTE: we perform 'dist' to ensure that all dependencies are in the same directory as the assembly under test.
       await context.Evaluate(buildTarget / Cs.Dist);
-      context.Logger.Info(string.Format("Testing '{0}'...", buildTarget));
+      context.Logger.Info($"Testing '{buildTarget}'...");
       var nunitArguments = context.Evaluate(buildTarget / NUnitArgs);
       var testExitCode = Runner.Main(nunitArguments.ToArray());
       if (testExitCode != 0) {
-        throw new Exception(string.Format("Failed tests in '{0}'...", buildTarget));
+        throw new Exception($"Failed tests in '{buildTarget}'...");
       }
     }
   }

@@ -31,7 +31,7 @@ namespace Bud.Dependencies {
       if (bestSuitedVersion != null) {
         return bestSuitedVersion;
       }
-      throw new Exception(string.Format("Could not find the version '{0}' of package '{1}'. Try running '{2}' to download packages.", dependencyId, versionRange, DependenciesKeys.Fetch));
+      throw new Exception($"Could not find the version '{dependencyId}' of package '{versionRange}'. Try running '{DependenciesKeys.Fetch}' to download packages.");
     }
 
     private Package GetMostCurrentVersion(string dependencyId) {
@@ -60,7 +60,7 @@ namespace Bud.Dependencies {
     }
 
     private static string PackageNotFoundMessage(string dependencyId) {
-      return string.Format("Could not find any version of the package '{0}'. Try running '{1}' to download packages.", dependencyId, DependenciesKeys.Fetch);
+      return $"Could not find any version of the package '{dependencyId}'. Try running '{DependenciesKeys.Fetch}' to download packages.";
     }
   }
 }

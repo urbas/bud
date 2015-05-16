@@ -31,7 +31,7 @@ namespace Bud.Publishing {
       var packageDir = Path.Combine(context.GetOutputDir(project), "package");
       var packageFile = Path.Combine(packageDir, buildTargetId + ".nupkg");
       Directory.CreateDirectory(packageDir);
-      var projectUrl = new Uri(String.Format("https://www.nuget.org/packages/{0}/", buildTargetId));
+      var projectUrl = new Uri($"https://www.nuget.org/packages/{buildTargetId}/");
       var packageBuilder = new PackageBuilder {
         Id = buildTargetId,
         Version = context.GetVersionOf(project),
@@ -86,7 +86,7 @@ namespace Bud.Publishing {
       if (File.Exists(publishApiKeyFile)) {
         return File.ReadAllText(publishApiKeyFile).Trim();
       }
-      var message = String.Format("Could not find the NuGet publish API key. Please place the API key into the file '{0}'.", publishApiKeyFile);
+      var message = $"Could not find the NuGet publish API key. Please place the API key into the file '{publishApiKeyFile}'.";
       config.Logger.Error(message);
       throw new Exception(message);
     }

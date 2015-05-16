@@ -44,7 +44,7 @@ namespace Bud.SettingsConstruction {
       }
     }
 
-    public static string EvaluationErrorMessage(Key taskKey) => string.Format("Task '{0}' failed.", taskKey);
+    public static string EvaluationErrorMessage(Key taskKey) => $"Task '{taskKey}' failed.";
   }
 
   public class TaskDefinition<T> : TaskDependencies, ITaskDefinition {

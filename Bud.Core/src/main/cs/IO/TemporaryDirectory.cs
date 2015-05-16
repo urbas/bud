@@ -12,7 +12,7 @@ namespace Bud.IO {
 
     public TemporaryDirectory(string directoryToCopy) {
       if (!Directory.Exists(directoryToCopy)) {
-        throw new ArgumentException(string.Format("The directory '{0}' does not exist.", directoryToCopy));
+        throw new ArgumentException($"The directory '{directoryToCopy}' does not exist.");
       }
       TempDirPath = Directories.CreateTemporary(System.IO.Path.GetFileName(directoryToCopy) + "-", string.Empty);
       try {

@@ -91,7 +91,7 @@ namespace Bud.Dependencies {
           foundPackage = packageManager.LocalRepository.FindPackage(dependency.Id, dependency.Version, false, false);
         }
         if (foundPackage == null) {
-          throw new Exception(string.Format("Could not download dependency '{0}'. Please verify your build configuration.", dependency));
+          throw new Exception($"Could not download dependency '{dependency}'. Please verify your build configuration.");
         }
       }
     }
@@ -101,7 +101,7 @@ namespace Bud.Dependencies {
         try {
           packageManager.InstallPackage(packageToInstall.Id, packageToInstall.Version);
         } catch (Exception e) {
-          throw new Exception(string.Format("Could not download dependency '{0}'. Please check your internet connection of your build definition.", packageToInstall), e);
+          throw new Exception($"Could not download dependency '{packageToInstall}'. Please check your internet connection of your build definition.", e);
         }
       }
     }

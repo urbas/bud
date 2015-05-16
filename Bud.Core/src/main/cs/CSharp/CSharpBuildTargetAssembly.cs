@@ -34,7 +34,7 @@ namespace Bud.CSharp {
 
     public IPackageFile ToPackagedAssembly() {
       return new PhysicalPackageFile {
-        TargetPath = string.Format("lib/{0}/{1}", targetFramework.Identifier, System.IO.Path.GetFileName(Path)),
+        TargetPath = $"lib/{targetFramework.Identifier}/{System.IO.Path.GetFileName(Path)}",
         SourcePath = Path
       };
     }
