@@ -7,6 +7,8 @@ using CommandLine;
 using NuGet;
 
 internal static class DistributionZipPackaging {
+  public static readonly string DropboxDistributionDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "Dropbox", "Public", "bud");
+
   public static void UploadDistZip(IConfig context, SemanticVersion version) {
     var budDistZipFile = CreateBudDistZip(context, version);
     PlaceZipIntoDropbox(context, budDistZipFile);
@@ -31,8 +33,7 @@ internal static class DistributionZipPackaging {
   }
 
   public static void PlaceZipIntoDropbox(IConfig config, string budZipDistFile) {
-    var homeFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-    var dropBoxDestination = Path.Combine(homeFolder, "Dropbox", "Public", "bud", Path.GetFileName(budZipDistFile));
+    var dropBoxDestination = Path.Combine(DropboxDistributionDir, Path.GetFileName(budZipDistFile));
     File.Copy(budZipDistFile, dropBoxDestination);
   }
 }

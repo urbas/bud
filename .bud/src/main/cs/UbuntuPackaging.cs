@@ -24,9 +24,9 @@ internal static class UbuntuPackaging {
       AddFileToArchive(debPackage, Path.Combine(ubuntuPackageDir, "debian-binary"));
       AddControlDataToDebPackage(debPackage, scratchDir.Path, ubuntuPackageDir, version, relativeFilesToPackage);
       AddDataToDebPackage(debPackage, scratchDir.Path);
-      var ubuntuPackage = Path.Combine(ubuntuPackageDir, GetUbuntuPackageFileName(version));
-      File.Copy(debPackage, ubuntuPackage);
-      return ubuntuPackage;
+      var distUbuntuPackage = Path.Combine(DistributionZipPackaging.DropboxDistributionDir, GetUbuntuPackageFileName(version));
+      File.Copy(debPackage, distUbuntuPackage);
+      return distUbuntuPackage;
     }
   }
 
