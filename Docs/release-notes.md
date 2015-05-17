@@ -1,4 +1,4 @@
-## Next release
+## 0.4.1
 
 - __Bugfix__: the `@watch` macro would not reinvoke tasks. Also, `@watch` macro would not invoke tasks at start.
 
