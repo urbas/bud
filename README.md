@@ -12,9 +12,9 @@ Bud lets you write automation scripts and build configuration in pure C#. This w
 
 ## Quick-start
 
-1.  Install Bud (use the links at the top of this page).
+1.  Install Bud (use the links at the top).
 
-1.  Create a folder for your project.
+1.  Create a folder for your project and navigate into it.
 
 1.  Place some sources into the `src/main/cs` folder. Including a class with the `Main` method. Here's an example:
 
@@ -31,3 +31,11 @@ Bud lets you write automation scripts and build configuration in pure C#. This w
     ```bash
     bud run
     ```
+
+1.  Generate MsBuild project files:
+
+    ```bash
+    bud generateSolution
+    ```
+
+    Bud will list the files it generated. Open the one with the `.sln` extension.
