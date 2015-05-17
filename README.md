@@ -1,10 +1,10 @@
 # Bud
 
-> - __Latest version__: [0.4.0](https://github.com/urbas/bud/releases/tag/v0.4.0)
+> - __Latest version__: [0.4.1](https://github.com/urbas/bud/releases/tag/v0.4.1)
 > - [__Documentation__](http://bud.urbas.si/Docs/Guide)
-> - __Portable distribution__: [bud-0.4.0.zip](https://dl.dropboxusercontent.com/u/9516950/bud/bud-0.4.0.zip)
-> - __Windows installation__: [Chocolatey](https://chocolatey.org/packages/bud/0.4.0)
-> - __Ubuntu installation__: [bud_0.4.0_i386.deb](https://dl.dropboxusercontent.com/u/9516950/bud/bud_0.4.0_i386.deb)
+> - __Portable distribution__: [bud-0.4.1.zip](https://dl.dropboxusercontent.com/u/9516950/bud/bud-0.4.1.zip)
+> - __Windows installation__: [Chocolatey](https://chocolatey.org/packages/bud/0.4.1)
+> - __Ubuntu installation__: [bud_0.4.1_i386.deb](https://dl.dropboxusercontent.com/u/9516950/bud/bud_0.4.1_i386.deb)
 
 Bud is a project automation tool for your C# projects. Bud downloads your projects' dependencies,
 builds your projects, tests them, deploys them, releases them, and automates any other project-related tasks you desire.
