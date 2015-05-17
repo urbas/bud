@@ -4,7 +4,7 @@ using System.Reflection;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration ("")]
 [assembly: AssemblyCompany ("")]
-[assembly: AssemblyProduct ("bud v0.4.1-dev")]
+[assembly: AssemblyProduct ("bud v0.4.1")]
 [assembly: AssemblyCopyright ("Matej Urbas")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]

@@ -5,7 +5,7 @@
     <!-- Read this before publishing packages to chocolatey.org: https://github.com/chocolatey/chocolatey/wiki/CreatePackages -->
     <id>bud</id>
     <title>Bud</title>
-    <version>0.4.1-dev</version>
+    <version>0.4.1</version>
     <authors>Matej Urbas</authors>
     <owners>Matej Urbas</owners>
     <summary>Bud is a build tool and a general automation tool</summary>
