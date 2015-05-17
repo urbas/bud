@@ -1,6 +1,5 @@
 using System.IO;
 using Bud;
-using Bud.Build;
 using Bud.Cli;
 using Bud.IO;
 using NuGet;
@@ -14,6 +13,6 @@ public static class ChocolateyPackaging {
   }
 
   public static string GetChocolateySpecDir(IConfig config) {
-    return Path.Combine(config.GetBaseDir(), "DevelopmentUtils", "ChocolateyPackage");
+    return Path.Combine(config.GetDeploymentTemplatesDir(), "ChocolateyPackage");
   }
 }

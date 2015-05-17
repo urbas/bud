@@ -12,6 +12,7 @@ packages/
 *.suo
 *.user
 *.sln.ide/
+*.sln.DotSettings
 
 # Editors
 *.swp
@@ -19,6 +20,6 @@ packages/
 
 # Bud Build
 .bud/global/nuGetRepository
-.bud/global/output
-**/.bud/output/
-.bud/Build.dll
+**/output/
+.bud/*.dll
+TestResult.xml

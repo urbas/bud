@@ -17,7 +17,7 @@ namespace Bud.Build.Macros {
       if (!watchedTasks.Any()) {
         throw new ArgumentException("No tasks to watch.");
       }
-      WatchedDirs = watchedDirs;
+      WatchedDirs = watchedDirs.Where(Directory.Exists);
       WatchedTasks = watchedTasks.ToArray();
     }
 

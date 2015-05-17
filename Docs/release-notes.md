@@ -2,6 +2,8 @@
 
 - __Bugfix__: the `@watch` macro would not reinvoke tasks. Also, `@watch` macro would not invoke tasks at start.
 
+- __Bugfix__: the `@watch` macro would fail if any of the watched directories does not exist.
+
 - __CLI__ (improvement): history does not overwrite entries in the past when the user modifies it and presses enter.
 
 ## 0.4.0

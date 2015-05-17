@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -7,13 +8,17 @@ using Bud.Build;
 using NuGet;
 
 internal static class Versioning {
-  public static void SetVersion(IBuildContext buildContext, SemanticVersion releaseVersion) {
+  public static void SetReleaseVersion(IBuildContext buildContext, SemanticVersion releaseVersion) {
     File.WriteAllText(Build.GetVersionFile(buildContext.Config), releaseVersion.ToString());
     UpdateAssemblyInfoVersion(buildContext, Build.BudCoreProjectId, releaseVersion);
     UpdateAssemblyInfoVersion(buildContext, Build.BudProjectId, releaseVersion);
     UpdateNuspecVersion(buildContext, releaseVersion);
     UpdateDistZipUrl(buildContext, releaseVersion);
     buildContext.Reset();
+  }
+
+  public static void SetNextDevelopmentVersion(IBuildContext context, SemanticVersion nextDevelopmentVersion) {
+    SetReleaseVersion(context, nextDevelopmentVersion);
   }
 
   public static SemanticVersion GetNextDevelopmentVersion(PerformReleaseArguments cliArguments, SemanticVersion releaseVersion) {
@@ -57,7 +62,8 @@ internal static class Versioning {
   }
 
   public static void ReplaceLinesInFile(string file, Func<string, string> lineReplacer) {
-    File.WriteAllLines(file, File.ReadAllLines(file).Select(lineReplacer).ToArray());
+    var replacedLines = File.ReadAllLines(file).Select(lineReplacer);
+    File.WriteAllLines(file, replacedLines);
   }
 
   public static string GetAssemblyInfoFile(IBuildContext buildContext, string projectId) {
