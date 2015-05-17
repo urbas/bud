@@ -27,7 +27,7 @@ internal static class UbuntuPackaging {
 
   private static ImmutableList<string> PlaceBudLibFilesIntoScratchDir(IConfig config, string scratchDir) {
     var budLibFiles = CopyBudLibsToScratchDir(scratchDir, Directory.EnumerateFiles(Build.GetBudDistDir(config)));
-    CopyBudShimExeToScratchDir(config, scratchDir);
+    PlaceBudShimToScratchDir(config, scratchDir);
     return budLibFiles.Add(BudExeShimPath);
   }
 
@@ -58,10 +58,10 @@ internal static class UbuntuPackaging {
   }
 
 
-  private static void CopyBudShimExeToScratchDir(IConfig config, string scratchDir) {
+  private static void PlaceBudShimToScratchDir(IConfig config, string scratchDir) {
     var absoluteBudShimExe = Path.Combine(scratchDir, BudExeShimPath);
     Directory.CreateDirectory(Path.GetDirectoryName(absoluteBudShimExe));
-    File.Copy(Path.Combine(GetUbuntuPackageTemplateDir(config), "bud"), absoluteBudShimExe);
+    File.WriteAllText(absoluteBudShimExe, "#! /bin/bash\n\n/usr/bin/mono /usr/lib/bud/bud.exe $@\n");
   }
 
   private static ImmutableList<string> CopyBudLibsToScratchDir(string scratchDir, IEnumerable<string> filesToPackage) {
