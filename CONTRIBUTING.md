@@ -12,6 +12,6 @@
 
 1.  Do teh codez.
 
-1.  Write a release note in `RELEASE_NOTES.md`.
+1.  Write a release note in `Docs/release-notes.md`.
 
 1.  Submit a pull request.
