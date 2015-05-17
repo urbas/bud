@@ -9,11 +9,10 @@ using Bud;
 using Bud.Cli;
 using Bud.IO;
 using Bud.Util;
-using CommandLine;
 using NuGet;
 
 internal static class UbuntuPackaging {
-  public static string CreateUbuntuPackage(IConfig config, SemanticVersion version) {
+  public static void CreateUbuntuPackage(IConfig config, SemanticVersion version) {
     using (var scratchDir = new TemporaryDirectory()) {
       var ubuntuPackageDir = GetUbuntuPackageDir(config);
       var debPackage = Path.Combine(scratchDir.Path, GetUbuntuPackageFileName(version));
@@ -25,7 +24,6 @@ internal static class UbuntuPackaging {
       AddDataToDebPackage(debPackage, scratchDir.Path);
       var distUbuntuPackage = Path.Combine(DistributionZipPackaging.DropboxDistributionDir, GetUbuntuPackageFileName(version));
       File.Copy(debPackage, distUbuntuPackage);
-      return distUbuntuPackage;
     }
   }
 
@@ -118,13 +116,5 @@ internal static class UbuntuPackaging {
 
   private static string GetUbuntuPackageFileName(SemanticVersion version) {
     return string.Format("bud_{0}_i386.deb", version);
-  }
-
-  public static MacroResult CreateUbuntuPackageMacro(IBuildContext context, string[] cmdArgs) {
-    var cliArguments = new PerformReleaseArguments();
-    if (Parser.Default.ParseArguments(cmdArgs, cliArguments)) {
-      return new MacroResult(CreateUbuntuPackage(context.Config, SemanticVersion.Parse(cliArguments.Version)), context);
-    }
-    return new MacroResult(null, context);
   }
 }

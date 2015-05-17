@@ -41,8 +41,9 @@ public class Build : IBuild {
                    .Add(ProjectKeys.Version.Modify(ReadFromBudCoreVersionResourceFile))
                    .Add(bud, budCore, budTest, budSystemTests, budExamplesSnippets)
                    .Add(new Macro("performRelease", ReleaseMacro.PerformRelease))
-                   .Add(new Macro("createUbuntuPackage", UbuntuPackaging.CreateUbuntuPackageMacro))
-                   .Add(new Macro("uploadDistZip", DistributionZipPackaging.UploadDistZip));
+                   .Add(ReleaseMacro.Create("createUbuntuPackage", UbuntuPackaging.CreateUbuntuPackage))
+                   .Add(ReleaseMacro.Create("uploadDistZip", DistributionZipPackaging.UploadDistZip))
+                   .Add(ReleaseMacro.Create("prepareDocs", Documentation.PrepareDocsForRelease));
   }
 
   private static SemanticVersion ReadFromBudCoreVersionResourceFile(IConfig config) {

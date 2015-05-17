@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Bud;
 using Bud.Cli;
 using Bud.IO;
-using CommandLine;
 using NuGet;
 
 internal static class DistributionZipPackaging {
@@ -13,15 +12,6 @@ internal static class DistributionZipPackaging {
   public static async void UploadDistZip(IConfig context, SemanticVersion version) {
     var budDistZipFile = await CreateBudDistZip(context, version);
     PlaceZipIntoDropbox(context, budDistZipFile);
-  }
-
-  public static MacroResult UploadDistZip(IBuildContext context, string[] cliArgs) {
-    var parsedArgs = new PerformReleaseArguments();
-    if (Parser.Default.ParseArguments(cliArgs, parsedArgs)) {
-      var version = SemanticVersion.Parse(parsedArgs.Version);
-      UploadDistZip(context.Config, version);
-    }
-    return new MacroResult(null, context);
   }
 
   public static async Task<string> CreateBudDistZip(IConfig context, SemanticVersion version) {

@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Bud;
 using Bud.Projects;
@@ -16,11 +17,25 @@ public static class ReleaseMacro {
   }
 
   private static void PerformRelease(IBuildContext context, SemanticVersion releaseVersion, SemanticVersion nextDevelopmentVersion) {
-    Versioning.SetReleaseVersion(context, releaseVersion);
+    Versioning.SetSourcesVersion(context, releaseVersion);
+    Documentation.PrepareDocsForRelease(context.Context, releaseVersion);
     GitTasks.GitTagRelease(releaseVersion);
     Publish(context.Context, releaseVersion).Wait();
-    Versioning.SetNextDevelopmentVersion(context, nextDevelopmentVersion);
+    Versioning.SetSourcesVersion(context, nextDevelopmentVersion);
     GitTasks.GitCommitNextDevelopmentVersion(nextDevelopmentVersion);
+  }
+
+  public static Macro Create(string macroName, Action<IContext, SemanticVersion> releaseAction) {
+    return new Macro(macroName, (buildContext, cliArgs) => PerformReleaseAction(buildContext, cliArgs, releaseAction));
+  }
+
+  public static MacroResult PerformReleaseAction(IBuildContext buildContext, string[] cliArgs, Action<IContext, SemanticVersion> releaseAction) {
+    var parsedArgs = new PerformReleaseArguments();
+    if (Parser.Default.ParseArguments(cliArgs, parsedArgs)) {
+      var version = SemanticVersion.Parse(parsedArgs.Version);
+      releaseAction(buildContext.Context, version);
+    }
+    return new MacroResult(null, buildContext);
   }
 
   private static async Task Publish(IContext context, SemanticVersion version) {

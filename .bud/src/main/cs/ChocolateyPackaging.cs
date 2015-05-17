@@ -6,9 +6,11 @@ using NuGet;
 
 public static class ChocolateyPackaging {
   public static void PublishToChocolatey(IConfig context, SemanticVersion version) {
-    using (new TemporaryDirChange(GetChocolateySpecDir(context))) {
-      ProcessBuilder.Execute("cpack");
-      ProcessBuilder.Execute("cpush", "-r", string.Format("bud.{0}.nupkg", version));
+    using (var tempDir = new TemporaryDirectory(GetChocolateySpecDir(context))) {
+      using (new TemporaryDirChange(tempDir.Path)) {
+        ProcessBuilder.Execute("cpack");
+        ProcessBuilder.Execute("cpush", "-r", string.Format("bud.{0}.nupkg", version));
+      }
     }
   }
 
