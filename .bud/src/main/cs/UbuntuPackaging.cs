@@ -6,7 +6,6 @@ using System.Linq;
 using System.Security.Cryptography;
 using Antlr4.StringTemplate;
 using Bud;
-using Bud.Build;
 using Bud.Cli;
 using Bud.IO;
 using Bud.Util;
@@ -114,7 +113,7 @@ internal static class UbuntuPackaging {
   }
 
   private static string GetUbuntuPackageDir(IConfig config) {
-    return Path.Combine(config.GetBaseDir(), "DevelopmentUtils", "UbuntuPackage");
+    return Path.Combine(config.GetDeploymentTemplatesDir(), "UbuntuPackage");
   }
 
   private static string GetUbuntuPackageFileName(SemanticVersion version) {
