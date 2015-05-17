@@ -12,51 +12,66 @@ using Bud.Util;
 using NuGet;
 
 internal static class UbuntuPackaging {
+  private const string BudExeShimPath = "usr/bin/bud";
+
   public static void CreateUbuntuPackage(IConfig config, SemanticVersion version) {
     using (var scratchDir = new TemporaryDirectory()) {
-      var ubuntuPackageDir = GetUbuntuPackageDir(config);
-      var debPackage = Path.Combine(scratchDir.Path, GetUbuntuPackageFileName(version));
-      const string relativeBudShimExe = "usr/bin/bud";
-      var relativeFilesToPackage = CopyBudBinariesToUsrDir(scratchDir.Path, Directory.EnumerateFiles(Build.GetBudDistDir(config))).Add(relativeBudShimExe);
-      CopyBudShimExe(scratchDir, relativeBudShimExe, ubuntuPackageDir);
-      AddFileToArchive(debPackage, Path.Combine(ubuntuPackageDir, "debian-binary"));
-      AddControlDataToDebPackage(debPackage, scratchDir.Path, ubuntuPackageDir, version, relativeFilesToPackage);
-      AddDataToDebPackage(debPackage, scratchDir.Path);
-      var distUbuntuPackage = Path.Combine(DistributionZipPackaging.DropboxDistributionDir, GetUbuntuPackageFileName(version));
-      File.Copy(debPackage, distUbuntuPackage);
+      var outputDebPackage = Path.Combine(scratchDir.Path, GetUbuntuPackageFileName(version));
+      var budLibFiles = PlaceBudLibFilesIntoScratchDir(config, scratchDir.Path);
+      AddDescriptorToDebPackage(config, outputDebPackage, scratchDir.Path);
+      AddControlToDebPackage(config, outputDebPackage, scratchDir.Path, version, budLibFiles);
+      AddBudLibFilesToDebPackage(outputDebPackage, scratchDir.Path);
+      UploadDebPackageToDropbox(version, outputDebPackage);
     }
   }
 
-
-  private static void AddDataToDebPackage(string debPackage, string baseDir) {
-    var dataTarXf = CreateTarGz(baseDir, "data.tar.gz", "usr");
-    AddFileToArchive(debPackage, dataTarXf);
+  private static ImmutableList<string> PlaceBudLibFilesIntoScratchDir(IConfig config, string scratchDir) {
+    var budLibFiles = CopyBudLibsToScratchDir(scratchDir, Directory.EnumerateFiles(Build.GetBudDistDir(config)));
+    CopyBudShimExeToScratchDir(config, scratchDir);
+    return budLibFiles.Add(BudExeShimPath);
   }
 
-  private static void CopyBudShimExe(TemporaryDirectory tmpDir, string relativeBudShimExe, string ubuntuPackageDir) {
-    var absoluteBudShimExe = Path.Combine(tmpDir.Path, relativeBudShimExe);
-    Directory.CreateDirectory(Path.GetDirectoryName(absoluteBudShimExe));
-    File.Copy(Path.Combine(ubuntuPackageDir, "bud"), absoluteBudShimExe);
+  private static void AddDescriptorToDebPackage(IConfig config, string outputDebPackage, string scratchDir) {
+    var debianDescriptorFile = Path.Combine(scratchDir, "debian-binary");
+    File.WriteAllText(debianDescriptorFile, "2.0\n");
+    AddFileToArchive(outputDebPackage, debianDescriptorFile);
   }
 
-  private static ImmutableList<string> CopyBudBinariesToUsrDir(string destDir, IEnumerable<string> filesToPackage) {
-    var destinationDir = Path.Combine(destDir, "usr", "lib", "bud");
-    Directory.CreateDirectory(destinationDir);
-    return filesToPackage.Select(file => {
-      var fileName = Path.GetFileName(file);
-      File.Copy(file, Path.Combine(destinationDir, fileName));
-      return "usr/lib/bud/" + fileName;
-    }).ToImmutableList();
-  }
-
-  private static void AddControlDataToDebPackage(string debPackage, string scratchDirectoryPath, string templatesDir, SemanticVersion version, IEnumerable<string> packagedBinaryFiles) {
+  private static void AddControlToDebPackage(IConfig config, string outputDebPackage, string scratchDir, SemanticVersion version, IEnumerable<string> packagedBinaryFiles) {
     const string controlTarGz = "control.tar.gz";
     const string controlFileName = "control";
     const string md5SumsFileName = "md5sums";
-    CreateControlFile(scratchDirectoryPath, version, templatesDir, controlFileName, (int) Math.Ceiling((double) CalculateSizeOfFilesInBytes(scratchDirectoryPath, packagedBinaryFiles) / 1024));
-    CreateMd5SumsFile(scratchDirectoryPath, packagedBinaryFiles, md5SumsFileName);
-    var controlArchive = CreateTarGz(scratchDirectoryPath, controlTarGz, controlFileName, md5SumsFileName);
-    AddFileToArchive(debPackage, controlArchive);
+    CreateControlFile(scratchDir, version, GetUbuntuPackageTemplateDir(config), controlFileName, (int) Math.Ceiling(CalculateSizeOfFilesInBytes(scratchDir, packagedBinaryFiles) / 1024));
+    CreateMd5SumsFile(scratchDir, packagedBinaryFiles, md5SumsFileName);
+    var controlArchive = CreateTarGz(scratchDir, controlTarGz, controlFileName, md5SumsFileName);
+    AddFileToArchive(outputDebPackage, controlArchive);
+  }
+
+  private static void AddBudLibFilesToDebPackage(string outputDebPackage, string scratchDir) {
+    var dataTarGz = CreateTarGz(scratchDir, "data.tar.gz", "usr");
+    AddFileToArchive(outputDebPackage, dataTarGz);
+  }
+
+  private static void UploadDebPackageToDropbox(SemanticVersion version, string outputDebPackage) {
+    var distUbuntuPackage = Path.Combine(DistributionZipPackaging.DropboxDistributionDir, GetUbuntuPackageFileName(version));
+    File.Copy(outputDebPackage, distUbuntuPackage);
+  }
+
+
+  private static void CopyBudShimExeToScratchDir(IConfig config, string scratchDir) {
+    var absoluteBudShimExe = Path.Combine(scratchDir, BudExeShimPath);
+    Directory.CreateDirectory(Path.GetDirectoryName(absoluteBudShimExe));
+    File.Copy(Path.Combine(GetUbuntuPackageTemplateDir(config), "bud"), absoluteBudShimExe);
+  }
+
+  private static ImmutableList<string> CopyBudLibsToScratchDir(string scratchDir, IEnumerable<string> filesToPackage) {
+    var scratchBudLibsDir = Path.Combine(scratchDir, "usr", "lib", "bud");
+    Directory.CreateDirectory(scratchBudLibsDir);
+    return filesToPackage.Select(srcFile => {
+      var fileName = Path.GetFileName(srcFile);
+      File.Copy(srcFile, Path.Combine(scratchBudLibsDir, fileName));
+      return "usr/lib/bud/" + fileName;
+    }).ToImmutableList();
   }
 
   private static double CalculateSizeOfFilesInBytes(string baseDir, IEnumerable<string> relativePaths) {
@@ -110,7 +125,7 @@ internal static class UbuntuPackaging {
     ProcessBuilder.Execute("ar", "r", archivePath, fileToAdd);
   }
 
-  private static string GetUbuntuPackageDir(IConfig config) {
+  private static string GetUbuntuPackageTemplateDir(IConfig config) {
     return Path.Combine(config.GetDeploymentTemplatesDir(), "UbuntuPackage");
   }
 
