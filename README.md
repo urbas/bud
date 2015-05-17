@@ -1,16 +1,11 @@
 # Bud
 
-> * Latest version: [0.4.0](https://github.com/urbas/bud/releases/tag/v0.4.0)
+> __Latest version__: [0.4.0](https://github.com/urbas/bud/releases/tag/v0.4.0)
+> __Portable distribution__: [bud-0.4.0.zip](https://dl.dropboxusercontent.com/u/9516950/bud/bud-0.4.0.zip)
+> __Windows installation__: [Chocolatey](https://chocolatey.org/packages/bud/0.4.0)
+> __Ubuntu installation__: [bud_0.4.0_i386.deb](https://dl.dropboxusercontent.com/u/9516950/bud/bud_0.4.0_i386.deb)
 
-Is a project automation tool for your C# projects. Bud downloads your project's local and external dependencies,
+Bud is a project automation tool for your C# projects. Bud downloads your project's local and external dependencies,
 builds your project, tests it, deploys it, releases it, and automates any project-related tasks you desire.
 
-Bud lets you write the build configuration in pure C#, so you can use Visual Studio to write your project automation.
-
-## Installation
-
-See [release notes](RELEASE_NOTES.md) for the latest version.
-
-Please see [Bud's home page](http://bud.urbas.si/) for instructions and other details.
-
-Sources for Bud's home page: https://github.com/urbas/budPage
+Bud lets you write automation scripts and build configuration in pure C#. This way you can use the full power of Visual Studio to write your project automation.
