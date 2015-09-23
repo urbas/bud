@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 
 namespace Bud.Tasking {
   internal class Context : IContext {
-    public TaskDefinitions TaskDefinitions { get; }
+    private Tasks Tasks { get; }
     private ImmutableDictionary<string, TaskResult> taskResultCache = ImmutableDictionary<string, TaskResult>.Empty;
     private readonly object taskResultCacheGuard = new object();
 
-    internal Context(TaskDefinitions taskDefinitions) {
-      TaskDefinitions = taskDefinitions;
+    internal Context(Tasks tasks) {
+      Tasks = tasks;
     }
 
     public Task<T> Invoke<T>(string taskName) {
@@ -21,7 +21,7 @@ namespace Bud.Tasking {
         if (TryGetCachedTaskResult(taskName, out taskResult)) {
           return taskResult;
         }
-        taskResult = CalculateTaskResult<T>(taskName);
+        taskResult = Tasks.InvokeTask<T>(taskName, this);
         taskResultCache = taskResultCache.Add(taskName, new TaskResult {ResultType = typeof(T), Result = taskResult});
         return taskResult;
       }
@@ -38,17 +38,7 @@ namespace Bud.Tasking {
       return false;
     }
 
-    private Task<T> CalculateTaskResult<T>(string taskName) {
-      ITaskDefinition taskDefinition;
-      if (TaskDefinitions.Definitions.TryGetValue(taskName, out taskDefinition)) {
-        AssertTaskTypedCorrectly<T>(taskName, taskDefinition.ReturnType);
-        var typedTaskDefinition = (TaskDefinition<T>) taskDefinition;
-        return typedTaskDefinition.Task(this);
-      }
-      throw new TaskUndefinedException($"Task '{taskName ?? "<null>"}' is undefined.");
-    }
-
-    private static void AssertTaskTypedCorrectly<T>(string taskName, Type actualTaskReturnType) {
+    internal static void AssertTaskTypedCorrectly<T>(string taskName, Type actualTaskReturnType) {
       if (actualTaskReturnType != typeof(T)) {
         throw new TaskReturnsDifferentTypeException($"Task '{taskName}' returns '{actualTaskReturnType.FullName}' but was expected to return '{typeof(T).FullName}'.");
       }
