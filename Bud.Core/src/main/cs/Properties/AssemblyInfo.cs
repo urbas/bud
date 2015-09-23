@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("Bud.Core")]
 [assembly: AssemblyDescription("")]
@@ -9,3 +10,4 @@ using System.Reflection;
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion("0.4.2")]
+[assembly: InternalsVisibleTo("Bud.Core.Test")]
