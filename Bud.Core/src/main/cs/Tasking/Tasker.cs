@@ -3,12 +3,12 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Bud.Tasking {
-  internal class Context : IContext {
+  internal class Tasker : ITasker {
     private Tasks Tasks { get; }
     private ImmutableDictionary<string, TaskResult> taskResultCache = ImmutableDictionary<string, TaskResult>.Empty;
     private readonly object taskResultCacheGuard = new object();
 
-    internal Context(Tasks tasks) {
+    internal Tasker(Tasks tasks) {
       Tasks = tasks;
     }
 

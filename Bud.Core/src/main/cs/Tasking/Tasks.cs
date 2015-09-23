@@ -11,7 +11,7 @@ namespace Bud.Tasking {
       TaskDefinitions = taskDefinitions;
     }
 
-    public Tasks SetAsync<T>(string taskName, Func<IContext, Task<T>> task) {
+    public Tasks SetAsync<T>(string taskName, Func<ITasker, Task<T>> task) {
       ITaskDefinition previousTaskDefinition;
       if (TaskDefinitions.TryGetValue(taskName, out previousTaskDefinition)) {
         if (previousTaskDefinition.ReturnType != typeof(T)) {
@@ -21,7 +21,7 @@ namespace Bud.Tasking {
       return new Tasks(TaskDefinitions.SetItem(taskName, new TaskDefinition<T>(task)));
     }
 
-    public Tasks ModifyAsync<T>(string taskName, Func<IContext, Task<T>, Task<T>> task) {
+    public Tasks ModifyAsync<T>(string taskName, Func<ITasker, Task<T>, Task<T>> task) {
       ITaskDefinition previousTaskDefinition;
       if (TaskDefinitions.TryGetValue(taskName, out previousTaskDefinition)) {
         if (previousTaskDefinition.ReturnType != typeof(T)) {
@@ -32,12 +32,12 @@ namespace Bud.Tasking {
       throw new TaskUndefinedException($"Could not modify the task '{taskName}'. The task is not defined yet.");
     }
 
-    public Task<T> InvokeTask<T>(string taskName, IContext context) {
+    public Task<T> InvokeTask<T>(string taskName, ITasker tasker) {
       ITaskDefinition taskDefinition;
       if (TaskDefinitions.TryGetValue(taskName, out taskDefinition)) {
-        Context.AssertTaskTypedCorrectly<T>(taskName, taskDefinition.ReturnType);
+        Tasker.AssertTaskTypedCorrectly<T>(taskName, taskDefinition.ReturnType);
         var typedTaskDefinition = (TaskDefinition<T>) taskDefinition;
-        return typedTaskDefinition.Task(context);
+        return typedTaskDefinition.Task(tasker);
       }
       throw new TaskUndefinedException($"Task '{taskName ?? "<null>"}' is undefined.");
     }
@@ -48,13 +48,13 @@ namespace Bud.Tasking {
 
     private class TaskDefinition<T> : ITaskDefinition {
       public Type ReturnType => typeof(T);
-      public Func<IContext, Task<T>> Task { get; }
+      public Func<ITasker, Task<T>> Task { get; }
 
-      public TaskDefinition(Func<IContext, Task<T>> originalTask, Func<IContext, Task<T>, Task<T>> modifierTask) {
+      public TaskDefinition(Func<ITasker, Task<T>> originalTask, Func<ITasker, Task<T>, Task<T>> modifierTask) {
         Task = context => modifierTask(context, originalTask(context));
       }
 
-      public TaskDefinition(Func<IContext, Task<T>> originalTask) {
+      public TaskDefinition(Func<ITasker, Task<T>> originalTask) {
         Task = originalTask;
       }
     }
