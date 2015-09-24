@@ -30,18 +30,12 @@ namespace Bud.Tasking {
     private bool TryGetCachedTaskResult<T>(string taskName, out Task<T> taskResult) {
       TaskResult cachedTaskResult;
       if (taskResultCache.TryGetValue(taskName, out cachedTaskResult)) {
-        AssertTaskTypedCorrectly<T>(taskName, cachedTaskResult.ResultType);
+        Tasks.AssertTaskTypedCorrectly<T>(taskName, cachedTaskResult.ResultType);
         taskResult = (Task<T>) cachedTaskResult.Result;
         return true;
       }
       taskResult = null;
       return false;
-    }
-
-    internal static void AssertTaskTypedCorrectly<T>(string taskName, Type actualTaskReturnType) {
-      if (actualTaskReturnType != typeof(T)) {
-        throw new TaskReturnsDifferentTypeException($"Task '{taskName}' returns '{actualTaskReturnType.FullName}' but was expected to return '{typeof(T).FullName}'.");
-      }
     }
 
     private struct TaskResult {
