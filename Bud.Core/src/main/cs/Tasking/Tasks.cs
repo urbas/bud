@@ -11,7 +11,7 @@ namespace Bud.Tasking {
       TaskDefinitions = taskDefinitions;
     }
 
-    public Tasks SetAsync<T>(string taskName, Func<ITasker, Task<T>> task) {
+    public Tasks Set<T>(string taskName, Func<ITasker, Task<T>> task) {
       ITaskDefinition previousTaskDefinition;
       if (TaskDefinitions.TryGetValue(taskName, out previousTaskDefinition)) {
         AssertTaskTypeNotOverridden<T>(taskName, previousTaskDefinition);
@@ -19,7 +19,7 @@ namespace Bud.Tasking {
       return new Tasks(TaskDefinitions.SetItem(taskName, new TaskDefinition<T>(task)));
     }
 
-    public Tasks ModifyAsync<T>(string taskName, Func<ITasker, Task<T>, Task<T>> task) {
+    public Tasks Modify<T>(string taskName, Func<ITasker, Task<T>, Task<T>> task) {
       ITaskDefinition previousTaskDefinition;
       if (TaskDefinitions.TryGetValue(taskName, out previousTaskDefinition)) {
         AssertTaskTypeNotOverridden<T>(taskName, previousTaskDefinition);

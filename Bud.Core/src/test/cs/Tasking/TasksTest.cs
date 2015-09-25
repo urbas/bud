@@ -7,8 +7,8 @@ namespace Bud.Tasking {
     [Test]
     public void overriding_a_task_with_a_different_type_must_throw_an_exception() {
       var exception = Assert.Throws<TaskTypeOverrideException>(
-        () => Tasks.Empty.SetAsync("fooTask", context => Task.FromResult("foo"))
-                   .SetAsync("fooTask", context => Task.FromResult(42)));
+        () => Tasks.Empty.Set("fooTask", context => Task.FromResult("foo"))
+                   .Set("fooTask", context => Task.FromResult(42)));
       Assert.That(exception.Message, Contains.Substring("fooTask"));
       Assert.That(exception.Message, Contains.Substring("System.String"));
       Assert.That(exception.Message, Contains.Substring("System.Int32"));
@@ -17,8 +17,8 @@ namespace Bud.Tasking {
     [Test]
     public void modifying_a_task_with_a_different_type_must_throw_an_exception() {
       var exception = Assert.Throws<TaskTypeOverrideException>(
-        () => Tasks.Empty.SetAsync("fooTask", context => Task.FromResult("foo"))
-                   .ModifyAsync<int>("fooTask", (context, oldTask) => Task.FromResult(42)));
+        () => Tasks.Empty.Set("fooTask", context => Task.FromResult("foo"))
+                   .Modify<int>("fooTask", (context, oldTask) => Task.FromResult(42)));
       Assert.That(exception.Message, Contains.Substring("fooTask"));
       Assert.That(exception.Message, Contains.Substring("System.String"));
       Assert.That(exception.Message, Contains.Substring("System.Int32"));
@@ -27,7 +27,7 @@ namespace Bud.Tasking {
     [Test]
     public void throw_when_modifying_a_task_that_has_not_yet_been_defined() {
       var exception = Assert.Throws<TaskUndefinedException>(
-        () => Tasks.Empty.ModifyAsync<int>("fooTask", (context, oldTask) => Task.FromResult(42)));
+        () => Tasks.Empty.Modify<int>("fooTask", (context, oldTask) => Task.FromResult(42)));
       Assert.That(exception.Message, Contains.Substring("fooTask"));
     }
 
@@ -41,7 +41,7 @@ namespace Bud.Tasking {
     public void TryGetTask_must_return_true_and_set_the_out_parameter_to_the_given_task() {
       ITaskDefinition taskDefinition;
       Func<ITasker, Task<int>> expectedTask = ctxt => Task.FromResult(42);
-      var tasks = Tasks.Empty.SetAsync("fooTask", expectedTask);
+      var tasks = Tasks.Empty.Set("fooTask", expectedTask);
       Assert.IsTrue(tasks.TryGetTask("fooTask", out taskDefinition));
       Assert.AreSame(typeof(int), taskDefinition.ReturnType);
       Assert.AreSame(expectedTask, taskDefinition.Task);
