@@ -14,9 +14,7 @@ namespace Bud.Tasking {
     public Tasks SetAsync<T>(string taskName, Func<ITasker, Task<T>> task) {
       ITaskDefinition previousTaskDefinition;
       if (TaskDefinitions.TryGetValue(taskName, out previousTaskDefinition)) {
-        if (previousTaskDefinition.ReturnType != typeof(T)) {
-          throw new TaskTypeOverrideException($"Could not redefine the type of task '{taskName}' from '{previousTaskDefinition.ReturnType}' to '{typeof(T)}'. Redefinition of task types is not allowed.");
-        }
+        AssertTaskTypeNotOverridden<T>(taskName, previousTaskDefinition);
       }
       return new Tasks(TaskDefinitions.SetItem(taskName, new TaskDefinition<T>(task)));
     }
@@ -24,42 +22,32 @@ namespace Bud.Tasking {
     public Tasks ModifyAsync<T>(string taskName, Func<ITasker, Task<T>, Task<T>> task) {
       ITaskDefinition previousTaskDefinition;
       if (TaskDefinitions.TryGetValue(taskName, out previousTaskDefinition)) {
-        if (previousTaskDefinition.ReturnType != typeof(T)) {
-          throw new TaskTypeOverrideException($"Could not redefine the type of task '{taskName}' from '{previousTaskDefinition.ReturnType}' to '{typeof(T)}'. Redefinition of task types is not allowed.");
-        }
+        AssertTaskTypeNotOverridden<T>(taskName, previousTaskDefinition);
         return new Tasks(TaskDefinitions.SetItem(taskName, new TaskDefinition<T>(((TaskDefinition<T>) previousTaskDefinition).Task, task)));
       }
       throw new TaskUndefinedException($"Could not modify the task '{taskName}'. The task is not defined yet.");
     }
 
-    public bool IsTaskDefined(string taskName) => TaskDefinitions.ContainsKey(taskName);
-
-    public bool TryGetTask<T>(string taskName, out Func<ITasker, Task<T>> task) {
+    public bool TryGetTask(string taskName, out ITaskDefinition task) {
       ITaskDefinition taskDefinition;
       if (TaskDefinitions.TryGetValue(taskName, out taskDefinition)) {
-        AssertTaskTypedCorrectly<T>(taskName, taskDefinition.ReturnType);
-        task = ((TaskDefinition<T>) taskDefinition).Task;
+        task = taskDefinition;
         return true;
       }
       task = null;
       return false;
     }
 
-    public Task<T> InvokeTask<T>(string taskName, ITasker tasker) {
-      Func<ITasker, Task<T>> taskDefinition;
-      if (TryGetTask(taskName, out taskDefinition)) {
-        return taskDefinition(tasker);
+    private static void AssertTaskTypeNotOverridden<T>(string taskName, ITaskDefinition previousTaskDefinition) {
+      if (previousTaskDefinition.ReturnType != typeof(T)) {
+        throw new TaskTypeOverrideException($"Could not redefine the type of task '{taskName}' from '{previousTaskDefinition.ReturnType}' to '{typeof(T)}'. Redefinition of task types is not allowed.");
       }
-      throw new TaskUndefinedException($"Task '{taskName ?? "<null>"}' is undefined.");
-    }
-
-    private interface ITaskDefinition {
-      Type ReturnType { get; }
     }
 
     private class TaskDefinition<T> : ITaskDefinition {
       public Type ReturnType => typeof(T);
       public Func<ITasker, Task<T>> Task { get; }
+      Func<ITasker, Task> ITaskDefinition.Task => Task;
 
       public TaskDefinition(Func<ITasker, Task<T>> originalTask, Func<ITasker, Task<T>, Task<T>> modifierTask) {
         Task = context => modifierTask(context, originalTask(context));
@@ -67,12 +55,6 @@ namespace Bud.Tasking {
 
       public TaskDefinition(Func<ITasker, Task<T>> originalTask) {
         Task = originalTask;
-      }
-    }
-
-    internal static void AssertTaskTypedCorrectly<T>(string taskName, Type actualTaskReturnType) {
-      if (actualTaskReturnType != typeof(T)) {
-        throw new TaskReturnsDifferentTypeException($"Task '{taskName}' returns '{actualTaskReturnType.FullName}' but was expected to return '{typeof(T).FullName}'.");
       }
     }
   }

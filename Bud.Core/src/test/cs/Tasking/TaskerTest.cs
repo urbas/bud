@@ -139,5 +139,22 @@ namespace Bud.Tasking {
       fooTask.Verify(self => self(It.IsAny<ITasker>()), Times.Exactly(repeatCount));
       appendBarStringTask.Verify(self => self(It.IsAny<ITasker>(), It.IsAny<Task<string>>()), Times.Exactly(repeatCount));
     }
+
+    [Test]
+    public async void invoking_a_task_without_specifying_a_type() {
+      var tasks = Tasks.Empty.SetAsync("fooTask", fooTask.Object);
+      await new Tasker(tasks).Invoke("fooTask");
+      fooTask.Verify(self => self(It.IsAny<ITasker>()));
+    }
+
+    [Test]
+    public async void invoke_once_when_invoking_a_task_without_specifying_a_type_and_again_with_a_type() {
+      var tasks = Tasks.Empty.SetAsync("fooTask", fooTask.Object)
+                       .SetAsync("myTask", duplicateFooTask);
+      var tasker = new Tasker(tasks);
+      await tasker.Invoke("fooTask");
+      await tasker.Invoke<string>("fooTask");
+      fooTask.Verify(self => self(It.IsAny<ITasker>()));
+    }
   }
 }
