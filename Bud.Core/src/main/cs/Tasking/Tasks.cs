@@ -18,7 +18,7 @@ namespace Bud.Tasking {
 
     public Tasks ModifyAsync<T>(string taskName, Func<ITasks, Task<T>, Task<T>> task) => Add(new TaskModification<T>(taskName, task));
 
-    private Tasks Add(ITaskModification taskOverride) => new Tasks(TaskModifications.Add(taskOverride));
+    private Tasks Add(ITaskModification taskModification) => new Tasks(TaskModifications.Add(taskModification));
 
     public Tasks ExtendedWith(Tasks tasks) => new Tasks(TaskModifications.AddRange(tasks.TaskModifications));
 
@@ -35,9 +35,9 @@ namespace Bud.Tasking {
       return taskDefinitions;
     }
 
-    public Task<T> Invoke<T>(string taskName) => new ResultCachingTasks(Compile()).Invoke<T>(taskName);
+    public Task<T> Invoke<T>(string taskName) => new TasksResultCache(Compile()).Invoke<T>(taskName);
 
-    public Task Invoke(string taskName) => new ResultCachingTasks(Compile()).Invoke(taskName);
+    public Task Invoke(string taskName) => new TasksResultCache(Compile()).Invoke(taskName);
 
     private interface ITaskModification {
       string Name { get; }

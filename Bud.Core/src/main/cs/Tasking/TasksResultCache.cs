@@ -4,12 +4,12 @@ using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Bud.Tasking {
-  internal class ResultCachingTasks : ITasks {
+  internal class TasksResultCache : ITasks {
     private IDictionary<string, TaskDefinition> Tasks { get; }
     private ImmutableDictionary<string, TaskResult> taskResultCache = ImmutableDictionary<string, TaskResult>.Empty;
     private readonly object taskResultCacheGuard = new object();
 
-    internal ResultCachingTasks(IDictionary<string, TaskDefinition> tasks) {
+    internal TasksResultCache(IDictionary<string, TaskDefinition> tasks) {
       Tasks = tasks;
     }
 

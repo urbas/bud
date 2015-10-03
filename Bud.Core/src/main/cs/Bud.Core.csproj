@@ -206,7 +206,7 @@
     <Compile Include="SolutionExporter\SolutionExporterKeys.cs" />
     <Compile Include="SolutionExporter\SolutionExporterPlugin.cs" />
     <Compile Include="SolutionExporter\TemplateErrorListener.cs" />
-    <Compile Include="Tasking\ResultCachingTasks.cs" />
+    <Compile Include="Tasking\TasksResultCache.cs" />
     <Compile Include="Tasking\ITasks.cs" />
     <Compile Include="Tasking\Tasks.cs" />
     <Compile Include="Tasking\TaskReturnsDifferentTypeException.cs" />
