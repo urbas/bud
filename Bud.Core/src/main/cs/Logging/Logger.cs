@@ -9,6 +9,6 @@ namespace Bud.Logging {
     }
 
     public static ILogger CreateFromStandardOutputs() => CreateFromWriters(Console.Out, Console.Error);
-    public static readonly ILogger NullLogger = Logger.CreateFromWriters(NullTextWriter.Instance, NullTextWriter.Instance);
+    public static readonly ILogger NullLogger = CreateFromWriters(NullTextWriter.Instance, NullTextWriter.Instance);
   }
 }

@@ -1,61 +1,90 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Bud.Tasking {
-  public class Tasks {
-    public static readonly Tasks Empty = new Tasks(ImmutableDictionary<string, ITaskDefinition>.Empty);
-    private ImmutableDictionary<string, ITaskDefinition> TaskDefinitions { get; }
+  public class Tasks : ITasks {
+    public readonly static Tasks New = new Tasks();
+    private ImmutableList<ITaskModification> TaskModifications { get; }
 
-    private Tasks(ImmutableDictionary<string, ITaskDefinition> taskDefinitions) {
-      TaskDefinitions = taskDefinitions;
+    private Tasks() : this(ImmutableList<ITaskModification>.Empty) {}
+
+    private Tasks(ImmutableList<ITaskModification> taskModifications) {
+      TaskModifications = taskModifications;
     }
 
-    public Tasks Set<T>(string taskName, Func<ITasker, Task<T>> task) {
-      ITaskDefinition previousTaskDefinition;
-      if (TaskDefinitions.TryGetValue(taskName, out previousTaskDefinition)) {
-        AssertTaskTypeNotOverridden<T>(taskName, previousTaskDefinition);
+    public Tasks SetAsync<T>(string taskName, Func<ITasks, Task<T>> task) => Add(new TaskOverride<T>(taskName, task));
+
+    public Tasks ModifyAsync<T>(string taskName, Func<ITasks, Task<T>, Task<T>> task) => Add(new TaskModification<T>(taskName, task));
+
+    private Tasks Add(ITaskModification taskOverride) => new Tasks(TaskModifications.Add(taskOverride));
+
+    public Tasks ExtendedWith(Tasks tasks) => new Tasks(TaskModifications.AddRange(tasks.TaskModifications));
+
+    public IDictionary<string, TaskDefinition> Compile() {
+      var taskDefinitions = new Dictionary<string, TaskDefinition>();
+      foreach (var taskModification in TaskModifications) {
+        TaskDefinition existingTaskDefinition;
+        if (taskDefinitions.TryGetValue(taskModification.Name, out existingTaskDefinition)) {
+          taskDefinitions[taskModification.Name] = taskModification.Extend(existingTaskDefinition);
+        } else {
+          taskDefinitions.Add(taskModification.Name, taskModification.ToTaskDefinition());
+        }
       }
-      return new Tasks(TaskDefinitions.SetItem(taskName, new TaskDefinition<T>(task)));
+      return taskDefinitions;
     }
 
-    public Tasks Modify<T>(string taskName, Func<ITasker, Task<T>, Task<T>> task) {
-      ITaskDefinition previousTaskDefinition;
-      if (TaskDefinitions.TryGetValue(taskName, out previousTaskDefinition)) {
-        AssertTaskTypeNotOverridden<T>(taskName, previousTaskDefinition);
-        return new Tasks(TaskDefinitions.SetItem(taskName, new TaskDefinition<T>(((TaskDefinition<T>) previousTaskDefinition).Task, task)));
+    public Task<T> Invoke<T>(string taskName) => new ResultCachingTasks(Compile()).Invoke<T>(taskName);
+
+    public Task Invoke(string taskName) => new ResultCachingTasks(Compile()).Invoke(taskName);
+
+    private interface ITaskModification {
+      string Name { get; }
+      TaskDefinition Extend(TaskDefinition taskDefinition);
+      TaskDefinition ToTaskDefinition();
+    }
+
+    private class TaskModification<T> : ITaskModification {
+      public string Name { get; }
+      private Func<ITasks, Task<T>, Task<T>> TaskModifier { get; }
+
+      public TaskModification(string name, Func<ITasks, Task<T>, Task<T>> taskModifier) {
+        Name = name;
+        TaskModifier = taskModifier;
       }
-      throw new TaskUndefinedException($"Could not modify the task '{taskName}'. The task is not defined yet.");
-    }
 
-    public bool TryGetTask(string taskName, out ITaskDefinition task) {
-      ITaskDefinition taskDefinition;
-      if (TaskDefinitions.TryGetValue(taskName, out taskDefinition)) {
-        task = taskDefinition;
-        return true;
+      public TaskDefinition Extend(TaskDefinition taskDefinition) {
+        AssertTaskTypeIsSame<T>(Name, taskDefinition);
+        return new TaskDefinition(typeof(T), tasker => TaskModifier(tasker, (Task<T>) taskDefinition.Task(tasker)));
       }
-      task = null;
-      return false;
+
+      public TaskDefinition ToTaskDefinition() {
+        throw new TaskUndefinedException($"Could not modify the task '{Name}'. The task is not defined yet.");
+      }
     }
 
-    private static void AssertTaskTypeNotOverridden<T>(string taskName, ITaskDefinition previousTaskDefinition) {
+    private static void AssertTaskTypeIsSame<T>(string taskName, TaskDefinition previousTaskDefinition) {
       if (previousTaskDefinition.ReturnType != typeof(T)) {
         throw new TaskTypeOverrideException($"Could not redefine the type of task '{taskName}' from '{previousTaskDefinition.ReturnType}' to '{typeof(T)}'. Redefinition of task types is not allowed.");
       }
     }
 
-    private class TaskDefinition<T> : ITaskDefinition {
-      public Type ReturnType => typeof(T);
-      public Func<ITasker, Task<T>> Task { get; }
-      Func<ITasker, Task> ITaskDefinition.Task => Task;
+    private class TaskOverride<T> : ITaskModification {
+      public string Name { get; }
+      private Func<ITasks, Task<T>> Task { get; }
 
-      public TaskDefinition(Func<ITasker, Task<T>> originalTask, Func<ITasker, Task<T>, Task<T>> modifierTask) {
-        Task = context => modifierTask(context, originalTask(context));
-      }
-
-      public TaskDefinition(Func<ITasker, Task<T>> originalTask) {
+      public TaskOverride(string name, Func<ITasks, Task<T>> originalTask) {
         Task = originalTask;
+        Name = name;
       }
+
+      public TaskDefinition Extend(TaskDefinition taskDefinition) {
+        AssertTaskTypeIsSame<T>(Name, taskDefinition);
+        return ToTaskDefinition();
+      }
+
+      public TaskDefinition ToTaskDefinition() => new TaskDefinition(typeof(T), Task);
     }
   }
 }

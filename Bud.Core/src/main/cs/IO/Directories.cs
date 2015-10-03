@@ -1,15 +1,13 @@
 using System;
 using System.IO;
-using System.Text;
 
 namespace Bud.IO {
   public static class Directories {
     public static string CreateTemporary(string prefix, string suffix) {
       string baseDir = Path.GetTempPath();
       string tempDir;
-      Random rng = new Random();
       do {
-        tempDir = Path.Combine(baseDir, CreateRandomName(rng, prefix, suffix));
+        tempDir = Path.Combine(baseDir, CreateRandomName(prefix, suffix));
       } while (Directory.Exists(tempDir));
       Directory.CreateDirectory(tempDir);
       return tempDir;
@@ -31,9 +29,8 @@ namespace Bud.IO {
       }
     }
 
-    private static string CreateRandomName(Random rng, string prefix, string suffix) {
-      return prefix + Guid.NewGuid().ToString() + suffix;
+    private static string CreateRandomName(string prefix, string suffix) {
+      return prefix + Guid.NewGuid() + suffix;
     }
   }
 }
-

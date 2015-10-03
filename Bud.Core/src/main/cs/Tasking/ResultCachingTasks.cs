@@ -1,14 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Threading.Tasks;
 
 namespace Bud.Tasking {
-  internal class Tasker : ITasker {
-    private Tasks Tasks { get; }
+  internal class ResultCachingTasks : ITasks {
+    private IDictionary<string, TaskDefinition> Tasks { get; }
     private ImmutableDictionary<string, TaskResult> taskResultCache = ImmutableDictionary<string, TaskResult>.Empty;
     private readonly object taskResultCacheGuard = new object();
 
-    internal Tasker(Tasks tasks) {
+    internal ResultCachingTasks(IDictionary<string, TaskDefinition> tasks) {
       Tasks = tasks;
     }
 
@@ -31,8 +32,8 @@ namespace Bud.Tasking {
         if (taskResultCache.TryGetValue(taskName, out taskResult)) {
           return taskResult;
         }
-        ITaskDefinition taskDefinition;
-        if (Tasks.TryGetTask(taskName, out taskDefinition)) {
+        TaskDefinition taskDefinition;
+        if (Tasks.TryGetValue(taskName, out taskDefinition)) {
           taskResult = new TaskResult {ResultType = taskDefinition.ReturnType, Result = taskDefinition.Task(this)};
           taskResultCache = taskResultCache.Add(taskName, taskResult);
           return taskResult;

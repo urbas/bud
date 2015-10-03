@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{9A963E52-B49C-E28F-C5CA-BC5AE14338E1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Bud</RootNamespace>
+    <AssemblyName>Bud.Core.Test</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\.bud\output\test\cs\dist</OutputPath>
+    <BaseIntermediateOutputPath>..\..\..\.bud\output\test\cs\debug\obj</BaseIntermediateOutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>full</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\..\.bud\output\test\cs\dist</OutputPath>
+    <BaseIntermediateOutputPath>..\..\..\.bud\output\test\cs\release\obj</BaseIntermediateOutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Data.Linq" />
+    <Reference Include="System.Collections.Immutable.dll">
+      <HintPath>../../../../.bud/global/nuGetRepository/Microsoft.Bcl.Immutable.1.0.34/lib/portable-net45+win8+wp8+wpa81/System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json.dll">
+      <HintPath>../../../../.bud/global/nuGetRepository/Newtonsoft.Json.6.0.8/lib/net45/Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NuGet.Core.dll">
+      <HintPath>../../../../.bud/global/nuGetRepository/NuGet.Core.2.8.5/lib/net40-Client/NuGet.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Antlr4.StringTemplate.dll">
+      <HintPath>../../../../.bud/global/nuGetRepository/Antlr4.StringTemplate.4.0.6.9004/lib/net35/Antlr4.StringTemplate.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit-console-runner.dll">
+      <HintPath>../../../../.bud/global/nuGetRepository/Bud.NUnit.ConsoleRunner.0.0.1/lib/net40/nunit-console-runner.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.core.dll">
+      <HintPath>../../../../.bud/global/nuGetRepository/Bud.NUnit.ConsoleRunner.0.0.1/lib/net40/nunit.core.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.core.interfaces.dll">
+      <HintPath>../../../../.bud/global/nuGetRepository/Bud.NUnit.ConsoleRunner.0.0.1/lib/net40/nunit.core.interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.util.dll">
+      <HintPath>../../../../.bud/global/nuGetRepository/Bud.NUnit.ConsoleRunner.0.0.1/lib/net40/nunit.util.dll</HintPath>
+    </Reference>
+    <Reference Include="CommandLine.dll">
+      <HintPath>../../../../.bud/global/nuGetRepository/CommandLineParser.1.9.71/lib/net45/CommandLine.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Web.XmlTransform.dll">
+      <HintPath>../../../../.bud/global/nuGetRepository/Microsoft.Web.Xdt.2.1.1/lib/net40/Microsoft.Web.XmlTransform.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework.dll">
+      <HintPath>../../../../.bud/global/nuGetRepository/NUnit.2.6.4/lib/nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Moq.dll">
+      <HintPath>../../../../.bud/global/nuGetRepository/Moq.4.2.1502.0911/lib/net40/Moq.dll</HintPath>
+    </Reference>
+    <ProjectReference Include="../../main/cs/Bud.Core.csproj">
+      <Project>{8b9c0b3e-fd13-d416-ef2b-4e7fa81105bb}</Project>
+      <Name>Bud.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="KeyPathUtilsTest.cs" />
+    <Compile Include="KeyTest.cs" />
+    <Compile Include="Cli\CommandListParserTest.cs" />
+    <Compile Include="Cli\ConsoleBufferTestUtils.cs" />
+    <Compile Include="Cli\ConsoleBufferUtilsTest.cs" />
+    <Compile Include="Cli\ConsoleTestUtils.cs" />
+    <Compile Include="Cli\InteractiveConsoleTest.cs" />
+    <Compile Include="Cli\LineEditorTest.cs" />
+    <Compile Include="Cli\MemoryConsoleBuffer.cs" />
+    <Compile Include="IO\PathsTest.cs" />
+    <Compile Include="Plugins\ProjectsPluginTest.cs" />
+    <Compile Include="SettingsConstruction\SettingConstructionTest.cs" />
+    <Compile Include="Take2\BuildTest.cs" />
+    <Compile Include="Take2\CSharp.cs" />
+    <Compile Include="Take2\CSharpProjectTest.cs" />
+    <Compile Include="Take2\Nothing.cs" />
+    <Compile Include="Tasking\TasksTest.cs" />
+    <EmbeddedResource Include="TestResources\PlainMainClass.cs" />
+    <Compile Include="Util\StringUtilsTest.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
