@@ -4,11 +4,13 @@ using Bud.Tasking;
 
 namespace Bud.Take2 {
   public static class CSharp {
-    public static Tasks Project() => Tasks.New.SetAsync("outputAssembly", GetOutputAssemblyPath);
+    public static readonly Key<string> OutputAssembly = "outputAssembly";
+
+    public static Tasks Project() => Tasks.New.SetAsync(OutputAssembly, GetOutputAssemblyPath);
 
     private static async Task<string> GetOutputAssemblyPath(ITasks tasks) {
-      var baseDir = await tasks.Invoke<string>("projectDir");
-      var id = await tasks.Invoke<string>("projectId");
+      var baseDir = await tasks.Get(Build.ProjectDir);
+      var id = await tasks.Get(Build.ProjectId);
       return Path.Combine(baseDir, "target", $"{id}.exe");
     }
   }

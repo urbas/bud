@@ -7,12 +7,12 @@ namespace Bud.Take2 {
 
     [Test]
     public async void should_set_the_projectDir() {
-      Assert.AreEqual("foo", await fooBarProject.Invoke<string>("projectDir"));
+      Assert.AreEqual("foo", await fooBarProject.Get(Build.ProjectDir));
     }
 
     [Test]
     public async void should_set_the_projectId() {
-      Assert.AreEqual("Foo.Bar", await fooBarProject.Invoke<string>("projectId"));
+      Assert.AreEqual("Foo.Bar", await fooBarProject.Get(Build.ProjectId));
     }
   }
 }

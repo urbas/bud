@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Bud.Tasking {
   public class Tasks : ITasks {
-    public readonly static Tasks New = new Tasks();
+    public static readonly Tasks New = new Tasks();
     private ImmutableList<ITaskModification> TaskModifications { get; }
 
     private Tasks() : this(ImmutableList<ITaskModification>.Empty) {}
@@ -14,15 +14,17 @@ namespace Bud.Tasking {
       TaskModifications = taskModifications;
     }
 
-    public Tasks SetAsync<T>(string taskName, Func<ITasks, Task<T>> task) => Add(new TaskOverride<T>(taskName, task));
+    public Task Get(string taskName) => new TasksResultCache(Compile()).Get(taskName);
+    public Task<T> Get<T>(Key<T> taskName) => new TasksResultCache(Compile()).Get<T>(taskName);
 
-    public Tasks ModifyAsync<T>(string taskName, Func<ITasks, Task<T>, Task<T>> task) => Add(new TaskModification<T>(taskName, task));
+    public Tasks Const<T>(Key<T> taskName, T value) => Add(new TaskOverride<T>(taskName, tasks => Task.FromResult(value)));
+    public Tasks Set<T>(Key<T> taskName, Func<T> task) => Add(new TaskOverride<T>(taskName, tasks => Task.FromResult(task())));
+    public Tasks SetAsync<T>(Key<T> taskName, Func<ITasks, Task<T>> task) => Add(new TaskOverride<T>(taskName, task));
+    public Tasks Modify<T>(Key<T> taskName, Func<T, T> task) => Add(new TaskModification<T>(taskName, async (tasks, oldTask) => task(await oldTask)));
+    public Tasks ModifyAsync<T>(Key<T> taskName, Func<ITasks, Task<T>, Task<T>> task) => Add(new TaskModification<T>(taskName, task));
+    public Tasks ExtendWith(Tasks tasks) => new Tasks(TaskModifications.AddRange(tasks.TaskModifications));
 
-    private Tasks Add(ITaskModification taskModification) => new Tasks(TaskModifications.Add(taskModification));
-
-    public Tasks ExtendedWith(Tasks tasks) => new Tasks(TaskModifications.AddRange(tasks.TaskModifications));
-
-    public IDictionary<string, TaskDefinition> Compile() {
+    internal IDictionary<string, TaskDefinition> Compile() {
       var taskDefinitions = new Dictionary<string, TaskDefinition>();
       foreach (var taskModification in TaskModifications) {
         TaskDefinition existingTaskDefinition;
@@ -35,9 +37,7 @@ namespace Bud.Tasking {
       return taskDefinitions;
     }
 
-    public Task<T> Invoke<T>(string taskName) => new TasksResultCache(Compile()).Invoke<T>(taskName);
-
-    public Task Invoke(string taskName) => new TasksResultCache(Compile()).Invoke(taskName);
+    private Tasks Add(ITaskModification taskModification) => new Tasks(TaskModifications.Add(taskModification));
 
     private interface ITaskModification {
       string Name { get; }

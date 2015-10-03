@@ -86,6 +86,7 @@
     <Compile Include="Setup.cs" />
     <Compile Include="SetupUtils.cs" />
     <Compile Include="Take2\Build.cs" />
+    <Compile Include="Tasking\Key.cs" />
     <Compile Include="Tasking\TaskDefinition.cs" />
     <Compile Include="TaskKey.cs" />
     <Compile Include="Build\BuildDirs.cs" />

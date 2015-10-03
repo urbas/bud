@@ -13,13 +13,13 @@ namespace Bud.Tasking {
       Tasks = tasks;
     }
 
-    public Task<T> Invoke<T>(string taskName) {
+    public Task<T> Get<T>(Key<T> taskName) {
       var taskResult = GetFromCacheOrInvoke(taskName);
       AssertTaskTypedCorrectly<T>(taskName, taskResult.ResultType);
       return (Task<T>) taskResult.Result;
     }
 
-    public Task Invoke(string taskName) => GetFromCacheOrInvoke(taskName).Result;
+    public Task Get(string taskName) => GetFromCacheOrInvoke(taskName).Result;
 
     private TaskResult GetFromCacheOrInvoke(string taskName) {
       TaskResult taskResult;

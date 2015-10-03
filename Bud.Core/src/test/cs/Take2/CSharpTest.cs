@@ -4,14 +4,14 @@ using Bud.Tasking;
 using NUnit.Framework;
 
 namespace Bud.Take2 {
-  public class CSharpProjectTest {
+  public class CSharpTest {
     private TemporaryDirectory tempDir;
     private Tasks fooBarProject;
 
     [SetUp]
     public void SetUp() {
       tempDir = new TemporaryDirectory();
-      fooBarProject = Build.Project(tempDir.Path, "Foo.Bar").ExtendedWith(CSharp.Project());
+      fooBarProject = Build.Project(tempDir.Path, "Foo.Bar").ExtendWith(CSharp.Project());
     }
 
     [TearDown]
@@ -20,7 +20,7 @@ namespace Bud.Take2 {
     [Test]
     public async void output_assembly_must_be_placed_in_the_target_folder() {
       Assert.AreEqual(Path.Combine(tempDir.Path, "target", "Foo.Bar.exe"),
-                      await fooBarProject.Invoke<string>("outputAssembly"));
+                      await fooBarProject.Get(CSharp.OutputAssembly));
     }
   }
 }

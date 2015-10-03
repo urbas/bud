@@ -53,7 +53,7 @@ namespace Bud.Tasking {
     public void ExtendedWith_must_contain_task_definitions_from_the_original_as_well_as_extending_tasks() {
       var originalTasks = Tasks.New.SetAsync("fooTask", tasker => Task.FromResult(42));
       var extendingTasks = Tasks.New.SetAsync("barTask", tasker => Task.FromResult(52));
-      var combinedTasks = originalTasks.ExtendedWith(extendingTasks).Compile();
+      var combinedTasks = originalTasks.ExtendWith(extendingTasks).Compile();
       Assert.IsTrue(combinedTasks.ContainsKey("fooTask"));
       Assert.IsTrue(combinedTasks.ContainsKey("barTask"));
     }
@@ -77,14 +77,14 @@ namespace Bud.Tasking {
 
     [Test]
     public void Invoking_an_undefined_task_must_throw_an_exception() {
-      var actualException = Assert.Throws<TaskUndefinedException>(async () => await Tasks.New.Invoke<string>("fooTask"));
+      var actualException = Assert.Throws<TaskUndefinedException>(async () => await Tasks.New.Get<string>("fooTask"));
       Assert.AreEqual("Task 'fooTask' is undefined.", actualException.Message);
     }
 
     [Test]
     public async void Invoking_an_async_task_must_return_value() {
       var taskResult = await Tasks.New.SetAsync("fooTask", fooTask.Object)
-                                  .Invoke<string>("fooTask");
+                                  .Get<string>("fooTask");
       Assert.AreEqual("foo", taskResult);
     }
 
@@ -92,7 +92,7 @@ namespace Bud.Tasking {
     public async void Invoking_an_overridden_task_should_call_the_override_only_once() {
       await Tasks.New.SetAsync("fooTask", fooTask.Object)
                  .SetAsync("fooTask", fooTask.Object)
-                 .Invoke<string>("fooTask");
+                 .Get<string>("fooTask");
       fooTask.Verify(self => self(It.IsAny<ITasks>()), Times.Once);
     }
 
@@ -100,14 +100,14 @@ namespace Bud.Tasking {
     public async void Invoking_modified_tasks_must_return_the_modified_value() {
       var taskResult = await Tasks.New.SetAsync("fooTask", fooTask.Object)
                                   .ModifyAsync("fooTask", appendBarStringTask.Object)
-                                  .Invoke<string>("fooTask");
+                                  .Get<string>("fooTask");
       Assert.AreEqual("foobar", taskResult);
     }
 
     [Test]
     public void Invoking_a_task_expecting_the_wrong_result_type_must_throw_an_exception() {
       var tasks = Tasks.New.SetAsync("fooTask", fooTask.Object);
-      var actualException = Assert.Throws<TaskReturnsDifferentTypeException>(async () => await tasks.Invoke<int>("fooTask"));
+      var actualException = Assert.Throws<TaskReturnsDifferentTypeException>(async () => await tasks.Get<int>("fooTask"));
       Assert.AreEqual("Task 'fooTask' returns 'System.String' but was expected to return 'System.Int32'.", actualException.Message);
     }
 
@@ -115,15 +115,15 @@ namespace Bud.Tasking {
     public async void Defining_and_then_invoking_two_tasks_must_return_both_of_their_values() {
       var tasks = Tasks.New.SetAsync("fooTask", fooTask.Object)
                        .SetAsync("mooTask", mooTask.Object);
-      Assert.AreEqual("moo", await tasks.Invoke<string>("mooTask"));
-      Assert.AreEqual("foo", await tasks.Invoke<string>("fooTask"));
+      Assert.AreEqual("moo", await tasks.Get<string>("mooTask"));
+      Assert.AreEqual("foo", await tasks.Get<string>("fooTask"));
     }
 
     [Test]
     public async void Invoking_a_single_task_must_not_invoke_the_other() {
       await Tasks.New.SetAsync("fooTask", fooTask.Object)
                  .SetAsync("mooTask", mooTask.Object)
-                 .Invoke<string>("fooTask");
+                 .Get<string>("fooTask");
       mooTask.Verify(self => self(It.IsAny<ITasks>()), Times.Never);
     }
 
@@ -131,7 +131,7 @@ namespace Bud.Tasking {
     public async void Invoking_an_overridden_task_must_return_the_last_value() {
       var taskResult = await Tasks.New.SetAsync("fooTask", fooTask.Object)
                                   .SetAsync("fooTask", mooTask.Object)
-                                  .Invoke<string>("fooTask");
+                                  .Get<string>("fooTask");
       Assert.AreEqual("moo", taskResult);
     }
 
@@ -139,7 +139,7 @@ namespace Bud.Tasking {
     public async void Invoking_an_overriden_task_must_not_invoke_the_original_task() {
       await Tasks.New.SetAsync("fooTask", fooTask.Object)
                  .SetAsync("fooTask", mooTask.Object)
-                 .Invoke<string>("fooTask");
+                 .Get<string>("fooTask");
       fooTask.Verify(self => self(It.IsAny<ITasks>()), Times.Never);
     }
 
@@ -148,7 +148,7 @@ namespace Bud.Tasking {
       var taskResult = await Tasks.New.SetAsync("fooTask", fooTask.Object)
                                   .ModifyAsync("fooTask", appendBarStringTask.Object)
                                   .SetAsync("myTask", InvokeFooTwiceAndConcatenate)
-                                  .Invoke<string>("myTask");
+                                  .Get<string>("myTask");
       Assert.AreEqual("foobarfoobar", taskResult);
     }
 
@@ -156,7 +156,7 @@ namespace Bud.Tasking {
     public async void a_dependent_task_is_invoked_only_once() {
       await Tasks.New.SetAsync("fooTask", fooTask.Object)
                  .SetAsync("myTask", InvokeFooTwiceAndConcatenate)
-                 .Invoke<string>("myTask");
+                 .Get<string>("myTask");
       fooTask.Verify(self => self(It.IsAny<ITasks>()), Times.Once);
     }
 
@@ -164,7 +164,7 @@ namespace Bud.Tasking {
     public void throw_when_invoking_a_dependent_task_for_the_second_time_expecting_the_wrong_type() {
       var tasks = Tasks.New.SetAsync("fooTask", fooTask.Object)
                        .SetAsync("myTask", InvokeFooAsStringAndInt);
-      var exception = Assert.Throws<TaskReturnsDifferentTypeException>(async () => await tasks.Invoke<string>("myTask"));
+      var exception = Assert.Throws<TaskReturnsDifferentTypeException>(async () => await tasks.Get<string>("myTask"));
       Assert.That(exception.Message, Contains.Substring("fooTask"));
       Assert.That(exception.Message, Contains.Substring("System.String"));
       Assert.That(exception.Message, Contains.Substring("System.Int32"));
@@ -175,7 +175,7 @@ namespace Bud.Tasking {
       var taskResult = await Tasks.New.SetAsync("fooTask", fooTask.Object)
                                   .SetAsync("mooTask", mooTask.Object)
                                   .ModifyAsync<string>("mooTask", PrependFooTaskResult)
-                                  .Invoke<string>("mooTask");
+                                  .Get<string>("mooTask");
       Assert.AreEqual("foomoo", taskResult);
     }
 
@@ -186,7 +186,7 @@ namespace Bud.Tasking {
                        .SetAsync("multithreadedTask", InvokeFooTaskTwiceConcurrently);
       int repeatCount = 10;
       for (int i = 0; i < repeatCount; i++) {
-        await tasks.Invoke<string>("multithreadedTask");
+        await tasks.Get<string>("multithreadedTask");
       }
       fooTask.Verify(self => self(It.IsAny<ITasks>()), Times.Exactly(repeatCount));
       appendBarStringTask.Verify(self => self(It.IsAny<ITasks>(), It.IsAny<Task<string>>()), Times.Exactly(repeatCount));
@@ -195,7 +195,7 @@ namespace Bud.Tasking {
     [Test]
     public async void Invoking_a_task_without_specifying_a_type() {
       await Tasks.New.SetAsync("fooTask", fooTask.Object)
-                 .Invoke("fooTask");
+                 .Get("fooTask");
       fooTask.Verify(self => self(It.IsAny<ITasks>()));
     }
 
@@ -203,31 +203,50 @@ namespace Bud.Tasking {
     public async void invoke_once_when_invoking_a_task_without_specifying_a_type_and_again_with_a_type() {
       var tasker = Tasks.New.SetAsync("fooTask", fooTask.Object)
                         .SetAsync("myTask", InvokeFooTwiceTypedAndUntyped);
-      await tasker.Invoke("myTask");
+      await tasker.Get("myTask");
       fooTask.Verify(self => self(It.IsAny<ITasks>()));
     }
 
+    [Test]
+    public async void invoking_a_constant_task() {
+      var tasker = Tasks.New.Const("fooTask", 42);
+      Assert.AreEqual(42, await tasker.Get<int>("fooTask"));
+    }
+
+    [Test]
+    public async void invoking_a_synchronous_task() {
+      var tasker = Tasks.New.Set("fooTask", () => 42);
+      Assert.AreEqual(42, await tasker.Get<int>("fooTask"));
+    }
+
+    [Test]
+    public async void invoking_a_synchronous_modified_task() {
+      var tasker = Tasks.New.Set("fooTask", () => 42)
+                        .Modify<int>("fooTask", oldTaskValue => oldTaskValue + 58);
+      Assert.AreEqual(100, await tasker.Get<int>("fooTask"));
+    }
+
     private static async Task<string> InvokeFooTwiceAndConcatenate(ITasks context) {
-      return await context.Invoke<string>("fooTask") + await context.Invoke<string>("fooTask");
+      return await context.Get<string>("fooTask") + await context.Get<string>("fooTask");
     }
 
     private static async Task<string> InvokeFooTwiceTypedAndUntyped(ITasks tasks) {
-      await tasks.Invoke("fooTask");
-      return await tasks.Invoke<string>("fooTask");
+      await tasks.Get("fooTask");
+      return await tasks.Get<string>("fooTask");
     }
 
     private static async Task<string> InvokeFooTaskTwiceConcurrently(ITasks context) {
-      var first = Task.Run(async () => await context.Invoke<string>("fooTask"));
-      var second = Task.Run(async () => await context.Invoke<string>("fooTask"));
+      var first = Task.Run(async () => await context.Get<string>("fooTask"));
+      var second = Task.Run(async () => await context.Get<string>("fooTask"));
       return await first + await second;
     }
 
     private static async Task<string> InvokeFooAsStringAndInt(ITasks context) {
-      return await context.Invoke<string>("fooTask") + await context.Invoke<int>("fooTask");
+      return await context.Get<string>("fooTask") + await context.Get<int>("fooTask");
     }
 
     private static async Task<string> PrependFooTaskResult(ITasks context, Task<string> oldValue) {
-      return await context.Invoke<string>("fooTask") + await oldValue;
+      return await context.Get<string>("fooTask") + await oldValue;
     }
   }
 }
