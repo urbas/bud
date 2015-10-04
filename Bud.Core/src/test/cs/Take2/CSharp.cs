@@ -6,7 +6,7 @@ namespace Bud.Take2 {
   public static class CSharp {
     public static readonly Key<string> OutputAssembly = "outputAssembly";
 
-    public static Tasks Project() => Tasks.New.SetAsync(OutputAssembly, GetOutputAssemblyPath);
+    public static Tasks CSharpProject() => Tasks.New.SetAsync(OutputAssembly, GetOutputAssemblyPath);
 
     private static async Task<string> GetOutputAssemblyPath(ITasks tasks) {
       var baseDir = await tasks.Get(Build.ProjectDir);

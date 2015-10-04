@@ -21,7 +21,7 @@ namespace Bud.Tasking {
 
     [Test]
     public void overriding_a_task_with_a_different_type_must_throw_an_exception() {
-      var exception = Assert.Throws<TaskTypeOverrideException>(
+      var exception = Assert.Throws<TaskReturnTypeException>(
         () => Tasks.New.SetAsync("fooTask", context => Task.FromResult("foo"))
                    .SetAsync("fooTask", context => Task.FromResult(42))
                    .Compile());
@@ -32,7 +32,7 @@ namespace Bud.Tasking {
 
     [Test]
     public void modifying_a_task_with_a_different_type_must_throw_an_exception() {
-      var exception = Assert.Throws<TaskTypeOverrideException>(
+      var exception = Assert.Throws<TaskReturnTypeException>(
         () => Tasks.New.SetAsync("fooTask", context => Task.FromResult("foo"))
                    .ModifyAsync<int>("fooTask", (context, oldTask) => Task.FromResult(42))
                    .Compile());
@@ -107,7 +107,7 @@ namespace Bud.Tasking {
     [Test]
     public void Invoking_a_task_expecting_the_wrong_result_type_must_throw_an_exception() {
       var tasks = Tasks.New.SetAsync("fooTask", fooTask.Object);
-      var actualException = Assert.Throws<TaskReturnsDifferentTypeException>(async () => await tasks.Get<int>("fooTask"));
+      var actualException = Assert.Throws<TaskReturnTypeException>(async () => await tasks.Get<int>("fooTask"));
       Assert.AreEqual("Task 'fooTask' returns 'System.String' but was expected to return 'System.Int32'.", actualException.Message);
     }
 
@@ -164,7 +164,7 @@ namespace Bud.Tasking {
     public void throw_when_invoking_a_dependent_task_for_the_second_time_expecting_the_wrong_type() {
       var tasks = Tasks.New.SetAsync("fooTask", fooTask.Object)
                        .SetAsync("myTask", InvokeFooAsStringAndInt);
-      var exception = Assert.Throws<TaskReturnsDifferentTypeException>(async () => await tasks.Get<string>("myTask"));
+      var exception = Assert.Throws<TaskReturnTypeException>(async () => await tasks.Get<string>("myTask"));
       Assert.That(exception.Message, Contains.Substring("fooTask"));
       Assert.That(exception.Message, Contains.Substring("System.String"));
       Assert.That(exception.Message, Contains.Substring("System.Int32"));
@@ -240,6 +240,14 @@ namespace Bud.Tasking {
       var nestedTasks = Tasks.New.Nest("bar", tasks);
       Assert.AreEqual("foofoo", await nestedTasks.Get<string>("bar/duplicatingTask"));
       fooTask.Verify(self => self(It.IsAny<ITasks>()));
+    }
+
+    [Test]
+    public void throw_when_modifying_a_nested_undefined_task() {
+      var tasks = Tasks.New.Modify<int>("fooTask", oldTaskValue => oldTaskValue + 1);
+      var nestedTasks = Tasks.New.Nest("bar", tasks);
+      var exception = Assert.Throws<TaskUndefinedException>(async () => await nestedTasks.Get<int>("bar/fooTask"));
+      Assert.That(exception.Message, Contains.Substring("bar/fooTask"));
     }
 
     private static async Task<string> InvokeFooTwiceAndConcatenate(ITasks context) {

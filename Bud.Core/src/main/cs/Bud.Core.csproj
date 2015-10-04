@@ -88,7 +88,7 @@
     <Compile Include="Take2\Build.cs" />
     <Compile Include="Tasking\ITaskModification.cs" />
     <Compile Include="Tasking\Key.cs" />
-    <Compile Include="Tasking\PrefixedTasks.cs" />
+    <Compile Include="Tasking\NestedTasks.cs" />
     <Compile Include="Tasking\TaskNestingModification.cs" />
     <Compile Include="Tasking\TaskDefinition.cs" />
     <Compile Include="Tasking\TaskModification.cs" />
@@ -215,8 +215,7 @@
     <Compile Include="Tasking\TasksResultCache.cs" />
     <Compile Include="Tasking\ITasks.cs" />
     <Compile Include="Tasking\Tasks.cs" />
-    <Compile Include="Tasking\TaskReturnsDifferentTypeException.cs" />
-    <Compile Include="Tasking\TaskTypeOverrideException.cs" />
+    <Compile Include="Tasking\TaskReturnTypeException.cs" />
     <Compile Include="Tasking\TaskUndefinedException.cs" />
     <Compile Include="Util\AssemblyUtils.cs" />
     <Compile Include="Util\ExceptionUtils.cs" />

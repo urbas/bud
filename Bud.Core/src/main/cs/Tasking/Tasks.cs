@@ -15,7 +15,7 @@ namespace Bud.Tasking {
       TaskModifications = taskModifications;
     }
 
-    public Task Get(string taskName) => new TasksResultCache(Compile()).Get(taskName);
+    public Task Get(Key taskName) => new TasksResultCache(Compile()).Get(taskName);
     public Task<T> Get<T>(Key<T> taskName) => new TasksResultCache(Compile()).Get<T>(taskName);
     public Tasks Const<T>(Key<T> taskName, T value) => Add(new TaskOverride<T>(taskName, tasks => Task.FromResult(value)));
     public Tasks Set<T>(Key<T> taskName, Func<T> task) => Add(new TaskOverride<T>(taskName, tasks => Task.FromResult(task())));
@@ -42,7 +42,7 @@ namespace Bud.Tasking {
 
     internal static void AssertTaskTypeIsSame<T>(string taskName, TaskDefinition previousTaskDefinition) {
       if (previousTaskDefinition.ReturnType != typeof(T)) {
-        throw new TaskTypeOverrideException($"Could not redefine the type of task '{taskName}' from '{previousTaskDefinition.ReturnType}' to '{typeof(T)}'. Redefinition of task types is not allowed.");
+        throw new TaskReturnTypeException($"Could not redefine the type of task '{taskName}' from '{previousTaskDefinition.ReturnType}' to '{typeof(T)}'. Redefinition of task types is not allowed.");
       }
     }
   }

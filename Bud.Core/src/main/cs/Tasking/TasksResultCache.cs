@@ -19,14 +19,14 @@ namespace Bud.Tasking {
       return (Task<T>) taskResult.Result;
     }
 
-    public Task Get(string taskName) => GetFromCacheOrInvoke(taskName).Result;
+    public Task Get(Key taskName) => GetFromCacheOrInvoke(taskName).Result;
 
     private TaskResult GetFromCacheOrInvoke(string taskName) {
       TaskResult taskResult;
-      return taskResultCache.TryGetValue(taskName, out taskResult) ? taskResult : InvokeTask(taskName);
+      return taskResultCache.TryGetValue(taskName, out taskResult) ? taskResult : InvokeTaskAndCache(taskName);
     }
 
-    private TaskResult InvokeTask(string taskName) {
+    private TaskResult InvokeTaskAndCache(string taskName) {
       lock (taskResultCacheGuard) {
         TaskResult taskResult;
         if (taskResultCache.TryGetValue(taskName, out taskResult)) {
@@ -44,7 +44,7 @@ namespace Bud.Tasking {
 
     private static void AssertTaskTypedCorrectly<T>(string taskName, Type actualTaskReturnType) {
       if (actualTaskReturnType != typeof(T)) {
-        throw new TaskReturnsDifferentTypeException($"Task '{taskName}' returns '{actualTaskReturnType.FullName}' but was expected to return '{typeof(T).FullName}'.");
+        throw new TaskReturnTypeException($"Task '{taskName}' returns '{actualTaskReturnType.FullName}' but was expected to return '{typeof(T).FullName}'.");
       }
     }
 
