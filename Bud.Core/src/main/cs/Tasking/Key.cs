@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace Bud.Tasking {
   public struct Key<T> {
     public readonly string Id;
@@ -8,5 +10,7 @@ namespace Bud.Tasking {
     public static implicit operator Key<T>(string id) => new Key<T>(id);
 
     public static implicit operator string(Key<T> key) => key.Id;
+
+    public Task<T> this[ITasks tasks] => tasks.Get(this);
   }
 }

@@ -86,8 +86,13 @@
     <Compile Include="Setup.cs" />
     <Compile Include="SetupUtils.cs" />
     <Compile Include="Take2\Build.cs" />
+    <Compile Include="Tasking\ITaskModification.cs" />
     <Compile Include="Tasking\Key.cs" />
+    <Compile Include="Tasking\PrefixedTasks.cs" />
+    <Compile Include="Tasking\TaskNestingModification.cs" />
     <Compile Include="Tasking\TaskDefinition.cs" />
+    <Compile Include="Tasking\TaskModification.cs" />
+    <Compile Include="Tasking\TaskOverride.cs" />
     <Compile Include="TaskKey.cs" />
     <Compile Include="Build\BuildDirs.cs" />
     <Compile Include="Build\BuildDirsKeys.cs" />

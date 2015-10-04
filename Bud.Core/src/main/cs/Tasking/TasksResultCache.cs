@@ -23,10 +23,10 @@ namespace Bud.Tasking {
 
     private TaskResult GetFromCacheOrInvoke(string taskName) {
       TaskResult taskResult;
-      return taskResultCache.TryGetValue(taskName, out taskResult) ? taskResult : CalculateTaskResult(taskName);
+      return taskResultCache.TryGetValue(taskName, out taskResult) ? taskResult : InvokeTask(taskName);
     }
 
-    private TaskResult CalculateTaskResult(string taskName) {
+    private TaskResult InvokeTask(string taskName) {
       lock (taskResultCacheGuard) {
         TaskResult taskResult;
         if (taskResultCache.TryGetValue(taskName, out taskResult)) {

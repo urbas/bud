@@ -20,7 +20,7 @@ namespace Bud.Take2 {
     [Test]
     public async void output_assembly_must_be_placed_in_the_target_folder() {
       Assert.AreEqual(Path.Combine(tempDir.Path, "target", "Foo.Bar.exe"),
-                      await fooBarProject.Get(CSharp.OutputAssembly));
+                      await CSharp.OutputAssembly[fooBarProject]);
     }
   }
 }

@@ -51,8 +51,8 @@ namespace Bud.Tasking {
 
     [Test]
     public void ExtendedWith_must_contain_task_definitions_from_the_original_as_well_as_extending_tasks() {
-      var originalTasks = Tasks.New.SetAsync("fooTask", tasker => Task.FromResult(42));
-      var extendingTasks = Tasks.New.SetAsync("barTask", tasker => Task.FromResult(52));
+      var originalTasks = Tasks.New.SetAsync("fooTask", tasks => Task.FromResult(42));
+      var extendingTasks = Tasks.New.SetAsync("barTask", tasks => Task.FromResult(52));
       var combinedTasks = originalTasks.ExtendWith(extendingTasks).Compile();
       Assert.IsTrue(combinedTasks.ContainsKey("fooTask"));
       Assert.IsTrue(combinedTasks.ContainsKey("barTask"));
@@ -201,29 +201,45 @@ namespace Bud.Tasking {
 
     [Test]
     public async void invoke_once_when_invoking_a_task_without_specifying_a_type_and_again_with_a_type() {
-      var tasker = Tasks.New.SetAsync("fooTask", fooTask.Object)
-                        .SetAsync("myTask", InvokeFooTwiceTypedAndUntyped);
-      await tasker.Get("myTask");
+      var tasks = Tasks.New.SetAsync("fooTask", fooTask.Object)
+                       .SetAsync("myTask", InvokeFooTwiceTypedAndUntyped);
+      await tasks.Get("myTask");
       fooTask.Verify(self => self(It.IsAny<ITasks>()));
     }
 
     [Test]
     public async void invoking_a_constant_task() {
-      var tasker = Tasks.New.Const("fooTask", 42);
-      Assert.AreEqual(42, await tasker.Get<int>("fooTask"));
+      var tasks = Tasks.New.Const("fooTask", 42);
+      Assert.AreEqual(42, await tasks.Get<int>("fooTask"));
     }
 
     [Test]
     public async void invoking_a_synchronous_task() {
-      var tasker = Tasks.New.Set("fooTask", () => 42);
-      Assert.AreEqual(42, await tasker.Get<int>("fooTask"));
+      var tasks = Tasks.New.Set("fooTask", () => 42);
+      Assert.AreEqual(42, await tasks.Get<int>("fooTask"));
     }
 
     [Test]
     public async void invoking_a_synchronous_modified_task() {
-      var tasker = Tasks.New.Set("fooTask", () => 42)
-                        .Modify<int>("fooTask", oldTaskValue => oldTaskValue + 58);
-      Assert.AreEqual(100, await tasker.Get<int>("fooTask"));
+      var tasks = Tasks.New.Set("fooTask", () => 42)
+                       .Modify<int>("fooTask", oldTaskValue => oldTaskValue + 58);
+      Assert.AreEqual(100, await tasks.Get<int>("fooTask"));
+    }
+
+    [Test]
+    public async void nesting_prefixes_task_names() {
+      var tasks = Tasks.New.Const("fooTask", 42);
+      var nestedTasks = Tasks.New.Nest("bar", tasks);
+      Assert.AreEqual(42, await nestedTasks.Get<int>("bar/fooTask"));
+    }
+
+    [Test]
+    public async void nesting_allows_access_to_sibling_tasks() {
+      var tasks = Tasks.New.SetAsync("fooTask", fooTask.Object)
+                       .SetAsync("duplicatingTask", InvokeFooTwiceAndConcatenate);
+      var nestedTasks = Tasks.New.Nest("bar", tasks);
+      Assert.AreEqual("foofoo", await nestedTasks.Get<string>("bar/duplicatingTask"));
+      fooTask.Verify(self => self(It.IsAny<ITasks>()));
     }
 
     private static async Task<string> InvokeFooTwiceAndConcatenate(ITasks context) {
