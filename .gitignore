@@ -20,3 +20,6 @@ packages/
 **/output/
 .bud/*.dll
 TestResult.xml
+
+obj/
+bin/
