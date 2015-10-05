@@ -9,7 +9,7 @@ namespace Bud.Tasking {
     public static readonly Tasks NewTasks = new Tasks();
     private IEnumerable<ITaskModification> TaskModifications { get; }
 
-    private Tasks() : this(ImmutableArray<ITaskModification>.Empty) {}
+    private Tasks() : this(Enumerable.Empty<ITaskModification>()) {}
 
     private Tasks(IEnumerable<ITaskModification> taskModifications) {
       TaskModifications = taskModifications;
@@ -58,9 +58,9 @@ namespace Bud.Tasking {
     private IDictionary<string, TaskDefinition> Compile() {
       var taskDefinitions = new Dictionary<string, TaskDefinition>();
       foreach (var taskModification in TaskModifications) {
-        TaskDefinition existingTaskDefinition;
-        if (taskDefinitions.TryGetValue(taskModification.Name, out existingTaskDefinition)) {
-          taskDefinitions[taskModification.Name] = taskModification.Modify(existingTaskDefinition);
+        TaskDefinition taskDefinition;
+        if (taskDefinitions.TryGetValue(taskModification.Name, out taskDefinition)) {
+          taskDefinitions[taskModification.Name] = taskModification.Modify(taskDefinition);
         } else {
           taskDefinitions.Add(taskModification.Name, taskModification.ToTaskDefinition());
         }

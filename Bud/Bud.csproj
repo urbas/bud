@@ -45,16 +45,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\Build.cs" />
-    <Compile Include="src\IO\Directories.cs" />
-    <Compile Include="src\IO\TemporaryDirectory.cs" />
-    <Compile Include="src\Resources\EmbeddedResources.cs" />
-    <Compile Include="src\Tasking\ITasks.cs" />
-    <Compile Include="src\Tasking\Key.cs" />
-    <Compile Include="src\Tasking\TaskReturnTypeException.cs" />
-    <Compile Include="src\Tasking\Tasks.cs" />
-    <Compile Include="src\Tasking\TasksExtensions.cs" />
-    <Compile Include="src\Tasking\TaskUndefinedException.cs" />
+    <Compile Include="Build.cs" />
+    <Compile Include="IO\Directories.cs" />
+    <Compile Include="IO\TemporaryDirectory.cs" />
+    <Compile Include="Resources\EmbeddedResources.cs" />
+    <Compile Include="Tasking\ITasks.cs" />
+    <Compile Include="Tasking\Key.cs" />
+    <Compile Include="Tasking\TaskReturnTypeException.cs" />
+    <Compile Include="Tasking\Tasks.cs" />
+    <Compile Include="Tasking\TasksExtensions.cs" />
+    <Compile Include="Tasking\TaskUndefinedException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
