@@ -2,275 +2,173 @@ using System;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
+using static Bud.Tasking.Tasks;
 
 namespace Bud.Tasking {
   public class TasksTest {
-    private Mock<Func<ITasks, Task<string>>> fooTask;
-    private Mock<Func<ITasks, Task<string>, Task<string>>> appendBarStringTask;
-    private Mock<Func<ITasks, Task<string>>> mooTask;
+    private Mock<Func<ITasks, Task<int>, Task<int>>> mockTask;
+    private Mock<Func<Task<int>, int>> mockIncrementContinuation;
+    private readonly Key<int> fooInt = "fooTask";
+    private readonly Key<int> barInt = "barTask";
+    private readonly Key<string> fooString = "fooTask";
 
     [SetUp]
     public void SetUp() {
-      fooTask = new Mock<Func<ITasks, Task<string>>>();
-      appendBarStringTask = new Mock<Func<ITasks, Task<string>, Task<string>>>();
-      mooTask = new Mock<Func<ITasks, Task<string>>>();
-      fooTask.Setup(self => self(It.IsAny<ITasks>())).Returns(Task.FromResult("foo"));
-      mooTask.Setup(self => self(It.IsAny<ITasks>())).Returns(Task.FromResult("moo"));
-      appendBarStringTask.Setup(self => self(It.IsAny<ITasks>(), It.IsAny<Task<string>>())).Returns<ITasks, Task<string>>(async (context, oldValue) => await oldValue + "bar");
+      mockTask = new Mock<Func<ITasks, Task<int>, Task<int>>>();
+      mockTask.Setup(self => self(It.IsAny<ITasks>(), It.IsAny<Task<int>>()))
+              .Returns<ITasks, Task<int>>(SetTo42OrIncrement);
+      mockIncrementContinuation = new Mock<Func<Task<int>, int>>();
+      mockIncrementContinuation.Setup(self => self(It.IsAny<Task<int>>()))
+                               .Returns((Task<int> task) => task.Result + 1);
     }
 
     [Test]
-    public void overriding_a_task_with_a_different_type_must_throw_an_exception() {
+    public void Overriding_a_task_with_a_different_type_must_throw_an_exception() {
       var exception = Assert.Throws<TaskReturnTypeException>(
-        () => Tasks.New.SetAsync("fooTask", context => Task.FromResult("foo"))
-                   .SetAsync("fooTask", context => Task.FromResult(42))
-                   .Compile());
+        () => NewTasks.Set(fooString, (tasks, oldTask) => Task.FromResult("foo"))
+                      .Set(fooInt, (tasks, oldTask) => Task.FromResult(42))
+                      .Compile());
       Assert.That(exception.Message, Contains.Substring("fooTask"));
       Assert.That(exception.Message, Contains.Substring("System.Int32"));
       Assert.That(exception.Message, Contains.Substring("System.String"));
     }
 
     [Test]
-    public void modifying_a_task_with_a_different_type_must_throw_an_exception() {
-      var exception = Assert.Throws<TaskReturnTypeException>(
-        () => Tasks.New.SetAsync("fooTask", context => Task.FromResult("foo"))
-                   .ModifyAsync<int>("fooTask", (context, oldTask) => Task.FromResult(42))
-                   .Compile());
-      Assert.That(exception.Message, Contains.Substring("fooTask"));
-      Assert.That(exception.Message, Contains.Substring("System.String"));
-      Assert.That(exception.Message, Contains.Substring("System.Int32"));
+    public async void Invoke_a_task() {
+      Assert.AreEqual(42, await NewTasks.Set(fooInt, SetTo42OrIncrement).Get(fooInt));
     }
 
     [Test]
-    public void throw_when_modifying_a_task_that_has_not_yet_been_defined() {
-      var exception = Assert.Throws<TaskUndefinedException>(
-        () => Tasks.New.ModifyAsync<int>("fooTask", (context, oldTask) => Task.FromResult(42))
-                   .Compile());
-      Assert.That(exception.Message, Contains.Substring("fooTask"));
+    public async void Invoke_a_task_without_specifying_a_type() {
+      await NewTasks.Set(fooInt, mockTask.Object).Get(fooInt.Id);
+      mockTask.Verify(self => self(It.IsAny<ITasks>(), It.IsAny<Task<int>>()));
     }
 
     [Test]
-    public void ExtendedWith_must_contain_task_definitions_from_the_original_as_well_as_extending_tasks() {
-      var originalTasks = Tasks.New.SetAsync("fooTask", tasks => Task.FromResult(42));
-      var extendingTasks = Tasks.New.SetAsync("barTask", tasks => Task.FromResult(52));
-      var combinedTasks = originalTasks.ExtendWith(extendingTasks).Compile();
-      Assert.IsTrue(combinedTasks.ContainsKey("fooTask"));
-      Assert.IsTrue(combinedTasks.ContainsKey("barTask"));
-    }
-
-    [Test]
-    public void TryGetTask_must_return_false_when_the_task_is_not_defined() {
-      TaskDefinition task;
-      Assert.IsFalse(Tasks.New.Compile().TryGetValue("fooTask", out task));
-      Assert.IsNull(task);
-    }
-
-    [Test]
-    public void TryGetTask_must_return_true_and_set_the_out_parameter_to_the_given_task() {
-      TaskDefinition taskDefinition;
-      Func<ITasks, Task<int>> expectedTask = ctxt => Task.FromResult(42);
-      var tasks = Tasks.New.SetAsync("fooTask", expectedTask);
-      Assert.IsTrue(tasks.Compile().TryGetValue("fooTask", out taskDefinition));
-      Assert.AreSame(typeof(int), taskDefinition.ReturnType);
-      Assert.AreSame(expectedTask, taskDefinition.Task);
-    }
-
-    [Test]
-    public void Invoking_an_undefined_task_must_throw_an_exception() {
-      var actualException = Assert.Throws<TaskUndefinedException>(async () => await Tasks.New.Get<string>("fooTask"));
-      Assert.AreEqual("Task 'fooTask' is undefined.", actualException.Message);
-    }
-
-    [Test]
-    public async void Invoking_an_async_task_must_return_value() {
-      var taskResult = await Tasks.New.SetAsync("fooTask", fooTask.Object)
-                                  .Get<string>("fooTask");
-      Assert.AreEqual("foo", taskResult);
-    }
-
-    [Test]
-    public async void Invoking_an_overridden_task_should_call_the_override_only_once() {
-      await Tasks.New.SetAsync("fooTask", fooTask.Object)
-                 .SetAsync("fooTask", fooTask.Object)
-                 .Get<string>("fooTask");
-      fooTask.Verify(self => self(It.IsAny<ITasks>()), Times.Once);
-    }
-
-    [Test]
-    public async void Invoking_modified_tasks_must_return_the_modified_value() {
-      var taskResult = await Tasks.New.SetAsync("fooTask", fooTask.Object)
-                                  .ModifyAsync("fooTask", appendBarStringTask.Object)
-                                  .Get<string>("fooTask");
-      Assert.AreEqual("foobar", taskResult);
-    }
-
-    [Test]
-    public void Invoking_a_task_expecting_the_wrong_result_type_must_throw_an_exception() {
-      var tasks = Tasks.New.SetAsync("fooTask", fooTask.Object);
-      var actualException = Assert.Throws<TaskReturnTypeException>(async () => await tasks.Get<int>("fooTask"));
-      Assert.AreEqual("Task 'fooTask' returns 'System.String' but was expected to return 'System.Int32'.", actualException.Message);
+    public async void Invoke_a_modified_task() {
+      var tasks = NewTasks.Set(fooInt, SetTo42OrIncrement)
+                          .Set(fooInt, SetTo42OrIncrement);
+      Assert.AreEqual(43, await tasks.Get(fooInt));
     }
 
     [Test]
     public async void Defining_and_then_invoking_two_tasks_must_return_both_of_their_values() {
-      var tasks = Tasks.New.SetAsync("fooTask", fooTask.Object)
-                       .SetAsync("mooTask", mooTask.Object);
-      Assert.AreEqual("moo", await tasks.Get<string>("mooTask"));
-      Assert.AreEqual("foo", await tasks.Get<string>("fooTask"));
+      var tasks = NewTasks.Set(fooInt, mockTask.Object)
+                          .Set(barInt, (tsks, oldTask) => Task.FromResult(1337));
+      Assert.AreEqual(42, await tasks.Get(fooInt));
+      Assert.AreEqual(1337, await tasks.Get(barInt));
     }
 
     [Test]
     public async void Invoking_a_single_task_must_not_invoke_the_other() {
-      await Tasks.New.SetAsync("fooTask", fooTask.Object)
-                 .SetAsync("mooTask", mooTask.Object)
-                 .Get<string>("fooTask");
-      mooTask.Verify(self => self(It.IsAny<ITasks>()), Times.Never);
+      var tasks = NewTasks.Set(fooInt, mockTask.Object)
+                          .Set(barInt, (tsks, oldTask) => Task.FromResult(1337));
+      await tasks.Get(barInt);
+      mockTask.Verify(self => self(It.Is<ITasks>(t => t == tasks), It.Is<Task<int>>(t => t == null)), Times.Never);
     }
 
     [Test]
-    public async void Invoking_an_overridden_task_must_return_the_last_value() {
-      var taskResult = await Tasks.New.SetAsync("fooTask", fooTask.Object)
-                                  .SetAsync("fooTask", mooTask.Object)
-                                  .Get<string>("fooTask");
-      Assert.AreEqual("moo", taskResult);
+    public void Extended_tasks_must_contain_task_definitions_from_the_original_as_well_as_extending_tasks() {
+      var originalTasks = NewTasks.Set(fooInt, (tasks, task) => Task.FromResult(42));
+      var extendingTasks = NewTasks.Set(barInt, (tasks, task) => Task.FromResult(52));
+      var combinedTasks = originalTasks.ExtendWith(extendingTasks).Compile();
+      Assert.IsTrue(combinedTasks.ContainsKey(fooInt));
+      Assert.IsTrue(combinedTasks.ContainsKey(barInt));
     }
 
     [Test]
-    public async void Invoking_an_overriden_task_must_not_invoke_the_original_task() {
-      await Tasks.New.SetAsync("fooTask", fooTask.Object)
-                 .SetAsync("fooTask", mooTask.Object)
-                 .Get<string>("fooTask");
-      fooTask.Verify(self => self(It.IsAny<ITasks>()), Times.Never);
+    public void Compiled_tasks_must_not_contain_undefined_tasks() {
+      TaskDefinition task;
+      Assert.IsFalse(NewTasks.Compile().TryGetValue(fooInt, out task));
+      Assert.IsNull(task);
     }
 
     [Test]
-    public async void a_task_can_invoke_a_dependent_task() {
-      var taskResult = await Tasks.New.SetAsync("fooTask", fooTask.Object)
-                                  .ModifyAsync("fooTask", appendBarStringTask.Object)
-                                  .SetAsync("myTask", InvokeFooTwiceAndConcatenate)
-                                  .Get<string>("myTask");
-      Assert.AreEqual("foobarfoobar", taskResult);
+    public void Invoking_an_undefined_task_must_throw_an_exception() {
+      var actualException = Assert.Throws<TaskUndefinedException>(async () => await NewTasks.Get(fooString));
+      Assert.That(actualException.Message, Contains.Substring(fooInt));
     }
 
     [Test]
-    public async void a_dependent_task_is_invoked_only_once() {
-      await Tasks.New.SetAsync("fooTask", fooTask.Object)
-                 .SetAsync("myTask", InvokeFooTwiceAndConcatenate)
-                 .Get<string>("myTask");
-      fooTask.Verify(self => self(It.IsAny<ITasks>()), Times.Once);
+    public async void Compiled_tasks_must_contain_task_definitions() {
+      TaskDefinition taskDefinition;
+      var tasks = NewTasks.Set(fooInt, mockTask.Object);
+      Assert.IsTrue(tasks.Compile().TryGetValue(fooInt, out taskDefinition));
+      Assert.AreEqual(typeof(int), taskDefinition.ReturnType);
+      Assert.AreEqual(42, await (Task<int>) taskDefinition.Task(tasks));
+      mockTask.Verify(self => self(It.Is<ITasks>(t => t == tasks), It.Is<Task<int>>(t => t == null)));
     }
 
     [Test]
-    public void throw_when_invoking_a_dependent_task_for_the_second_time_expecting_the_wrong_type() {
-      var tasks = Tasks.New.SetAsync("fooTask", fooTask.Object)
-                       .SetAsync("myTask", InvokeFooAsStringAndInt);
-      var exception = Assert.Throws<TaskReturnTypeException>(async () => await tasks.Get<string>("myTask"));
-      Assert.That(exception.Message, Contains.Substring("fooTask"));
-      Assert.That(exception.Message, Contains.Substring("System.String"));
+    public void Invoking_a_task_expecting_the_wrong_result_type_must_throw_an_exception() {
+      var exception = Assert.Throws<TaskReturnTypeException>(async () => await NewTasks.Set(fooInt, mockTask.Object).Get(fooString));
+      Assert.That(exception.Message, Contains.Substring(fooInt));
       Assert.That(exception.Message, Contains.Substring("System.Int32"));
+      Assert.That(exception.Message, Contains.Substring("System.String"));
     }
 
     [Test]
-    public async void a_modifier_task_can_call_dependent_tasks() {
-      var taskResult = await Tasks.New.SetAsync("fooTask", fooTask.Object)
-                                  .SetAsync("mooTask", mooTask.Object)
-                                  .ModifyAsync<string>("mooTask", PrependFooTaskResult)
-                                  .Get<string>("mooTask");
-      Assert.AreEqual("foomoo", taskResult);
+    public void Do_not_await_the_original_task_when_the_modification_ignores_the_original() {
+      NewTasks.Set(fooInt, async (tsks, task) => await mockTask.Object(tsks, task))
+              .Set(fooInt, (tsks, oldTask) => Task.FromResult(1337))
+              .Get(fooInt);
+      mockIncrementContinuation.Verify(self => self(It.IsAny<Task<int>>()), Times.Never);
     }
 
     [Test]
-    public async void multithreaded_access_to_tasks_should_prevent_duplicate_invocations() {
-      var tasks = Tasks.New.SetAsync("fooTask", fooTask.Object)
-                       .ModifyAsync("fooTask", appendBarStringTask.Object)
-                       .SetAsync("multithreadedTask", InvokeFooTaskTwiceConcurrently);
+    public async void A_task_can_invoke_another_task() {
+      var taskResult = await NewTasks.Set(fooInt, mockTask.Object)
+                                     .Set(barInt, AddFooTwice)
+                                     .Get(barInt);
+      Assert.AreEqual(84, taskResult);
+    }
+
+    [Test]
+    public async void Tasks_are_invoked_once_only_and_their_result_is_cached() {
+      await NewTasks.Set(fooInt, mockTask.Object)
+                    .Set(barInt, AddFooTwice)
+                    .Get(barInt);
+      mockTask.Verify(self => self(It.IsAny<ITasks>(), It.IsAny<Task<int>>()));
+    }
+
+    [Test]
+    public async void Multithreaded_access_to_tasks_should_not_result_in_duplicate_invocations() {
+      var tasks = NewTasks.Set(fooInt, mockTask.Object)
+                          .Set(barInt, AddFooTwiceConcurrently);
       int repeatCount = 10;
       for (int i = 0; i < repeatCount; i++) {
-        await tasks.Get<string>("multithreadedTask");
+        await tasks.Get(barInt);
       }
-      fooTask.Verify(self => self(It.IsAny<ITasks>()), Times.Exactly(repeatCount));
-      appendBarStringTask.Verify(self => self(It.IsAny<ITasks>(), It.IsAny<Task<string>>()), Times.Exactly(repeatCount));
+      mockTask.Verify(self => self(It.IsAny<ITasks>(), It.IsAny<Task<int>>()), Times.Exactly(repeatCount));
     }
 
     [Test]
-    public async void Invoking_a_task_without_specifying_a_type() {
-      await Tasks.New.SetAsync("fooTask", fooTask.Object)
-                 .Get("fooTask");
-      fooTask.Verify(self => self(It.IsAny<ITasks>()));
+    public async void Nesting_prefixes_task_names() {
+      var nestedTasks = NewTasks.Set(fooInt, mockTask.Object).Nest("bar");
+      Assert.AreEqual(42, await nestedTasks.Get("bar" / fooInt));
     }
 
     [Test]
-    public async void invoke_once_when_invoking_a_task_without_specifying_a_type_and_again_with_a_type() {
-      var tasks = Tasks.New.SetAsync("fooTask", fooTask.Object)
-                       .SetAsync("myTask", InvokeFooTwiceTypedAndUntyped);
-      await tasks.Get("myTask");
-      fooTask.Verify(self => self(It.IsAny<ITasks>()));
+    public async void Nesting_allows_access_to_sibling_tasks() {
+      var nestedTasks = NewTasks.Set(fooInt, mockTask.Object)
+                                .Set(barInt, AddFooTwice)
+                                .Nest("bar");
+      Assert.AreEqual(84, await nestedTasks.Get("bar" / barInt));
+      mockTask.Verify(self => self(It.IsAny<ITasks>(), It.IsAny<Task<int>>()));
     }
 
-    [Test]
-    public async void invoking_a_constant_task() {
-      var tasks = Tasks.New.Const("fooTask", 42);
-      Assert.AreEqual(42, await tasks.Get<int>("fooTask"));
+    private async Task<int> SetTo42OrIncrement(ITasks context, Task<int> oldTask) {
+      return oldTask == null ? 42 : (await oldTask.ContinueWith(mockIncrementContinuation.Object));
     }
 
-    [Test]
-    public async void invoking_a_synchronous_task() {
-      var tasks = Tasks.New.Set("fooTask", () => 42);
-      Assert.AreEqual(42, await tasks.Get<int>("fooTask"));
+    private async Task<int> AddFooTwice(ITasks tasks, Task<int> oldTask) {
+      return await tasks.Get(fooInt) + await tasks.Get(fooInt);
     }
 
-    [Test]
-    public async void invoking_a_synchronous_modified_task() {
-      var tasks = Tasks.New.Set("fooTask", () => 42)
-                       .Modify<int>("fooTask", oldTaskValue => oldTaskValue + 58);
-      Assert.AreEqual(100, await tasks.Get<int>("fooTask"));
-    }
-
-    [Test]
-    public async void nesting_prefixes_task_names() {
-      var tasks = Tasks.New.Const("fooTask", 42);
-      var nestedTasks = Tasks.New.Nest("bar", tasks);
-      Assert.AreEqual(42, await nestedTasks.Get<int>("bar/fooTask"));
-    }
-
-    [Test]
-    public async void nesting_allows_access_to_sibling_tasks() {
-      var tasks = Tasks.New.SetAsync("fooTask", fooTask.Object)
-                       .SetAsync("duplicatingTask", InvokeFooTwiceAndConcatenate);
-      var nestedTasks = Tasks.New.Nest("bar", tasks);
-      Assert.AreEqual("foofoo", await nestedTasks.Get<string>("bar/duplicatingTask"));
-      fooTask.Verify(self => self(It.IsAny<ITasks>()));
-    }
-
-    [Test]
-    public void throw_when_modifying_a_nested_undefined_task() {
-      var tasks = Tasks.New.Modify<int>("fooTask", oldTaskValue => oldTaskValue + 1);
-      var nestedTasks = Tasks.New.Nest("bar", tasks);
-      var exception = Assert.Throws<TaskUndefinedException>(async () => await nestedTasks.Get<int>("bar/fooTask"));
-      Assert.That(exception.Message, Contains.Substring("bar/fooTask"));
-    }
-
-    private static async Task<string> InvokeFooTwiceAndConcatenate(ITasks context) {
-      return await context.Get<string>("fooTask") + await context.Get<string>("fooTask");
-    }
-
-    private static async Task<string> InvokeFooTwiceTypedAndUntyped(ITasks tasks) {
-      await tasks.Get("fooTask");
-      return await tasks.Get<string>("fooTask");
-    }
-
-    private static async Task<string> InvokeFooTaskTwiceConcurrently(ITasks context) {
-      var first = Task.Run(async () => await context.Get<string>("fooTask"));
-      var second = Task.Run(async () => await context.Get<string>("fooTask"));
+    private async Task<int> AddFooTwiceConcurrently(ITasks tsks, Task<int> oldTask) {
+      var first = Task.Run(async () => await tsks.Get(fooInt));
+      var second = Task.Run(async () => await tsks.Get(fooInt));
       return await first + await second;
-    }
-
-    private static async Task<string> InvokeFooAsStringAndInt(ITasks context) {
-      return await context.Get<string>("fooTask") + await context.Get<int>("fooTask");
-    }
-
-    private static async Task<string> PrependFooTaskResult(ITasks context, Task<string> oldValue) {
-      return await context.Get<string>("fooTask") + await oldValue;
     }
   }
 }

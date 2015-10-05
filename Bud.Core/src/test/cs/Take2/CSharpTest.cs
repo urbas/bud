@@ -13,7 +13,7 @@ namespace Bud.Take2 {
     [SetUp]
     public void SetUp() {
       tempDir = new TemporaryDirectory();
-      fooBarProject = Project(tempDir.Path, "Foo.Bar").ExtendWith(CSharpProject());
+      fooBarProject = Project(tempDir.Path, "Foo.Bar").ExtendWith(CSharpCompiler());
     }
 
     [TearDown]

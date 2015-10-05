@@ -1,4 +1,5 @@
 using Bud.Tasking;
+using static Bud.Tasking.Tasks;
 
 namespace Bud.Take2 {
   public static class Build {
@@ -6,8 +7,8 @@ namespace Bud.Take2 {
     public static readonly Key<string> ProjectId = "projectId";
 
     public static Tasks Project(string projectDir, string projectId) {
-      return Tasks.New.Const(ProjectDir, projectDir)
-                  .Const(ProjectId, projectId);
+      return NewTasks.Const(ProjectId, projectId)
+                     .Const(ProjectDir, projectDir);
     }
   }
 }

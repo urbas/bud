@@ -2,22 +2,20 @@ using System;
 using System.Threading.Tasks;
 
 namespace Bud.Tasking {
-  internal class TaskModification<T> : ITaskModification {
+  public class TaskModification<T> : ITaskModification {
     public string Name { get; }
-    private Func<ITasks, Task<T>, Task<T>> TaskModifier { get; }
+    private Func<ITasks, Task<T>, Task<T>> Task { get; }
 
-    public TaskModification(string name, Func<ITasks, Task<T>, Task<T>> taskModifier) {
+    public TaskModification(Key<T> name, Func<ITasks, Task<T>, Task<T>> task) {
       Name = name;
-      TaskModifier = taskModifier;
+      Task = task;
     }
 
     public TaskDefinition Modify(TaskDefinition taskDefinition) {
-      Tasks.AssertTaskTypeIsSame<T>(Name, taskDefinition);
-      return new TaskDefinition(typeof(T), tasker => TaskModifier(tasker, (Task<T>) taskDefinition.Task(tasker)));
+      TasksExtensions.AssertTaskTypeIsSame<T>(Name, taskDefinition);
+      return new TaskDefinition(typeof(T), tasks => Task(tasks, (Task<T>) taskDefinition.Task(tasks)));
     }
 
-    public TaskDefinition ToTaskDefinition() {
-      throw new TaskUndefinedException($"Could not modify the task '{Name}'. The task is not defined yet.");
-    }
+    public TaskDefinition ToTaskDefinition() => new TaskDefinition(typeof(T), tasks => Task(tasks, null));
   }
 }
