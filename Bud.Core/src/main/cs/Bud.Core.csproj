@@ -88,7 +88,6 @@
     <Compile Include="SetupUtils.cs" />
     <Compile Include="Take2\Build.cs" />
     <Compile Include="Tasking\Key.cs" />
-    <Compile Include="Tasking\TaskDefinition.cs" />
     <Compile Include="Tasking\TasksExtensions.cs" />
     <Compile Include="TaskKey.cs" />
     <Compile Include="Build\BuildDirs.cs" />
@@ -209,7 +208,6 @@
     <Compile Include="SolutionExporter\SolutionExporterKeys.cs" />
     <Compile Include="SolutionExporter\SolutionExporterPlugin.cs" />
     <Compile Include="SolutionExporter\TemplateErrorListener.cs" />
-    <Compile Include="Tasking\TasksResultCache.cs" />
     <Compile Include="Tasking\ITasks.cs" />
     <Compile Include="Tasking\Tasks.cs" />
     <Compile Include="Tasking\TaskReturnTypeException.cs" />

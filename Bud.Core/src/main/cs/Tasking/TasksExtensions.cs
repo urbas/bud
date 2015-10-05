@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace Bud.Tasking {
@@ -14,9 +15,9 @@ namespace Bud.Tasking {
       return tasks.Set(taskName, (tsks, oldTask) => Task.FromResult(value));
     }
 
-    internal static void AssertTaskTypeIsSame<T>(string taskName, TaskDefinition previousTaskDefinition) {
-      if (previousTaskDefinition.ReturnType != typeof(T)) {
-        throw new TaskReturnTypeException($"Could not redefine the type of task '{taskName}' from '{previousTaskDefinition.ReturnType}' to '{typeof(T)}'. Redefinition of task types is not allowed.");
+    internal static void AssertTaskTypeIsSame<T>(string taskName, Type returnType) {
+      if (returnType != typeof(T)) {
+        throw new TaskReturnTypeException($"Could not treat the type of task '{taskName}' as '{returnType}'. Its actual type is '{typeof(T)}'.");
       }
     }
   }

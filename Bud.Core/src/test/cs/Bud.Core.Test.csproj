@@ -93,7 +93,6 @@
     <Compile Include="Take2\BuildTest.cs" />
     <Compile Include="Take2\CSharp.cs" />
     <Compile Include="Take2\CSharpTest.cs" />
-    <Compile Include="Take2\Nothing.cs" />
     <Compile Include="Tasking\TasksTest.cs" />
     <Compile Include="Util\StringUtilsTest.cs" />
   </ItemGroup>

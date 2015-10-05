@@ -27,7 +27,7 @@ namespace Bud.Tasking {
       var exception = Assert.Throws<TaskReturnTypeException>(
         () => NewTasks.Set(fooString, (tasks, oldTask) => Task.FromResult("foo"))
                       .Set(fooInt, (tasks, oldTask) => Task.FromResult(42))
-                      .Compile());
+                      .Get(fooInt));
       Assert.That(exception.Message, Contains.Substring("fooTask"));
       Assert.That(exception.Message, Contains.Substring("System.Int32"));
       Assert.That(exception.Message, Contains.Substring("System.String"));
@@ -68,35 +68,18 @@ namespace Bud.Tasking {
     }
 
     [Test]
-    public void Extended_tasks_must_contain_task_definitions_from_the_original_as_well_as_extending_tasks() {
+    public async void Extended_tasks_must_contain_task_definitions_from_the_original_as_well_as_extending_tasks() {
       var originalTasks = NewTasks.Set(fooInt, (tasks, task) => Task.FromResult(42));
       var extendingTasks = NewTasks.Set(barInt, (tasks, task) => Task.FromResult(52));
-      var combinedTasks = originalTasks.ExtendWith(extendingTasks).Compile();
-      Assert.IsTrue(combinedTasks.ContainsKey(fooInt));
-      Assert.IsTrue(combinedTasks.ContainsKey(barInt));
-    }
-
-    [Test]
-    public void Compiled_tasks_must_not_contain_undefined_tasks() {
-      TaskDefinition task;
-      Assert.IsFalse(NewTasks.Compile().TryGetValue(fooInt, out task));
-      Assert.IsNull(task);
+      var combinedTasks = originalTasks.ExtendWith(extendingTasks);
+      Assert.AreEqual(42, await combinedTasks.Get(fooInt));
+      Assert.AreEqual(58, await combinedTasks.Get(barInt));
     }
 
     [Test]
     public void Invoking_an_undefined_task_must_throw_an_exception() {
       var actualException = Assert.Throws<TaskUndefinedException>(async () => await NewTasks.Get(fooString));
       Assert.That(actualException.Message, Contains.Substring(fooInt));
-    }
-
-    [Test]
-    public async void Compiled_tasks_must_contain_task_definitions() {
-      TaskDefinition taskDefinition;
-      var tasks = NewTasks.Set(fooInt, mockTask.Object);
-      Assert.IsTrue(tasks.Compile().TryGetValue(fooInt, out taskDefinition));
-      Assert.AreEqual(typeof(int), taskDefinition.ReturnType);
-      Assert.AreEqual(42, await (Task<int>) taskDefinition.Task(tasks));
-      mockTask.Verify(self => self(It.Is<ITasks>(t => t == tasks), It.Is<Task<int>>(t => t == null)));
     }
 
     [Test]
@@ -144,7 +127,8 @@ namespace Bud.Tasking {
 
     [Test]
     public async void Nesting_prefixes_task_names() {
-      var nestedTasks = NewTasks.Set(fooInt, mockTask.Object).Nest("bar");
+      var tasks = NewTasks.Set(fooInt, mockTask.Object);
+      var nestedTasks = tasks.Nest("bar");
       Assert.AreEqual(42, await nestedTasks.Get("bar" / fooInt));
     }
 

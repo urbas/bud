@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{14dc3c10-0943-1ee9-66bd-6b962289bdba}</ProjectGuid>
+    <ProjectGuid>{14DC3C10-0943-1EE9-66BD-6B962289BDBA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Bud.SystemTests</RootNamespace>
     <AssemblyName>Bud.SystemTests.Test</AssemblyName>
@@ -35,10 +35,6 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data.Linq" />
-
-    <Reference Include="System.Collections.Immutable.dll">
-      <HintPath>../../../../.bud/global/nuGetRepository/Microsoft.Bcl.Immutable.1.0.34/lib/portable-net45+win8+wp8+wpa81/System.Collections.Immutable.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json.dll">
       <HintPath>../../../../.bud/global/nuGetRepository/Newtonsoft.Json.6.0.8/lib/net45/Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -69,7 +65,6 @@
     <Reference Include="nunit.framework.dll">
       <HintPath>../../../../.bud/global/nuGetRepository/NUnit.2.6.4/lib/nunit.framework.dll</HintPath>
     </Reference>
-
     <ProjectReference Include="../../../../Bud.Test/src/main/cs/Bud.Test.csproj">
       <Project>{193ffb50-6057-79e6-0f31-e1e657dced62}</Project>
       <Name>Bud.Test</Name>
@@ -78,11 +73,8 @@
       <Project>{8b9c0b3e-fd13-d416-ef2b-4e7fa81105bb}</Project>
       <Name>Bud.Core</Name>
     </ProjectReference>
-
   </ItemGroup>
-
   <ItemGroup>
-
     <Compile Include="BuildConfigurationProject.cs" />
     <Compile Include="BuildLevels.cs" />
     <Compile Include="CleanExternalDependenciesTest.cs" />
@@ -99,12 +91,8 @@
     <Compile Include="TransitiveDependencies.cs" />
     <Compile Include="TransitiveExternalDependencies.cs" />
     <Compile Include="Examples\ExampleProjectsTest.cs" />
-
   </ItemGroup>
-
   <ItemGroup>
-
   </ItemGroup>
-
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
