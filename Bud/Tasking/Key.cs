@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace Bud.Tasking {
@@ -33,5 +34,7 @@ namespace Bud.Tasking {
     public Task<T> this[ITasks tasks] => tasks.Get(this);
 
     public static Key<T> operator /(string prefix, Key<T> key) => prefix + "/" + key.Id;
+
+    public Type Type => typeof(T);
   }
 }

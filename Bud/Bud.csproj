@@ -49,12 +49,22 @@
     <Compile Include="IO\Directories.cs" />
     <Compile Include="IO\TemporaryDirectory.cs" />
     <Compile Include="Resources\EmbeddedResources.cs" />
+    <Compile Include="Tasking\ApiV1\InitializeTask.cs" />
+    <Compile Include="Tasking\ApiV1\TaskModification.cs" />
+    <Compile Include="Tasking\ApiV1\NestedTasks.cs" />
+    <Compile Include="Tasking\ApiV1\ResultCachingTasks.cs" />
+    <Compile Include="Tasking\ApiV1\SetTask.cs" />
+    <Compile Include="Tasking\ApiV1\TaskDefinition.cs" />
+    <Compile Include="Tasking\ApiV1\TaskDefinitionException.cs" />
+    <Compile Include="Tasking\ApiV1\TaskNesting.cs" />
+    <Compile Include="Tasking\ApiV1\ModifyTask.cs" />
+    <Compile Include="Tasking\ApiV1\TaskReturnTypeException.cs" />
+    <Compile Include="Tasking\ApiV1\Tasks.cs" />
+    <Compile Include="Tasking\ApiV1\TasksExtensions.cs" />
+    <Compile Include="Tasking\ApiV1\TasksUtils.cs" />
+    <Compile Include="Tasking\ApiV1\TaskUndefinedException.cs" />
     <Compile Include="Tasking\ITasks.cs" />
     <Compile Include="Tasking\Key.cs" />
-    <Compile Include="Tasking\TaskReturnTypeException.cs" />
-    <Compile Include="Tasking\Tasks.cs" />
-    <Compile Include="Tasking\TasksExtensions.cs" />
-    <Compile Include="Tasking\TaskUndefinedException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

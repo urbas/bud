@@ -1,6 +1,6 @@
 using System;
 
-namespace Bud.Tasking {
+namespace Bud.Tasking.ApiV1 {
   public class TaskUndefinedException : Exception {
     public TaskUndefinedException(string message) : base(message) {}
 

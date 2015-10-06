@@ -50,7 +50,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BuildTest.cs" />
-    <Compile Include="Tasking\TasksTest.cs" />
+    <Compile Include="Tasking\ApiV1\TasksExtensionsTest.cs" />
     <EmbeddedResource Include="resources\TestMainClass.cs">
       <LogicalName>TestMainClass.cs</LogicalName>
     </EmbeddedResource>
