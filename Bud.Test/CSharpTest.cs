@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using Bud.IO;
 using Bud.Tasking.ApiV1;
@@ -7,8 +6,7 @@ using static Bud.Build;
 using static Bud.CSharp;
 
 namespace Bud {
-  public class CSharpTest
-  {
+  public class CSharpTest {
     private TemporaryDirectory tempDir;
     private Tasks project;
 
@@ -26,7 +24,7 @@ namespace Bud {
     [Test]
     public async void Compiles_a_single_source_file() {
       tempDir.CreateFile(@"public class A {}", "A.cs");
-      var compilationResult = await Compile[project.ToResultCachingTasks()];
+      var compilationResult = await project.Get(Compile);
       Assert.IsTrue(File.Exists(compilationResult.AssemblyPath));
       Assert.IsTrue(compilationResult.EmitResult.Success);
       Assert.IsEmpty(compilationResult.EmitResult.Diagnostics);
