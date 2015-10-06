@@ -16,7 +16,8 @@ namespace Bud {
       tempDir = new TemporaryDirectory();
       bareProject = Project(tempDir.Path, "Foo");
       cSharpProject = bareProject.ExtendWith(Sources(fileFilter: "*.cs"));
-      twoSourceDirsProject = bareProject.ExtendWith(Sources("A")).ExtendWith(Sources("B"));
+      twoSourceDirsProject = bareProject.ExtendWith(Sources("A"))
+                                        .ExtendWith(Sources("B"));
     }
 
     [TearDown]
@@ -39,26 +40,26 @@ namespace Bud {
 
     [Test]
     public async void CSharp_sources_must_be_listed() {
-      var sourceFile = tempDir.CreateFile("TestMainClass.cs");
+      var sourceFile = tempDir.CreateEmptyFile("TestMainClass.cs");
       Assert.That(await cSharpProject.Get(SourceFiles), Contains.Item(sourceFile));
     }
 
     [Test]
     public async void CSharp_sources_in_nested_directories_must_be_listed() {
-      var sourceFile = tempDir.CreateFile("Bud", "TestMainClass.cs");
+      var sourceFile = tempDir.CreateEmptyFile("Bud", "TestMainClass.cs");
       Assert.That(await cSharpProject.Get(SourceFiles), Contains.Item(sourceFile));
     }
 
     [Test]
     public async void Non_csharp_files_must_not_be_listed() {
-      var textFile = tempDir.CreateFile("Bud", "TextFile.txt");
+      var textFile = tempDir.CreateEmptyFile("Bud", "TextFile.txt");
       Assert.That(await cSharpProject.Get(SourceFiles), Is.Not.Contains(textFile));
     }
 
     [Test]
     public async void Multiple_source_directories() {
-      var fileA = tempDir.CreateFile("A", "A.cs");
-      var fileB = tempDir.CreateFile("B", "B.cs");
+      var fileA = tempDir.CreateEmptyFile("A", "A.cs");
+      var fileB = tempDir.CreateEmptyFile("B", "B.cs");
       Assert.That(await twoSourceDirsProject.Get(SourceFiles), Is.EquivalentTo(new[] {fileA, fileB}));
     }
   }

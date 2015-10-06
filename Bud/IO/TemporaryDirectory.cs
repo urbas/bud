@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using static System.IO.Path;
 
 namespace Bud.IO {
   public class TemporaryDirectory : IDisposable {
@@ -15,19 +16,22 @@ namespace Bud.IO {
     public override string ToString() => Path;
 
     private static string CreateDirectory() {
-      string baseDir = System.IO.Path.GetTempPath();
+      string baseDir = GetTempPath();
       string tempDir;
       do {
-        tempDir = System.IO.Path.Combine(baseDir, Guid.NewGuid().ToString());
+        tempDir = Combine(baseDir, Guid.NewGuid().ToString());
       } while (Directory.Exists(tempDir));
       Directory.CreateDirectory(tempDir);
       return tempDir;
     }
 
-    public string CreateFile(params string[] subPath) {
-      var file = System.IO.Path.Combine(new[] {Path}.Concat(subPath).ToArray());
-      Directory.CreateDirectory(System.IO.Path.GetDirectoryName(file));
-      File.Create(file).Dispose();
+    public string CreateEmptyFile(string firstPathComponent, params string[] pathComponents)
+      => CreateFile(string.Empty, firstPathComponent, pathComponents);
+
+    public string CreateFile(string content, string firstPathComponent, params string[] pathComponents) {
+      var file = Combine(new[] {Path, firstPathComponent}.Concat(pathComponents).ToArray());
+      Directory.CreateDirectory(GetDirectoryName(file));
+      File.WriteAllText(file, content);
       return file;
     }
   }
