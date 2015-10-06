@@ -1,7 +1,5 @@
 using System.IO;
 using Bud.IO;
-using Bud.Resources;
-using Bud.Tasking;
 using Bud.Tasking.ApiV1;
 using NUnit.Framework;
 using static Bud.Build;
@@ -41,31 +39,26 @@ namespace Bud {
 
     [Test]
     public async void CSharp_sources_must_be_listed() {
-      var sourceFile = Path.Combine(tempDir.Path, "TestMainClass.cs");
-      await EmbeddedResources.CopyTo(GetType().Assembly, "TestMainClass.cs", sourceFile);
+      var sourceFile = tempDir.CreateFile("TestMainClass.cs");
       Assert.That(await cSharpProject.Get(SourceFiles), Contains.Item(sourceFile));
     }
 
     [Test]
     public async void CSharp_sources_in_nested_directories_must_be_listed() {
-      var sourceFile = Path.Combine(tempDir.Path, "Bud", "TestMainClass.cs");
-      await EmbeddedResources.CopyTo(GetType().Assembly, "TestMainClass.cs", sourceFile);
+      var sourceFile = tempDir.CreateFile("Bud", "TestMainClass.cs");
       Assert.That(await cSharpProject.Get(SourceFiles), Contains.Item(sourceFile));
     }
 
     [Test]
     public async void Non_csharp_files_must_not_be_listed() {
-      var textFile = Path.Combine(tempDir.Path, "Bud", "TextFile.txt");
-      await EmbeddedResources.CopyTo(GetType().Assembly, "TestMainClass.cs", textFile);
+      var textFile = tempDir.CreateFile("Bud", "TextFile.txt");
       Assert.That(await cSharpProject.Get(SourceFiles), Is.Not.Contains(textFile));
     }
 
     [Test]
     public async void Multiple_source_directories() {
-      var fileA = Path.Combine(tempDir.Path, "A", "A.cs");
-      var fileB = Path.Combine(tempDir.Path, "B", "B.cs");
-      await EmbeddedResources.CopyTo(GetType().Assembly, "TestMainClass.cs", fileA);
-      await EmbeddedResources.CopyTo(GetType().Assembly, "TestMainClass.cs", fileB);
+      var fileA = tempDir.CreateFile("A", "A.cs");
+      var fileB = tempDir.CreateFile("B", "B.cs");
       Assert.That(await twoSourceDirsProject.Get(SourceFiles), Is.EquivalentTo(new[] {fileA, fileB}));
     }
   }

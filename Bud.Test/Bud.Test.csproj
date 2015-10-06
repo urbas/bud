@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IO\FilesObserverTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BuildTest.cs" />
     <Compile Include="Tasking\ApiV1\TasksExtensionsTest.cs" />
