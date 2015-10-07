@@ -4,8 +4,8 @@ using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
 namespace Bud.IO {
-  public class FileSystemObserverFactory : IFileSystemObserverFactory {
-    public IObservable<FileSystemEventArgs> Create(string sourceDir, string fileFilter, bool includeSubfolders) {
+  public class FilesObservatory : IFilesObservatory {
+    public IObservable<FileSystemEventArgs> CreateObserver(string sourceDir, string fileFilter, bool includeSubfolders) {
       return ObserveFileSystem(sourceDir, fileFilter, includeSubfolders);
     }
 

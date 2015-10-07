@@ -8,15 +8,15 @@ using System.Reactive.Linq;
 namespace Bud.IO {
   public class ListedFiles : IFiles {
     public IEnumerable<string> Files { get; }
-    public IFileSystemObserverFactory FileSystemObserverFactory { get; }
+    public IFilesObservatory FilesObservatory { get; }
 
-    public ListedFiles(IFileSystemObserverFactory fileSystemObserverFactory, IEnumerable<string> files) {
+    public ListedFiles(IFilesObservatory filesObservatory, IEnumerable<string> files) {
       Files = files;
-      FileSystemObserverFactory = fileSystemObserverFactory;
+      FilesObservatory = filesObservatory;
     }
 
     public IObservable<IFiles> AsObservable() {
-      var filesObservable = Files.Select(s => FileSystemObserverFactory.Create(Path.GetDirectoryName(s), Path.GetFileName(s), false)).Merge().Select(args => this);
+      var filesObservable = Files.Select(s => FilesObservatory.CreateObserver(Path.GetDirectoryName(s), Path.GetFileName(s), false)).Merge().Select(args => this);
       return Observable.Return(this).Concat(filesObservable);
     }
 

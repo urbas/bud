@@ -24,7 +24,7 @@ namespace Bud.IO {
         return tempDir.CreateEmptyFile("A", "A.txt");
       });
 
-      var fileSystemEventArgs = await FileSystemObserverFactory.ObserveFileSystem(tempDir.Path, "*.txt", true).Take(1).ToTask();
+      var fileSystemEventArgs = await FilesObservatory.ObserveFileSystem(tempDir.Path, "*.txt", true).Take(1).ToTask();
 
       Assert.AreEqual(WatcherChangeTypes.Created, fileSystemEventArgs.ChangeType);
       Assert.AreEqual(await file, fileSystemEventArgs.FullPath);

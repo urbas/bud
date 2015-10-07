@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Reactive.Linq;
 using Bud.Compilation;
 using Bud.IO;
@@ -22,20 +21,12 @@ namespace Bud {
                  .InitConst(CSharpCompiler, compiler ?? new RoslynCSharpCompiler())
                  .InitConst(SourcesObservationStrategy, sourceObservationStrategy ?? DefaultSourceObservationStrategy);
 
-    private static IObservable<ICompilationResult> PerformCompilation(ITasks tasks) {
-      return SourcesObservationStrategy[tasks](SourceFiles[tasks].AsObservable())
-        .Select(sources => {
-          var assemblyName = ProjectId[tasks] + ".dll";
-          var targetDir = Combine(ProjectDir[tasks], "target");
-          Directory.CreateDirectory(targetDir);
-          return CSharpCompiler[tasks].Compile(
-            targetDir,
-            assemblyName,
-            sources,
-            new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
-            new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)});
-        });
-    }
+    private static IObservable<ICompilationResult> PerformCompilation(ITasks tasks)
+      => CSharpCompiler[tasks].Compile(sourceFiles: SourcesObservationStrategy[tasks](SourceFiles[tasks].AsObservable()),
+                                       outputDir: Combine(ProjectDir[tasks], "target"),
+                                       assemblyName: ProjectId[tasks] + ".dll",
+                                       options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
+                                       references: new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)});
 
     private static IObservable<IFiles> DefaultSourceObservationStrategy(IObservable<IFiles> sources)
       => sources.Sample(TimeSpan.FromMilliseconds(100)).Delay(TimeSpan.FromMilliseconds(25));

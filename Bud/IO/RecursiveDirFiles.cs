@@ -7,12 +7,12 @@ using static System.IO.SearchOption;
 
 namespace Bud.IO {
   public class RecursiveDirFiles : IFiles {
-    public IFileSystemObserverFactory FileSystemObserverFactory { get; }
+    public IFilesObservatory FilesObservatory { get; }
     public string SourceDir { get; }
     public string FileFilter { get; }
 
-    public RecursiveDirFiles(IFileSystemObserverFactory fileSystemObserverFactory, string sourceDir, string fileFilter) {
-      FileSystemObserverFactory = fileSystemObserverFactory;
+    public RecursiveDirFiles(IFilesObservatory filesObservatory, string sourceDir, string fileFilter) {
+      FilesObservatory = filesObservatory;
       SourceDir = sourceDir;
       FileFilter = fileFilter;
     }
@@ -24,6 +24,6 @@ namespace Bud.IO {
 
     public IObservable<IFiles> AsObservable()
       => Observable.Return(this)
-                   .Concat(FileSystemObserverFactory.Create(SourceDir, FileFilter, true).Select(pattern => this));
+                   .Concat(FilesObservatory.CreateObserver(SourceDir, FileFilter, true).Select(pattern => this));
   }
 }

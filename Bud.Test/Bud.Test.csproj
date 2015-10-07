@@ -87,7 +87,6 @@
   <ItemGroup>
     <Compile Include="CSharpTest.cs" />
     <Compile Include="IO\FileSystemObserverFactoryTest.cs" />
-    <Compile Include="IO\MockFileSystemObserverFactory.cs" />
     <Compile Include="IO\RecursiveDirFilesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BuildTest.cs" />
