@@ -17,7 +17,9 @@ namespace Bud {
       var cSharpCompiler = new Mock<ICSharpCompiler>();
       var compilationResult = Observable.Return(new Mock<ICompilationResult>().Object);
 
-      var project = Project("fooDir", "Foo").ExtendWith(CSharpCompilation(cSharpCompiler.Object));
+      var project = Project("fooDir", "Foo")
+        .ExtendWith(CSharpCompilation())
+        .Const(CSharpCompiler, cSharpCompiler.Object);
 
       cSharpCompiler.Setup(self => self.Compile(It.IsAny<IObservable<IFiles>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CSharpCompilationOptions>(), It.IsAny<IEnumerable<MetadataReference>>()))
                     .Returns(compilationResult);

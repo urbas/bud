@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reactive.Linq;
 using Bud.Compilation;
 using Bud.IO;
@@ -10,24 +11,50 @@ using static Bud.Configs;
 
 namespace Bud {
   public static class CSharp {
-    public static readonly Key<ICSharpCompiler> CSharpCompiler = nameof(CSharpCompiler);
     public static readonly Key<IObservable<ICompilationResult>> Compile = nameof(Compile);
+    public static readonly Key<string> OutputDir = nameof(OutputDir);
+    public static readonly Key<string> AssemblyName = nameof(AssemblyName);
+    public static readonly Key<IEnumerable<MetadataReference>> References = nameof(References);
+    public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
+    public static readonly Key<ICSharpCompiler> CSharpCompiler = nameof(CSharpCompiler);
     public static readonly Key<Func<IObservable<IFiles>, IObservable<IFiles>>> SourcesObservationStrategy = nameof(SourcesObservationStrategy);
 
-    public static Configs CSharpCompilation(ICSharpCompiler compiler = null, Func<IObservable<IFiles>, IObservable<IFiles>> sourceObservationStrategy = null)
+    public static Configs CSharpCompilation()
       => NewConfigs.Init(Compile, PerformCompilation)
-                 .InitConst(CSharpCompiler, compiler ?? new RoslynCSharpCompiler())
-                 .InitConst(SourcesObservationStrategy, sourceObservationStrategy ?? DefaultSourceObservationStrategy);
+                   .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
+                   .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
+                   .Init(References, configs => new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)})
+                   .InitConst(CSharpCompiler, new RoslynCSharpCompiler())
+                   .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                   .InitConst(SourcesObservationStrategy, DefaultSourceObservationStrategy);
 
     private static IObservable<ICompilationResult> PerformCompilation(IConfigs configs)
-      => CSharpCompiler[configs].Compile(sourceFiles: SourcesObservationStrategy[configs](Sources[configs].AsObservable()),
-                                       outputDir: Combine(ProjectDir[configs], "target"),
-                                       assemblyName: ProjectId[configs] + ".dll",
-                                       options: new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary),
-                                       references: new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)});
+      => CSharpCompiler[configs].Compile(SourcesObservationStrategy[configs](Sources[configs].AsObservable()),
+                                         OutputDir[configs],
+                                         AssemblyName[configs],
+                                         CSharpCompilationOptions[configs],
+                                         References[configs]);
 
     private static IObservable<IFiles> DefaultSourceObservationStrategy(IObservable<IFiles> sources)
       => sources.Sample(TimeSpan.FromMilliseconds(100))
                 .Delay(TimeSpan.FromMilliseconds(25));
+
+
+    public static string ToExtension(this OutputKind kind) {
+      switch (kind) {
+        case OutputKind.ConsoleApplication:
+        case OutputKind.WindowsApplication:
+        case OutputKind.WindowsRuntimeApplication:
+          return ".exe";
+        case OutputKind.DynamicallyLinkedLibrary:
+          return ".dll";
+        case OutputKind.NetModule:
+          return ".netmodule";
+        case OutputKind.WindowsRuntimeMetadata:
+          return ".winmdobj";
+        default:
+          return ".dll";
+      }
+    }
   }
 }
