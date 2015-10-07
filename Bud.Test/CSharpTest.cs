@@ -1,4 +1,7 @@
+using System;
 using System.IO;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using Bud.IO;
 using Bud.Tasking.ApiV1;
 using NUnit.Framework;
@@ -24,7 +27,7 @@ namespace Bud {
     [Test]
     public async void Compiles_a_single_source_file() {
       tempDir.CreateFile(@"public class A {}", "A.cs");
-      var compilationResult = await project.Get(Compile);
+      var compilationResult = await (await project.Get(Compile)).Take(1).ToTask();
       Assert.IsTrue(File.Exists(compilationResult.AssemblyPath));
       Assert.IsTrue(compilationResult.EmitResult.Success);
       Assert.IsEmpty(compilationResult.EmitResult.Diagnostics);
