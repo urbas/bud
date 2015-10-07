@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis.Emit;
 
-namespace Bud {
-  public class CompilationResult {
+namespace Bud.Compilation {
+  public class CompilationResult : ICompilationResult {
     public string AssemblyPath { get; }
     public EmitResult EmitResult { get; }
 

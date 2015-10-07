@@ -1,16 +1,15 @@
 using System;
-using System.Threading.Tasks;
 
 namespace Bud.Tasking.ApiV1 {
   public class InitializeTask<T> : ITaskModification {
-    public InitializeTask(Key<T> name, Func<ITasks, Task<T>> task) {
+    public InitializeTask(Key<T> name, Func<ITasks, T> task) {
       Name = name;
       Task = task;
     }
 
     public string Name { get; }
-    public Func<ITasks, Task<T>> Task { get; }
-    public TaskDefinition Modify(TaskDefinition taskDefinition) => taskDefinition;
-    public TaskDefinition ToTaskDefinition() => new TaskDefinition(typeof(T), Task);
+    public Func<ITasks, T> Task { get; }
+    public ITaskDefinition Modify(ITaskDefinition taskDefinition) => taskDefinition;
+    public ITaskDefinition ToTaskDefinition() => new TaskDefinition<T>(Task);
   }
 }

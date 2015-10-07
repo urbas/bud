@@ -1,25 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Threading.Tasks;
 
 namespace Bud.Tasking.ApiV1 {
   public class ResultCachingTasks : ITasks {
-    private IDictionary<string, TaskDefinition> Tasks { get; }
+    private IDictionary<string, ITaskDefinition> Tasks { get; }
     private ImmutableDictionary<string, TaskResult> taskResultCache = ImmutableDictionary<string, TaskResult>.Empty;
     private readonly object taskResultCacheGuard = new object();
 
-    internal ResultCachingTasks(IDictionary<string, TaskDefinition> tasks) {
+    internal ResultCachingTasks(IDictionary<string, ITaskDefinition> tasks) {
       Tasks = tasks;
     }
 
-    public Task<T> Get<T>(Key<T> taskName) {
+    public T Get<T>(Key<T> taskName) {
       var taskResult = GetFromCacheOrInvoke(taskName);
       TasksUtils.AssertTaskTypeIsSame<T>(taskName, taskResult.ResultType);
-      return (Task<T>) taskResult.Result;
+      return (T) taskResult.Result;
     }
-
-    public Task Get(Key taskName) => GetFromCacheOrInvoke(taskName).Result;
 
     private TaskResult GetFromCacheOrInvoke(string taskName) {
       TaskResult taskResult;
@@ -32,9 +29,9 @@ namespace Bud.Tasking.ApiV1 {
         if (taskResultCache.TryGetValue(taskName, out taskResult)) {
           return taskResult;
         }
-        TaskDefinition taskDefinition;
+        ITaskDefinition taskDefinition;
         if (Tasks.TryGetValue(taskName, out taskDefinition)) {
-          taskResult = new TaskResult {ResultType = taskDefinition.ReturnType, Result = taskDefinition.Task(this)};
+          taskResult = new TaskResult {ResultType = taskDefinition.ReturnType, Result = taskDefinition.Invoke(this)};
           taskResultCache = taskResultCache.Add(taskName, taskResult);
           return taskResult;
         }
@@ -44,7 +41,7 @@ namespace Bud.Tasking.ApiV1 {
 
     private struct TaskResult {
       public Type ResultType;
-      public Task Result;
+      public object Result;
     }
   }
 }

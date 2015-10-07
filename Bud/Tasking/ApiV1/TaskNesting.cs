@@ -11,17 +11,17 @@ namespace Bud.Tasking.ApiV1 {
 
     public string Name { get; }
 
-    public TaskDefinition Modify(TaskDefinition taskDefinition) {
+    public ITaskDefinition Modify(ITaskDefinition taskDefinition) {
       var modifiedTaskDefinition = NestedModification.Modify(taskDefinition);
       return new TaskDefinition(modifiedTaskDefinition.ReturnType, tasks => {
         var prefixedTasks = new NestedTasks(Prefix, tasks);
-        return modifiedTaskDefinition.Task(prefixedTasks);
+        return modifiedTaskDefinition.Invoke(prefixedTasks);
       });
     }
 
-    public TaskDefinition ToTaskDefinition() {
+    public ITaskDefinition ToTaskDefinition() {
       var taskDefinition = NestedModification.ToTaskDefinition();
-      return new TaskDefinition(taskDefinition.ReturnType, tasks => taskDefinition.Task(new NestedTasks(Prefix, tasks)));
+      return new TaskDefinition(taskDefinition.ReturnType, tasks => taskDefinition.Invoke(new NestedTasks(Prefix, tasks)));
     }
   }
 }

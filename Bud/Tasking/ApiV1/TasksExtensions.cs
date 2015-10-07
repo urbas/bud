@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Bud.Tasking.ApiV1 {
   public static class TasksExtensions {
@@ -19,7 +18,7 @@ namespace Bud.Tasking.ApiV1 {
     /// <remarks>this method discards any existing definitions of the task.</remarks>
     /// <returns>a copy of <paramref name="tasks" /> with the new definition of the task.</returns>
     public static Tasks Const<TResult>(this Tasks tasks, Key<TResult> taskName, TResult value)
-      => tasks.Set(taskName, tsks => Task.FromResult(value));
+      => tasks.Set(taskName, tsks => value);
 
     /// <summary>
     ///   Defines a task that returns the given constant <paramref name="value" /> (if the task is not defined yet).
@@ -27,23 +26,26 @@ namespace Bud.Tasking.ApiV1 {
     /// <remarks>this method does not override existing definitions of the task.</remarks>
     /// <returns>a copy of <paramref name="tasks" /> with the new definition of the task.</returns>
     public static Tasks InitConst<TResult>(this Tasks tasks, Key<TResult> taskName, TResult value)
-      => tasks.Init(taskName, tsks => Task.FromResult(value));
+      => tasks.Init(taskName, tsks => value);
 
     /// <summary>
-    ///   Defines a task that returns the given constant <paramref name="value" /> (if the task is not defined yet).
+    ///   Defines a task that returns the <paramref name="value" />.
+    ///   If the task is already defined, then this method does nothing.
     /// </summary>
-    /// <remarks>this method does not override existing definitions of the task.</remarks>
     /// <returns>a copy of <paramref name="tasks" /> with the new definition of the task.</returns>
-    public static Tasks Init<TResult>(this Tasks tasks, Key<TResult> taskName, Func<ITasks, Task<TResult>> value)
+    public static Tasks Init<TResult>(this Tasks tasks, Key<TResult> taskName, Func<ITasks, TResult> value)
       => new Tasks(tasks.Add(new InitializeTask<TResult>(taskName, value)));
 
+    /// <summary>
+    ///   Defines a task that returns the <paramref name="value" />.
+    ///   This method overrides existing definitions of the task.
+    /// </summary>
     /// <typeparam name="TResult">the type of the task's result</typeparam>
     /// <param name="tasks">the collection of tasks to which to add this constant.</param>
     /// <param name="taskName">the name of the task.</param>
     /// <param name="value">the constant value that should become the result of the task.</param>
-    /// <remarks>this method overrides any existing definitions of the task.</remarks>
     /// <returns>a copy of <paramref name="tasks" /> with the new definition of the task.</returns>
-    public static Tasks Set<TResult>(this Tasks tasks, Key<TResult> taskName, Func<ITasks, Task<TResult>> value)
+    public static Tasks Set<TResult>(this Tasks tasks, Key<TResult> taskName, Func<ITasks, TResult> value)
       => new Tasks(tasks.Add(new SetTask<TResult>(taskName, value)));
 
     /// <typeparam name="TResult">the return type of the task.</typeparam>
@@ -58,7 +60,7 @@ namespace Bud.Tasking.ApiV1 {
     ///     function will be <c>null</c>.
     ///   </para>
     /// </remarks>
-    public static Tasks Modify<TResult>(this Tasks tasks, Key<TResult> taskName, Func<ITasks, Task<TResult>, Task<TResult>> task)
+    public static Tasks Modify<TResult>(this Tasks tasks, Key<TResult> taskName, Func<ITasks, TResult, TResult> task)
       => new Tasks(tasks.Add(new ModifyTask<TResult>(taskName, task)));
 
     /// <returns>a copy of these tasks with added task definitions from <paramref name="tasks" />.</returns>
@@ -69,16 +71,14 @@ namespace Bud.Tasking.ApiV1 {
     public static Tasks Nest(this Tasks tasks, string prefix)
       => new Tasks(tasks.Select(taskModification => new TaskNesting(prefix, taskModification)));
 
-    /// <param name="tasks"></param>
-    /// <returns>a dictionary of task names mapped to task definitions.</returns>
     /// <remarks>
-    ///   the task definitions are a result of the aggregation of all task modifications with the same name into task
+    ///   task definitions are a result of the aggregation of all task modifications with the same name into task
     ///   definitions.
     /// </remarks>
-    public static IDictionary<string, TaskDefinition> Compile(this Tasks tasks) {
-      var taskDefinitions = new Dictionary<string, TaskDefinition>();
+    public static IDictionary<string, ITaskDefinition> Compile(this Tasks tasks) {
+      var taskDefinitions = new Dictionary<string, ITaskDefinition>();
       foreach (var taskModification in tasks) {
-        TaskDefinition taskDefinition;
+        ITaskDefinition taskDefinition;
         if (taskDefinitions.TryGetValue(taskModification.Name, out taskDefinition)) {
           taskDefinitions[taskModification.Name] = taskModification.Modify(taskDefinition);
         } else {
@@ -89,20 +89,17 @@ namespace Bud.Tasking.ApiV1 {
     }
 
     /// <summary>
-    ///   Asynchronously invokes the task with the given name and returns the result of the task.
-    /// </summary>
-    public static Task Get(this Tasks tasks, Key taskName) => tasks.ToResultCachingTasks().Get(taskName);
-
-    /// <summary>
-    ///   Asynchronously invokes the task with the given name and returns the typed result of the task.
+    ///   Invokes the task with the given name and returns the result of the task.
     /// </summary>
     /// <exception cref="TaskReturnTypeException">
     ///   thrown if the actual type of the task does not
     ///   match the requested type of the task.
     /// </exception>
     /// <typeparam name="T">the requested type of the task's result.</typeparam>
-    public static Task<T> Get<T>(this Tasks tasks, Key<T> taskName) => tasks.ToResultCachingTasks().Get(taskName);
+    public static T Get<T>(this Tasks tasks, Key<T> taskName)
+      => tasks.ToResultCachingTasks().Get(taskName);
 
-    public static ResultCachingTasks ToResultCachingTasks(this Tasks tasks) => new ResultCachingTasks(tasks.Compile());
+    public static ResultCachingTasks ToResultCachingTasks(this Tasks tasks)
+      => new ResultCachingTasks(tasks.Compile());
   }
 }

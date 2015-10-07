@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 
 namespace Bud.Tasking {
   public struct Key {
@@ -12,8 +11,6 @@ namespace Bud.Tasking {
     public static implicit operator Key(string id) => new Key(id);
 
     public static implicit operator string(Key key) => key.Id;
-
-    public Task this[ITasks tasks] => tasks.Get(this);
 
     public static Key operator /(string prefix, Key key) => prefix + "/" + key.Id;
   }
@@ -31,7 +28,7 @@ namespace Bud.Tasking {
 
     public static implicit operator Key(Key<T> key) => new Key(key.Id);
 
-    public Task<T> this[ITasks tasks] => tasks.Get(this);
+    public T this[ITasks tasks] => tasks.Get(this);
 
     public static Key<T> operator /(string prefix, Key<T> key) => prefix + "/" + key.Id;
 

@@ -1,5 +1,3 @@
-using System.Threading.Tasks;
-
 namespace Bud.Tasking.ApiV1 {
   public class NestedTasks : ITasks {
     private readonly string prefix;
@@ -10,7 +8,6 @@ namespace Bud.Tasking.ApiV1 {
       this.tasks = tasks;
     }
 
-    public Task<T> Get<T>(Key<T> taskName) => tasks.Get<T>(prefix + taskName);
-    public Task Get(Key taskName) => tasks.Get(prefix + taskName);
+    public T Get<T>(Key<T> taskName) => tasks.Get<T>(prefix + taskName);
   }
 }

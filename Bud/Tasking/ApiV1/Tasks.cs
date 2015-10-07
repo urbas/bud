@@ -11,12 +11,7 @@ namespace Bud.Tasking.ApiV1 {
       TaskModifications = taskModifications;
     }
 
-    public IEnumerator<ITaskModification> GetEnumerator() {
-      return TaskModifications.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator() {
-      return ((IEnumerable) TaskModifications).GetEnumerator();
-    }
+    public IEnumerator<ITaskModification> GetEnumerator() => TaskModifications.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
   }
 }
