@@ -23,9 +23,9 @@ namespace Bud.IO {
     private bool AnyIncludedFileChanged(FilesUpdate update)
       => update.FileSystemEventArgs == null ||
          IsFileIncluded(update.FileSystemEventArgs.FullPath) ||
-         IsOldPathIncluded(update);
+         WasOldPathIncluded(update);
 
-    private bool IsOldPathIncluded(FilesUpdate update) {
+    private bool WasOldPathIncluded(FilesUpdate update) {
       var renamedEventArgs = update.FileSystemEventArgs as RenamedEventArgs;
       return renamedEventArgs != null && IsFileIncluded(renamedEventArgs.OldFullPath);
     }

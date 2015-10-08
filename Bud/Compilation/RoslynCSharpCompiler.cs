@@ -22,7 +22,7 @@ namespace Bud.Compilation {
       var assemblyPath = Path.Combine(outputDir, assemblyName);
       Directory.CreateDirectory(outputDir);
 
-      return FilesDiff.ToFilesDiffObservable(sourceFiles).Select(sources => {
+      return FilesDiff.DoDiffing(sourceFiles).Select(sources => {
         var stopwatch = new Stopwatch();
         stopwatch.Start();
         using (var assemblyOutputFile = File.Create(assemblyPath)) {
