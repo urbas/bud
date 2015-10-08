@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -15,18 +16,41 @@ namespace Bud.Compilation {
                                                    string assemblyName,
                                                    CSharpCompilationOptions options,
                                                    IEnumerable<MetadataReference> references) {
-      return sourceFiles.Select(sources => {
+      var cSharpCompilation = CSharpCompilation.Create(assemblyName, Enumerable.Empty<SyntaxTree>(), references, options);
+      var allSyntaxTrees = ImmutableDictionary<string, SyntaxTree>.Empty;
+
+      var assemblyPath = Path.Combine(outputDir, assemblyName);
+      Directory.CreateDirectory(outputDir);
+
+      return FilesDiff.ToFilesDiffObservable(sourceFiles).Select(sources => {
         var stopwatch = new Stopwatch();
         stopwatch.Start();
-        var assemblyPath = Path.Combine(outputDir, assemblyName);
-        Directory.CreateDirectory(outputDir);
         using (var assemblyOutputFile = File.Create(assemblyPath)) {
-          var syntaxTrees = sources.Select(s => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s)));
-          var emitResult = CSharpCompilation.Create(assemblyName, syntaxTrees, references, options).Emit(assemblyOutputFile);
+          var addedSyntaxTrees = sources.AddedFiles.Select(ToFileSyntaxTreePair).ToList();
+          var changedSyntaxTrees = sources.ChangedFiles.Select(ToFileSyntaxTreePair).ToList();
+
+          cSharpCompilation = UpdateCompilation(cSharpCompilation, addedSyntaxTrees, changedSyntaxTrees, sources.RemovedFiles, allSyntaxTrees);
+          allSyntaxTrees = UpdateSyntaxTrees(allSyntaxTrees, addedSyntaxTrees, changedSyntaxTrees, sources.RemovedFiles);
+
+          var emitResult = cSharpCompilation.Emit(assemblyOutputFile);
+
           stopwatch.Stop();
           return new CompilationResult(assemblyPath, emitResult, stopwatch.Elapsed);
         }
       });
     }
+
+    private static KeyValuePair<string, SyntaxTree> ToFileSyntaxTreePair(string s)
+      => new KeyValuePair<string, SyntaxTree>(s, SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s)));
+
+    private static ImmutableDictionary<string, SyntaxTree> UpdateSyntaxTrees(ImmutableDictionary<string, SyntaxTree> allSyntaxTrees, List<KeyValuePair<string, SyntaxTree>> addedSyntaxTrees, List<KeyValuePair<string, SyntaxTree>> changedSyntaxTrees, ImmutableHashSet<string> removedFiles)
+      => allSyntaxTrees.RemoveRange(removedFiles)
+                       .AddRange(addedSyntaxTrees)
+                       .SetItems(changedSyntaxTrees);
+
+    private static CSharpCompilation UpdateCompilation(CSharpCompilation cSharpCompilation, List<KeyValuePair<string, SyntaxTree>> addedSyntaxTrees, List<KeyValuePair<string, SyntaxTree>> changedSyntaxTrees, ImmutableHashSet<string> removedFiles, ImmutableDictionary<string, SyntaxTree> filesToSyntaxTrees)
+      => changedSyntaxTrees.Aggregate(cSharpCompilation.AddSyntaxTrees(addedSyntaxTrees.Select(pair => pair.Value))
+                                                       .RemoveSyntaxTrees(removedFiles.Select(s => filesToSyntaxTrees[s])),
+                                      (compilation, pair) => compilation.ReplaceSyntaxTree(filesToSyntaxTrees[pair.Key], pair.Value));
   }
 }

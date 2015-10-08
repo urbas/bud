@@ -21,6 +21,8 @@ namespace Bud.IO {
       FilesObserverFactory = () => filesObservableFactory.Select(ToFilesUpdate);
     }
 
+    public ListedFiles(params string[] files) : this(Observable.Empty<FileSystemEventArgs>(), files) {}
+
     public IObservable<FilesUpdate> AsObservable() {
       return Observable.Return(ToFilesUpdate(null))
                        .Concat(FilesObserverFactory());

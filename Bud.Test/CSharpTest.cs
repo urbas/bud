@@ -40,7 +40,9 @@ namespace Bud {
                     CSharpCompilation(),
                     BudDependencies())
         .Get(Compile)
-        .Do(result => Console.WriteLine($"Compilation succeeded in {result.CompilationTime.Milliseconds}ms"))
+        .Do(result => {
+          Console.WriteLine($"Compilation: Success = {result.EmitResult.Success}, Time = {result.CompilationTime.Milliseconds}ms");
+        })
         .ToTask();
     }
 

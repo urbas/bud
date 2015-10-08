@@ -51,6 +51,12 @@ namespace Bud.IO {
     }
 
     [Test]
+    public void Observing_filtered_files() {
+      var filesUpdate = new FilterFiles(someFiles, path => path.Contains("a")).AsObservable().ToEnumerable().First();
+      Assert.AreEqual(new [] {"a", "bar/c"}, filesUpdate);
+    }
+
+    [Test]
     public void Including_renames() {
       var observations = new FilterFiles(someFiles, path => path.EndsWith("h")).AsObservable().ToEnumerable();
       Assert.AreEqual(ImmutableArray.Create(renamedEventArgs), observations.Select(update => update.FileSystemEventArgs).Skip(1));

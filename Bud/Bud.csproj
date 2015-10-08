@@ -91,11 +91,14 @@
     <Compile Include="CSharp.cs" />
     <Compile Include="IO\CompoundFiles.cs" />
     <Compile Include="IO\Files.cs" />
+    <Compile Include="IO\FilesDiff.cs" />
     <Compile Include="IO\FilesObservatory.cs" />
     <Compile Include="IO\FilesUpdate.cs" />
+    <Compile Include="IO\FileTimestamps.cs" />
     <Compile Include="IO\FilterFiles.cs" />
     <Compile Include="IO\IFiles.cs" />
     <Compile Include="IO\IFilesObservatory.cs" />
+    <Compile Include="IO\IFileTimestamps.cs" />
     <Compile Include="IO\ListedFiles.cs" />
     <Compile Include="IO\FilesInDir.cs" />
     <Compile Include="IO\EmptyFilesObservatory.cs" />

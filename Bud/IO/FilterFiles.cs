@@ -18,7 +18,7 @@ namespace Bud.IO {
     public IEnumerator<string> GetEnumerator() => FilteredFiles.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) FilteredFiles).GetEnumerator();
     public IEnumerable<string> FilteredFiles => Files.Where(IsFileIncluded);
-    public IObservable<FilesUpdate> AsObservable() => Files.AsObservable().Where(AnyIncludedFileChanged);
+    public IObservable<FilesUpdate> AsObservable() => Files.AsObservable().Where(AnyIncludedFileChanged).Select(update => new FilesUpdate(update.FileSystemEventArgs, this));
 
     private bool AnyIncludedFileChanged(FilesUpdate update)
       => update.FileSystemEventArgs == null ||
