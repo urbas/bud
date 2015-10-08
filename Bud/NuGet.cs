@@ -5,6 +5,6 @@ namespace Bud {
     public readonly static Key<string> PackagesFile = nameof(PackagesFile);
 
     public static Configs NuGetPackages()
-      => NewConfigs.Init(PackagesFile, null);
+      => Empty.Init(PackagesFile, null);
   }
 }

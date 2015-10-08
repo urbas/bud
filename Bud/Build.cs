@@ -11,21 +11,21 @@ namespace Bud {
     public static readonly Key<IFiles> Sources = nameof(Sources);
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
 
-    public static Configs Project(string projectDir, string projectId = null, IFilesObservatory filesObservatory = null)
-      => NewConfigs.InitConst(Sources, Files.Empty)
-                 .InitConst(ProjectId, projectId ?? GetFileName(projectDir))
-                 .InitConst(ProjectDir, projectDir)
-                 .InitConst(FilesObservatory, filesObservatory ?? new FilesObservatory());
+    public static Configs Project(string projectDir, string projectId = null)
+      => Empty.InitConst(Sources, Files.Empty)
+              .InitConst(ProjectDir, projectDir)
+              .Init(ProjectId, c => projectId ?? GetFileName(ProjectDir[c]))
+              .Init(FilesObservatory, c => new FilesObservatory());
 
     public static Configs SourceDir(string subDir = null, string fileFilter = "*", SearchOption searchOption = SearchOption.AllDirectories) {
-      return NewConfigs.Modify(Sources, (tasks, existingSources) => {
+      return Empty.Modify(Sources, (tasks, existingSources) => {
         var sourceDir = subDir == null ? ProjectDir[tasks] : Combine(ProjectDir[tasks], subDir);
         return existingSources.ExtendWith(FilesObservatory[tasks], sourceDir, fileFilter, searchOption);
       });
     }
 
     public static Configs SourceFiles(params string[] relativeFilePaths)
-      => NewConfigs.Modify(Sources, (tasks, existingSources) => {
+      => Empty.Modify(Sources, (tasks, existingSources) => {
         var projectDir = ProjectDir[tasks];
         var absolutePaths = relativeFilePaths.Select(relativeFilePath => Combine(projectDir, relativeFilePath));
         return existingSources.ExtendWith(new ListedFiles(FilesObservatory[tasks], absolutePaths));

@@ -20,13 +20,13 @@ namespace Bud {
     public static readonly Key<Func<IObservable<IFiles>, IObservable<IFiles>>> SourcesObservationStrategy = nameof(SourcesObservationStrategy);
 
     public static Configs CSharpCompilation()
-      => NewConfigs.Init(Compile, PerformCompilation)
-                   .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
-                   .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
-                   .Init(References, configs => new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)})
-                   .InitConst(CSharpCompiler, new RoslynCSharpCompiler())
-                   .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-                   .InitConst(SourcesObservationStrategy, DefaultSourceObservationStrategy);
+      => Empty.Init(Compile, PerformCompilation)
+              .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
+              .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
+              .Init(References, configs => new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)})
+              .InitConst(CSharpCompiler, new RoslynCSharpCompiler())
+              .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+              .InitConst(SourcesObservationStrategy, DefaultSourceObservationStrategy);
 
     private static IObservable<ICompilationResult> PerformCompilation(IConfigs configs)
       => CSharpCompiler[configs].Compile(SourcesObservationStrategy[configs](Sources[configs].AsObservable().Select(update => update.Files)),

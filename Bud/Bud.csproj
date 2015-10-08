@@ -116,7 +116,6 @@
     <Compile Include="Configuration\ConfigAssertions.cs" />
     <Compile Include="Configuration\ConfigUndefinedException.cs" />
     <Compile Include="Configs.cs" />
-    <Compile Include="ConfigExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
