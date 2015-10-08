@@ -58,8 +58,8 @@ namespace Bud {
       => Add(new ModifyConfig<T>(configKey, valueFactory));
 
     /// <returns>a copy of self with added configurations from <paramref name="otherConfigs" />.</returns>
-    public Configs ExtendWith(Configs otherConfigs)
-      => new Configs(this.Concat(otherConfigs));
+    public Configs ExtendWith(params Configs[] otherConfigs)
+      => otherConfigs.Aggregate(this, (configs, configs1) => new Configs(configs.Concat(configs1)));
 
     /// <returns>a copy of self with every configuration key prefixed with <paramref name="parentKey" />.</returns>
     public Configs Nest(string parentKey)
