@@ -30,32 +30,32 @@ namespace Bud {
     ///   <paramref name="valueFactory" /> is invoked when the configuration is accessed.
     ///   If the configuration is already defined, then this method does nothing.
     /// </summary>
-    public static Configs Init<TResult>(this Configs configs, Key<TResult> configKey, Func<IConfigs, TResult> valueFactory)
-      => new Configs(configs.Add(new InitConfig<TResult>(configKey, valueFactory)));
+    public static Configs Init<T>(this Configs configs, Key<T> configKey, Func<IConfigs, T> valueFactory)
+      => new Configs(configs.Add(new InitConfig<T>(configKey, valueFactory)));
 
     /// <summary>
     ///   Defines a configuration that returns the value produced by <paramref name="valueFactory" />.
     ///   <paramref name="valueFactory" /> is invoked when the configuration is accessed.
     ///   If the configuration is already defined, then this method overwrites the configuration.
     /// </summary>
-    public static Configs Set<TResult>(this Configs configs, Key<TResult> configKey, Func<IConfigs, TResult> valueFactory)
-      => new Configs(configs.Add(new SetConfig<TResult>(configKey, valueFactory)));
+    public static Configs Set<T>(this Configs configs, Key<T> configKey, Func<IConfigs, T> valueFactory)
+      => new Configs(configs.Add(new SetConfig<T>(configKey, valueFactory)));
 
     /// <summary>
     ///   Defines a configuration that returns the value produced by <paramref name="valueFactory" />.
     ///   <paramref name="valueFactory" /> is invoked when the configuration is accessed.
     ///   If the configuration is already defined, then this method overwrites the configuration.
     /// </summary>
-    public static Configs Modify<TResult>(this Configs configs, Key<TResult> configKey, Func<IConfigs, TResult, TResult> valueFactory)
-      => new Configs(configs.Add(new ModifyConfig<TResult>(configKey, valueFactory)));
+    public static Configs Modify<T>(this Configs configs, Key<T> configKey, Func<IConfigs, T, T> valueFactory)
+      => new Configs(configs.Add(new ModifyConfig<T>(configKey, valueFactory)));
 
     /// <returns>a copy of <paramref name="configs" /> with added configurations from <paramref name="otherConfigs" />.</returns>
     public static Configs ExtendWith(this Configs configs, Configs otherConfigs)
       => new Configs(configs.Concat(otherConfigs));
 
-    /// <returns>a copy of <paramref name="configs" /> with every configuration key prefixed with <paramref name="prefix"/>.</returns>
-    public static Configs Nest(this Configs configs, string prefix)
-      => new Configs(configs.Select(taskModification => new NestConfig(prefix, taskModification)));
+    /// <returns>a copy of <paramref name="configs" /> with every configuration key prefixed with <paramref name="parentKey"/>.</returns>
+    public static Configs Nest(this Configs configs, string parentKey)
+      => new Configs(configs.Select(configTransform => configTransform.Nest(parentKey)));
     
     public static IDictionary<string, IConfigDefinition> Compile(this Configs configs) {
       var taskDefinitions = new Dictionary<string, IConfigDefinition>();

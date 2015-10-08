@@ -14,8 +14,8 @@ namespace Bud.IO {
       this.filesB = filesB;
     }
 
-    public IObservable<IFiles> AsObservable()
-      => filesA.AsObservable().CombineLatest(filesB.AsObservable(), (files, files1) => this);
+    public IObservable<FilesUpdate> AsObservable()
+      => filesA.AsObservable().Merge(filesB.AsObservable()).Select(update => new FilesUpdate(update.FileSystemEventArgs, this));
 
     public IEnumerator<string> GetEnumerator() => filesA.Concat(filesB).GetEnumerator();
 

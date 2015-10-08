@@ -87,8 +87,9 @@
   <ItemGroup>
     <Compile Include="ConfigExtensionsTest.cs" />
     <Compile Include="CSharpTest.cs" />
+    <Compile Include="IO\FilterFilesTest.cs" />
     <Compile Include="IO\FileSystemObserverFactoryTest.cs" />
-    <Compile Include="IO\RecursiveDirFilesTest.cs" />
+    <Compile Include="IO\FilesInDirTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BuildTest.cs" />
   </ItemGroup>

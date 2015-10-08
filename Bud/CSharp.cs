@@ -29,7 +29,7 @@ namespace Bud {
                    .InitConst(SourcesObservationStrategy, DefaultSourceObservationStrategy);
 
     private static IObservable<ICompilationResult> PerformCompilation(IConfigs configs)
-      => CSharpCompiler[configs].Compile(SourcesObservationStrategy[configs](Sources[configs].AsObservable()),
+      => CSharpCompiler[configs].Compile(SourcesObservationStrategy[configs](Sources[configs].AsObservable().Select(update => update.Files)),
                                          OutputDir[configs],
                                          AssemblyName[configs],
                                          CSharpCompilationOptions[configs],
@@ -38,7 +38,6 @@ namespace Bud {
     private static IObservable<IFiles> DefaultSourceObservationStrategy(IObservable<IFiles> sources)
       => sources.Sample(TimeSpan.FromMilliseconds(100))
                 .Delay(TimeSpan.FromMilliseconds(25));
-
 
     public static string ToExtension(this OutputKind kind) {
       switch (kind) {

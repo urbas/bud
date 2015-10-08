@@ -1,7 +1,8 @@
 namespace Bud.Configuration {
   public interface IConfigTransform {
     string Key { get; }
-    IConfigDefinition Modify(IConfigDefinition configDefinition);
     IConfigDefinition ToConfigDefinition();
+    IConfigDefinition Modify(IConfigDefinition configDefinition);
+    IConfigTransform Nest(string parentKey);
   }
 }

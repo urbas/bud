@@ -6,13 +6,13 @@ using Bud.Configuration;
 namespace Bud {
   public struct Configs : IEnumerable<IConfigTransform> {
     public static readonly Configs NewConfigs = new Configs(Enumerable.Empty<IConfigTransform>());
-    private IEnumerable<IConfigTransform> ConfigModifications { get; }
+    private IEnumerable<IConfigTransform> ConfigTransforms { get; }
 
-    public Configs(IEnumerable<IConfigTransform> configModifications) {
-      ConfigModifications = configModifications;
+    public Configs(IEnumerable<IConfigTransform> configTransforms) {
+      ConfigTransforms = configTransforms;
     }
 
-    public IEnumerator<IConfigTransform> GetEnumerator() => ConfigModifications.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) ConfigModifications).GetEnumerator();
+    public IEnumerator<IConfigTransform> GetEnumerator() => ConfigTransforms.GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) ConfigTransforms).GetEnumerator();
   }
 }

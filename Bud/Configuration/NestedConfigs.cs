@@ -1,5 +1,3 @@
-using Bud;
-
 namespace Bud.Configuration {
   public class NestedConfigs : IConfigs {
     private readonly string prefix;

@@ -103,8 +103,8 @@ namespace Bud {
     [Test]
     public void A_config_can_invoke_another_config() {
       var configResult = Configs.NewConfigs.Const(fooInt, 42)
-                               .Set(barInt, configs => configs.Get(fooInt) + 1)
-                               .Get(barInt);
+                                .Set(barInt, configs => configs.Get(fooInt) + 1)
+                                .Get(barInt);
       Assert.AreEqual(43, configResult);
     }
 
@@ -112,8 +112,8 @@ namespace Bud {
     public void Configurations_are_invoked_once_only_and_their_result_is_cached() {
       var intTask = new Mock<Func<IConfigs, int>>();
       Configs.NewConfigs.Set(fooInt, intTask.Object)
-              .Set(barInt, configs => fooInt[configs] + fooInt[configs])
-              .Get(barInt);
+             .Set(barInt, configs => fooInt[configs] + fooInt[configs])
+             .Get(barInt);
       intTask.Verify(self => self(It.IsAny<IConfigs>()));
     }
 
@@ -121,7 +121,7 @@ namespace Bud {
     public async void Multithreaded_access_to_configs_should_not_result_in_duplicate_invocations() {
       var intTask = new Mock<Func<IConfigs, int>>();
       var configs = Configs.NewConfigs.Set(fooInt, intTask.Object)
-                          .Set(barAsyncInt, AddFooTwiceConcurrently);
+                           .Set(barAsyncInt, AddFooTwiceConcurrently);
       int repeatCount = 10;
       for (int i = 0; i < repeatCount; i++) {
         await configs.Get(barAsyncInt);
@@ -138,9 +138,18 @@ namespace Bud {
     [Test]
     public void Nesting_allows_access_to_sibling_configs() {
       var nestedConfigs = Configs.NewConfigs.Set(barInt, configs => fooInt[configs] + 1)
-                                .Const(fooInt, 42)
-                                .Nest("bar");
+                                 .Const(fooInt, 42)
+                                 .Nest("bar");
       Assert.AreEqual(43, nestedConfigs.Get("bar" / barInt));
+    }
+
+    [Test]
+    public void Nested_configs_can_be_modified() {
+      var nestedConfigs = Configs.NewConfigs
+                                 .Const(fooInt, 42)
+                                 .Nest("bar")
+                                 .Modify("bar" / fooInt, (configs, i) => 58);
+      Assert.AreEqual(58, nestedConfigs.Get("bar" / fooInt));
     }
 
     private async Task<int> AddFooTwiceConcurrently(IConfigs tsks) {

@@ -5,14 +5,13 @@ using System.Reactive.Linq;
 
 namespace Bud.IO {
   public class FilesObservatory : IFilesObservatory {
-    public IObservable<FileSystemEventArgs> CreateObserver(string sourceDir, string fileFilter, bool includeSubfolders) {
-      return ObserveFileSystem(sourceDir, fileFilter, includeSubfolders);
-    }
+    public IObservable<FileSystemEventArgs> CreateObserver(string sourceDir, string fileFilter, bool includeSubfolders)
+      => ObserveFileSystem(sourceDir, fileFilter, includeSubfolders);
 
     public static IObservable<FileSystemEventArgs> ObserveFileSystem(string watcherDir,
                                                                      string fileFilter,
-                                                                     bool includeSubdirectories) {
-      return Observable.Create<FileSystemEventArgs>(observer => {
+                                                                     bool includeSubdirectories)
+      => Observable.Create<FileSystemEventArgs>(observer => {
         var compositeDisposable = new CompositeDisposable();
 
         var fileSystemWatcher = new FileSystemWatcher(watcherDir, fileFilter) {
@@ -32,6 +31,5 @@ namespace Bud.IO {
 
         return compositeDisposable;
       });
-    }
   }
 }

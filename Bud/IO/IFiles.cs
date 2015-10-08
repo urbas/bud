@@ -3,6 +3,6 @@ using System.Collections.Generic;
 
 namespace Bud.IO {
   public interface IFiles : IEnumerable<string> {
-    IObservable<IFiles> AsObservable();
+    IObservable<FilesUpdate> AsObservable();
   }
 }

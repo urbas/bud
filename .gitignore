@@ -3,6 +3,8 @@ bud.userprefs
 
 # MonoDevelop
 test-results/
+
+# NuGet
 packages/
 
 # Visual Studio Files
@@ -15,11 +17,7 @@ packages/
 *.swp
 *~
 
-# Bud Build
-.bud/global/nuGetRepository
-**/output/
-.bud/*.dll
-TestResult.xml
-
+# Build
 obj/
 bin/
+target/

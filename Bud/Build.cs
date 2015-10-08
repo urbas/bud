@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using Bud.IO;
 using static System.IO.Path;
@@ -16,10 +17,10 @@ namespace Bud {
                  .InitConst(ProjectDir, projectDir)
                  .InitConst(FilesObservatory, filesObservatory ?? new FilesObservatory());
 
-    public static Configs SourceDir(string subDir = null, string fileFilter = "*") {
+    public static Configs SourceDir(string subDir = null, string fileFilter = "*", SearchOption searchOption = SearchOption.AllDirectories) {
       return NewConfigs.Modify(Sources, (tasks, existingSources) => {
         var sourceDir = subDir == null ? ProjectDir[tasks] : Combine(ProjectDir[tasks], subDir);
-        return existingSources.ExtendWith(FilesObservatory[tasks], sourceDir, fileFilter);
+        return existingSources.ExtendWith(FilesObservatory[tasks], sourceDir, fileFilter, searchOption);
       });
     }
 
