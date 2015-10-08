@@ -5,7 +5,7 @@ using Moq;
 using NUnit.Framework;
 
 namespace Bud {
-  public class ConfigExtensionsTest {
+  public class ConfigsTest {
     private readonly Key<int> fooInt = "foo";
     private readonly Key<int> barInt = nameof(barInt);
     private readonly Key<Task<int>> barAsyncInt = nameof(barAsyncInt);

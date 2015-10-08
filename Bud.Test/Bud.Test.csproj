@@ -85,7 +85,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConfigExtensionsTest.cs" />
+    <Compile Include="ConfigsTest.cs" />
     <Compile Include="CSharpTest.cs" />
     <Compile Include="IO\FilterFilesTest.cs" />
     <Compile Include="IO\FileSystemObserverFactoryTest.cs" />
