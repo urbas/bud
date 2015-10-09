@@ -14,11 +14,9 @@ namespace Bud.IO {
       this.filesB = filesB;
     }
 
-    public IObservable<FilesUpdate> AsObservable()
-      => filesA.AsObservable().Merge(filesB.AsObservable()).Select(update => new FilesUpdate(update.FileSystemEventArgs, this));
+    public IEnumerable<string> Enumerate() => filesA.Enumerate().Concat(filesB.Enumerate());
 
-    public IEnumerator<string> GetEnumerator() => filesA.Concat(filesB).GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public IObservable<FilesUpdate> Watch()
+      => filesA.Watch().Merge(filesB.Watch()).Select(update => new FilesUpdate(update.FileSystemEventArgs, this));
   }
 }

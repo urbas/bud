@@ -25,7 +25,7 @@ namespace Bud {
         .ExtendWith(CSharpCompilation())
         .Const(CSharpCompiler, cSharpCompiler.Object);
 
-      cSharpCompiler.Setup(self => self.Compile(It.IsAny<IObservable<IFiles>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CSharpCompilationOptions>(), It.IsAny<IEnumerable<MetadataReference>>()))
+      cSharpCompiler.Setup(self => self.Compile(It.IsAny<IObservable<FilesUpdate>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CSharpCompilationOptions>(), It.IsAny<IEnumerable<MetadataReference>>()))
                     .Returns(compilationResult);
 
       Assert.AreSame(compilationResult, project.Get(Compile));

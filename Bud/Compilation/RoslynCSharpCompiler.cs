@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Bud.Compilation {
   public class RoslynCSharpCompiler : ICSharpCompiler {
-    public IObservable<ICompilationResult> Compile(IObservable<IFiles> sourceFiles,
+    public IObservable<ICompilationResult> Compile(IObservable<FilesUpdate> sourceFiles,
                                                    string outputDir,
                                                    string assemblyName,
                                                    CSharpCompilationOptions options,

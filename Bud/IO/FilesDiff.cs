@@ -18,14 +18,14 @@ namespace Bud.IO {
       AllFiles = allFiles;
     }
 
-    public static IObservable<FilesDiff> DoDiffing(IObservable<IFiles> filesObservable) 
+    public static IObservable<FilesDiff> DoDiffing(IObservable<FilesUpdate> filesObservable) 
       => DoDiffing(filesObservable, FileTimestamps.Instance);
 
-    public static IObservable<FilesDiff> DoDiffing(IObservable<IFiles> filesObservable, IFileTimestamps fileTimestamps) {
+    public static IObservable<FilesDiff> DoDiffing(IObservable<FilesUpdate> filesObservable, IFileTimestamps fileTimestamps) {
       var oldFiles = ImmutableHashSet<string>.Empty;
       var oldFilesWithTimestamps = ImmutableDictionary<string, DateTime>.Empty;
       return filesObservable.Select(files => {
-        var newFiles = ImmutableHashSet.CreateRange(files);
+        var newFiles = ImmutableHashSet.CreateRange(files.Enumerate());
         var newFilesWithTimestamps = ImmutableDictionary.CreateRange(newFiles.Select(s => new KeyValuePair<string, DateTime>(s, fileTimestamps.GetTimestamp(s))));
         var addedFiles = newFiles.Except(oldFiles);
         var removedFiles = oldFiles.Except(newFiles);

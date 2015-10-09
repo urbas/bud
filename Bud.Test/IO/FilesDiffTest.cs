@@ -9,7 +9,7 @@ namespace Bud.IO {
   public class FilesDiffTest {
     [Test]
     public void Initially_all_files_are_added() {
-      var filesUpdates = ImmutableArray.Create(new ListedFiles("a", "b")).ToObservable();
+      var filesUpdates = ImmutableArray.Create(FileList("a", "b")).ToObservable();
       var diff = FilesDiff.DoDiffing(filesUpdates).ToEnumerable().First();
       Assert.AreEqual(new[] {"a", "b"}, diff.AddedFiles);
       Assert.IsEmpty(diff.RemovedFiles);
@@ -19,7 +19,7 @@ namespace Bud.IO {
 
     [Test]
     public void List_newly_added_files() {
-      var filesUpdates = ImmutableArray.Create(new ListedFiles("a"), new ListedFiles("a", "b")).ToObservable();
+      var filesUpdates = ImmutableArray.Create(FileList("a"), FileList("a", "b")).ToObservable();
       var diff = FilesDiff.DoDiffing(filesUpdates).ToEnumerable().Last();
       Assert.AreEqual(new[] {"b"}, diff.AddedFiles);
       Assert.IsEmpty(diff.RemovedFiles);
@@ -29,7 +29,7 @@ namespace Bud.IO {
 
     [Test]
     public void List_removed_files() {
-      var filesUpdates = ImmutableArray.Create(new ListedFiles("a", "b"), new ListedFiles("a")).ToObservable();
+      var filesUpdates = ImmutableArray.Create(FileList("a", "b"), FileList("a")).ToObservable();
       var diff = FilesDiff.DoDiffing(filesUpdates).ToEnumerable().Last();
       Assert.AreEqual(new[] {"b"}, diff.RemovedFiles);
       Assert.IsEmpty(diff.AddedFiles);
@@ -39,7 +39,7 @@ namespace Bud.IO {
 
     [Test]
     public void No_changes() {
-      var filesUpdates = ImmutableArray.Create(new ListedFiles("a"), new ListedFiles("a")).ToObservable();
+      var filesUpdates = ImmutableArray.Create(FileList("a"), FileList("a")).ToObservable();
       var diff = FilesDiff.DoDiffing(filesUpdates).ToEnumerable().Last();
       Assert.IsEmpty(diff.RemovedFiles);
       Assert.IsEmpty(diff.AddedFiles);
@@ -51,7 +51,7 @@ namespace Bud.IO {
     public void Changed_file() {
       var fileTimestamps = new Mock<IFileTimestamps>();
       long fileTimestamp = 0L;
-      var filesUpdates = ImmutableArray.Create(new ListedFiles("a"), new ListedFiles("a"))
+      var filesUpdates = ImmutableArray.Create(FileList("a"), FileList("a"))
                                        .ToObservable()
                                        .Do(update => fileTimestamps.Setup(self => self.GetTimestamp(It.Is<string>(s => "a".Equals(s)))).Returns(DateTime.FromFileTime(++fileTimestamp)));
       var diff = FilesDiff.DoDiffing(filesUpdates, fileTimestamps.Object).ToEnumerable().Last();
@@ -60,5 +60,7 @@ namespace Bud.IO {
       Assert.AreEqual(new[] {"a"}, diff.ChangedFiles);
       Assert.AreEqual(new[] {"a"}, diff.AllFiles);
     }
+
+    private static FilesUpdate FileList(params string[] paths) => new FilesUpdate(null, new ListedFiles(paths));
   }
 }

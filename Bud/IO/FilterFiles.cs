@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,10 +14,10 @@ namespace Bud.IO {
       IsFileIncluded = isFileIncluded;
     }
 
-    public IEnumerator<string> GetEnumerator() => FilteredFiles.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) FilteredFiles).GetEnumerator();
-    public IEnumerable<string> FilteredFiles => Files.Where(IsFileIncluded);
-    public IObservable<FilesUpdate> AsObservable() => Files.AsObservable().Where(AnyIncludedFileChanged).Select(update => new FilesUpdate(update.FileSystemEventArgs, this));
+    public IEnumerable<string> Enumerate() => Files.Enumerate().Where(IsFileIncluded);
+
+    public IObservable<FilesUpdate> Watch()
+      => Files.Watch().Where(AnyIncludedFileChanged).Select(update => new FilesUpdate(update.FileSystemEventArgs, this));
 
     private bool AnyIncludedFileChanged(FilesUpdate update)
       => update.FileSystemEventArgs == null ||

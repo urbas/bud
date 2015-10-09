@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Bud.Compilation {
   public interface ICSharpCompiler {
-    IObservable<ICompilationResult> Compile(IObservable<IFiles> sourceFiles,
+    IObservable<ICompilationResult> Compile(IObservable<FilesUpdate> sourceFiles,
                                             string outputDir,
                                             string assemblyName,
                                             CSharpCompilationOptions options,

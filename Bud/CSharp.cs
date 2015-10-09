@@ -17,7 +17,7 @@ namespace Bud {
     public static readonly Key<IEnumerable<MetadataReference>> References = nameof(References);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
     public static readonly Key<ICSharpCompiler> CSharpCompiler = nameof(CSharpCompiler);
-    public static readonly Key<Func<IObservable<IFiles>, IObservable<IFiles>>> SourcesObservationStrategy = nameof(SourcesObservationStrategy);
+    public static readonly Key<Func<IObservable<FilesUpdate>, IObservable<FilesUpdate>>> SourcesObservationStrategy = nameof(SourcesObservationStrategy);
 
     public static Configs CSharpCompilation()
       => Empty.Init(Compile, PerformCompilation)
@@ -29,13 +29,13 @@ namespace Bud {
               .InitConst(SourcesObservationStrategy, DefaultSourceObservationStrategy);
 
     private static IObservable<ICompilationResult> PerformCompilation(IConfigs configs)
-      => CSharpCompiler[configs].Compile(SourcesObservationStrategy[configs](Sources[configs].AsObservable().Select(update => update.Files)),
+      => CSharpCompiler[configs].Compile(SourcesObservationStrategy[configs](Sources[configs].Watch()),
                                          OutputDir[configs],
                                          AssemblyName[configs],
                                          CSharpCompilationOptions[configs],
                                          References[configs]);
 
-    private static IObservable<IFiles> DefaultSourceObservationStrategy(IObservable<IFiles> sources)
+    private static IObservable<FilesUpdate> DefaultSourceObservationStrategy(IObservable<FilesUpdate> sources)
       => sources.Sample(TimeSpan.FromMilliseconds(100))
                 .Delay(TimeSpan.FromMilliseconds(25));
 

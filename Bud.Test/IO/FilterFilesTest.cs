@@ -25,40 +25,40 @@ namespace Bud.IO {
 
     [Test]
     public void Exclude_everything() {
-      Assert.IsEmpty(new FilterFiles(someFiles, path => false));
+      Assert.IsEmpty(new FilterFiles(someFiles, path => false).Enumerate());
     }
 
     [Test]
     public void Exclude_nothing() {
-      Assert.That(new FilterFiles(someFiles, path => true), Is.EquivalentTo(someFiles));
+      Assert.That(new FilterFiles(someFiles, path => true).Enumerate(), Is.EquivalentTo(someFiles.Enumerate()));
     }
 
     [Test]
     public void Exclude_some_files() {
-      Assert.That(new FilterFiles(someFiles, path => path.Contains("c")), Is.EquivalentTo(ImmutableArray.Create("bar/c")));
+      Assert.That(new FilterFiles(someFiles, path => path.Contains("c")).Enumerate(), Is.EquivalentTo(ImmutableArray.Create("bar/c")));
     }
 
     [Test]
     public void Include_renames() {
-      var observations = new FilterFiles(someFiles, path => path.EndsWith("h")).AsObservable().ToEnumerable();
+      var observations = new FilterFiles(someFiles, path => path.EndsWith("h")).Watch().ToEnumerable();
       Assert.AreEqual(ImmutableArray.Create(renamedEventArgs), observations.Select(update => update.FileSystemEventArgs).Skip(1));
     }
 
     [Test]
     public void Exclude_all_but_first_observation() {
-      var observations = new FilterFiles(someFiles, path => false).AsObservable().ToEnumerable();
+      var observations = new FilterFiles(someFiles, path => false).Watch().ToEnumerable();
       Assert.IsEmpty(observations.Select(update => update.FileSystemEventArgs).Skip(1));
     }
 
     [Test]
     public void Exclude_no_observations() {
-      var observations = new FilterFiles(someFiles, path => true).AsObservable().ToEnumerable();
+      var observations = new FilterFiles(someFiles, path => true).Watch().ToEnumerable();
       Assert.AreEqual(fileSystemEvents, observations.Select(update => update.FileSystemEventArgs).Skip(1));
     }
 
     [Test]
     public void Observe_filtered_files_only() {
-      var filesUpdate = new FilterFiles(someFiles, path => path.Contains("a")).AsObservable().ToEnumerable().First();
+      var filesUpdate = new FilterFiles(someFiles, path => path.Contains("a")).Watch().ToEnumerable().First().Enumerate();
       Assert.AreEqual(new [] {"a", "bar/c"}, filesUpdate);
     }
   }

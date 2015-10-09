@@ -16,9 +16,8 @@ namespace Bud.IO {
       => new CompoundFiles(files, otherFiles);
 
     private class EmptyFiles : IFiles {
-      public IObservable<FilesUpdate> AsObservable() => Observable.Return(new FilesUpdate(null, this));
-      public IEnumerator<string> GetEnumerator() => Enumerable.Empty<string>().GetEnumerator();
-      IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+      public IEnumerable<string> Enumerate() => Enumerable.Empty<string>();
+      public IObservable<FilesUpdate> Watch() => Observable.Return(new FilesUpdate(null, this));
     }
   }
 }

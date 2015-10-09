@@ -20,12 +20,9 @@ namespace Bud.IO {
       SearchOption = searchOption;
     }
 
-    public IEnumerator<string> GetEnumerator()
-      => EnumerateFiles(SourceDir, FileFilter, SearchOption).GetEnumerator();
+    public IEnumerable<string> Enumerate() => EnumerateFiles(SourceDir, FileFilter, SearchOption);
 
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    public IObservable<FilesUpdate> AsObservable()
+    public IObservable<FilesUpdate> Watch()
       => Observable.Return(ToFilesUpdate(null))
                    .Concat(CreateFilesObserver().Select(ToFilesUpdate));
 

@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,21 +15,18 @@ namespace Bud.IO {
       FilesObserverFactory = () => Files.Select(file => filesObservatory.CreateObserver(GetDirectoryName(file), GetFileName(file), false)).Merge().Select(ToFilesUpdate);
     }
 
-    public ListedFiles(IObservable<FileSystemEventArgs> filesObservableFactory, IEnumerable<string> files) {
+    public ListedFiles(IObservable<FileSystemEventArgs> filesObservable, IEnumerable<string> files) {
       Files = files;
-      FilesObserverFactory = () => filesObservableFactory.Select(ToFilesUpdate);
+      FilesObserverFactory = () => filesObservable.Select(ToFilesUpdate);
     }
 
     public ListedFiles(params string[] files) : this(Observable.Empty<FileSystemEventArgs>(), files) {}
 
-    public IObservable<FilesUpdate> AsObservable() {
-      return Observable.Return(ToFilesUpdate(null))
-                       .Concat(FilesObserverFactory());
-    }
+    public IEnumerable<string> Enumerate() => Files;
 
-    public IEnumerator<string> GetEnumerator() => Files.GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable) Files).GetEnumerator();
+    public IObservable<FilesUpdate> Watch()
+      => Observable.Return(ToFilesUpdate(null))
+                   .Concat(FilesObserverFactory());
 
     private FilesUpdate ToFilesUpdate(FileSystemEventArgs fileSystemEventArgs)
       => new FilesUpdate(fileSystemEventArgs, this);

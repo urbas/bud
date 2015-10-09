@@ -40,26 +40,26 @@ namespace Bud {
     [Test]
     public void CSharp_sources_must_be_listed() {
       var sourceFile = tempDir.CreateEmptyFile("TestMainClass.cs");
-      Assert.That(cSharpProject.Get(Sources), Contains.Item(sourceFile));
+      Assert.That(cSharpProject.Get(Sources).Enumerate(), Contains.Item(sourceFile));
     }
 
     [Test]
     public void CSharp_sources_in_nested_directories_must_be_listed() {
       var sourceFile = tempDir.CreateEmptyFile("Bud", "TestMainClass.cs");
-      Assert.That(cSharpProject.Get(Sources), Contains.Item(sourceFile));
+      Assert.That(cSharpProject.Get(Sources).Enumerate(), Contains.Item(sourceFile));
     }
 
     [Test]
     public void Non_csharp_files_must_not_be_listed() {
       var textFile = tempDir.CreateEmptyFile("Bud", "TextFile.txt");
-      Assert.That(cSharpProject.Get(Sources), Is.Not.Contains(textFile));
+      Assert.That(cSharpProject.Get(Sources).Enumerate(), Is.Not.Contains(textFile));
     }
 
     [Test]
     public void Multiple_source_directories() {
       var fileA = tempDir.CreateEmptyFile("A", "A.cs");
       var fileB = tempDir.CreateEmptyFile("B", "B.cs");
-      Assert.That(twoSourceDirsProject.Get(Sources), Is.EquivalentTo(new[] {fileA, fileB}));
+      Assert.That(twoSourceDirsProject.Get(Sources).Enumerate(), Is.EquivalentTo(new[] {fileA, fileB}));
     }
   }
 }
