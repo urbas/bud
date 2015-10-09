@@ -41,7 +41,7 @@ namespace Bud.Compilation {
     }
 
     private static KeyValuePair<string, SyntaxTree> ToFileSyntaxTreePair(string s)
-      => new KeyValuePair<string, SyntaxTree>(s, SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s)));
+      => new KeyValuePair<string, SyntaxTree>(s, SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s), path: s));
 
     private static ImmutableDictionary<string, SyntaxTree> UpdateSyntaxTrees(ImmutableDictionary<string, SyntaxTree> allSyntaxTrees, List<KeyValuePair<string, SyntaxTree>> addedSyntaxTrees, List<KeyValuePair<string, SyntaxTree>> changedSyntaxTrees, ImmutableHashSet<string> removedFiles)
       => allSyntaxTrees.RemoveRange(removedFiles)
