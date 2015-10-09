@@ -1,7 +1,6 @@
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using NUnit.Framework;
 
 namespace Bud.IO {
@@ -35,7 +34,7 @@ namespace Bud.IO {
       var fileA = tempDir.CreateEmptyFile("A", "A.txt");
       var fileB = tempDir.CreateEmptyFile("B", "B.cs");
       Assert.That(new FilesInDir(noFileChanges, Path.Combine(tempDir.Path, "B"), "*.cs")
-                    .ExtendWith(noFileChanges, Path.Combine(tempDir.Path, "A"), "*.txt")
+                    .ExtendWith(new FilesInDir(noFileChanges, Path.Combine(tempDir.Path, "A"), "*.txt"))
                     .Enumerate(),
                   Contains.Item(fileA).And.Contains(fileB));
     }

@@ -20,7 +20,7 @@ namespace Bud {
     public static Configs SourceDir(string subDir = null, string fileFilter = "*", SearchOption searchOption = SearchOption.AllDirectories) {
       return Empty.Modify(Sources, (tasks, existingSources) => {
         var sourceDir = subDir == null ? ProjectDir[tasks] : Combine(ProjectDir[tasks], subDir);
-        return existingSources.ExtendWith(FilesObservatory[tasks], sourceDir, fileFilter, searchOption);
+        return existingSources.ExtendWith(new FilesInDir(FilesObservatory[tasks], sourceDir, fileFilter, searchOption));
       });
     }
 
