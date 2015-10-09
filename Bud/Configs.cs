@@ -66,16 +66,16 @@ namespace Bud {
       => new Configs(this.Select(configTransform => configTransform.Nest(parentKey)));
 
     public IDictionary<string, IConfigDefinition> Compile() {
-      var taskDefinitions = new Dictionary<string, IConfigDefinition>();
-      foreach (var taskModification in this) {
+      var configDefinitions = new Dictionary<string, IConfigDefinition>();
+      foreach (var configTransform in this) {
         IConfigDefinition configDefinition;
-        if (taskDefinitions.TryGetValue(taskModification.Key, out configDefinition)) {
-          taskDefinitions[taskModification.Key] = taskModification.Modify(configDefinition);
+        if (configDefinitions.TryGetValue(configTransform.Key, out configDefinition)) {
+          configDefinitions[configTransform.Key] = configTransform.Modify(configDefinition);
         } else {
-          taskDefinitions.Add(taskModification.Key, taskModification.ToConfigDefinition());
+          configDefinitions.Add(configTransform.Key, configTransform.ToConfigDefinition());
         }
       }
-      return taskDefinitions;
+      return configDefinitions;
     }
 
     /// <summary>

@@ -18,17 +18,17 @@ namespace Bud {
               .Init(FilesObservatory, c => new FilesObservatory());
 
     public static Configs SourceDir(string subDir = null, string fileFilter = "*", SearchOption searchOption = SearchOption.AllDirectories) {
-      return Empty.Modify(Sources, (tasks, existingSources) => {
-        var sourceDir = subDir == null ? ProjectDir[tasks] : Combine(ProjectDir[tasks], subDir);
-        return existingSources.ExtendWith(new FilesInDir(FilesObservatory[tasks], sourceDir, fileFilter, searchOption));
+      return Empty.Modify(Sources, (configs, existingSources) => {
+        var sourceDir = subDir == null ? ProjectDir[configs] : Combine(ProjectDir[configs], subDir);
+        return existingSources.ExtendWith(new FilesInDir(FilesObservatory[configs], sourceDir, fileFilter, searchOption));
       });
     }
 
     public static Configs SourceFiles(params string[] relativeFilePaths)
-      => Empty.Modify(Sources, (tasks, existingSources) => {
-        var projectDir = ProjectDir[tasks];
+      => Empty.Modify(Sources, (configs, existingSources) => {
+        var projectDir = ProjectDir[configs];
         var absolutePaths = relativeFilePaths.Select(relativeFilePath => Combine(projectDir, relativeFilePath));
-        return existingSources.ExtendWith(new ListedFiles(FilesObservatory[tasks], absolutePaths));
+        return existingSources.ExtendWith(new ListedFiles(FilesObservatory[configs], absolutePaths));
       });
   }
 }

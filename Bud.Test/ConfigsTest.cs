@@ -110,23 +110,23 @@ namespace Bud {
 
     [Test]
     public void Configurations_are_invoked_once_only_and_their_result_is_cached() {
-      var intTask = new Mock<Func<IConfigs, int>>();
-      Configs.Empty.Set(fooInt, intTask.Object)
+      var intConfig = new Mock<Func<IConfigs, int>>();
+      Configs.Empty.Set(fooInt, intConfig.Object)
              .Set(barInt, configs => fooInt[configs] + fooInt[configs])
              .Get(barInt);
-      intTask.Verify(self => self(It.IsAny<IConfigs>()));
+      intConfig.Verify(self => self(It.IsAny<IConfigs>()));
     }
 
     [Test]
     public async void Multithreaded_access_to_configs_should_not_result_in_duplicate_invocations() {
-      var intTask = new Mock<Func<IConfigs, int>>();
-      var configs = Configs.Empty.Set(fooInt, intTask.Object)
+      var intConfig = new Mock<Func<IConfigs, int>>();
+      var configs = Configs.Empty.Set(fooInt, intConfig.Object)
                            .Set(barAsyncInt, AddFooTwiceConcurrently);
       int repeatCount = 10;
       for (int i = 0; i < repeatCount; i++) {
         await configs.Get(barAsyncInt);
       }
-      intTask.Verify(self => self(It.IsAny<IConfigs>()), Times.Exactly(repeatCount));
+      intConfig.Verify(self => self(It.IsAny<IConfigs>()), Times.Exactly(repeatCount));
     }
 
     [Test]
