@@ -22,7 +22,7 @@ namespace Bud {
       var compilationResult = Observable.Return(new Mock<ICompilationResult>().Object);
 
       var project = Project("fooDir", "Foo")
-        .ExtendWith(CSharpCompilation())
+        .Add(CSharpCompilation())
         .Const(CSharpCompiler, cSharpCompiler.Object);
 
       cSharpCompiler.Setup(self => self.Compile(It.IsAny<IObservable<FilesUpdate>>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CSharpCompilationOptions>(), It.IsAny<IEnumerable<MetadataReference>>()))
@@ -35,14 +35,12 @@ namespace Bud {
     [Ignore]
     public async void Compile_bud() {
       await Project(@"C:\Users\matej\Programming\bud\Bud")
-        .ExtendWith(SourceDir(fileFilter: "*.cs"),
-                    ExcludeSourceDirs("obj", "bin", "target"),
-                    CSharpCompilation(),
-                    BudDependencies())
+        .Add(SourceDir(fileFilter: "*.cs"),
+             ExcludeSourceDirs("obj", "bin", "target"),
+             CSharpCompilation(),
+             BudDependencies())
         .Get(Compile)
-        .Do(result => {
-          Console.WriteLine($"Compilation: Success = {result.EmitResult.Success}, Time = {result.CompilationTime.Milliseconds}ms");
-        })
+        .Do(result => Console.WriteLine($"Compilation: Success = {result.EmitResult.Success}, Time = {result.CompilationTime.Milliseconds}ms"))
         .ToTask();
     }
 

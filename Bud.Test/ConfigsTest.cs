@@ -89,7 +89,7 @@ namespace Bud {
     public void Extended_configs_must_contain_configurations_from_the_original_as_well_as_extending_configs() {
       var originalConfigs = Configs.Empty.Const(fooInt, 42);
       var extendingConfigs = Configs.Empty.Const(barInt, 58);
-      var combinedConfigs = originalConfigs.ExtendWith(extendingConfigs);
+      var combinedConfigs = originalConfigs.Add(extendingConfigs);
       Assert.AreEqual(42, combinedConfigs.Get(fooInt));
       Assert.AreEqual(58, combinedConfigs.Get(barInt));
     }

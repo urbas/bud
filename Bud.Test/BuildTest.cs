@@ -14,9 +14,8 @@ namespace Bud {
     public void SetUp() {
       tempDir = new TemporaryDirectory();
       bareProject = Project(tempDir.Path, "Foo");
-      cSharpProject = bareProject.ExtendWith(SourceDir(fileFilter: "*.cs"));
-      twoSourceDirsProject = bareProject.ExtendWith(SourceDir("A"))
-                                        .ExtendWith(SourceDir("B"));
+      cSharpProject = bareProject.Add(SourceDir(fileFilter: "*.cs"));
+      twoSourceDirsProject = bareProject.Add(SourceDir("A"), SourceDir("B"));
     }
 
     [TearDown]
