@@ -15,11 +15,12 @@ namespace Bud.Compilation {
       var allSyntaxTrees = ImmutableDictionary<string, SyntaxTree>.Empty;
 
       return FilesDiff.DoDiffing(sourceFiles).CombineLatest(observedReferences, (sources, references) => {
-        var addedSyntaxTrees = sources.AddedFiles.Select(ToFileSyntaxTreePair).ToList();
-        var changedSyntaxTrees = sources.ChangedFiles.Select(ToFileSyntaxTreePair).ToList();
+        var addedSources = sources.AddedFiles.Select(ToFileSyntaxTreePair).ToList();
+        var changedSources = sources.ChangedFiles.Select(ToFileSyntaxTreePair).ToList();
+        var removedSources = sources.RemovedFiles;
 
-        cSharpCompilation = UpdateCompilation(cSharpCompilation, addedSyntaxTrees, changedSyntaxTrees, sources.RemovedFiles, allSyntaxTrees);
-        allSyntaxTrees = UpdateSyntaxTrees(allSyntaxTrees, addedSyntaxTrees, changedSyntaxTrees, sources.RemovedFiles);
+        cSharpCompilation = UpdateCompilation(cSharpCompilation, addedSources, changedSources, removedSources, allSyntaxTrees);
+        allSyntaxTrees = UpdateSyntaxTrees(allSyntaxTrees, addedSources, changedSources, removedSources);
         cSharpCompilation = cSharpCompilation.RemoveAllReferences().AddReferences(references);
         return cSharpCompilation;
       });
@@ -28,14 +29,18 @@ namespace Bud.Compilation {
     private static KeyValuePair<string, SyntaxTree> ToFileSyntaxTreePair(string s)
       => new KeyValuePair<string, SyntaxTree>(s, SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s), path: s));
 
-    private static ImmutableDictionary<string, SyntaxTree> UpdateSyntaxTrees(ImmutableDictionary<string, SyntaxTree> allSyntaxTrees, List<KeyValuePair<string, SyntaxTree>> addedSyntaxTrees, List<KeyValuePair<string, SyntaxTree>> changedSyntaxTrees, ImmutableHashSet<string> removedFiles)
+    private static ImmutableDictionary<string, SyntaxTree> UpdateSyntaxTrees(ImmutableDictionary<string, SyntaxTree> allSyntaxTrees, IEnumerable<KeyValuePair<string, SyntaxTree>> addedSources, IEnumerable<KeyValuePair<string, SyntaxTree>> changedSources, ImmutableHashSet<string> removedFiles)
       => allSyntaxTrees.RemoveRange(removedFiles)
-                       .AddRange(addedSyntaxTrees)
-                       .SetItems(changedSyntaxTrees);
+                       .AddRange(addedSources)
+                       .SetItems(changedSources);
 
-    private static CSharpCompilation UpdateCompilation(CSharpCompilation cSharpCompilation, List<KeyValuePair<string, SyntaxTree>> addedSyntaxTrees, List<KeyValuePair<string, SyntaxTree>> changedSyntaxTrees, ImmutableHashSet<string> removedFiles, ImmutableDictionary<string, SyntaxTree> filesToSyntaxTrees)
-      => changedSyntaxTrees.Aggregate(cSharpCompilation.AddSyntaxTrees(addedSyntaxTrees.Select(pair => pair.Value))
-                                                       .RemoveSyntaxTrees(removedFiles.Select(s => filesToSyntaxTrees[s])),
-                                      (compilation, pair) => compilation.ReplaceSyntaxTree(filesToSyntaxTrees[pair.Key], pair.Value));
+    private static CSharpCompilation UpdateCompilation(CSharpCompilation cSharpCompilation, IEnumerable<KeyValuePair<string, SyntaxTree>> addedSources, IEnumerable<KeyValuePair<string, SyntaxTree>> changedSources, ImmutableHashSet<string> removedSources, IDictionary<string, SyntaxTree> filesToSyntaxTrees) {
+      var updatedCompilation = cSharpCompilation.AddSyntaxTrees(addedSources.Select(pair => pair.Value))
+                                                .RemoveSyntaxTrees(removedSources.Select(s => filesToSyntaxTrees[s]));
+      foreach (var source in changedSources) {
+        updatedCompilation = updatedCompilation.ReplaceSyntaxTree(filesToSyntaxTrees[source.Key], source.Value);
+      }
+      return updatedCompilation;
+    }
   }
 }
