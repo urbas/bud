@@ -53,6 +53,18 @@ namespace Bud.Pipeline {
 
     public override string ToString()
       => $"Added: [{string.Join(", ", Added)}], Removed: [{string.Join(", ", Removed)}], Changed: [{string.Join(", ", Changed)}], Unchanged: [{string.Join(", ", All.Except(Added).Except(Changed))}], Timestamps: [{string.Join(", ", Timestamps.Select(pair => $"({pair.Key}, {pair.Value})"))}]";
+
+    public void ToPrettyString() {
+      foreach (var source in Added) {
+        Console.WriteLine($"+ {source}");
+      }
+      foreach (var source in Removed) {
+        Console.WriteLine($"- {source}");
+      }
+      foreach (var source in Changed) {
+        Console.WriteLine($"~ {source}");
+      }
+    }
   }
 
   public static class Diff {

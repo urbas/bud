@@ -4,34 +4,25 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using Bud.IO;
 using Bud.Pipeline;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using static Bud.IO.FileTimestamps;
 
 namespace Bud.Compilation {
   public class RoslynCSharpCompiler : ICSharpCompiler {
     public IObservable<CSharpCompilation> Compile(IObservable<IEnumerable<string>> sourceFiles, IObservable<IEnumerable<MetadataReference>> observedReferences, string assemblyName, CSharpCompilationOptions options) {
       var cSharpCompilation = CSharpCompilation.Create(assemblyName, Enumerable.Empty<SyntaxTree>(), Enumerable.Empty<MetadataReference>(), options);
       var allSyntaxTrees = ImmutableDictionary<string, SyntaxTree>.Empty;
-      var sourceDiff = FilesDiff.Empty;
+      var sourceDiff = Diff.Empty<string>();
 
-      return sourceFiles.CombineLatest(observedReferences, (sourcesSnapshot, references) => {
-        sourceDiff = FilesDiff.Create(sourcesSnapshot, sourceDiff);
+      return sourceFiles.CombineLatest(observedReferences, (sources, references) => {
+        sourceDiff = sourceDiff.NextDiff(ToTimestampedFiles(sources));
+        var addedSources = sourceDiff.Added.Select(ToFileSyntaxTreePair).ToList();
+        var changedSources = sourceDiff.Changed.Select(ToFileSyntaxTreePair).ToList();
+        var removedSources = sourceDiff.Removed;
 
-        var addedSources = sourceDiff.AddedFiles.Select(ToFileSyntaxTreePair).ToList();
-        var changedSources = sourceDiff.ChangedFiles.Select(ToFileSyntaxTreePair).ToList();
-        var removedSources = sourceDiff.RemovedFiles;
-
-        foreach (var source in addedSources) {
-          Console.WriteLine($"+ {source.Key}");
-        }
-        foreach (var source in removedSources) {
-          Console.WriteLine($"- {source}");
-        }
-        foreach (var source in changedSources) {
-          Console.WriteLine($"~ {source.Key}");
-        }
+        sourceDiff.ToPrettyString();
 
         cSharpCompilation = UpdateCompilation(cSharpCompilation, addedSources, changedSources, removedSources, allSyntaxTrees);
         allSyntaxTrees = UpdateSyntaxTrees(allSyntaxTrees, addedSources, changedSources, removedSources);

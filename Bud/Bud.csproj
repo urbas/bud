@@ -90,7 +90,6 @@
     <Compile Include="Configuration\IConfigDefinition.cs" />
     <Compile Include="Configuration\IConfigTransform.cs" />
     <Compile Include="CSharp.cs" />
-    <Compile Include="IO\FilesDiff.cs" />
     <Compile Include="IO\FilesObservatory.cs" />
     <Compile Include="IO\LocalFilesObservatory.cs" />
     <Compile Include="IO\FileTimestamps.cs" />
