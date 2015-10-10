@@ -20,7 +20,8 @@ namespace Bud.IO {
       FilesToTimestamps = filesToTimestamps;
     }
 
-    public static FilesDiff Create(IEnumerable<string> files, FilesDiff oldFileDiff) => Create(FileTimestamps.Instance, files, oldFileDiff);
+    public static FilesDiff Create(IEnumerable<string> files, FilesDiff oldFileDiff)
+      => Create(FileTimestamps.Instance, files, oldFileDiff);
 
     public static FilesDiff Create(IFileTimestamps fileTimestamps, IEnumerable<string> files, FilesDiff oldFilesDiff) {
       var newFiles = ImmutableHashSet.CreateRange(files);

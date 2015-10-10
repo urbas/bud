@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Bud.Compilation {
   public static class ReferencesObservatory {
-    public static IObservable<IEnumerable<MetadataReference>> FromFiles(this IFilesObservatory filesObservatory, params string[] locations)
+    public static IObservable<IEnumerable<MetadataReference>> ObserveReferences(this IFilesObservatory filesObservatory, params string[] locations)
       => filesObservatory.ObserveFileList(locations).Select(_ => locations.Select(s => MetadataReference.CreateFromFile(s)));
   }
 }

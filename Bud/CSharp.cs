@@ -22,7 +22,7 @@ namespace Bud {
       => Empty.Init(Compilation, DefaultCompilation)
               .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
               .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
-              .Init(References, configs => ReferencesObservatory.FromFiles(Build.FilesObservatory[configs], typeof(object).Assembly.Location))
+              .Init(References, configs => FilesObservatory[configs].ObserveReferences(typeof(object).Assembly.Location))
               .InitConst(CSharpCompiler, new RoslynCSharpCompiler())
               .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
               .InitConst(SourcesObservationStrategy, DefaultSourceObservationStrategy);

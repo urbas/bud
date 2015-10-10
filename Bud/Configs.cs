@@ -65,7 +65,7 @@ namespace Bud {
     public Configs Nest(string parentKey)
       => new Configs(this.Select(configTransform => configTransform.Nest(parentKey)));
 
-    public IDictionary<string, IConfigDefinition> Compile() {
+    public IDictionary<string, IConfigDefinition> Bake() {
       var configDefinitions = new Dictionary<string, IConfigDefinition>();
       foreach (var configTransform in this) {
         IConfigDefinition configDefinition;
@@ -86,6 +86,6 @@ namespace Bud {
     /// </exception>
     public T Get<T>(Key<T> configKey) => ToCachingConfigs().Get(configKey);
 
-    public CachingConfigs ToCachingConfigs() => new CachingConfigs(Compile());
+    public CachingConfigs ToCachingConfigs() => new CachingConfigs(Bake());
   }
 }

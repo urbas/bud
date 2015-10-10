@@ -99,7 +99,7 @@
     <Compile Include="IO\EmptyFilesObservatory.cs" />
     <Compile Include="IConfigs.cs" />
     <Compile Include="Key.cs" />
-    <Compile Include="Pipeline\PackagePipes.cs" />
+    <Compile Include="Pipeline\Pipes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Build.cs" />
     <Compile Include="IO\TemporaryDirectory.cs" />

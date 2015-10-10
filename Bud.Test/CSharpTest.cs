@@ -41,7 +41,7 @@ namespace Bud {
 
     private static Configs BudDependencies()
       => Configs.Empty
-                .Set(References, c => FilesObservatory[c].FromFiles(
+                .Set(References, c => FilesObservatory[c].ObserveReferences(
                   Path.Combine(ProjectDir[c], "../packages/Microsoft.CodeAnalysis.Common.1.1.0-beta1-20150812-01/lib/net45/Microsoft.CodeAnalysis.dll"),
                   Path.Combine(ProjectDir[c], "../packages/Microsoft.CodeAnalysis.CSharp.1.1.0-beta1-20150812-01/lib/net45/Microsoft.CodeAnalysis.CSharp.dll"),
                   Path.Combine(ProjectDir[c], "../packages/Microsoft.Web.Xdt.2.1.0/lib/net40/Microsoft.Web.XmlTransform.dll"),
@@ -73,7 +73,7 @@ namespace Bud {
                   "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/System.Core.dll"));
 
     private static Configs BudTestDependencies()
-      => BudDependencies().Modify(References, (c, references) => references.JoinPipes(FilesObservatory[c].FromFiles(
+      => BudDependencies().Modify(References, (c, references) => references.JoinPipes(FilesObservatory[c].ObserveReferences(
         Path.Combine(ProjectDir[c], "../packages/NUnit.2.6.4/lib/nunit.framework.dll"),
         Path.Combine(ProjectDir[c], "../packages/Moq.4.2.1507.0118/lib/net40/Moq.dll"))));
 

@@ -56,7 +56,7 @@ namespace Bud {
     [Test]
     public void Throw_when_modifying_a_configuration_that_does_not_yet_exist() {
       var exception = Assert.Throws<ConfigDefinitionException>(
-        () => Configs.Empty.Modify(fooInt, (configs, oldConfig) => oldConfig + 1).Compile());
+        () => Configs.Empty.Modify(fooInt, (configs, oldConfig) => oldConfig + 1).Bake());
       Assert.AreEqual(fooInt.Id, exception.Key);
       Assert.AreEqual(fooInt.Type, exception.ValueType);
     }
