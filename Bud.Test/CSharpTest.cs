@@ -19,6 +19,7 @@ namespace Bud {
     private static readonly Configs BudTestProject = Project(@"../../../Bud.Test").Add(SimpleCSharpProject, BudTestDependencies());
 
     [Test]
+    [Ignore]
     public async void Compiles_bud() {
       var budCompilation = CSharp.Compilation[BudProject]
         .Do(compilation => EmitDllAndPrintResult(compilation, BudProject))

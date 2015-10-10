@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using System.Reactive;
 using Moq;
@@ -23,8 +22,8 @@ namespace Bud.Pipeline {
 
     [Test]
     public void Adding_an_element() {
-      var diff = Diff.Empty<int>();
-      diff = diff.NextDiff(new[] {new Timestamped<int>(42, DateTimeOffset.FromFileTime(1))});
+      var diff = Diff.Empty<int>()
+                     .NextDiff(new[] {new Timestamped<int>(42, DateTimeOffset.FromFileTime(1))});
 
       Assert.That(diff.Added, Is.EquivalentTo(new[] {42}));
       Assert.IsEmpty(diff.Removed);
@@ -35,9 +34,9 @@ namespace Bud.Pipeline {
 
     [Test]
     public void Removing_an_element() {
-      var diff = Diff.Empty<string>();
-      diff = diff.NextDiff(new[] {new Timestamped<string>("a", DateTimeOffset.FromFileTime(1))});
-      diff = diff.NextDiff(new Timestamped<string>[] {});
+      var diff = Diff.Empty<string>()
+                     .NextDiff(new[] {new Timestamped<string>("a", DateTimeOffset.FromFileTime(1))})
+                     .NextDiff(new Timestamped<string>[] {});
 
       Assert.IsEmpty(diff.Added);
       Assert.That(diff.Removed, Is.EquivalentTo(new[] {"a"}));
@@ -48,9 +47,9 @@ namespace Bud.Pipeline {
 
     [Test]
     public void Changing_an_element() {
-      var diff = Diff.Empty<string>();
-      diff = diff.NextDiff(new[] {new Timestamped<string>("a", DateTimeOffset.FromFileTime(1))});
-      diff = diff.NextDiff(new[] {new Timestamped<string>("a", DateTimeOffset.FromFileTime(2))});
+      var diff = Diff.Empty<string>()
+                     .NextDiff(new[] {new Timestamped<string>("a", DateTimeOffset.FromFileTime(1))})
+                     .NextDiff(new[] {new Timestamped<string>("a", DateTimeOffset.FromFileTime(2))});
 
       Assert.IsEmpty(diff.Added);
       Assert.IsEmpty(diff.Removed);
