@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -11,32 +10,18 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Bud.Compilation {
   public class RoslynCSharpCompiler : ICSharpCompiler {
-    public IObservable<ICompilationResult> Compile(IObservable<FilesUpdate> sourceFiles,
-                                                   string outputDir,
-                                                   string assemblyName,
-                                                   CSharpCompilationOptions options,
-                                                   IEnumerable<MetadataReference> references) {
-      var cSharpCompilation = CSharpCompilation.Create(assemblyName, Enumerable.Empty<SyntaxTree>(), references, options);
+    public IObservable<CSharpCompilation> Compile(IObservable<FilesUpdate> sourceFiles, IObservable<IEnumerable<MetadataReference>> observedReferences, string assemblyName, CSharpCompilationOptions options) {
+      var cSharpCompilation = CSharpCompilation.Create(assemblyName, Enumerable.Empty<SyntaxTree>(), Enumerable.Empty<MetadataReference>(), options);
       var allSyntaxTrees = ImmutableDictionary<string, SyntaxTree>.Empty;
 
-      var assemblyPath = Path.Combine(outputDir, assemblyName);
-      Directory.CreateDirectory(outputDir);
+      return FilesDiff.DoDiffing(sourceFiles).CombineLatest(observedReferences, (sources, references) => {
+        var addedSyntaxTrees = sources.AddedFiles.Select(ToFileSyntaxTreePair).ToList();
+        var changedSyntaxTrees = sources.ChangedFiles.Select(ToFileSyntaxTreePair).ToList();
 
-      return FilesDiff.DoDiffing(sourceFiles).Select(sources => {
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-        using (var assemblyOutputFile = File.Create(assemblyPath)) {
-          var addedSyntaxTrees = sources.AddedFiles.Select(ToFileSyntaxTreePair).ToList();
-          var changedSyntaxTrees = sources.ChangedFiles.Select(ToFileSyntaxTreePair).ToList();
-
-          cSharpCompilation = UpdateCompilation(cSharpCompilation, addedSyntaxTrees, changedSyntaxTrees, sources.RemovedFiles, allSyntaxTrees);
-          allSyntaxTrees = UpdateSyntaxTrees(allSyntaxTrees, addedSyntaxTrees, changedSyntaxTrees, sources.RemovedFiles);
-
-          var emitResult = cSharpCompilation.Emit(assemblyOutputFile);
-
-          stopwatch.Stop();
-          return new CompilationResult(assemblyPath, emitResult, stopwatch.Elapsed);
-        }
+        cSharpCompilation = UpdateCompilation(cSharpCompilation, addedSyntaxTrees, changedSyntaxTrees, sources.RemovedFiles, allSyntaxTrees);
+        allSyntaxTrees = UpdateSyntaxTrees(allSyntaxTrees, addedSyntaxTrees, changedSyntaxTrees, sources.RemovedFiles);
+        cSharpCompilation = cSharpCompilation.RemoveAllReferences().AddReferences(references);
+        return cSharpCompilation;
       });
     }
 

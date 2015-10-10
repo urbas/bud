@@ -11,29 +11,26 @@ using static Bud.Configs;
 
 namespace Bud {
   public static class CSharp {
-    public static readonly Key<IObservable<ICompilationResult>> Compile = nameof(Compile);
+    public static readonly Key<IObservable<CSharpCompilation>> Compilation = nameof(Compilation);
     public static readonly Key<string> OutputDir = nameof(OutputDir);
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
-    public static readonly Key<IEnumerable<MetadataReference>> References = nameof(References);
+    public static readonly Key<IObservable<IEnumerable<MetadataReference>>> References = nameof(References);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
     public static readonly Key<ICSharpCompiler> CSharpCompiler = nameof(CSharpCompiler);
     public static readonly Key<Func<IObservable<FilesUpdate>, IObservable<FilesUpdate>>> SourcesObservationStrategy = nameof(SourcesObservationStrategy);
 
     public static Configs CSharpCompilation()
-      => Empty.Init(Compile, PerformCompilation)
+      => Empty.Init(Compilation, DefaultCompilation)
               .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
               .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
-              .Init(References, configs => new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)})
+              .Init(References, configs => Observable.Return(new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) }))
               .InitConst(CSharpCompiler, new RoslynCSharpCompiler())
               .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
               .InitConst(SourcesObservationStrategy, DefaultSourceObservationStrategy);
 
-    private static IObservable<ICompilationResult> PerformCompilation(IConfigs configs)
+    private static IObservable<CSharpCompilation> DefaultCompilation(IConfigs configs)
       => CSharpCompiler[configs].Compile(SourcesObservationStrategy[configs](Sources[configs].Watch()),
-                                         OutputDir[configs],
-                                         AssemblyName[configs],
-                                         CSharpCompilationOptions[configs],
-                                         References[configs]);
+                                         References[configs], AssemblyName[configs], CSharpCompilationOptions[configs]);
 
     private static IObservable<FilesUpdate> DefaultSourceObservationStrategy(IObservable<FilesUpdate> sources)
       => sources.Sample(TimeSpan.FromMilliseconds(100))

@@ -6,10 +6,6 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Bud.Compilation {
   public interface ICSharpCompiler {
-    IObservable<ICompilationResult> Compile(IObservable<FilesUpdate> sourceFiles,
-                                            string outputDir,
-                                            string assemblyName,
-                                            CSharpCompilationOptions options,
-                                            IEnumerable<MetadataReference> references);
+    IObservable<CSharpCompilation> Compile(IObservable<FilesUpdate> sourceFiles, IObservable<IEnumerable<MetadataReference>> observedReferences, string assemblyName, CSharpCompilationOptions options);
   }
 }
