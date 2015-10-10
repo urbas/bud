@@ -7,20 +7,27 @@ using NUnit.Framework;
 
 namespace Bud.IO {
   public class FilesDiffTest {
+    private Mock<IFileTimestamps> fileTimestamps;
+    private FilesDiff initialDiff;
+
+    [SetUp]
+    public void SetUp() {
+      fileTimestamps = new Mock<IFileTimestamps>();
+      fileTimestamps.Setup(self => self.GetTimestamp(It.IsAny<string>())).Returns(DateTime.FromFileTime(1));
+      initialDiff = FilesDiff.Create(fileTimestamps.Object, new[] {"a"}, FilesDiff.Empty);
+    }
+
     [Test]
     public void Initially_all_files_are_added() {
-      var filesUpdates = ImmutableArray.Create(FileList("a", "b")).ToObservable();
-      var diff = FilesDiff.DoDiffing(filesUpdates).ToEnumerable().First();
-      Assert.AreEqual(new[] {"a", "b"}, diff.AddedFiles);
-      Assert.IsEmpty(diff.RemovedFiles);
-      Assert.IsEmpty(diff.ChangedFiles);
-      Assert.AreEqual(new[] {"a", "b"}, diff.AllFiles);
+      Assert.AreEqual(new[] {"a"}, initialDiff.AddedFiles);
+      Assert.IsEmpty(initialDiff.RemovedFiles);
+      Assert.IsEmpty(initialDiff.ChangedFiles);
+      Assert.AreEqual(new[] {"a"}, initialDiff.AllFiles);
     }
 
     [Test]
     public void List_newly_added_files() {
-      var filesUpdates = ImmutableArray.Create(FileList("a"), FileList("a", "b")).ToObservable();
-      var diff = FilesDiff.DoDiffing(filesUpdates).ToEnumerable().Last();
+      var diff = FilesDiff.Create(fileTimestamps.Object, new[] { "a", "b" }, initialDiff);
       Assert.AreEqual(new[] {"b"}, diff.AddedFiles);
       Assert.IsEmpty(diff.RemovedFiles);
       Assert.IsEmpty(diff.ChangedFiles);
@@ -29,18 +36,16 @@ namespace Bud.IO {
 
     [Test]
     public void List_removed_files() {
-      var filesUpdates = ImmutableArray.Create(FileList("a", "b"), FileList("a")).ToObservable();
-      var diff = FilesDiff.DoDiffing(filesUpdates).ToEnumerable().Last();
-      Assert.AreEqual(new[] {"b"}, diff.RemovedFiles);
+      var diff = FilesDiff.Create(fileTimestamps.Object, Enumerable.Empty<string>(), initialDiff);
+      Assert.AreEqual(new[] {"a"}, diff.RemovedFiles);
       Assert.IsEmpty(diff.AddedFiles);
       Assert.IsEmpty(diff.ChangedFiles);
-      Assert.AreEqual(new[] {"a"}, diff.AllFiles);
+      Assert.IsEmpty(diff.AllFiles);
     }
 
     [Test]
     public void No_changes() {
-      var filesUpdates = ImmutableArray.Create(FileList("a"), FileList("a")).ToObservable();
-      var diff = FilesDiff.DoDiffing(filesUpdates).ToEnumerable().Last();
+      var diff = FilesDiff.Create(fileTimestamps.Object, new[] { "a" }, initialDiff);
       Assert.IsEmpty(diff.RemovedFiles);
       Assert.IsEmpty(diff.AddedFiles);
       Assert.IsEmpty(diff.ChangedFiles);
@@ -49,18 +54,12 @@ namespace Bud.IO {
 
     [Test]
     public void Changed_file() {
-      var fileTimestamps = new Mock<IFileTimestamps>();
-      long fileTimestamp = 0L;
-      var filesUpdates = ImmutableArray.Create(FileList("a"), FileList("a"))
-                                       .ToObservable()
-                                       .Do(update => fileTimestamps.Setup(self => self.GetTimestamp(It.Is<string>(s => "a".Equals(s)))).Returns(DateTime.FromFileTime(++fileTimestamp)));
-      var diff = FilesDiff.DoDiffing(filesUpdates, fileTimestamps.Object).ToEnumerable().Last();
+      fileTimestamps.Setup(self => self.GetTimestamp(It.IsAny<string>())).Returns(DateTime.FromFileTime(2));
+      var diff = FilesDiff.Create(fileTimestamps.Object, ImmutableArray.Create("a"), initialDiff);
       Assert.IsEmpty(diff.RemovedFiles);
       Assert.IsEmpty(diff.AddedFiles);
       Assert.AreEqual(new[] {"a"}, diff.ChangedFiles);
       Assert.AreEqual(new[] {"a"}, diff.AllFiles);
     }
-
-    private static FilesUpdate FileList(params string[] paths) => new FilesUpdate(null, new ListedFiles(paths));
   }
 }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 
 namespace Bud.IO {
-  public class FileSystemObserverFactoryTest {
+  public class LocalFilesObservatoryTest {
     private TemporaryDirectory tempDir;
 
     [SetUp]
@@ -24,7 +24,7 @@ namespace Bud.IO {
         return tempDir.CreateEmptyFile("A", "A.txt");
       });
 
-      var fileSystemEventArgs = await FilesObservatory.ObserveFileSystem(tempDir.Path, "*.txt", true).Take(1).ToTask();
+      var fileSystemEventArgs = await LocalFilesObservatory.ObserveFileSystem(tempDir.Path, "*.txt", true).Take(1).ToTask();
 
       Assert.AreEqual(WatcherChangeTypes.Created, fileSystemEventArgs.ChangeType);
       Assert.AreEqual(await file, fileSystemEventArgs.FullPath);
