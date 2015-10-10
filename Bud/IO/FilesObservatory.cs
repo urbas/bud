@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using Bud.Pipeline;
 
 namespace Bud.IO {
   public static class FilesObservatory {
-    public static readonly IObservable<IEnumerable<string>> Empty = Observable.Return(Enumerable.Empty<string>());
+    public static readonly IObservable<IEnumerable<string>> Empty = Pipes.Empty<string>();
 
     public static IObservable<IEnumerable<string>> ObserveFiles(this IFilesObservatory filesObservatory, string sourceDir, string fileFilter, bool includeSubdirs)
       => ObserveFiles(filesObservatory, EnumerateFiles, sourceDir, fileFilter, includeSubdirs);
@@ -22,12 +23,6 @@ namespace Bud.IO {
 
     public static IObservable<IEnumerable<string>> ObserveFileList(this IFilesObservatory filesobservatory, params string[] absolutePaths)
       => ObserveFileList(filesobservatory, absolutePaths as IEnumerable<string>);
-
-    public static IObservable<IEnumerable<string>> Join(IObservable<IEnumerable<string>> observedFiles, IObservable<IEnumerable<string>> otherObservedFiles)
-      => observedFiles.CombineLatest(otherObservedFiles, (oldFiles, newFiles) => oldFiles.Concat(newFiles));
-
-    public static IObservable<IEnumerable<string>> Filter(IObservable<IEnumerable<string>> observedFiles, Func<string, bool> predicate)
-      => observedFiles.Select(enumerable => enumerable.Where(predicate));
 
     private static IEnumerable<string> EnumerateFiles(string sourceDir, string fileFilter, bool includeSubdirs)
       => Directory.EnumerateFiles(sourceDir, fileFilter, includeSubdirs ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);

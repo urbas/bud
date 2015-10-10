@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using Bud.Pipeline;
 using Moq;
 using NUnit.Framework;
 
@@ -27,8 +28,7 @@ namespace Bud.IO {
       => Assert.That(FilesObservatory.Empty.ToEnumerable(), Is.EquivalentTo(ImmutableArray.Create(Enumerable.Empty<string>())));
 
     [Test]
-    public void Empty_observable_is_reusable()
-    {
+    public void Empty_observable_is_reusable() {
       Empty_observes_empty_files_only_once();
       Empty_observes_empty_files_only_once();
     }
@@ -59,30 +59,5 @@ namespace Bud.IO {
     public void Listing_individual_files_should_produce_the_first_observation()
       => Assert.That(noFileChanges.ObserveFileList(Path.Combine(tempDir.Path, "B")).ToEnumerable().First(),
                      Is.EquivalentTo(ImmutableArray.Create(new[] {Path.Combine(tempDir.Path, "B")})));
-
-    [Test]
-    public void Joining_empties_should_produce_a_single_update()
-      => Assert.That(FilesObservatory.Join(FilesObservatory.Empty, FilesObservatory.Empty).ToEnumerable(),
-                     Is.EquivalentTo(ImmutableArray.Create(Enumerable.Empty<string>())));
-
-    [Test]
-    public void Joining_an_empty_with_a_file_listing_should_produce_a_single_update()
-      => Assert.That(FilesObservatory.Join(FilesObservatory.Empty, noFileChanges.ObserveFileList("a")).ToEnumerable(),
-                     Is.EquivalentTo(ImmutableArray.Create(ImmutableArray.Create("a"))));
-
-    [Test]
-    public void Filter_can_exclude_everything()
-      => Assert.That(FilesObservatory.Filter(noFileChanges.ObserveFileList("a"), s => false).ToEnumerable().First(),
-                     Is.Empty);
-
-    [Test]
-    public void Filter_can_exclude_nothing()
-      => Assert.That(FilesObservatory.Filter(noFileChanges.ObserveFileList("a"), s => true).ToEnumerable().First(),
-                     Is.EquivalentTo(ImmutableArray.Create("a")));
-
-    [Test]
-    public void Filter_can_exclude_something()
-      => Assert.That(FilesObservatory.Filter(noFileChanges.ObserveFileList("a", "b"), s => s == "b").ToEnumerable().First(),
-                     Is.EquivalentTo(ImmutableArray.Create("b")));
   }
 }

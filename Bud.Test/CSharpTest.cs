@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Bud.Compilation;
-using Bud.IO;
+using Bud.Pipeline;
 using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
 using static Bud.Build;
@@ -15,18 +15,18 @@ namespace Bud {
     private static readonly Configs SimpleCSharpProject = SourceDir(fileFilter: "*.cs")
       .Add(ExcludeSourceDirs("obj", "bin", "target"), CSharpCompilation());
 
-    private static readonly Configs budProject = Project(@"../../../Bud").Add(SimpleCSharpProject, BudDependencies());
-    private static readonly Configs budTestProject = Project(@"../../../Bud.Test").Add(SimpleCSharpProject, BudTestDependencies());
+    private static readonly Configs BudProject = Project(@"../../../Bud").Add(SimpleCSharpProject, BudDependencies());
+    private static readonly Configs BudTestProject = Project(@"../../../Bud.Test").Add(SimpleCSharpProject, BudTestDependencies());
 
     [Test]
     [Ignore]
     public async void Compiles_bud() {
-      var budCompilation = CSharp.Compilation[budProject]
-        .Do(compilation => EmitDllAndPrintResult(compilation, budProject))
-        .Select(result => result.ToMetadataReference());
-      await budTestProject.Modify(CSharp.References, (configs, references) => references.ExtendWith(budCompilation))
+      var budCompilation = CSharp.Compilation[BudProject]
+        .Do(compilation => EmitDllAndPrintResult(compilation, BudProject))
+        .Select(result => new[] {result.ToMetadataReference()});
+      await BudTestProject.Modify(References, (configs, references) => references.JoinPipes(budCompilation))
                           .Get(CSharp.Compilation)
-                          .Do(compilation => EmitDllAndPrintResult(compilation, budTestProject))
+                          .Do(compilation => EmitDllAndPrintResult(compilation, BudTestProject))
                           .ToTask();
     }
 
@@ -41,7 +41,7 @@ namespace Bud {
 
     private static Configs BudDependencies()
       => Configs.Empty
-                .Set(CSharp.References, c => Compilation.References.FromFiles(
+                .Set(References, c => FilesObservatory[c].FromFiles(
                   Path.Combine(ProjectDir[c], "../packages/Microsoft.CodeAnalysis.Common.1.1.0-beta1-20150812-01/lib/net45/Microsoft.CodeAnalysis.dll"),
                   Path.Combine(ProjectDir[c], "../packages/Microsoft.CodeAnalysis.CSharp.1.1.0-beta1-20150812-01/lib/net45/Microsoft.CodeAnalysis.CSharp.dll"),
                   Path.Combine(ProjectDir[c], "../packages/Microsoft.Web.Xdt.2.1.0/lib/net40/Microsoft.Web.XmlTransform.dll"),
@@ -73,7 +73,7 @@ namespace Bud {
                   "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/System.Core.dll"));
 
     private static Configs BudTestDependencies()
-      => BudDependencies().Modify(CSharp.References, (c, references) => references.ExtendWith(Compilation.References.FromFiles(
+      => BudDependencies().Modify(References, (c, references) => references.JoinPipes(FilesObservatory[c].FromFiles(
         Path.Combine(ProjectDir[c], "../packages/NUnit.2.6.4/lib/nunit.framework.dll"),
         Path.Combine(ProjectDir[c], "../packages/Moq.4.2.1507.0118/lib/net40/Moq.dll"))));
 

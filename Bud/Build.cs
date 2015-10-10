@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using Bud.IO;
+using Bud.Pipeline;
 using static System.IO.Path;
 using static Bud.Configs;
 
@@ -24,7 +24,7 @@ namespace Bud {
       return Empty.Modify(Sources, (configs, sources) => {
         var sourceDir = subDir == null ? ProjectDir[configs] : Combine(ProjectDir[configs], subDir);
         var newSources = FilesObservatory[configs].ObserveFiles(sourceDir, fileFilter, includeSubdirs);
-        return IO.FilesObservatory.Join(sources, newSources);
+        return sources.JoinPipes(newSources);
       });
     }
 
@@ -32,8 +32,8 @@ namespace Bud {
       => Empty.Modify(Sources, (configs, existingSources) => {
         var projectDir = ProjectDir[configs];
         var absolutePaths = relativeFilePaths.Select(relativeFilePath => Combine(projectDir, relativeFilePath));
-        var newSources = IO.FilesObservatory.ObserveFileList(FilesObservatory[configs], absolutePaths);
-        return IO.FilesObservatory.Join(existingSources, newSources);
+        var newSources = FilesObservatory[configs].ObserveFileList(absolutePaths);
+        return existingSources.JoinPipes(newSources);
       });
   }
 }
