@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 
 namespace Bud.Pipeline {
   /// <summary>
-  /// A pipe is an observable that produces collections.
+  ///   A pipe is an observable that produces collections.
   /// </summary>
   public static class Pipes {
     /// <returns>a pipe that produces a single empty collection.</returns>
@@ -19,7 +19,8 @@ namespace Bud.Pipeline {
       => pipe.CombineLatest(otherPipe, (oldFiles, newFiles) => oldFiles.Concat(newFiles));
 
     /// <returns>
-    ///   a pipe that produces the same entries as <paramref name="pipe" /> but with a 'Where(<paramref name="predicate"/>)' filter applied
+    ///   a pipe that produces the same entries as <paramref name="pipe" /> but with a 'Where(<paramref name="predicate" />)'
+    ///   filter applied
     ///   on each of them.
     /// </returns>
     public static IObservable<IEnumerable<T>> FilterPipe<T>(this IObservable<IEnumerable<T>> pipe, Func<T, bool> predicate)

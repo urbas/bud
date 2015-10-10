@@ -98,6 +98,8 @@
     <Compile Include="IO\FilesDiffTest.cs" />
     <Compile Include="IO\LocalFilesObservatoryTest.cs" />
     <Compile Include="IO\FilesObservatoryTest.cs" />
+    <Compile Include="Pipeline\DiffPipesTest.cs" />
+    <Compile Include="Pipeline\DiffTest.cs" />
     <Compile Include="Pipeline\PipesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BuildTest.cs" />
