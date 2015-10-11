@@ -81,6 +81,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compilation\CompilationResult.cs" />
+    <Compile Include="Compilation\CSharpCompilationInput.cs" />
+    <Compile Include="Compilation\CSharpCompiler.cs" />
     <Compile Include="Compilation\ICompilationResult.cs" />
     <Compile Include="Compilation\ICSharpCompiler.cs" />
     <Compile Include="Compilation\ReferencesObservatory.cs" />

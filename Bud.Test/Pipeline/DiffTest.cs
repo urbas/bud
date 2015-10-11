@@ -65,5 +65,16 @@ namespace Bud.Pipeline {
       Diff.Empty<int>().NextDiff(timestampedElements.Object);
       timestampedElements.Verify(self => self.GetEnumerator(), Times.Once);
     }
+
+    [Test]
+    public void Set_of_changed_must_contain_elements_from_the_latest_collection() {
+      var dependency1 = new Timestamped<Dependency>(new Dependency("a", null), DateTimeOffset.FromFileTime(1));
+      var dependency2 = new Timestamped<Dependency>(new Dependency("a", null), DateTimeOffset.FromFileTime(2));
+      var diff = Diff.Empty<Dependency>()
+                     .NextDiff(new[] { dependency1 })
+                     .NextDiff(new[] { dependency2 });
+
+      Assert.AreSame(dependency2.Value, diff.Changed.First());
+    }
   }
 }
