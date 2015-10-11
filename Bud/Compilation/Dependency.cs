@@ -1,3 +1,4 @@
+using System;
 using Microsoft.CodeAnalysis;
 
 namespace Bud.Compilation {
@@ -12,7 +13,7 @@ namespace Bud.Compilation {
 
     public override string ToString() => Path;
 
-    public bool Equals(Dependency other) => string.Equals(Path, other.Path);
+    public bool Equals(Dependency other) => String.Equals(Path, other.Path);
 
     public override bool Equals(object obj) {
       if (ReferenceEquals(null, obj)) {
@@ -29,5 +30,8 @@ namespace Bud.Compilation {
     public static bool operator ==(Dependency left, Dependency right) => Equals(left, right);
 
     public static bool operator !=(Dependency left, Dependency right) => !Equals(left, right);
+
+    public static Dependency CreateFromFile(string file)
+      => new Dependency(file, MetadataReference.CreateFromFile(file));
   }
 }

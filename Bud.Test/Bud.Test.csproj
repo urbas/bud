@@ -93,12 +93,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compilation\DiffTest.cs" />
     <Compile Include="ConfigsTest.cs" />
     <Compile Include="CSharpTest.cs" />
     <Compile Include="IO\LocalFilesObservatoryTest.cs" />
     <Compile Include="IO\FilesObservatoryTest.cs" />
-    <Compile Include="Pipeline\DiffPipesTest.cs" />
-    <Compile Include="Pipeline\DiffTest.cs" />
     <Compile Include="Pipeline\PipesTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BuildTest.cs" />

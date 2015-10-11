@@ -80,15 +80,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Compilation\CompilationResult.cs" />
-    <Compile Include="Compilation\CSharpCompilationInput.cs" />
-    <Compile Include="Compilation\CSharpCompiler.cs" />
+    <Compile Include="Compilation\CompilationInput.cs" />
+    <Compile Include="Compilation\CompilationOutput.cs" />
     <Compile Include="Compilation\Dependency.cs" />
-    <Compile Include="Compilation\ICompilationResult.cs" />
-    <Compile Include="Compilation\ICSharpCompiler.cs" />
     <Compile Include="Compilation\OutputAssemblyKind.cs" />
-    <Compile Include="Compilation\ReferencesObservatory.cs" />
+    <Compile Include="Compilation\DependencyObservatory.cs" />
     <Compile Include="Compilation\RoslynCSharpCompiler.cs" />
+    <Compile Include="Compilation\TimedEmittingCompiler.cs" />
     <Compile Include="Configuration\CachingConfigs.cs" />
     <Compile Include="Configuration\ConfigTransform.cs" />
     <Compile Include="Configuration\IConfigDefinition.cs" />
@@ -102,8 +100,7 @@
     <Compile Include="IO\EmptyFilesObservatory.cs" />
     <Compile Include="IConfigs.cs" />
     <Compile Include="Key.cs" />
-    <Compile Include="Pipeline\Diff.cs" />
-    <Compile Include="Pipeline\DiffPipes.cs" />
+    <Compile Include="Compilation\Diff.cs" />
     <Compile Include="Pipeline\Pipes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Build.cs" />

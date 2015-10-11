@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Reactive;
 
 namespace Bud.Compilation {
-  public class CSharpCompilationInput {
-    public CSharpCompilationInput(IEnumerable<string> sources, IEnumerable<Timestamped<Dependency>> dependencies) {
+  public class CompilationInput {
+    public CompilationInput(IEnumerable<string> sources, IEnumerable<Timestamped<Dependency>> dependencies) {
       Sources = sources;
       Dependencies = dependencies;
     }

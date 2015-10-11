@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reactive;
 using System.Text;
 
-namespace Bud.Pipeline {
+namespace Bud.Compilation {
   public class Diff<T> {
     public Diff(ImmutableHashSet<T> added, ImmutableHashSet<T> removed, ImmutableHashSet<T> changed, ImmutableHashSet<T> all, ImmutableDictionary<T, DateTimeOffset> timestamps) {
       Added = added;

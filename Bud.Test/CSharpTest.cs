@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Bud.Compilation;
 using Bud.Pipeline;
-using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
 using static Bud.Build;
 using static Bud.CSharp;
@@ -15,7 +13,7 @@ using static Bud.CSharp;
 namespace Bud {
   public class CSharpTest {
     private static readonly Configs SimpleCSharpProject = CSharpProject()
-      .Modify(CSharp.CSharpCompiler, (configs, oldCompiler) => new TimedEmittingCompiler(oldCompiler));
+      .Modify(CSharpCompiler, TimedEmittingCompiler.Create);
 
     private static readonly Configs BudProject = "bud" / Project(@"../../../Bud").Add(SimpleCSharpProject, BudDependencies());
     private static readonly Configs BudTestProject = "budTest" / Project(@"../../../Bud.Test").Add(SimpleCSharpProject, BudTestDependencies());
@@ -32,7 +30,7 @@ namespace Bud {
     private IObservable<IEnumerable<Timestamped<Dependency>>> AddBudReference(IConfigs configs, IObservable<IEnumerable<Timestamped<Dependency>>> previousReferences) {
       var budCompilation = ("bud" / CSharp.Compilation)[configs];
       var budProjectId = ("bud" / ProjectId)[configs];
-      var budReference = budCompilation.Select(result => new[] {new Timestamped<Dependency>(new Dependency(budProjectId, result.ToMetadataReference()), DateTimeOffset.Now)});
+      var budReference = budCompilation.Select(result => new[] {new Timestamped<Dependency>(new Dependency(budProjectId, result.Compilation.ToMetadataReference()), DateTimeOffset.Now)});
       return previousReferences.JoinPipes(budReference);
     }
 
@@ -72,30 +70,5 @@ namespace Bud {
       => BudDependencies().Modify(Dependencies, (c, references) => references.JoinPipes(FilesObservatory[c].ObserveAssemblies(
         Path.Combine(ProjectDir[c], "../packages/NUnit.2.6.4/lib/nunit.framework.dll"),
         Path.Combine(ProjectDir[c], "../packages/Moq.4.2.1507.0118/lib/net40/Moq.dll"))));
-  }
-
-  public class TimedEmittingCompiler : ICSharpCompiler {
-    public ICSharpCompiler UnderlyingCompiler { get; }
-
-    public TimedEmittingCompiler(ICSharpCompiler underlyingCompiler) {
-      UnderlyingCompiler = underlyingCompiler;
-    }
-
-    public IObservable<CSharpCompilation> Compile(IObservable<CSharpCompilationInput> inputPipe, IConfigs config) {
-      var stopwatch = new Stopwatch();
-      return inputPipe.Do(_ => stopwatch.Restart())
-                      .CompileWith(UnderlyingCompiler, config)
-                      .Do(compilation => EmitDllAndPrintResult(compilation, config, stopwatch));
-    }
-
-    private static void EmitDllAndPrintResult(CSharpCompilation compilation, IConfigs project, Stopwatch stopwatch) {
-      var assemblyPath = Path.Combine(OutputDir[project], AssemblyName[project]);
-      Directory.CreateDirectory(OutputDir[project]);
-      using (var assemblyOutputFile = File.Create(assemblyPath)) {
-        var emitResult = compilation.Emit(assemblyOutputFile);
-        stopwatch.Stop();
-        Console.WriteLine($"Compiled: {assemblyPath}, Success: {emitResult.Success}, Time: {stopwatch.ElapsedMilliseconds}ms");
-      }
-    }
   }
 }

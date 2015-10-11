@@ -5,15 +5,20 @@ using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
-using Bud.Pipeline;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static Bud.IO.FileTimestamps;
 
 namespace Bud.Compilation {
-  public class RoslynCSharpCompiler : ICSharpCompiler {
-    public IObservable<CSharpCompilation> Compile(IObservable<CSharpCompilationInput> inputPipe, IConfigs config) {
-      var cSharpCompilation = CSharpCompilation.Create(CSharp.AssemblyName[config], Enumerable.Empty<SyntaxTree>(), Enumerable.Empty<MetadataReference>(), CSharp.CSharpCompilationOptions[config]);
+  public class RoslynCSharpCompiler {
+    public IConfigs Configs { get; }
+
+    public RoslynCSharpCompiler(IConfigs configs) {
+      Configs = configs;
+    }
+
+    public IObservable<CompilationOutput> Compile(IObservable<CompilationInput> inputPipe) {
+      var cSharpCompilation = CSharpCompilation.Create(CSharp.AssemblyName[Configs], Enumerable.Empty<SyntaxTree>(), Enumerable.Empty<MetadataReference>(), CSharp.CSharpCompilationOptions[Configs]);
       var allSyntaxTrees = ImmutableDictionary<string, SyntaxTree>.Empty;
       var sourceDiff = Diff.Empty<string>();
       var previousDependenciesDiff = Diff.Empty<Dependency>();
@@ -21,10 +26,6 @@ namespace Bud.Compilation {
       return inputPipe.Select(input => {
         sourceDiff = sourceDiff.NextDiff(ToTimestampedFiles(input.Sources));
         var dependenciesDiff = previousDependenciesDiff.NextDiff(input.Dependencies as IList<Timestamped<Dependency>> ?? input.Dependencies.ToList());
-
-        Console.WriteLine($"=================");
-        Console.Write(sourceDiff.ToPrettyString());
-        Console.Write(dependenciesDiff.ToPrettyString());
 
         var addedSources = sourceDiff.Added.Select(ToFileSyntaxTreePair).ToList();
         var changedSources = sourceDiff.Changed.Select(ToFileSyntaxTreePair).ToList();
@@ -34,7 +35,7 @@ namespace Bud.Compilation {
         cSharpCompilation = UpdateReferences(dependenciesDiff, cSharpCompilation, previousDependenciesDiff);
         previousDependenciesDiff = dependenciesDiff;
 
-        return cSharpCompilation;
+        return new CompilationOutput(cSharpCompilation);
       });
     }
 

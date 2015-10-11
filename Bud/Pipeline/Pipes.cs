@@ -5,12 +5,18 @@ using System.Reactive.Linq;
 
 namespace Bud.Pipeline {
 
+  public delegate IObservable<T> Pipe<T>(IObservable<T> input);
+  public delegate IObservable<TOut> Pipe<in TIn, out TOut>(IObservable<TIn> input);
+
   /// <summary>
   ///   A pipe is an observable that produces collections.
   /// </summary>
   public static class Pipes {
     /// <returns>a pipe that produces a single empty collection.</returns>
     public static IObservable<IEnumerable<T>> Empty<T>() => SingleEmptyCollectionPipe<T>.Instance;
+
+    public static IObservable<TOut> ApplyPipe<TIn, TOut>(this IObservable<TIn> inputStream, Pipe<TIn, TOut> pipe)
+      => pipe(inputStream);
 
     /// <returns>
     ///   a pipe that produces entries made by concatenating the last collections from the pipes

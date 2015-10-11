@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
-using Bud.Compilation;
 using Moq;
 using NUnit.Framework;
 
-namespace Bud.Pipeline {
+namespace Bud.Compilation {
   public class DiffTest {
     [Test]
     public void Empty_diff_always_returns_the_same_instance()
