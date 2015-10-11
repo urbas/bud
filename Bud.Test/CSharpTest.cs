@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
@@ -14,20 +14,26 @@ using static Bud.CSharp;
 
 namespace Bud {
   public class CSharpTest {
-    private static readonly Configs SimpleCSharpProject = SourceDir(fileFilter: "*.cs")
-      .Add(ExcludeSourceDirs("obj", "bin", "target"), CSharpCompilation())
+    private static readonly Configs SimpleCSharpProject = CSharpProject()
       .Modify(CSharp.CSharpCompiler, (configs, oldCompiler) => new TimedEmittingCompiler(oldCompiler));
 
-    private static readonly Configs BudProject = Project(@"../../../Bud").Add(SimpleCSharpProject, BudDependencies());
-    private static readonly Configs BudTestProject = Project(@"../../../Bud.Test").Add(SimpleCSharpProject, BudTestDependencies());
+    private static readonly Configs BudProject = "bud" / Project(@"../../../Bud").Add(SimpleCSharpProject, BudDependencies());
+    private static readonly Configs BudTestProject = "budTest" / Project(@"../../../Bud.Test").Add(SimpleCSharpProject, BudTestDependencies());
 
     [Test]
     [Ignore]
     public async void Compiles_bud() {
-      var budReference = CSharp.Compilation[BudProject].Select(result => new[] {new Timestamped<Dependency>(new Dependency(ProjectId[BudProject], result.ToMetadataReference()), DateTimeOffset.Now)});
-      await BudTestProject.Modify(Dependencies, (configs, references) => references.JoinPipes(budReference))
-                          .Get(CSharp.Compilation)
-                          .ToTask();
+      await BudProject.Add(BudTestProject)
+                      .Modify("budTest" / Dependencies, AddBudReference)
+                      .Get("budTest" / CSharp.Compilation)
+                      .ToTask();
+    }
+
+    private IObservable<IEnumerable<Timestamped<Dependency>>> AddBudReference(IConfigs configs, IObservable<IEnumerable<Timestamped<Dependency>>> previousReferences) {
+      var budCompilation = ("bud" / CSharp.Compilation)[configs];
+      var budProjectId = ("bud" / ProjectId)[configs];
+      var budReference = budCompilation.Select(result => new[] {new Timestamped<Dependency>(new Dependency(budProjectId, result.ToMetadataReference()), DateTimeOffset.Now)});
+      return previousReferences.JoinPipes(budReference);
     }
 
     private static Configs BudDependencies()
@@ -66,13 +72,6 @@ namespace Bud {
       => BudDependencies().Modify(Dependencies, (c, references) => references.JoinPipes(FilesObservatory[c].ObserveAssemblies(
         Path.Combine(ProjectDir[c], "../packages/NUnit.2.6.4/lib/nunit.framework.dll"),
         Path.Combine(ProjectDir[c], "../packages/Moq.4.2.1507.0118/lib/net40/Moq.dll"))));
-
-    private static Configs ExcludeSourceDirs(params string[] subDirs)
-      => Configs.Empty
-                .Modify(Sources, (configs, previousFiles) => {
-                  var forbiddenDirs = subDirs.Select(s => Path.Combine(ProjectDir[configs], s));
-                  return previousFiles.Select(enumerable => enumerable.Where(file => !forbiddenDirs.Any(file.StartsWith)));
-                });
   }
 
   public class TimedEmittingCompiler : ICSharpCompiler {
@@ -82,11 +81,11 @@ namespace Bud {
       UnderlyingCompiler = underlyingCompiler;
     }
 
-    public IObservable<CSharpCompilation> Compile(IObservable<CSharpCompilationInput> input, IConfigs config) {
+    public IObservable<CSharpCompilation> Compile(IObservable<CSharpCompilationInput> inputPipe, IConfigs config) {
       var stopwatch = new Stopwatch();
-      return input.Do(_ => stopwatch.Restart())
-                  .CompileWith(UnderlyingCompiler, config)
-                  .Do(compilation => EmitDllAndPrintResult(compilation, config, stopwatch));
+      return inputPipe.Do(_ => stopwatch.Restart())
+                      .CompileWith(UnderlyingCompiler, config)
+                      .Do(compilation => EmitDllAndPrintResult(compilation, config, stopwatch));
     }
 
     private static void EmitDllAndPrintResult(CSharpCompilation compilation, IConfigs project, Stopwatch stopwatch) {

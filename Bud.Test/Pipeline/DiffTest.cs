@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive;
+using Bud.Compilation;
 using Moq;
 using NUnit.Framework;
 

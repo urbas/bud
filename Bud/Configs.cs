@@ -61,9 +61,9 @@ namespace Bud {
     public Configs Add(params Configs[] otherConfigs)
       => otherConfigs.Aggregate(this, (configs, configs1) => new Configs(configs.Concat(configs1)));
 
-    /// <returns>a copy of self with every configuration key prefixed with <paramref name="parentKey" />.</returns>
-    public Configs Nest(string parentKey)
-      => new Configs(this.Select(configTransform => configTransform.Nest(parentKey)));
+    /// <returns>a copy of self with every configuration key prefixed with <paramref name="prefix" />.</returns>
+    public static Configs operator /(string prefix, Configs configs)
+      => new Configs(configs.Select(configTransform => configTransform.Nest(prefix)));
 
     public IDictionary<string, IConfigDefinition> Bake() {
       var configDefinitions = new Dictionary<string, IConfigDefinition>();

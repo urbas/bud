@@ -17,65 +17,30 @@ namespace Bud {
     public static readonly Key<IObservable<IEnumerable<Timestamped<Dependency>>>> Dependencies = nameof(Dependencies);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
     public static readonly Key<ICSharpCompiler> CSharpCompiler = nameof(CSharpCompiler);
-    public static readonly Key<Func<IObservable<IEnumerable<string>>, IObservable<IEnumerable<string>>>> SourcesObservationStrategy = nameof(SourcesObservationStrategy);
+    public static readonly Key<Func<IObservable<CSharpCompilationInput>, IObservable<CSharpCompilationInput>>> SourcesObservationStrategy = nameof(SourcesObservationStrategy);
 
-    public static Configs CSharpCompilation()
-      => Empty.Init(Compilation, configs => CSharpCompiler[configs].Compile(SourcesObservationStrategy[configs](Sources[configs]).CombineLatest(Dependencies[configs], (enumerable, references) => new CSharpCompilationInput(enumerable, references)), configs))
-              .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
-              .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
-              .Init(Dependencies, configs => FilesObservatory[configs].ObserveAssemblies(typeof(object).Assembly.Location))
-              .InitConst(CSharpCompiler, new RoslynCSharpCompiler())
-              .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-              .InitConst(SourcesObservationStrategy, DefaultSourceObservationStrategy);
+    public static Configs SharpCompilation() => Empty.Init(Compilation, DefaultCompilation)
+                                                     .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
+                                                     .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
+                                                     .Init(Dependencies, configs => FilesObservatory[configs].ObserveAssemblies(typeof(object).Assembly.Location))
+                                                     .InitConst(CSharpCompiler, new RoslynCSharpCompiler())
+                                                     .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+                                                     .InitConst(SourcesObservationStrategy, DefaultSourceObservationStrategy);
+
+    private static IObservable<CSharpCompilation> DefaultCompilation(IConfigs configs) {
+      var sources = Sources[configs];
+      var sourceObservationStrategy = SourcesObservationStrategy[configs];
+      var depdendencies = Dependencies[configs];
+      var cSharpCompiler = CSharpCompiler[configs];
+      var compilationInputPipe = sourceObservationStrategy(sources.CombineLatest(depdendencies, (enumerable, references) => new CSharpCompilationInput(enumerable, references)));
+      return cSharpCompiler.Compile(compilationInputPipe, configs);
+    }
+
+    public static Configs CSharpProject() => SourceDir(fileFilter: "*.cs")
+      .Add(ExcludeSourceDirs("obj", "bin", "target"))
+      .Add(SharpCompilation());
 
     private static IObservable<T> DefaultSourceObservationStrategy<T>(IObservable<T> sources)
       => sources.Sample(TimeSpan.FromMilliseconds(100)).Delay(TimeSpan.FromMilliseconds(25));
-
-    public static string ToExtension(this OutputKind kind) {
-      switch (kind) {
-        case OutputKind.ConsoleApplication:
-        case OutputKind.WindowsApplication:
-        case OutputKind.WindowsRuntimeApplication:
-          return ".exe";
-        case OutputKind.DynamicallyLinkedLibrary:
-          return ".dll";
-        case OutputKind.NetModule:
-          return ".netmodule";
-        case OutputKind.WindowsRuntimeMetadata:
-          return ".winmdobj";
-        default:
-          return ".dll";
-      }
-    }
-  }
-
-  public class Dependency {
-    public Dependency(string path, MetadataReference metadataReference) {
-      Path = path;
-      MetadataReference = metadataReference;
-    }
-
-    public string Path { get; }
-    public MetadataReference MetadataReference { get; }
-
-    public override string ToString() => Path;
-
-    public bool Equals(Dependency other) => string.Equals(Path, other.Path);
-
-    public override bool Equals(object obj) {
-      if (ReferenceEquals(null, obj)) {
-        return false;
-      }
-      if (ReferenceEquals(this, obj)) {
-        return true;
-      }
-      return obj.GetType() == typeof(Dependency) && Equals((Dependency) obj);
-    }
-
-    public override int GetHashCode() => Path.GetHashCode();
-
-    public static bool operator ==(Dependency left, Dependency right) => Equals(left, right);
-
-    public static bool operator !=(Dependency left, Dependency right) => !Equals(left, right);
   }
 }

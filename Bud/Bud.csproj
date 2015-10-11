@@ -83,8 +83,10 @@
     <Compile Include="Compilation\CompilationResult.cs" />
     <Compile Include="Compilation\CSharpCompilationInput.cs" />
     <Compile Include="Compilation\CSharpCompiler.cs" />
+    <Compile Include="Compilation\Dependency.cs" />
     <Compile Include="Compilation\ICompilationResult.cs" />
     <Compile Include="Compilation\ICSharpCompiler.cs" />
+    <Compile Include="Compilation\OutputAssemblyKind.cs" />
     <Compile Include="Compilation\ReferencesObservatory.cs" />
     <Compile Include="Compilation\RoslynCSharpCompiler.cs" />
     <Compile Include="Configuration\CachingConfigs.cs" />

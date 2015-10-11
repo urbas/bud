@@ -79,7 +79,7 @@ namespace Bud.Pipeline {
       var timestamps = ImmutableDictionary.CreateRange(timestampedElementsList.Select(s => new KeyValuePair<T, DateTimeOffset>(s.Value, s.Timestamp)));
       var removed = previousDiff.All.Except(all);
       var added = all.Except(previousDiff.All);
-      var changed = previousDiff.All.Intersect(all).Where(el => timestamps[el] > previousDiff.Timestamps[el]).ToImmutableHashSet();
+      var changed = all.Except(added).Where(el => timestamps[el] > previousDiff.Timestamps[el]).ToImmutableHashSet();
       return new Diff<T>(added, removed, changed, all, timestamps);
     }
 

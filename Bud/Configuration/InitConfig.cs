@@ -7,7 +7,6 @@ namespace Bud.Configuration {
     }
 
     public Func<IConfigs, T> ValueFactory { get; }
-    public override ConfigDefinition<T> Modify(ConfigDefinition<T> configDefinition) => configDefinition;
     public override ConfigDefinition<T> ToConfigDefinition() => new ConfigDefinition<T>(ValueFactory);
   }
 }

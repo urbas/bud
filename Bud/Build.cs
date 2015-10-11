@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using Bud.IO;
@@ -35,5 +36,12 @@ namespace Bud {
         var newSources = FilesObservatory[configs].ObserveFileList(absolutePaths);
         return existingSources.JoinPipes(newSources);
       });
+
+    public static Configs ExcludeSourceDirs(params string[] subDirs)
+      => Configs.Empty
+                .Modify(Sources, (configs, previousFiles) => {
+                  var forbiddenDirs = subDirs.Select(s => Path.Combine(ProjectDir[configs], s));
+                  return previousFiles.Select(enumerable => enumerable.Where(file => !forbiddenDirs.Any(file.StartsWith)));
+                });
   }
 }

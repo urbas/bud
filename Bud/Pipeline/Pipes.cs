@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reactive.Linq;
 
 namespace Bud.Pipeline {
+
   /// <summary>
   ///   A pipe is an observable that produces collections.
   /// </summary>
