@@ -19,8 +19,9 @@ namespace Bud.Compilation {
 
     public IObservable<CompilationOutput> Compile(IObservable<CompilationInput> inputPipe) {
       var stopwatch = new Stopwatch();
-      return inputPipe.Do(_ => stopwatch.Restart())
-                      .ApplyPipe(UnderlyingCompiler)
+      return inputPipe.AddPipe(DontOverdoIt)
+                      .Do(_ => stopwatch.Restart())
+                      .AddPipe(UnderlyingCompiler)
                       .Do(output => EmitDllAndPrintResult(output, stopwatch, Configs));
     }
 
@@ -33,5 +34,8 @@ namespace Bud.Compilation {
         Console.WriteLine($"Compiled: {assemblyPath}, Success: {emitResult.Success}, Time: {stopwatch.ElapsedMilliseconds}ms");
       }
     }
+
+    private static IObservable<T> DontOverdoIt<T>(IObservable<T> sources)
+      => sources.Sample(TimeSpan.FromMilliseconds(100)).Delay(TimeSpan.FromMilliseconds(25));
   }
 }

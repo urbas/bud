@@ -10,5 +10,9 @@ namespace Bud.Compilation {
 
     public IEnumerable<string> Sources { get; }
     public IEnumerable<Timestamped<Dependency>> Dependencies { get; }
+
+    public static CompilationInput Create(IEnumerable<string> enumerable, IEnumerable<Timestamped<Dependency>> references) {
+      return new CompilationInput(enumerable, references);
+    }
   }
 }

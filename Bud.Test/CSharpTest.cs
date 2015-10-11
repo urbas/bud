@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -12,27 +11,24 @@ using static Bud.CSharp;
 
 namespace Bud {
   public class CSharpTest {
-    private static readonly Configs SimpleCSharpProject = CSharpProject()
-      .Modify(CSharpCompiler, TimedEmittingCompiler.Create);
-
+    private static readonly Configs SimpleCSharpProject = CSharpProject().Modify(CSharpCompiler, TimedEmittingCompiler.Create);
     private static readonly Configs BudProject = "bud" / Project(@"../../../Bud").Add(SimpleCSharpProject, BudDependencies());
     private static readonly Configs BudTestProject = "budTest" / Project(@"../../../Bud.Test").Add(SimpleCSharpProject, BudTestDependencies());
 
     [Test]
     [Ignore]
-    public async void Compiles_bud() {
-      await BudProject.Add(BudTestProject)
-                      .Modify("budTest" / Dependencies, AddBudReference)
-                      .Get("budTest" / CSharp.Compilation)
-                      .ToTask();
-    }
+    public async void Compiles_bud() => await BudProject.Add(BudTestProject)
+                                                        .Add(CompilationDependency("budTest", "bud"))
+                                                        .Get("budTest" / CSharp.Compilation)
+                                                        .ToTask();
 
-    private IObservable<IEnumerable<Timestamped<Dependency>>> AddBudReference(IConfigs configs, IObservable<IEnumerable<Timestamped<Dependency>>> previousReferences) {
-      var budCompilation = ("bud" / CSharp.Compilation)[configs];
-      var budProjectId = ("bud" / ProjectId)[configs];
-      var budReference = budCompilation.Select(result => new[] {new Timestamped<Dependency>(new Dependency(budProjectId, result.Compilation.ToMetadataReference()), DateTimeOffset.Now)});
-      return previousReferences.JoinPipes(budReference);
-    }
+    public static Configs CompilationDependency(string dependentProject, string dependencyProject)
+      => Configs.Empty.Modify(dependentProject / Dependencies, (configs, existingDependencies) => {
+        var dependencyProjectId = (dependencyProject / ProjectId)[configs];
+        var dependencyCompilation = (dependencyProject / CSharp.Compilation)[configs];
+        var dependency = dependencyCompilation.Select(result => new[] {new Timestamped<Dependency>(new Dependency(dependencyProjectId, result.Compilation.ToMetadataReference()), DateTimeOffset.Now)});
+        return existingDependencies.CombineStream(dependency);
+      });
 
     private static Configs BudDependencies()
       => Configs.Empty.Set(Dependencies, c => FilesObservatory[c].ObserveAssemblies(
@@ -67,7 +63,7 @@ namespace Bud {
         "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/System.Core.dll"));
 
     private static Configs BudTestDependencies()
-      => BudDependencies().Modify(Dependencies, (c, references) => references.JoinPipes(FilesObservatory[c].ObserveAssemblies(
+      => BudDependencies().Modify(Dependencies, (c, references) => references.CombineStream(FilesObservatory[c].ObserveAssemblies(
         Path.Combine(ProjectDir[c], "../packages/NUnit.2.6.4/lib/nunit.framework.dll"),
         Path.Combine(ProjectDir[c], "../packages/Moq.4.2.1507.0118/lib/net40/Moq.dll"))));
   }

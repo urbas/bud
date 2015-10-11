@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using Bud.IO;
@@ -25,7 +24,7 @@ namespace Bud {
       return Empty.Modify(Sources, (configs, sources) => {
         var sourceDir = subDir == null ? ProjectDir[configs] : Combine(ProjectDir[configs], subDir);
         var newSources = FilesObservatory[configs].ObserveFiles(sourceDir, fileFilter, includeSubdirs);
-        return sources.JoinPipes(newSources);
+        return sources.CombineStream(newSources);
       });
     }
 
@@ -34,14 +33,13 @@ namespace Bud {
         var projectDir = ProjectDir[configs];
         var absolutePaths = relativeFilePaths.Select(relativeFilePath => Combine(projectDir, relativeFilePath));
         var newSources = FilesObservatory[configs].ObserveFileList(absolutePaths);
-        return existingSources.JoinPipes(newSources);
+        return existingSources.CombineStream(newSources);
       });
 
     public static Configs ExcludeSourceDirs(params string[] subDirs)
-      => Configs.Empty
-                .Modify(Sources, (configs, previousFiles) => {
-                  var forbiddenDirs = subDirs.Select(s => Path.Combine(ProjectDir[configs], s));
-                  return previousFiles.Select(enumerable => enumerable.Where(file => !forbiddenDirs.Any(file.StartsWith)));
-                });
+      => Empty.Modify(Sources, (configs, previousFiles) => {
+        var forbiddenDirs = subDirs.Select(s => Combine(ProjectDir[configs], s));
+        return previousFiles.Select(enumerable => enumerable.Where(file => !forbiddenDirs.Any(file.StartsWith)));
+      });
   }
 }

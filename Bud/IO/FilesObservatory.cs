@@ -7,7 +7,7 @@ using Bud.Pipeline;
 
 namespace Bud.IO {
   public static class FilesObservatory {
-    public static readonly IObservable<IEnumerable<string>> Empty = Pipes.Empty<string>();
+    public static readonly IObservable<IEnumerable<string>> Empty = Streams.Empty<string>();
 
     public static IObservable<IEnumerable<string>> ObserveFiles(this IFilesObservatory filesObservatory, string sourceDir, string fileFilter, bool includeSubdirs)
       => ObserveFiles(filesObservatory, EnumerateFiles, sourceDir, fileFilter, includeSubdirs);
