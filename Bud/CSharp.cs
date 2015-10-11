@@ -32,6 +32,6 @@ namespace Bud {
 
     private static IObservable<CompilationOutput> DefaultCompilation(IConfigs configs)
       => Sources[configs].CombineLatest(Dependencies[configs], CompilationInput.Create)
-                         .AddPipe(CSharpCompiler[configs]);
+                         .PipeInto(CSharpCompiler[configs]);
   }
 }

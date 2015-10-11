@@ -19,9 +19,9 @@ namespace Bud.Compilation {
 
     public IObservable<CompilationOutput> Compile(IObservable<CompilationInput> inputPipe) {
       var stopwatch = new Stopwatch();
-      return inputPipe.AddPipe(DontOverdoIt)
+      return inputPipe.PipeInto(DontOverdoIt)
                       .Do(_ => stopwatch.Restart())
-                      .AddPipe(UnderlyingCompiler)
+                      .PipeInto(UnderlyingCompiler)
                       .Do(output => EmitDllAndPrintResult(output, stopwatch, Configs));
     }
 
