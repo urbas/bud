@@ -17,12 +17,12 @@ namespace Bud.Compilation {
     public static Pipe<CompilationInput, CompilationOutput> Create(IConfigs configs, Pipe<CompilationInput, CompilationOutput> oldCompiler)
       => new TimedEmittingCompiler(oldCompiler, configs).Compile;
 
-    public IObservable<CompilationOutput> Compile(IObservable<CompilationInput> inputPipe) {
+    public IObservable<CompilationOutput> Compile(IObservable<CompilationInput> input) {
       var stopwatch = new Stopwatch();
-      return inputPipe.PipeInto(DontOverdoIt)
-                      .Do(_ => stopwatch.Restart())
-                      .PipeInto(UnderlyingCompiler)
-                      .Do(output => EmitDllAndPrintResult(output, stopwatch, Configs));
+      return input.PipeInto(Throttler)
+                  .Do(_ => stopwatch.Restart())
+                  .PipeInto(UnderlyingCompiler)
+                  .Do(output => EmitDllAndPrintResult(output, stopwatch, Configs));
     }
 
     private static void EmitDllAndPrintResult(CompilationOutput compilationOutput, Stopwatch stopwatch, IConfigs configs) {
@@ -35,7 +35,7 @@ namespace Bud.Compilation {
       }
     }
 
-    private static IObservable<T> DontOverdoIt<T>(IObservable<T> sources)
+    private static IObservable<T> Throttler<T>(IObservable<T> sources)
       => sources.Sample(TimeSpan.FromMilliseconds(100)).Delay(TimeSpan.FromMilliseconds(25));
   }
 }
