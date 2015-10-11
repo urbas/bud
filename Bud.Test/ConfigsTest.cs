@@ -59,7 +59,6 @@ namespace Bud {
       var exception = Assert.Throws<ConfigDefinitionException>(
         () => Configs.Empty.Modify(A, (configs, oldConfig) => oldConfig + 1).Bake());
       Assert.AreEqual(A.Id, exception.Key);
-      Assert.AreEqual(A.Type, exception.ValueType);
     }
 
     [Test]
