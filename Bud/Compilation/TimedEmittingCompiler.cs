@@ -4,8 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Linq;
-using Bud.Pipeline;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
@@ -27,11 +25,11 @@ namespace Bud.Compilation {
       => new TimedEmittingCompiler(new RoslynCSharpCompiler(configs).Compile, configs, Path.Combine(CSharp.OutputDir[configs], CSharp.AssemblyName[configs])).Compile;
 
     public CompilationOutput Compile(CompilationInput compilationInput) {
-        Stopwatch.Restart();
-        if (File.Exists(OutputAssemblyPath) && IsFileUpToDate(OutputAssemblyPath, compilationInput.Sources) && IsFileUpToDate(OutputAssemblyPath, compilationInput.Dependencies)) {
-          return new CompilationOutput(Enumerable.Empty<Diagnostic>(), Stopwatch.Elapsed, OutputAssemblyPath, true, File.GetLastWriteTime(OutputAssemblyPath), MetadataReference.CreateFromFile(OutputAssemblyPath));
-        }
-        return EmitDllAndPrintResult(UnderlyingCompiler(compilationInput), Stopwatch);
+      Stopwatch.Restart();
+      if (File.Exists(OutputAssemblyPath) && IsFileUpToDate(OutputAssemblyPath, compilationInput.Sources) && IsFileUpToDate(OutputAssemblyPath, compilationInput.Dependencies)) {
+        return new CompilationOutput(Enumerable.Empty<Diagnostic>(), Stopwatch.Elapsed, OutputAssemblyPath, true, File.GetLastWriteTime(OutputAssemblyPath), MetadataReference.CreateFromFile(OutputAssemblyPath));
+      }
+      return EmitDllAndPrintResult(UnderlyingCompiler(compilationInput), Stopwatch);
     }
 
     private static bool IsFileUpToDate<T>(string file, IEnumerable<Timestamped<T>> otherResources)
