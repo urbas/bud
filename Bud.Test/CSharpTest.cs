@@ -5,28 +5,29 @@ using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using Bud.Compilation;
 using Bud.Pipeline;
+using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 using static Bud.Build;
 using static Bud.CSharp;
 
 namespace Bud {
   public class CSharpTest {
-    private static readonly Configs SimpleCSharpProject = CSharpProject().Modify(CSharpCompiler, TimedEmittingCompiler.Create);
-    private static readonly Configs BudProject = "bud" / Project(@"../../../Bud").Add(SimpleCSharpProject, BudDependencies());
-    private static readonly Configs BudTestProject = "budTest" / Project(@"../../../Bud.Test").Add(SimpleCSharpProject, BudTestDependencies());
+    private static readonly Configs BudProject = "bud" / CSharpProject(@"../../../Bud").Add(BudDependencies());
+    private static readonly Configs BudTestProject = "budTest" / CSharpProject(@"../../../Bud.Test").Add(BudTestDependencies());
 
     [Test]
     [Ignore]
     public async void Compiles_bud() => await BudProject.Add(BudTestProject)
                                                         .Add(CompilationDependency("budTest", "bud"))
                                                         .Get("budTest" / CSharp.Compilation)
+                                                        .Do(output => Console.WriteLine($"Compilation of budtest success: {output.Success}"))
                                                         .ToTask();
 
     public static Configs CompilationDependency(string dependentProject, string dependencyProject)
       => Configs.Empty.Modify(dependentProject / Dependencies, (configs, existingDependencies) => {
-        var dependencyProjectId = (dependencyProject / ProjectId)[configs];
         var dependencyCompilation = (dependencyProject / CSharp.Compilation)[configs];
-        var dependency = dependencyCompilation.Select(result => new[] {new Timestamped<Dependency>(new Dependency(dependencyProjectId, result.Compilation.ToMetadataReference()), DateTimeOffset.Now)});
+        var dependency = dependencyCompilation.Do(output => Console.WriteLine($"Compilation of bud success: {output.Success}"))
+                                              .Select(result => new[] {result.ToTimestampedDependency()});
         return existingDependencies.CombineStream(dependency);
       });
 

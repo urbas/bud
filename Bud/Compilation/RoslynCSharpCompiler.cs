@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Reactive.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static Bud.IO.FileTimestamps;
@@ -11,37 +9,32 @@ using static Bud.IO.FileTimestamps;
 namespace Bud.Compilation {
   public class RoslynCSharpCompiler {
     public IConfigs Configs { get; }
+    private ImmutableDictionary<string, SyntaxTree> oldSyntaxTrees = ImmutableDictionary<string, SyntaxTree>.Empty;
+    private Diff<string> sources = Diff.Empty<string>();
+    private Diff<Dependency> oldDependencies = Diff.Empty<Dependency>();
+    private CSharpCompilation cSharpCompilation;
 
     public RoslynCSharpCompiler(IConfigs configs) {
       Configs = configs;
+      cSharpCompilation = CSharpCompilation.Create(CSharp.AssemblyName[Configs], Enumerable.Empty<SyntaxTree>(), Enumerable.Empty<MetadataReference>(), CSharp.CSharpCompilationOptions[Configs]);
     }
 
-    public IObservable<CompilationOutput> Compile(IObservable<CompilationInput> inputPipe) {
-      var cSharpCompilation = CSharpCompilation.Create(CSharp.AssemblyName[Configs], Enumerable.Empty<SyntaxTree>(), Enumerable.Empty<MetadataReference>(), CSharp.CSharpCompilationOptions[Configs]);
-      var oldSyntaxTrees = ImmutableDictionary<string, SyntaxTree>.Empty;
-      var sources = Diff.Empty<string>();
-      var oldDependencies = Diff.Empty<Dependency>();
+    public CSharpCompilation Compile(CompilationInput input) {
+      sources = sources.NextDiff(ToTimestampedFiles(input.Sources));
+      var newDependenciesDiff = oldDependencies.NextDiff(input.Dependencies);
 
-      return inputPipe.Select(input => {
-        sources = sources.NextDiff(ToTimestampedFiles(input.Sources));
-        var newDependenciesDiff = oldDependencies.NextDiff(input.Dependencies);
+      var addedSources = sources.Added.Select(ToFileSyntaxTreePair).ToList();
+      var changedSources = sources.Changed.Select(ToFileSyntaxTreePair).ToList();
+      cSharpCompilation = cSharpCompilation.AddSyntaxTrees(addedSources.Select(pair => pair.Value))
+                                           .RemoveSyntaxTrees(sources.Removed.Select(s => oldSyntaxTrees[s]))
+                                           .RemoveSyntaxTrees(changedSources.Select(s => oldSyntaxTrees[s.Key]))
+                                           .AddSyntaxTrees(changedSources.Select(s => s.Value));
+      oldSyntaxTrees = oldSyntaxTrees.RemoveRange(sources.Removed).AddRange(addedSources).SetItems(changedSources);
 
-        Console.WriteLine($"=== Compiling: {Build.ProjectId[Configs]} ============");
-        Console.Write(sources.ToPrettyString());
+      cSharpCompilation = UpdateReferences(cSharpCompilation, oldDependencies, newDependenciesDiff);
+      oldDependencies = newDependenciesDiff;
 
-        var addedSources = sources.Added.Select(ToFileSyntaxTreePair).ToList();
-        var changedSources = sources.Changed.Select(ToFileSyntaxTreePair).ToList();
-        cSharpCompilation = cSharpCompilation.AddSyntaxTrees(addedSources.Select(pair => pair.Value))
-                                             .RemoveSyntaxTrees(sources.Removed.Select(s => oldSyntaxTrees[s]))
-                                             .RemoveSyntaxTrees(changedSources.Select(s => oldSyntaxTrees[s.Key]))
-                                             .AddSyntaxTrees(changedSources.Select(s => s.Value));
-        oldSyntaxTrees = oldSyntaxTrees.RemoveRange(sources.Removed).AddRange(addedSources).SetItems(changedSources);
-
-        cSharpCompilation = UpdateReferences(cSharpCompilation, oldDependencies, newDependenciesDiff);
-        oldDependencies = newDependenciesDiff;
-
-        return new CompilationOutput(cSharpCompilation);
-      });
+      return cSharpCompilation;
     }
 
     private static CSharpCompilation UpdateReferences(CSharpCompilation cSharpCompilation, Diff<Dependency> previousDependenciesDiff, Diff<Dependency> newDependenciesDiff)

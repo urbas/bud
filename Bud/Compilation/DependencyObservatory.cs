@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -13,6 +14,6 @@ namespace Bud.Compilation {
 
     private static Timestamped<Dependency> ToTimestampedDependency(string file)
       => new Timestamped<Dependency>(Dependency.CreateFromFile(file),
-                                     FileTimestamps.Instance.GetTimestamp(file));
+                                     File.GetLastWriteTime(file));
   }
 }

@@ -1,41 +1,53 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using Bud.Pipeline;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
 
 namespace Bud.Compilation {
   public class TimedEmittingCompiler {
+    public string OutputAssemblyPath { get; }
     public IConfigs Configs { get; }
-    public Pipe<CompilationInput, CompilationOutput> UnderlyingCompiler { get; }
+    public Func<CompilationInput, CSharpCompilation> UnderlyingCompiler { get; }
+    public Stopwatch Stopwatch { get; } = new Stopwatch();
 
-    public TimedEmittingCompiler(Pipe<CompilationInput, CompilationOutput> underlyingCompiler, IConfigs configs) {
+    public TimedEmittingCompiler(Func<CompilationInput, CSharpCompilation> underlyingCompiler, IConfigs configs, string outputAssemblyPath) {
+      OutputAssemblyPath = outputAssemblyPath;
       UnderlyingCompiler = underlyingCompiler;
       Configs = configs;
     }
 
-    public static Pipe<CompilationInput, CompilationOutput> Create(IConfigs configs, Pipe<CompilationInput, CompilationOutput> oldCompiler)
-      => new TimedEmittingCompiler(oldCompiler, configs).Compile;
+    public static Func<CompilationInput, CompilationOutput> Create(IConfigs configs)
+      => new TimedEmittingCompiler(new RoslynCSharpCompiler(configs).Compile, configs, Path.Combine(CSharp.OutputDir[configs], CSharp.AssemblyName[configs])).Compile;
 
-    public IObservable<CompilationOutput> Compile(IObservable<CompilationInput> input) {
-      var stopwatch = new Stopwatch();
-      return input.PipeInto(Throttler)
-                  .Do(_ => stopwatch.Restart())
-                  .PipeInto(UnderlyingCompiler)
-                  .Do(output => EmitDllAndPrintResult(output, stopwatch, Configs));
+    public CompilationOutput Compile(CompilationInput compilationInput) {
+        Stopwatch.Restart();
+        if (File.Exists(OutputAssemblyPath) && IsFileUpToDate(OutputAssemblyPath, compilationInput.Sources) && IsFileUpToDate(OutputAssemblyPath, compilationInput.Dependencies)) {
+          return new CompilationOutput(Enumerable.Empty<Diagnostic>(), Stopwatch.Elapsed, OutputAssemblyPath, true, File.GetLastWriteTime(OutputAssemblyPath), MetadataReference.CreateFromFile(OutputAssemblyPath));
+        }
+        return EmitDllAndPrintResult(UnderlyingCompiler(compilationInput), Stopwatch);
     }
 
-    private static void EmitDllAndPrintResult(CompilationOutput compilationOutput, Stopwatch stopwatch, IConfigs configs) {
-      var assemblyPath = Path.Combine(CSharp.OutputDir[configs], CSharp.AssemblyName[configs]);
-      Directory.CreateDirectory(CSharp.OutputDir[configs]);
-      using (var assemblyOutputFile = File.Create(assemblyPath)) {
-        var emitResult = compilationOutput.Compilation.Emit(assemblyOutputFile);
+    private static bool IsFileUpToDate<T>(string file, IEnumerable<Timestamped<T>> otherResources)
+      => otherResources.Any() && File.GetLastWriteTime(file) >= otherResources.Select(timestamped => timestamped.Timestamp).Max();
+
+    private static bool IsFileUpToDate(string file, IEnumerable<string> otherFiles)
+      => otherFiles.Any() && File.GetLastWriteTime(file) >= otherFiles.Select(File.GetLastWriteTime).Max();
+
+    private CompilationOutput EmitDllAndPrintResult(CSharpCompilation compilation, Stopwatch stopwatch) {
+      Directory.CreateDirectory(Path.GetDirectoryName(OutputAssemblyPath));
+      EmitResult emitResult;
+      using (var assemblyOutputFile = File.Create(OutputAssemblyPath)) {
+        emitResult = compilation.Emit(assemblyOutputFile);
         stopwatch.Stop();
-        Console.WriteLine($"Compiled: {assemblyPath}, Success: {emitResult.Success}, Time: {stopwatch.ElapsedMilliseconds}ms");
       }
+      return new CompilationOutput(emitResult.Diagnostics, stopwatch.Elapsed, OutputAssemblyPath, emitResult.Success, DateTime.Now, compilation.ToMetadataReference());
     }
-
-    private static IObservable<T> Throttler<T>(IObservable<T> sources)
-      => sources.Sample(TimeSpan.FromMilliseconds(100)).Delay(TimeSpan.FromMilliseconds(25));
   }
 }
