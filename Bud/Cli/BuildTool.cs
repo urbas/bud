@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reflection;
 using Bud.Compilation;
@@ -12,9 +11,9 @@ using static Bud.IO.FilesObservatory;
 namespace Bud.Cli {
   public class BuildTool {
     public static void Main(string[] args) {
-      var compilationOutput = CSharp.CSharpProject(Combine(GetCurrentDirectory(), "..", "..", "..", "Bud"))
+      var compilationOutput = CSharp.CSharpProject(Combine(GetCurrentDirectory(), "..", "..", ".."))
                                     .Add(BudDependencies())
-                                    .Set(Sources, configs => FilesObservatory[configs].ObserveFileList(Combine(ProjectDir[configs], "Bud.cs")))
+                                    .Set(Sources, configs => FilesObservatory[configs].ObserveFileList(Combine(ProjectDir[configs], "Build.cs")))
                                     .Get(CSharp.Compilation)
                                     .ToEnumerable()
                                     .First();
@@ -44,6 +43,7 @@ namespace Bud.Cli {
     private static Conf BudDependencies()
       => Conf.Empty.Set(CSharp.Dependencies, c => FilesObservatory[c].ObserveAssemblies(
         typeof(BuildTool).Assembly.Location,
-        typeof(object).Assembly.Location));
+        typeof(object).Assembly.Location,
+        typeof(Observable).Assembly.Location));
   }
 }

@@ -83,7 +83,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bud.cs" />
     <Compile Include="Cli\BuildTool.cs" />
     <Compile Include="Compilation\CompilationInput.cs" />
     <Compile Include="Compilation\CompilationOutput.cs" />
