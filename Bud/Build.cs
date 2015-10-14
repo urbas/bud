@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 using Bud.IO;
 using Bud.Pipeline;
 using static System.IO.Path;
-using static Bud.Configs;
+using static Bud.Conf;
 
 namespace Bud {
   public static class Build {
@@ -14,13 +14,13 @@ namespace Bud {
     public static readonly Key<IObservable<IEnumerable<string>>> Sources = nameof(Sources);
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
 
-    public static Configs Project(string projectDir, string projectId = null)
+    public static Conf Project(string projectDir, string projectId = null)
       => Empty.InitConst(Sources, Observable.Return(Enumerable.Empty<string>()))
               .InitConst(ProjectDir, projectDir)
               .Init(ProjectId, c => projectId ?? GetFileName(ProjectDir[c]))
               .Init(FilesObservatory, c => new LocalFilesObservatory());
 
-    public static Configs SourceDir(string subDir = null, string fileFilter = "*", bool includeSubdirs = true) {
+    public static Conf SourceDir(string subDir = null, string fileFilter = "*", bool includeSubdirs = true) {
       return Empty.Modify(Sources, (configs, sources) => {
         var sourceDir = subDir == null ? ProjectDir[configs] : Combine(ProjectDir[configs], subDir);
         var newSources = FilesObservatory[configs].ObserveFiles(sourceDir, fileFilter, includeSubdirs);
@@ -28,7 +28,7 @@ namespace Bud {
       });
     }
 
-    public static Configs SourceFiles(params string[] relativeFilePaths)
+    public static Conf SourceFiles(params string[] relativeFilePaths)
       => Empty.Modify(Sources, (configs, existingSources) => {
         var projectDir = ProjectDir[configs];
         var absolutePaths = relativeFilePaths.Select(relativeFilePath => Combine(projectDir, relativeFilePath));
@@ -36,7 +36,7 @@ namespace Bud {
         return existingSources.CombineStream(newSources);
       });
 
-    public static Configs ExcludeSourceDirs(params string[] subDirs)
+    public static Conf ExcludeSourceDirs(params string[] subDirs)
       => Empty.Modify(Sources, (configs, previousFiles) => {
         var forbiddenDirs = subDirs.Select(s => Combine(ProjectDir[configs], s));
         return previousFiles.Select(enumerable => enumerable.Where(file => !forbiddenDirs.Any(file.StartsWith)));

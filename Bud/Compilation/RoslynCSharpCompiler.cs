@@ -8,40 +8,38 @@ using static Bud.IO.FileTimestamps;
 
 namespace Bud.Compilation {
   public class RoslynCSharpCompiler {
-    public IConfigs Configs { get; }
-    private ImmutableDictionary<string, SyntaxTree> oldSyntaxTrees = ImmutableDictionary<string, SyntaxTree>.Empty;
+    public IConf Conf { get; }
+    private ImmutableDictionary<string, SyntaxTree> syntaxTrees = ImmutableDictionary<string, SyntaxTree>.Empty;
     private Diff<string> sources = Diff.Empty<string>();
     private Diff<Dependency> oldDependencies = Diff.Empty<Dependency>();
     private CSharpCompilation cSharpCompilation;
 
-    public RoslynCSharpCompiler(IConfigs configs) {
-      Configs = configs;
-      cSharpCompilation = CSharpCompilation.Create(CSharp.AssemblyName[Configs], Enumerable.Empty<SyntaxTree>(), Enumerable.Empty<MetadataReference>(), CSharp.CSharpCompilationOptions[Configs]);
+    public RoslynCSharpCompiler(IConf conf) {
+      Conf = conf;
+      cSharpCompilation = CSharpCompilation.Create(CSharp.AssemblyName[Conf], Enumerable.Empty<SyntaxTree>(), Enumerable.Empty<MetadataReference>(), CSharp.CSharpCompilationOptions[Conf]);
     }
 
     public CSharpCompilation Compile(CompilationInput input) {
       sources = sources.NextDiff(ToTimestampedFiles(input.Sources));
-      var newDependenciesDiff = oldDependencies.NextDiff(input.Dependencies);
+      var newDependencies = oldDependencies.NextDiff(input.Dependencies);
 
       var addedSources = sources.Added.Select(ToFileSyntaxTreePair).ToList();
       var changedSources = sources.Changed.Select(ToFileSyntaxTreePair).ToList();
       cSharpCompilation = cSharpCompilation.AddSyntaxTrees(addedSources.Select(pair => pair.Value))
-                                           .RemoveSyntaxTrees(sources.Removed.Select(s => oldSyntaxTrees[s]))
-                                           .RemoveSyntaxTrees(changedSources.Select(s => oldSyntaxTrees[s.Key]))
+                                           .RemoveSyntaxTrees(sources.Removed.Select(s => syntaxTrees[s]))
+                                           .RemoveSyntaxTrees(changedSources.Select(s => syntaxTrees[s.Key]))
                                            .AddSyntaxTrees(changedSources.Select(s => s.Value));
-      oldSyntaxTrees = oldSyntaxTrees.RemoveRange(sources.Removed).AddRange(addedSources).SetItems(changedSources);
 
-      cSharpCompilation = UpdateReferences(cSharpCompilation, oldDependencies, newDependenciesDiff);
-      oldDependencies = newDependenciesDiff;
+      cSharpCompilation = cSharpCompilation.RemoveReferences(newDependencies.Removed.Select(dependency => dependency.MetadataReference))
+                                           .AddReferences(newDependencies.Added.Select(dependency => dependency.MetadataReference))
+                                           .RemoveReferences(newDependencies.Changed.Select(dependency => GetDependency(oldDependencies, dependency).MetadataReference))
+                                           .AddReferences(newDependencies.Changed.Select(dependency => dependency.MetadataReference));
+
+      syntaxTrees = syntaxTrees.RemoveRange(sources.Removed).AddRange(addedSources).SetItems(changedSources);
+      oldDependencies = newDependencies;
 
       return cSharpCompilation;
     }
-
-    private static CSharpCompilation UpdateReferences(CSharpCompilation cSharpCompilation, Diff<Dependency> previousDependenciesDiff, Diff<Dependency> newDependenciesDiff)
-      => cSharpCompilation.RemoveReferences(newDependenciesDiff.Removed.Select(dependency => dependency.MetadataReference))
-                          .AddReferences(newDependenciesDiff.Added.Select(dependency => dependency.MetadataReference))
-                          .RemoveReferences(newDependenciesDiff.Changed.Select(dependency => GetDependency(previousDependenciesDiff, dependency).MetadataReference))
-                          .AddReferences(newDependenciesDiff.Changed.Select(dependency => dependency.MetadataReference));
 
     private static Dependency GetDependency(Diff<Dependency> dependenciesDiff, Dependency dependency)
       => dependenciesDiff.All.TryGetValue(dependency, out dependency) ? dependency : dependency;

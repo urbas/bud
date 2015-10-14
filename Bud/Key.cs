@@ -10,7 +10,7 @@ namespace Bud {
 
     public static implicit operator string(Key<T> key) => key.Id;
 
-    public T this[IConfigs configs] => configs.Get(this);
+    public T this[IConf conf] => conf.Get(this);
 
     public static Key<T> operator /(string prefix, Key<T> key) => prefix + "/" + key.Id;
   }

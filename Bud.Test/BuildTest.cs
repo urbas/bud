@@ -8,9 +8,9 @@ using static Bud.Build;
 namespace Bud {
   public class BuildTest {
     private TemporaryDirectory tempDir;
-    private Configs cSharpProject;
-    private Configs bareProject;
-    private Configs twoSourceDirsProject;
+    private Conf cSharpProject;
+    private Conf bareProject;
+    private Conf twoSourceDirsProject;
 
     [SetUp]
     public void SetUp() {

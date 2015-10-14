@@ -28,8 +28,8 @@ namespace Bud.Cli {
       Console.ReadLine();
     }
 
-    private static Configs BudDependencies()
-      => Configs.Empty.Set(CSharp.Dependencies, c => FilesObservatory[c].ObserveAssemblies(
+    private static Conf BudDependencies()
+      => Conf.Empty.Set(CSharp.Dependencies, c => FilesObservatory[c].ObserveAssemblies(
         typeof(BuildTool).Assembly.Location,
         typeof(object).Assembly.Location));
   }

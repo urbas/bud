@@ -1,5 +1,5 @@
 namespace Bud {
-  public interface IConfigs {
+  public interface IConf {
     T Get<T>(Key<T> configKey);
   }
 }

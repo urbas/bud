@@ -2,12 +2,12 @@ using System;
 
 namespace Bud.Configuration {
   public class ConfigDefinition<T> : IConfigDefinition {
-    public Func<IConfigs, T> ValueFactory { get; }
+    public Func<IConf, T> ValueFactory { get; }
     public Type ValueType => typeof(T);
-    object IConfigDefinition.Invoke(IConfigs configs) => Invoke(configs);
-    public T Invoke(IConfigs configs) => ValueFactory(configs);
+    object IConfigDefinition.Invoke(IConf conf) => Invoke(conf);
+    public T Invoke(IConf conf) => ValueFactory(conf);
 
-    public ConfigDefinition(Func<IConfigs, T> valueFactory) {
+    public ConfigDefinition(Func<IConf, T> valueFactory) {
       ValueFactory = valueFactory;
     }
   }

@@ -10,13 +10,13 @@ namespace Bud.Configuration {
 
     public override ConfigDefinition<T> ToConfigDefinition() {
       var configDefinition = ConfigToNest.ToConfigDefinition();
-      return new ConfigDefinition<T>(configs => configDefinition.Invoke(new NestedConfigs(Prefix, configs)));
+      return new ConfigDefinition<T>(configs => configDefinition.Invoke(new NestedConf(Prefix, configs)));
     }
 
     public override ConfigDefinition<T> Modify(ConfigDefinition<T> configDefinition) {
       var modifiedConfigDefinition = ConfigToNest.Modify(configDefinition);
       return new ConfigDefinition<T>(configs => {
-        var nestedConfigs = new NestedConfigs(Prefix, configs);
+        var nestedConfigs = new NestedConf(Prefix, configs);
         return modifiedConfigDefinition.Invoke(nestedConfigs);
       });
     }

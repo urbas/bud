@@ -92,7 +92,7 @@
     <Compile Include="Compilation\DependencyObservatory.cs" />
     <Compile Include="Compilation\RoslynCSharpCompiler.cs" />
     <Compile Include="Compilation\TimedEmittingCompiler.cs" />
-    <Compile Include="Configuration\CachingConfigs.cs" />
+    <Compile Include="Configuration\CachingConf.cs" />
     <Compile Include="Configuration\ConfigTransform.cs" />
     <Compile Include="Configuration\IConfigDefinition.cs" />
     <Compile Include="Configuration\IConfigTransform.cs" />
@@ -104,7 +104,7 @@
     <Compile Include="IO\IFilesObservatory.cs" />
     <Compile Include="IO\IFileTimestamps.cs" />
     <Compile Include="IO\EmptyFilesObservatory.cs" />
-    <Compile Include="IConfigs.cs" />
+    <Compile Include="IConf.cs" />
     <Compile Include="Key.cs" />
     <Compile Include="Compilation\Diff.cs" />
     <Compile Include="Pipeline\Streams.cs" />
@@ -112,7 +112,7 @@
     <Compile Include="Build.cs" />
     <Compile Include="IO\TemporaryDirectory.cs" />
     <Compile Include="Configuration\InitConfig.cs" />
-    <Compile Include="Configuration\NestedConfigs.cs" />
+    <Compile Include="Configuration\NestedConf.cs" />
     <Compile Include="Configuration\SetConfig.cs" />
     <Compile Include="Configuration\ConfigDefinition.cs" />
     <Compile Include="Configuration\ConfigDefinitionException.cs" />
@@ -121,7 +121,7 @@
     <Compile Include="Configuration\ConfigTypeException.cs" />
     <Compile Include="Configuration\ConfigAssertions.cs" />
     <Compile Include="Configuration\ConfigUndefinedException.cs" />
-    <Compile Include="Configs.cs" />
+    <Compile Include="Conf.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

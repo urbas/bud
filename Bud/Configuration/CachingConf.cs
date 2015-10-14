@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Bud.Configuration {
-  public class CachingConfigs : IConfigs {
+  public class CachingConf : IConf {
     private IDictionary<string, IConfigDefinition> ConfigDefinitions { get; }
     private ImmutableDictionary<string, ConfigValue> configValueCache = ImmutableDictionary<string, ConfigValue>.Empty;
     private readonly object configValueCacheGuard = new object();
 
-    internal CachingConfigs(IDictionary<string, IConfigDefinition> configDefinitions) {
+    internal CachingConf(IDictionary<string, IConfigDefinition> configDefinitions) {
       ConfigDefinitions = configDefinitions;
     }
 

@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Path;
 using static Bud.Build;
-using static Bud.Configs;
+using static Bud.Conf;
 
 namespace Bud {
   public static class CSharp {
@@ -18,20 +18,20 @@ namespace Bud {
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
 
-    public static Configs CSharpProject(string projectDir, string projectId = null) => Project(projectDir, projectId)
+    public static Conf CSharpProject(string projectDir, string projectId = null) => Project(projectDir, projectId)
       .Add(SourceDir(fileFilter: "*.cs"))
       .Add(ExcludeSourceDirs("obj", "bin", "target"))
       .Add(CSharpCompilation());
 
-    public static Configs CSharpCompilation() => Empty.Init(Compilation, DefaultCompilation)
+    public static Conf CSharpCompilation() => Empty.Init(Compilation, DefaultCompilation)
                                                       .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
                                                       .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
                                                       .Init(Dependencies, configs => FilesObservatory[configs].ObserveAssemblies(typeof(object).Assembly.Location))
                                                       .Init(CSharpCompiler, TimedEmittingCompiler.Create)
                                                       .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-    private static IObservable<CompilationOutput> DefaultCompilation(IConfigs configs)
-      => Sources[configs].CombineLatest(Dependencies[configs], CompilationInput.Create)
-                         .Select(CSharpCompiler[configs]);
+    private static IObservable<CompilationOutput> DefaultCompilation(IConf conf)
+      => Sources[conf].CombineLatest(Dependencies[conf], CompilationInput.Create)
+                         .Select(CSharpCompiler[conf]);
   }
 }

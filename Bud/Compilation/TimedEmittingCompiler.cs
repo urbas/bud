@@ -11,18 +11,18 @@ using Microsoft.CodeAnalysis.Emit;
 namespace Bud.Compilation {
   public class TimedEmittingCompiler {
     public string OutputAssemblyPath { get; }
-    public IConfigs Configs { get; }
+    public IConf Conf { get; }
     public Func<CompilationInput, CSharpCompilation> UnderlyingCompiler { get; }
     public Stopwatch Stopwatch { get; } = new Stopwatch();
 
-    public TimedEmittingCompiler(Func<CompilationInput, CSharpCompilation> underlyingCompiler, IConfigs configs, string outputAssemblyPath) {
+    public TimedEmittingCompiler(Func<CompilationInput, CSharpCompilation> underlyingCompiler, IConf conf, string outputAssemblyPath) {
       OutputAssemblyPath = outputAssemblyPath;
       UnderlyingCompiler = underlyingCompiler;
-      Configs = configs;
+      Conf = conf;
     }
 
-    public static Func<CompilationInput, CompilationOutput> Create(IConfigs configs)
-      => new TimedEmittingCompiler(new RoslynCSharpCompiler(configs).Compile, configs, Path.Combine(CSharp.OutputDir[configs], CSharp.AssemblyName[configs])).Compile;
+    public static Func<CompilationInput, CompilationOutput> Create(IConf conf)
+      => new TimedEmittingCompiler(new RoslynCSharpCompiler(conf).Compile, conf, Path.Combine(CSharp.OutputDir[conf], CSharp.AssemblyName[conf])).Compile;
 
     public CompilationOutput Compile(CompilationInput compilationInput) {
       Stopwatch.Restart();
