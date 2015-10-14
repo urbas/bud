@@ -11,12 +11,14 @@ using static Bud.CSharp;
 namespace Bud {
   public class CSharpTest {
     private static readonly Conf BudProject = "bud" / CSharpProject(@"../../../Bud").Add(BudDependencies());
-    private static readonly Conf BudTestProject = "budTest" / CSharpProject(@"../../../Bud.Test").Add(BudTestDependencies());
+
+    private static readonly Conf BudTestProject = "budTest" / CSharpProject(@"../../../Bud.Test")
+      .Add(BudTestDependencies())
+      .Add(CompilationDependency("budTest", "bud"));
 
     [Test]
     [Ignore]
     public async void Compiles_bud() => await BudProject.Add(BudTestProject)
-                                                        .Add(CompilationDependency("budTest", "bud"))
                                                         .Get("budTest" / CSharp.Compilation)
                                                         .Do(output => Console.WriteLine($"Compilation of budtest success: {output.Success}"))
                                                         .ToTask();

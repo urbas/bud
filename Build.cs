@@ -20,8 +20,7 @@ public class Build : IBuild {
   public static Conf CompilationDependency(string dependentProject, string dependencyProject)
     => Conf.Empty.Modify(dependentProject / Dependencies, (configs, existingDependencies) => {
       var dependencyCompilation = (dependencyProject / CSharp.Compilation)[configs];
-      var dependency = dependencyCompilation.Do(output => Console.WriteLine($"Compilation of bud success: {output.Success}"))
-                                            .Select(compilationOutput => new[] {compilationOutput.ToTimestampedDependency()});
+      var dependency = dependencyCompilation.Select(compilationOutput => new[] {compilationOutput.ToTimestampedDependency()});
       return existingDependencies.CombineStream(dependency);
     });
 

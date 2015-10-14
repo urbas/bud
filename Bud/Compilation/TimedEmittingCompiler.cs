@@ -15,28 +15,46 @@ namespace Bud.Compilation {
     public Func<CompilationInput, CSharpCompilation> UnderlyingCompiler { get; }
     public Stopwatch Stopwatch { get; } = new Stopwatch();
 
-    public TimedEmittingCompiler(Func<CompilationInput, CSharpCompilation> underlyingCompiler, IConf conf, string outputAssemblyPath) {
-      OutputAssemblyPath = outputAssemblyPath;
-      UnderlyingCompiler = underlyingCompiler;
+    public TimedEmittingCompiler(IConf conf) {
+      OutputAssemblyPath = GetOutputAssemblyPath(conf);
+      UnderlyingCompiler = new RoslynCSharpCompiler(conf).Compile;
       Conf = conf;
     }
 
     public static Func<CompilationInput, CompilationOutput> Create(IConf conf)
-      => new TimedEmittingCompiler(new RoslynCSharpCompiler(conf).Compile, conf, Path.Combine(CSharp.OutputDir[conf], CSharp.AssemblyName[conf])).Compile;
+      => new TimedEmittingCompiler(conf).Compile;
 
     public CompilationOutput Compile(CompilationInput compilationInput) {
       Stopwatch.Restart();
-      if (File.Exists(OutputAssemblyPath) && IsFileUpToDate(OutputAssemblyPath, compilationInput.Sources) && IsFileUpToDate(OutputAssemblyPath, compilationInput.Dependencies)) {
-        return new CompilationOutput(Enumerable.Empty<Diagnostic>(), Stopwatch.Elapsed, OutputAssemblyPath, true, File.GetLastWriteTime(OutputAssemblyPath), MetadataReference.CreateFromFile(OutputAssemblyPath));
+      if (IsCompilationUpToDate(compilationInput)) {
+        return CreateOutputFromAssembly();
       }
       return EmitDllAndPrintResult(UnderlyingCompiler(compilationInput), Stopwatch);
     }
 
+    private static string GetOutputAssemblyPath(IConf conf)
+      => Path.Combine(CSharp.OutputDir[conf], CSharp.AssemblyName[conf]);
+
+    private CompilationOutput CreateOutputFromAssembly()
+      => new CompilationOutput(Enumerable.Empty<Diagnostic>(),
+                               Stopwatch.Elapsed,
+                               OutputAssemblyPath,
+                               true,
+                               File.GetLastWriteTime(OutputAssemblyPath),
+                               MetadataReference.CreateFromFile(OutputAssemblyPath));
+
+    private bool IsCompilationUpToDate(CompilationInput compilationInput)
+      => File.Exists(OutputAssemblyPath) &&
+         IsFileUpToDate(OutputAssemblyPath, compilationInput.Sources) &&
+         IsFileUpToDate(OutputAssemblyPath, compilationInput.Dependencies);
+
     private static bool IsFileUpToDate<T>(string file, IEnumerable<Timestamped<T>> otherResources)
-      => otherResources.Any() && File.GetLastWriteTime(file) >= otherResources.Select(timestamped => timestamped.Timestamp).Max();
+      => otherResources.Any() &&
+         File.GetLastWriteTime(file) >= otherResources.Select(timestamped => timestamped.Timestamp).Max();
 
     private static bool IsFileUpToDate(string file, IEnumerable<string> otherFiles)
-      => otherFiles.Any() && File.GetLastWriteTime(file) >= otherFiles.Select(File.GetLastWriteTime).Max();
+      => otherFiles.Any() &&
+         File.GetLastWriteTime(file) >= otherFiles.Select(File.GetLastWriteTime).Max();
 
     private CompilationOutput EmitDllAndPrintResult(CSharpCompilation compilation, Stopwatch stopwatch) {
       Directory.CreateDirectory(Path.GetDirectoryName(OutputAssemblyPath));
@@ -45,7 +63,12 @@ namespace Bud.Compilation {
         emitResult = compilation.Emit(assemblyOutputFile);
         stopwatch.Stop();
       }
-      return new CompilationOutput(emitResult.Diagnostics, stopwatch.Elapsed, OutputAssemblyPath, emitResult.Success, DateTime.Now, compilation.ToMetadataReference());
+      return new CompilationOutput(emitResult.Diagnostics,
+                                   stopwatch.Elapsed,
+                                   OutputAssemblyPath,
+                                   emitResult.Success,
+                                   DateTime.Now,
+                                   compilation.ToMetadataReference());
     }
   }
 }

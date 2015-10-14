@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Reactive;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 using Bud.Compilation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -11,6 +13,7 @@ using static Bud.Conf;
 
 namespace Bud {
   public static class CSharp {
+    public static readonly Key<Task> Compile = nameof(Compile);
     public static readonly Key<IObservable<CompilationOutput>> Compilation = nameof(Compilation);
     public static readonly Key<IObservable<IEnumerable<Timestamped<Dependency>>>> Dependencies = nameof(Dependencies);
     public static readonly Key<Func<CompilationInput, CompilationOutput>> CSharpCompiler = nameof(CSharpCompiler);
@@ -24,14 +27,27 @@ namespace Bud {
       .Add(CSharpCompilation());
 
     public static Conf CSharpCompilation() => Empty.Init(Compilation, DefaultCompilation)
-                                                      .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
-                                                      .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
-                                                      .Init(Dependencies, configs => FilesObservatory[configs].ObserveAssemblies(typeof(object).Assembly.Location))
-                                                      .Init(CSharpCompiler, TimedEmittingCompiler.Create)
-                                                      .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+                                                   .Init(Compile, configs => Compilation[configs].ToTask())
+                                                   .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
+                                                   .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
+                                                   .Init(Dependencies, configs => FilesObservatory[configs].ObserveAssemblies(typeof(object).Assembly.Location))
+                                                   .Init(CSharpCompiler, TimedEmittingCompiler.Create)
+                                                   .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+
+    private static void PrintCompilationResult(CompilationOutput output) {
+      if (output.Success) {
+        Console.WriteLine($"Compiled '{output.AssemblyPath}' in {output.CompilationTime.Milliseconds}ms.");
+      } else {
+        Console.WriteLine($"Failed to compile '{output.AssemblyPath}'.");
+        foreach (var diagnostic in output.Diagnostics) {
+          Console.WriteLine(diagnostic);
+        }
+      }
+    }
 
     private static IObservable<CompilationOutput> DefaultCompilation(IConf conf)
       => Sources[conf].CombineLatest(Dependencies[conf], CompilationInput.Create)
-                         .Select(CSharpCompiler[conf]);
+                      .Select(CSharpCompiler[conf])
+                      .Do(PrintCompilationResult);
   }
 }
