@@ -59,7 +59,7 @@ namespace Bud {
 
     /// <returns>a copy of self with added configurations from <paramref name="otherConf" />.</returns>
     public Conf Add(params Conf[] otherConf)
-      => otherConf.Aggregate(this, (configs, configs1) => new Conf(configs.Concat(configs1)));
+      => otherConf.Aggregate(this, (aggregatedConf, conf) => new Conf(aggregatedConf.Concat(conf)));
 
     /// <returns>a copy of self with every configuration key prefixed with <paramref name="prefix" />.</returns>
     public static Conf operator /(string prefix, Conf conf)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Linq;
 using System.Reflection;
 using Bud.Compilation;
@@ -18,14 +19,26 @@ namespace Bud.Cli {
                                     .ToEnumerable()
                                     .First();
       if (compilationOutput.Success) {
-        var assembly = Assembly.LoadFile(compilationOutput.AssemblyPath);
-        var buildDefinitionType = assembly.GetExportedTypes().Single(typeof(IBuild).IsAssignableFrom);
-        var buildDefinition = (IBuild) buildDefinitionType.GetConstructor(Type.EmptyTypes).Invoke(new object[] {});
-        var configs = buildDefinition.Init(GetCurrentDirectory());
+        var configs = LoadBuildConf(compilationOutput);
         configs.Get<int>("hello");
-        Console.WriteLine($"Success!!");
+      } else {
+        PrintCompilationErrors(compilationOutput);
       }
       Console.ReadLine();
+    }
+
+    private static Conf LoadBuildConf(CompilationOutput compilationOutput) {
+      var assembly = Assembly.LoadFile(compilationOutput.AssemblyPath);
+      var buildDefinitionType = assembly.GetType("Build");
+      var buildDefinition = (IBuild) buildDefinitionType.GetConstructor(Type.EmptyTypes).Invoke(new object[] {});
+      return buildDefinition.Init(GetCurrentDirectory());
+    }
+
+    private static void PrintCompilationErrors(CompilationOutput compilationOutput) {
+      Console.WriteLine("Could not compile the build configuration.");
+      foreach (var diagnostic in compilationOutput.Diagnostics) {
+        Console.WriteLine(diagnostic);
+      }
     }
 
     private static Conf BudDependencies()
