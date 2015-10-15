@@ -77,7 +77,9 @@ namespace Bud {
     [Test]
     public void Get_a_subtype() {
       var expectedList = ImmutableArray.Create(42);
-      var actualList = Conf.Empty.InitConst(FooKeyAsEnumerable, expectedList).Get(FooKeyAsList);
+      var actualList = Conf.Empty
+                           .InitConst(FooKeyAsEnumerable, expectedList)
+                           .Get(FooKeyAsList);
       Assert.AreEqual(expectedList, actualList);
     }
 
@@ -114,8 +116,8 @@ namespace Bud {
     [Test]
     public void A_config_can_invoke_another_config() {
       var configResult = Conf.Empty.Const(A, 42)
-                                .Set(B, configs => configs.Get(A) + 1)
-                                .Get(B);
+                             .Set(B, configs => configs.Get(A) + 1)
+                             .Get(B);
       Assert.AreEqual(43, configResult);
     }
 
@@ -123,8 +125,8 @@ namespace Bud {
     public void Configurations_are_invoked_once_only_and_their_result_is_cached() {
       var intConfig = new Mock<Func<IConf, int>>();
       Conf.Empty.Set(A, intConfig.Object)
-             .Set(B, configs => A[configs] + A[configs])
-             .Get(B);
+          .Set(B, configs => A[configs] + A[configs])
+          .Get(B);
       intConfig.Verify(self => self(It.IsAny<IConf>()));
     }
 
@@ -132,7 +134,7 @@ namespace Bud {
     public async void Multithreaded_access_to_configs_should_not_result_in_duplicate_invocations() {
       var intConfig = new Mock<Func<IConf, int>>();
       var configs = Conf.Empty.Set(A, intConfig.Object)
-                           .Set(BAsync, AddFooTwiceConcurrently);
+                        .Set(BAsync, AddFooTwiceConcurrently);
       int repeatCount = 10;
       for (int i = 0; i < repeatCount; i++) {
         await configs.Get(BAsync);
@@ -149,7 +151,7 @@ namespace Bud {
     [Test]
     public void Nesting_allows_access_to_sibling_configs() {
       var nestedConfigs = "bar" / Conf.Empty.Set(B, configs => A[configs] + 1)
-                                         .Const(A, 42);
+                                      .Const(A, 42);
       Assert.AreEqual(43, nestedConfigs.Get("bar" / B));
     }
 
@@ -163,10 +165,10 @@ namespace Bud {
     [Test]
     public void Nesting_with_multiple_modifications() {
       var nestedConfigs = "bar" / Conf.Empty
-                                         .InitConst(C, 10)
-                                         .Init(B, configs => 1)
-                                         .Modify(B, (configs, i) => i + C[configs])
-                                         .Modify(B, (configs, i) => i + C[configs]);
+                                      .InitConst(C, 10)
+                                      .Init(B, configs => 1)
+                                      .Modify(B, (configs, i) => i + C[configs])
+                                      .Modify(B, (configs, i) => i + C[configs]);
       Assert.AreEqual(21, nestedConfigs.Get("bar" / B));
     }
 
