@@ -16,7 +16,10 @@ namespace Bud.Compilation {
 
     public RoslynCSharpCompiler(IConf conf) {
       Conf = conf;
-      cSharpCompilation = CSharpCompilation.Create(CSharp.AssemblyName[Conf], Enumerable.Empty<SyntaxTree>(), Enumerable.Empty<MetadataReference>(), CSharp.CSharpCompilationOptions[Conf]);
+      cSharpCompilation = CSharpCompilation.Create(CSharp.AssemblyName[Conf],
+                                                   Enumerable.Empty<SyntaxTree>(),
+                                                   Enumerable.Empty<MetadataReference>(),
+                                                   CSharp.CSharpCompilationOptions[Conf]);
     }
 
     public CSharpCompilation Compile(CompilationInput input) {
@@ -30,10 +33,10 @@ namespace Bud.Compilation {
                                            .RemoveSyntaxTrees(changedSources.Select(s => syntaxTrees[s.Key]))
                                            .AddSyntaxTrees(changedSources.Select(s => s.Value));
 
-      cSharpCompilation = cSharpCompilation.RemoveReferences(newDependencies.Removed.Select(dependency => dependency.MetadataReference))
-                                           .AddReferences(newDependencies.Added.Select(dependency => dependency.MetadataReference))
-                                           .RemoveReferences(newDependencies.Changed.Select(dependency => GetDependency(oldDependencies, dependency).MetadataReference))
-                                           .AddReferences(newDependencies.Changed.Select(dependency => dependency.MetadataReference));
+      cSharpCompilation = cSharpCompilation.RemoveReferences(newDependencies.Removed.Select(ToReference))
+                                           .AddReferences(newDependencies.Added.Select(ToReference))
+                                           .RemoveReferences(newDependencies.Changed.Select(FindOldReference))
+                                           .AddReferences(newDependencies.Changed.Select(ToReference));
 
       syntaxTrees = syntaxTrees.RemoveRange(sources.Removed).AddRange(addedSources).SetItems(changedSources);
       oldDependencies = newDependencies;
@@ -46,5 +49,11 @@ namespace Bud.Compilation {
 
     private static KeyValuePair<string, SyntaxTree> ToFileSyntaxTreePair(string s)
       => new KeyValuePair<string, SyntaxTree>(s, SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s), path: s));
+
+    private static MetadataReference ToReference(Dependency dependency)
+      => dependency.MetadataReference;
+
+    private MetadataReference FindOldReference(Dependency dependency)
+      => GetDependency(oldDependencies, dependency).MetadataReference;
   }
 }
