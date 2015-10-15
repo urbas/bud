@@ -94,7 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compilation\DiffTest.cs" />
-    <Compile Include="ConfigsTest.cs" />
+    <Compile Include="ConfTest.cs" />
     <Compile Include="CSharpTest.cs" />
     <Compile Include="IO\LocalFilesObservatoryTest.cs" />
     <Compile Include="IO\FilesObservatoryTest.cs" />

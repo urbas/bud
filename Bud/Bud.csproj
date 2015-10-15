@@ -118,7 +118,6 @@
     <Compile Include="Configuration\NestConfig.cs" />
     <Compile Include="Configuration\ModifyConfig.cs" />
     <Compile Include="Configuration\ConfigTypeException.cs" />
-    <Compile Include="Configuration\ConfigAssertions.cs" />
     <Compile Include="Configuration\ConfigUndefinedException.cs" />
     <Compile Include="Conf.cs" />
   </ItemGroup>

@@ -14,8 +14,11 @@ namespace Bud.Configuration {
 
     public T Get<T>(Key<T> configKey) {
       var configValue = GetFromCacheOrInvoke(configKey);
-      ConfigAssertions.RequireConfigType<T>(configKey, configValue.ValueType);
-      return (T) configValue.Value;
+      try {
+        return (T) configValue.Value;
+      } catch (Exception) {
+        throw new ConfigTypeException($"Trying to read configuration '{(string)configKey}' as type '{typeof(T)}'. Its actual type is '{configValue.Value.GetType()}'.");
+      }
     }
 
     private ConfigValue GetFromCacheOrInvoke(string configKey) {

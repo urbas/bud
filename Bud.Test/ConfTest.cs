@@ -1,16 +1,20 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Threading.Tasks;
 using Bud.Configuration;
 using Moq;
 using NUnit.Framework;
 
 namespace Bud {
-  public class ConfigsTest {
+  public class ConfTest {
     private static readonly Key<int> A = nameof(A);
     private static readonly Key<int> B = nameof(B);
     private static readonly Key<int> C = nameof(C);
     private static readonly Key<Task<int>> BAsync = nameof(BAsync);
     private static readonly Key<string> AString = A.Id;
+    private static readonly Key<IEnumerable<int>> FooKeyAsEnumerable = "Foo";
+    private static readonly Key<IList<int>> FooKeyAsList = "Foo";
 
     [Test]
     public void Empty() => Assert.IsEmpty(Conf.Empty);
@@ -68,6 +72,13 @@ namespace Bud {
       Assert.That(exception.Message, Contains.Substring(A.Id));
       Assert.That(exception.Message, Contains.Substring("System.Int32"));
       Assert.That(exception.Message, Contains.Substring("System.String"));
+    }
+
+    [Test]
+    public void Get_a_subtype() {
+      var expectedList = ImmutableArray.Create(42);
+      var actualList = Conf.Empty.InitConst(FooKeyAsEnumerable, expectedList).Get(FooKeyAsList);
+      Assert.AreEqual(expectedList, actualList);
     }
 
     [Test]
