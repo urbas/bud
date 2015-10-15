@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -7,60 +8,31 @@ using static Bud.Build;
 
 namespace Bud {
   public class BuildTest {
-    private TemporaryDirectory tempDir;
-    private Conf cSharpProject;
-    private Conf bareProject;
-    private Conf twoSourceDirsProject;
-
-    [SetUp]
-    public void SetUp() {
-      tempDir = new TemporaryDirectory();
-      bareProject = Project(tempDir.Path, "Foo");
-      cSharpProject = bareProject.Add(SourceDir(fileFilter: "*.cs"));
-      twoSourceDirsProject = bareProject.Add(SourceDir("A"), SourceDir("B"));
-    }
-
-    [TearDown]
-    public void TearDown() => tempDir.Dispose();
+    private readonly Conf project = Project("bar", "Foo");
 
     [Test]
-    public void Set_the_projectDir() {
-      Assert.AreEqual(tempDir.Path, bareProject.Get(ProjectDir));
-    }
+    public void Set_the_projectDir() => Assert.AreEqual("bar", ProjectDir[project]);
 
     [Test]
-    public void Set_the_projectId() {
-      Assert.AreEqual("Foo", bareProject.Get(ProjectId));
-    }
+    public void Set_the_projectId() => Assert.AreEqual("Foo", ProjectId[project]);
 
     [Test]
-    public void Set_the_directory_name_as_the_default_projectId() {
-      Assert.AreEqual(Path.GetFileName(tempDir.Path), Project(tempDir.Path).Get(ProjectId));
-    }
+    public void Set_the_directory_name_as_the_default_projectId()
+      => Assert.AreEqual(Path.GetFileName("bar/moo"), ProjectId[Project("bar/moo")]);
 
     [Test]
-    public void CSharp_sources_must_be_listed() {
-      var sourceFile = tempDir.CreateEmptyFile("TestMainClass.cs");
-      Assert.That(Sources[cSharpProject].ToEnumerable().First(), Contains.Item(sourceFile));
-    }
-
-    [Test]
-    public void CSharp_sources_in_nested_directories_must_be_listed() {
-      var sourceFile = tempDir.CreateEmptyFile("Bud", "TestMainClass.cs");
-      Assert.That(Sources[cSharpProject].ToEnumerable().First(), Contains.Item(sourceFile));
-    }
-
-    [Test]
-    public void Non_csharp_files_must_not_be_listed() {
-      var textFile = tempDir.CreateEmptyFile("Bud", "TextFile.txt");
-      Assert.That(Sources[cSharpProject].ToEnumerable().First(), Is.Not.Contains(textFile));
-    }
+    public void Sources_should_be_empty()
+      => Assert.That(Sources[project].ToEnumerable().ToList(),
+                     Is.EquivalentTo(ImmutableArray.Create(Enumerable.Empty<string>())));
 
     [Test]
     public void Multiple_source_directories() {
-      var fileA = tempDir.CreateEmptyFile("A", "A.cs");
-      var fileB = tempDir.CreateEmptyFile("B", "B.cs");
-      Assert.That(Sources[twoSourceDirsProject].ToEnumerable().First(), Is.EquivalentTo(new[] {fileA, fileB}));
+      using (var tempDir = new TemporaryDirectory()) {
+        var fileA = tempDir.CreateEmptyFile("A", "A.cs");
+        var fileB = tempDir.CreateEmptyFile("B", "B.cs");
+        var twoDirsProject = Project(tempDir.Path).Add(SourceDir("A"), SourceDir("B"));
+        Assert.That(Sources[twoDirsProject].ToEnumerable().First(), Is.EquivalentTo(new[] {fileA, fileB}));
+      }
     }
   }
 }
