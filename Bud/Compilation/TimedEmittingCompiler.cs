@@ -46,9 +46,9 @@ namespace Bud.Compilation {
     private bool IsCompilationUpToDate(CompilationInput compilationInput)
       => File.Exists(OutputAssemblyPath) &&
          IsFileUpToDate(OutputAssemblyPath, compilationInput.Sources) &&
-         IsFileUpToDate(OutputAssemblyPath, compilationInput.Dependencies);
+         IsFileUpToDate(OutputAssemblyPath, compilationInput.Assemblies);
 
-    private static bool IsFileUpToDate<T>(string file, IEnumerable<Timestamped<T>> otherResources)
+    private static bool IsFileUpToDate<T>(string file, IEnumerable<IO.Timestamped<T>> otherResources)
       => otherResources.Any() &&
          File.GetLastWriteTime(file) >= otherResources.Select(timestamped => timestamped.Timestamp).Max();
 

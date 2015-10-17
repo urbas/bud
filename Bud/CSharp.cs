@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Bud.Compilation;
+using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Path;
@@ -14,8 +14,8 @@ using static Bud.Conf;
 namespace Bud {
   public static class CSharp {
     public static readonly Key<Task> Compile = nameof(Compile);
+    public static readonly Key<IObservable<Assemblies>> AssemblyReferences = nameof(AssemblyReferences);
     public static readonly Key<IObservable<CompilationOutput>> Compilation = nameof(Compilation);
-    public static readonly Key<IObservable<IEnumerable<Timestamped<Dependency>>>> Dependencies = nameof(Dependencies);
     public static readonly Key<Func<CompilationInput, CompilationOutput>> CSharpCompiler = nameof(CSharpCompiler);
     public static readonly Key<string> OutputDir = nameof(OutputDir);
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
@@ -29,10 +29,10 @@ namespace Bud {
 
     public static Conf CSharpCompilation()
       => Empty.Init(Compilation, DefaultCompilation)
-              .Init(Compile, configs => Compilation[configs].ToTask())
+              .Init(Compile, configs => Compilation[configs].Do(PrintCompilationResult).ToTask())
               .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
               .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
-              .Init(Dependencies, configs => FilesObservatory[configs].ObserveAssemblies(typeof(object).Assembly.Location))
+              .Init(AssemblyReferences, configs => Build.FilesObservatory[configs].ObserveAssemblies(typeof(object).Assembly.Location))
               .Init(CSharpCompiler, TimedEmittingCompiler.Create)
               .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -48,9 +48,8 @@ namespace Bud {
     }
 
     private static IObservable<CompilationOutput> DefaultCompilation(IConf conf)
-      => Sources[conf].CombineLatest(Dependencies[conf], CompilationInput.Create)
+      => Sources[conf].CombineLatest(AssemblyReferences[conf], CompilationInput.Create)
                       .Sample(TimeSpan.FromMilliseconds(25))
-                      .Select(CSharpCompiler[conf])
-                      .Do(PrintCompilationResult);
+                      .Select(CSharpCompiler[conf]);
   }
 }

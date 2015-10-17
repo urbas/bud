@@ -4,17 +4,17 @@ using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Bud.Compilation;
+using Bud.IO;
 using static System.IO.Directory;
 using static System.IO.Path;
 using static Bud.Build;
-using static Bud.IO.FilesObservatory;
 
 namespace Bud.Cli {
   public class BuildTool {
     public static void Main(string[] args) {
       var compilationOutput = CSharp.CSharpProject(Combine(GetCurrentDirectory(), "..", "..", ".."), "BuildConf")
                                     .Add(BudDependencies())
-                                    .Set(Sources, configs => FilesObservatory[configs].ObserveFileList(Combine(ProjectDir[configs], "Build.cs")))
+                                    .Set(Sources, configs => Build.FilesObservatory[configs].ObserveFiles(Combine(ProjectDir[configs], "Build.cs")))
                                     .Get(CSharp.Compilation)
                                     .ToEnumerable()
                                     .First();
@@ -30,7 +30,7 @@ namespace Bud.Cli {
 
     private static IConf LoadBuildConf(CompilationOutput compilationOutput) {
       var assembly = Assembly.LoadFile(compilationOutput.AssemblyPath);
-      var buildDefinitionType = assembly.GetType("Build");
+      var buildDefinitionType = assembly.GetExportedTypes().First(typeof(IBuild).IsAssignableFrom);
       var buildDefinition = (IBuild) buildDefinitionType.GetConstructor(Type.EmptyTypes).Invoke(new object[] {});
       return buildDefinition.Init(GetCurrentDirectory()).ToCachingConfigs();
     }
@@ -43,7 +43,7 @@ namespace Bud.Cli {
     }
 
     private static Conf BudDependencies()
-      => Conf.Empty.Set(CSharp.Dependencies, c => FilesObservatory[c].ObserveAssemblies(
+      => Conf.Empty.Set(CSharp.AssemblyReferences, c => Build.FilesObservatory[c].ObserveAssemblies(
         typeof(BuildTool).Assembly.Location,
         typeof(object).Assembly.Location,
         typeof(Observable).Assembly.Location));

@@ -2,16 +2,16 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using static Bud.IO.FileTimestamps;
 
 namespace Bud.Compilation {
   public class RoslynCSharpCompiler {
     public IConf Conf { get; }
-    private ImmutableDictionary<string, SyntaxTree> syntaxTrees = ImmutableDictionary<string, SyntaxTree>.Empty;
-    private Diff<string> sources = Diff.Empty<string>();
-    private Diff<Dependency> oldDependencies = Diff.Empty<Dependency>();
+    private ImmutableDictionary<Timestamped<string>, SyntaxTree> syntaxTrees = ImmutableDictionary<Timestamped<string>, SyntaxTree>.Empty;
+    private Diff<Timestamped<string>> sources = Diff.Empty<Timestamped<string>>();
+    private Diff<Timestamped<Dependency>> oldDependencies = Diff.Empty<Timestamped<Dependency>>();
     private CSharpCompilation cSharpCompilation;
 
     public RoslynCSharpCompiler(IConf conf) {
@@ -23,8 +23,8 @@ namespace Bud.Compilation {
     }
 
     public CSharpCompilation Compile(CompilationInput input) {
-      sources = sources.NextDiff(ToTimestampedFiles(input.Sources));
-      var newDependencies = oldDependencies.NextDiff(input.Dependencies);
+      sources = sources.NextDiff(input.Sources);
+      var newDependencies = oldDependencies.NextDiff(input.Assemblies);
 
       var addedSources = sources.Added.Select(ToFileSyntaxTreePair).ToList();
       var changedSources = sources.Changed.Select(ToFileSyntaxTreePair).ToList();
@@ -44,16 +44,16 @@ namespace Bud.Compilation {
       return cSharpCompilation;
     }
 
-    private static Dependency GetDependency(Diff<Dependency> dependenciesDiff, Dependency dependency)
+    private static Timestamped<Dependency> GetDependency(Diff<Timestamped<Dependency>> dependenciesDiff, Timestamped<Dependency> dependency)
       => dependenciesDiff.All.TryGetValue(dependency, out dependency) ? dependency : dependency;
 
-    private static KeyValuePair<string, SyntaxTree> ToFileSyntaxTreePair(string s)
-      => new KeyValuePair<string, SyntaxTree>(s, SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s), path: s));
+    private static KeyValuePair<Timestamped<string>, SyntaxTree> ToFileSyntaxTreePair(Timestamped<string> s)
+      => new KeyValuePair<Timestamped<string>, SyntaxTree>(s, SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s.Value), path: s.Value));
 
-    private static MetadataReference ToReference(Dependency dependency)
-      => dependency.MetadataReference;
+    private static MetadataReference ToReference(Timestamped<Dependency> dependency)
+      => dependency.Value.MetadataReference;
 
-    private MetadataReference FindOldReference(Dependency dependency)
-      => GetDependency(oldDependencies, dependency).MetadataReference;
+    private MetadataReference FindOldReference(Timestamped<Dependency> dependency)
+      => GetDependency(oldDependencies, dependency).Value.MetadataReference;
   }
 }

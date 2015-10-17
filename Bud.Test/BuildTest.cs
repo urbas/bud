@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using Bud.Compilation;
 using Bud.IO;
 using NUnit.Framework;
 using static Bud.Build;
@@ -21,9 +23,9 @@ namespace Bud {
       => Assert.AreEqual(Path.GetFileName("bar/moo"), ProjectId[Project("bar/moo")]);
 
     [Test]
-    public void Sources_should_be_empty()
+    public void Dependencies_should_be_empty()
       => Assert.That(Sources[project].ToEnumerable().ToList(),
-                     Is.EquivalentTo(ImmutableArray.Create(Enumerable.Empty<string>())));
+                     Is.EquivalentTo(ImmutableArray.Create(Enumerable.Empty<ITimestamped>())));
 
     [Test]
     public void Multiple_source_directories() {
@@ -31,7 +33,8 @@ namespace Bud {
         var fileA = tempDir.CreateEmptyFile("A", "A.cs");
         var fileB = tempDir.CreateEmptyFile("B", "B.cs");
         var twoDirsProject = Project(tempDir.Path).Add(SourceDir("A"), SourceDir("B"));
-        Assert.That(Sources[twoDirsProject].ToEnumerable().First(), Is.EquivalentTo(new[] {fileA, fileB}));
+        Assert.That(Sources[twoDirsProject].ToEnumerable().First(),
+                    Is.EquivalentTo(new[] {new Timestamped<string>(fileA, DateTimeOffset.Now), new Timestamped<string>(fileB, DateTimeOffset.Now) }));
       }
     }
   }

@@ -8,7 +8,7 @@ using Bud.Pipeline;
 using static Bud.Build;
 using static Bud.CSharp;
 
-public class Build : IBuild {
+public class BudBuild : IBuild {
   public Conf Init(string dir)
     => BudProject.Add(BudTestProject)
                  .Add(CompilationDependency("budTest", "bud"));
@@ -18,14 +18,14 @@ public class Build : IBuild {
   private static readonly Conf BudTestProject = "budTest" / CSharpProject(@"../../../Bud.Test").Add(BudTestDependencies());
 
   public static Conf CompilationDependency(string dependentProject, string dependencyProject)
-    => Conf.Empty.Modify(dependentProject / Dependencies, (configs, existingDependencies) => {
+    => Conf.Empty.Modify(dependentProject / AssemblyReferences, (configs, existingDependencies) => {
       var dependencyCompilation = (dependencyProject / CSharp.Compilation)[configs];
-      var dependency = dependencyCompilation.Select(compilationOutput => new[] {compilationOutput.ToTimestampedDependency()});
-      return existingDependencies.CombineStream(dependency);
+      var dependency = dependencyCompilation.Select(compilationOutput => new Assemblies(new[] {compilationOutput.ToTimestampedDependency()}));
+      return existingDependencies.AddAssemblies(dependency);
     });
 
   private static Conf BudDependencies()
-    => Conf.Empty.Set(Dependencies, c => FilesObservatory[c].ObserveAssemblies(
+    => Conf.Empty.Set(AssemblyReferences, c => Build.FilesObservatory[c].ObserveAssemblies(
       Path.Combine(ProjectDir[c], "../packages/Microsoft.CodeAnalysis.Common.1.1.0-beta1-20150812-01/lib/net45/Microsoft.CodeAnalysis.dll"),
       Path.Combine(ProjectDir[c], "../packages/Microsoft.CodeAnalysis.CSharp.1.1.0-beta1-20150812-01/lib/net45/Microsoft.CodeAnalysis.CSharp.dll"),
       Path.Combine(ProjectDir[c], "../packages/Microsoft.Web.Xdt.2.1.0/lib/net40/Microsoft.Web.XmlTransform.dll"),
@@ -57,7 +57,7 @@ public class Build : IBuild {
       "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/System.Core.dll"));
 
   private static Conf BudTestDependencies()
-    => BudDependencies().Modify(Dependencies, (c, references) => references.CombineStream(FilesObservatory[c].ObserveAssemblies(
+    => BudDependencies().Modify(AssemblyReferences, (c, references) => references.AddAssemblies(Build.FilesObservatory[c].ObserveAssemblies(
       Path.Combine(ProjectDir[c], "../packages/NUnit.2.6.4/lib/nunit.framework.dll"),
       Path.Combine(ProjectDir[c], "../packages/Moq.4.2.1507.0118/lib/net40/Moq.dll"))));
 }

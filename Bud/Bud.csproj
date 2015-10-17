@@ -84,8 +84,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cli\BuildTool.cs" />
+    <Compile Include="Compilation\AssembliesStream.cs" />
     <Compile Include="Compilation\CompilationInput.cs" />
     <Compile Include="Compilation\CompilationOutput.cs" />
+    <Compile Include="Compilation\Assemblies.cs" />
     <Compile Include="Compilation\Dependency.cs" />
     <Compile Include="Compilation\OutputAssemblyKind.cs" />
     <Compile Include="Compilation\DependencyObservatory.cs" />
@@ -97,15 +99,20 @@
     <Compile Include="Configuration\IConfigTransform.cs" />
     <Compile Include="CSharp.cs" />
     <Compile Include="IBuild.cs" />
+    <Compile Include="IO\Diff.cs" />
+    <Compile Include="IO\FileFinder.cs" />
+    <Compile Include="IO\Files.cs" />
     <Compile Include="IO\FilesObservatory.cs" />
+    <Compile Include="IO\FilesStream.cs" />
+    <Compile Include="IO\ITimestamped.cs" />
     <Compile Include="IO\LocalFilesObservatory.cs" />
     <Compile Include="IO\FileTimestamps.cs" />
     <Compile Include="IO\IFilesObservatory.cs" />
     <Compile Include="IO\IFileTimestamps.cs" />
     <Compile Include="IO\EmptyFilesObservatory.cs" />
     <Compile Include="IConf.cs" />
+    <Compile Include="IO\Timestamped.cs" />
     <Compile Include="Key.cs" />
-    <Compile Include="Compilation\Diff.cs" />
     <Compile Include="Pipeline\Streams.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Build.cs" />

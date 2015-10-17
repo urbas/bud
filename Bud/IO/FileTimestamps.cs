@@ -8,7 +8,7 @@ namespace Bud.IO {
   public class FileTimestamps : IFileTimestamps {
     public DateTime GetTimestamp(string file) => File.GetLastWriteTime(file);
 
-    public static IEnumerable<Timestamped<string>> ToTimestampedFiles(IEnumerable<string> files)
-      => files.Select(s => new Timestamped<string>(s, File.GetLastWriteTime(s)));
+    public static IEnumerable<System.Reactive.Timestamped<string>> ToTimestampedFiles(IEnumerable<string> files)
+      => files.Select(s => new System.Reactive.Timestamped<string>(s, File.GetLastWriteTime(s)));
   }
 }

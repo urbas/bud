@@ -22,7 +22,7 @@ namespace Bud.Compilation {
       Reference = reference;
     }
 
-    public Timestamped<Dependency> ToTimestampedDependency()
-      => new Timestamped<Dependency>(new Dependency(AssemblyPath, Reference), Timestamp);
+    public IO.Timestamped<Dependency> ToTimestampedDependency()
+      => new IO.Timestamped<Dependency>(new Dependency(AssemblyPath, Reference), Timestamp);
   }
 }

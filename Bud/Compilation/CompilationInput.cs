@@ -1,17 +1,17 @@
-using System.Collections.Generic;
-using System.Reactive;
+using Bud.IO;
 
 namespace Bud.Compilation {
-  public class CompilationInput {
-    public IEnumerable<string> Sources { get; }
-    public IEnumerable<Timestamped<Dependency>> Dependencies { get; }
-
-    public CompilationInput(IEnumerable<string> sources, IEnumerable<Timestamped<Dependency>> dependencies) {
+  public struct CompilationInput {
+    public CompilationInput(Files sources, Assemblies assemblies) {
       Sources = sources;
-      Dependencies = dependencies;
+      Assemblies = assemblies;
     }
 
-    public static CompilationInput Create(IEnumerable<string> sources, IEnumerable<Timestamped<Dependency>> references)
-      => new CompilationInput(sources, references);
+    public Files Sources { get; }
+    public Assemblies Assemblies { get; }
+
+    public static CompilationInput Create(Files sources, Assemblies dependencies) {
+      return new CompilationInput(sources, dependencies);
+    }
   }
 }
