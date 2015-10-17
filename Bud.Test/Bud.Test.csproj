@@ -99,7 +99,7 @@
     <Compile Include="IO\DiffTest.cs" />
     <Compile Include="IO\LocalFilesObservatoryTest.cs" />
     <Compile Include="IO\FilesObservatoryTest.cs" />
-    <Compile Include="IO\TimestampedTest.cs" />
+    <Compile Include="IO\HashedTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BuildTest.cs" />
   </ItemGroup>

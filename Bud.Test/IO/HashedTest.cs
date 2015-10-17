@@ -1,7 +1,7 @@
 using NUnit.Framework;
 
 namespace Bud.IO {
-  public class TimestampedTest {
+  public class HashedTest {
     private readonly Hashed<int> fooAtTime1 = Hashed.Create(42, 1);
     private readonly Hashed<int> fooAtTime2 = Hashed.Create(42, 2);
     private readonly Hashed<int> barAtTime1 = Hashed.Create(9001, 1);
