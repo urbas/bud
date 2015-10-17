@@ -13,7 +13,7 @@ namespace Bud.Configuration {
     }
 
     public T Get<T>(Key<T> configKey) {
-      var configValue = GetFromCacheOrInvoke(configKey);
+      var configValue = GetFromCacheOrInvoke(configKey.ToAbsolute());
       try {
         return (T) configValue.Value;
       } catch (Exception) {

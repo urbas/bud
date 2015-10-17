@@ -1,7 +1,7 @@
 namespace Bud.Configuration {
   public abstract class ConfigTransform<T> : IConfigTransform {
     protected ConfigTransform(string key) {
-      Key = key;
+      Key = "/" + key;
     }
 
     public string Key { get; }

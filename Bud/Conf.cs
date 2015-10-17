@@ -84,7 +84,7 @@ namespace Bud {
     /// <exception cref="ConfigTypeException">
     ///   thrown if the actual type of the configuration does not match the requested type <typeparamref name="T" />.
     /// </exception>
-    public T Get<T>(Key<T> configKey) => ToCachingConfigs().Get(configKey);
+    public T Get<T>(Key<T> configKey) => ToCachingConfigs().Get(configKey.ToAbsolute());
 
     public CachingConf ToCachingConfigs() => new CachingConf(Bake());
   }

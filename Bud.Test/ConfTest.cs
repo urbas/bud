@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Bud.Configuration;
 using Moq;
 using NUnit.Framework;
+using static Bud.Key;
 
 namespace Bud {
   public class ConfTest {
@@ -62,7 +63,8 @@ namespace Bud {
     public void Throw_when_modifying_a_configuration_that_does_not_yet_exist() {
       var exception = Assert.Throws<ConfigDefinitionException>(
         () => Conf.Empty.Modify(A, (configs, oldConfig) => oldConfig + 1).Bake());
-      Assert.AreEqual(A.Id, exception.Key);
+      Assert.AreEqual(A.ToAbsolute().Id, exception.Key);
+      Assert.That(exception.Message, Contains.Substring(A.Id));
     }
 
     [Test]
@@ -172,6 +174,23 @@ namespace Bud {
                               .Modify(B, (configs, i) => i + C[configs])
                               .In("bar");
       Assert.AreEqual(21, nestedConfigs.Get("bar" / B));
+    }
+
+    [Test]
+    public void Keys_can_access_root_keys() {
+      var nestedConfigs = Conf.Empty
+                              .Init(A, conf => 42 + conf.Get(Root / B))
+                              .Init(B, configs => 1);
+      Assert.AreEqual(43, nestedConfigs.Get(A));
+    }
+
+    [Test]
+    public void Nested_keys_can_access_root_key() {
+      var nestedConfigs = Conf.Empty
+                              .Init(A, conf => 42 + conf.Get(Root / B))
+                              .In("bar")
+                              .Init(B, configs => 1);
+      Assert.AreEqual(43, nestedConfigs.Get("bar" / A));
     }
 
     private static async Task<int> AddFooTwiceConcurrently(IConf tsks) {

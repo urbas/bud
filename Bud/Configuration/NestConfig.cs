@@ -1,6 +1,6 @@
 namespace Bud.Configuration {
   public class NestConfig<T> : ConfigTransform<T> {
-    public NestConfig(string prefix, ConfigTransform<T> configToNest) : base(prefix + "/" + configToNest.Key) {
+    public NestConfig(string prefix, ConfigTransform<T> configToNest) : base(prefix + configToNest.Key) {
       Prefix = prefix;
       ConfigToNest = configToNest;
     }

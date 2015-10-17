@@ -8,6 +8,11 @@ namespace Bud.Configuration {
       this.conf = conf;
     }
 
-    public T Get<T>(Key<T> configKey) => conf.Get<T>(prefix + configKey);
+    public T Get<T>(Key<T> configKey) {
+      if (configKey.IsAbsolute) {
+        return conf.Get(configKey);
+      }
+      return conf.Get<T>(prefix + configKey);
+    }
   }
 }
