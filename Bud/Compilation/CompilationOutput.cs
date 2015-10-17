@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Reactive;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
 
@@ -22,7 +21,7 @@ namespace Bud.Compilation {
       Reference = reference;
     }
 
-    public IO.Hashed<Dependency> ToTimestampedDependency()
-      => new IO.Hashed<Dependency>(new Dependency(AssemblyPath, Reference), Timestamp);
+    public Hashed<AssemblyReference> ToTimestampedDependency()
+      => new Hashed<AssemblyReference>(new AssemblyReference(AssemblyPath, Reference), Timestamp);
   }
 }

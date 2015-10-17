@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using Bud.IO;
 using NUnit.Framework;
 using static Bud.Build;
-using static Bud.IO.Hashed;
 
 namespace Bud {
   public class BuildTest {
@@ -17,9 +16,12 @@ namespace Bud {
     public void Set_the_projectId() => Assert.AreEqual("Foo", ProjectId[project]);
 
     [Test]
-    public void Dependencies_should_be_empty()
+    public void Sources_should_be_initially_empty()
       => Assert.That(Sources[project].ToEnumerable().ToList(),
                      Is.EquivalentTo(ImmutableArray.Create(Enumerable.Empty<IHashed>())));
+    [Test]
+    public void Dependencies_should_be_initially_empty()
+      => Assert.IsEmpty(Dependencies[project]);
 
     [Test]
     public void Multiple_source_directories() {

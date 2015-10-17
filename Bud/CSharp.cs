@@ -30,7 +30,7 @@ namespace Bud {
               .Init(Compile, configs => Compilation[configs].Do(PrintCompilationResult).ToTask())
               .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
               .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
-              .Init(AssemblyReferences, configs => Build.FilesObservatory[configs].ObserveAssemblies(typeof(object).Assembly.Location))
+              .Init(AssemblyReferences, configs => FilesObservatory[configs].ObserveAssemblies(typeof(object).Assembly.Location))
               .Init(CSharpCompiler, TimedEmittingCompiler.Create)
               .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 

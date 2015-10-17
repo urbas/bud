@@ -11,7 +11,7 @@ namespace Bud.Compilation {
     public IConf Conf { get; }
     private ImmutableDictionary<Hashed<string>, SyntaxTree> syntaxTrees = ImmutableDictionary<Hashed<string>, SyntaxTree>.Empty;
     private Diff<Hashed<string>> sources = Diff.Empty<Hashed<string>>();
-    private Diff<Hashed<Dependency>> oldDependencies = Diff.Empty<Hashed<Dependency>>();
+    private Diff<Hashed<AssemblyReference>> oldDependencies = Diff.Empty<Hashed<AssemblyReference>>();
     private CSharpCompilation cSharpCompilation;
 
     public RoslynCSharpCompiler(IConf conf) {
@@ -44,16 +44,16 @@ namespace Bud.Compilation {
       return cSharpCompilation;
     }
 
-    private static Hashed<Dependency> GetDependency(Diff<Hashed<Dependency>> dependenciesDiff, Hashed<Dependency> dependency)
+    private static Hashed<AssemblyReference> GetDependency(Diff<Hashed<AssemblyReference>> dependenciesDiff, Hashed<AssemblyReference> dependency)
       => dependenciesDiff.All.TryGetValue(dependency, out dependency) ? dependency : dependency;
 
     private static KeyValuePair<Hashed<string>, SyntaxTree> ToFileSyntaxTreePair(Hashed<string> s)
       => new KeyValuePair<Hashed<string>, SyntaxTree>(s, SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s.Value), path: s.Value));
 
-    private static MetadataReference ToReference(Hashed<Dependency> dependency)
+    private static MetadataReference ToReference(Hashed<AssemblyReference> dependency)
       => dependency.Value.MetadataReference;
 
-    private MetadataReference FindOldReference(Hashed<Dependency> dependency)
+    private MetadataReference FindOldReference(Hashed<AssemblyReference> dependency)
       => GetDependency(oldDependencies, dependency).Value.MetadataReference;
   }
 }

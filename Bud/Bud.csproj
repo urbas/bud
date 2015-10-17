@@ -87,7 +87,7 @@
     <Compile Include="Compilation\CompilationInput.cs" />
     <Compile Include="Compilation\CompilationOutput.cs" />
     <Compile Include="Compilation\Assemblies.cs" />
-    <Compile Include="Compilation\Dependency.cs" />
+    <Compile Include="Compilation\AssemblyReference.cs" />
     <Compile Include="Compilation\OutputAssemblyKind.cs" />
     <Compile Include="Compilation\DependencyObservatory.cs" />
     <Compile Include="Compilation\RoslynCSharpCompiler.cs" />

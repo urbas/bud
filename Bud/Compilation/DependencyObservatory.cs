@@ -10,7 +10,7 @@ namespace Bud.Compilation {
       => filesObservatory.ObserveFiles(locations)
                          .Select(_ => new Assemblies(locations.Select(ToTimestampedDependency)));
 
-    private static Hashed<Dependency> ToTimestampedDependency(string file)
-      => new Hashed<Dependency>(new Dependency(file, MetadataReference.CreateFromFile(file)), Files.GetTimeHash(file));
+    private static Hashed<AssemblyReference> ToTimestampedDependency(string file)
+      => new Hashed<AssemblyReference>(new AssemblyReference(file, MetadataReference.CreateFromFile(file)), Files.GetTimeHash(file));
   }
 }

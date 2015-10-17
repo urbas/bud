@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using Bud.IO;
@@ -10,12 +11,14 @@ namespace Bud {
     public static readonly Key<string> ProjectDir = nameof(ProjectDir);
     public static readonly Key<string> ProjectId = nameof(ProjectId);
     public static readonly Key<IObservable<Files>> Sources = nameof(Sources);
+    public static readonly Key<IEnumerable<string>> Dependencies = nameof(Dependencies);
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
 
     public static Conf Project(string projectDir, string projectId = null)
-      => Empty.InitConst(Sources, Observable.Return(Files.Empty))
-              .InitConst(ProjectDir, projectDir)
+      => Empty.InitConst(ProjectDir, projectDir)
               .Init(ProjectId, c => projectId ?? GetFileName(ProjectDir[c]))
+              .InitConst(Sources, Observable.Return(Files.Empty))
+              .InitConst(Dependencies, Enumerable.Empty<string>())
               .Init(FilesObservatory, c => new LocalFilesObservatory());
 
     public static Conf SourceDir(string subDir = null, string fileFilter = "*", bool includeSubdirs = true) {
