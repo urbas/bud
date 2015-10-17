@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Reactive.Linq;
 using Bud;
 using Bud.Compilation;

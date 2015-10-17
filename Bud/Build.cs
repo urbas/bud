@@ -22,7 +22,7 @@ namespace Bud {
       return Empty.Modify(Sources, (configs, sources) => {
         var sourceDir = subDir == null ? ProjectDir[configs] : Combine(ProjectDir[configs], subDir);
         var newSources = FilesObservatory[configs].ObserveDir(sourceDir, fileFilter, includeSubdirs);
-        return sources.AddFiles(newSources);
+        return sources.ExpandWith(newSources);
       });
     }
 
@@ -31,7 +31,7 @@ namespace Bud {
         var projectDir = ProjectDir[configs];
         var absolutePaths = relativeFilePaths.Select(relativeFilePath => Combine(projectDir, relativeFilePath));
         var newSources = FilesObservatory[configs].ObserveFiles(absolutePaths);
-        return existingSources.AddFiles(newSources);
+        return existingSources.ExpandWith(newSources);
       });
 
     public static Conf ExcludeSourceDirs(params string[] subDirs)

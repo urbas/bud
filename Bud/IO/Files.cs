@@ -1,10 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
 namespace Bud.IO {
-  public struct Files : IEnumerable<Timestamped<string>> {
+  public struct Files : IEnumerable<Timestamped<string>>, IExpandable<Files>
+  {
     public static readonly Files Empty = new Files(Enumerable.Empty<Timestamped<string>>());
     private readonly IEnumerable<Timestamped<string>> files;
 
@@ -24,5 +26,11 @@ namespace Bud.IO {
 
     private static Timestamped<string> ToTimestampedFile(string path)
       => Timestamped.Create(path, File.GetLastWriteTime(path));
+
+    public Files ExpandWith(Files other)
+      => new Files(files.Concat(other.files));
+
+    public Files Filter(Func<Timestamped<string>, bool> filter)
+      => new Files(files.Where(filter));
   }
 }

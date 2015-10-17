@@ -4,7 +4,7 @@ using System.Linq;
 using Bud.IO;
 
 namespace Bud.Compilation {
-  public struct Assemblies : IEnumerable<Timestamped<Dependency>> {
+  public struct Assemblies : IEnumerable<Timestamped<Dependency>>, IExpandable<Assemblies> {
     public static readonly Assemblies Empty = new Assemblies(Enumerable.Empty<Timestamped<Dependency>>());
     private readonly IEnumerable<Timestamped<Dependency>> files;
 
@@ -14,5 +14,6 @@ namespace Bud.Compilation {
 
     public IEnumerator<Timestamped<Dependency>> GetEnumerator() => files.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public Assemblies ExpandWith(Assemblies other) => new Assemblies(files.Concat(other.files));
   }
 }

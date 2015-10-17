@@ -7,16 +7,16 @@ using System.Reactive.Linq;
 namespace Bud.IO {
   public static class FilesObservatory {
     public static IObservable<Files> ObserveDir(this IFilesObservatory filesObservatory,
-                                                  string sourceDir,
-                                                  string fileFilter,
-                                                  bool includeSubdirs)
+                                                string sourceDir,
+                                                string fileFilter,
+                                                bool includeSubdirs)
       => ObserveDir(filesObservatory, FindFiles, sourceDir, fileFilter, includeSubdirs);
 
     public static IObservable<Files> ObserveDir(this IFilesObservatory filesObservatory,
-                                                  FileFinder fileFinder,
-                                                  string sourceDir,
-                                                  string fileFilter,
-                                                  bool includeSubdirs)
+                                                FileFinder fileFinder,
+                                                string sourceDir,
+                                                string fileFilter,
+                                                bool includeSubdirs)
       => SingletonFilesStream(fileFinder, sourceDir, fileFilter, includeSubdirs)
         .Concat(WatchingFileListStream(filesObservatory, fileFinder, sourceDir, fileFilter, includeSubdirs));
 
