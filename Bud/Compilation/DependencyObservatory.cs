@@ -11,6 +11,6 @@ namespace Bud.Compilation {
                          .Select(_ => new Assemblies(locations.Select(ToTimestampedDependency)));
 
     private static Hashed<Dependency> ToTimestampedDependency(string file)
-      => new Hashed<Dependency>(new Dependency(file, MetadataReference.CreateFromFile(file)), Hashed.GetTimeHash(file));
+      => new Hashed<Dependency>(new Dependency(file, MetadataReference.CreateFromFile(file)), Files.GetTimeHash(file));
   }
 }

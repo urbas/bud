@@ -106,9 +106,7 @@
     <Compile Include="IO\IExpandable.cs" />
     <Compile Include="IO\IHashed.cs" />
     <Compile Include="IO\LocalFilesObservatory.cs" />
-    <Compile Include="IO\FileTimestamps.cs" />
     <Compile Include="IO\IFilesObservatory.cs" />
-    <Compile Include="IO\IFileTimestamps.cs" />
     <Compile Include="IO\EmptyFilesObservatory.cs" />
     <Compile Include="IConf.cs" />
     <Compile Include="IO\Hashed.cs" />

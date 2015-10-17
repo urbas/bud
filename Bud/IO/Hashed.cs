@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 
 namespace Bud.IO {
   public struct Hashed<T> : IHashed {
@@ -18,7 +17,7 @@ namespace Bud.IO {
       if (ReferenceEquals(null, obj)) {
         return false;
       }
-      return (obj is Hashed<T> && Equals((Hashed<T>) obj)) || (obj is T && Value.Equals((T)obj));
+      return (obj is Hashed<T> && Equals((Hashed<T>) obj)) || (obj is T && Value.Equals((T) obj));
     }
 
     public override int GetHashCode()
@@ -43,8 +42,5 @@ namespace Bud.IO {
   public static class Hashed {
     public static Hashed<TValue> Create<TValue>(TValue value, long hash)
       => new Hashed<TValue>(value, hash);
-
-    public static long GetTimeHash(string file)
-      => File.GetLastWriteTime(file).ToFileTime();
   }
 }

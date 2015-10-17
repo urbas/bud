@@ -20,14 +20,8 @@ namespace Bud.IO {
     public IEnumerator<Hashed<string>> GetEnumerator() => files.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public static Files Create(IEnumerable<string> paths)
-      => new Files(paths);
-
     public Files ExpandWith(Files other)
       => new Files(files.Concat(other.files));
-
-    public Files Filter(Func<Hashed<string>, bool> filter)
-      => new Files(files.Where(filter));
 
     public static Hashed<string> ToTimeHashedFile(string path)
       => new Hashed<string>(path, GetTimeHash(path));

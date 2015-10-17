@@ -97,6 +97,7 @@
     <Compile Include="ConfTest.cs" />
     <Compile Include="CSharpTest.cs" />
     <Compile Include="IO\DiffTest.cs" />
+    <Compile Include="IO\FilesTest.cs" />
     <Compile Include="IO\LocalFilesObservatoryTest.cs" />
     <Compile Include="IO\FilesObservatoryTest.cs" />
     <Compile Include="IO\HashedTest.cs" />

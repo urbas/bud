@@ -40,7 +40,7 @@ namespace Bud.Compilation {
                                Stopwatch.Elapsed,
                                OutputAssemblyPath,
                                true,
-                               Hashed.GetTimeHash(OutputAssemblyPath),
+                               Files.GetTimeHash(OutputAssemblyPath),
                                MetadataReference.CreateFromFile(OutputAssemblyPath));
 
     private bool IsOutputUpToDate(CompilationInput compilationInput)
