@@ -144,31 +144,33 @@ namespace Bud {
 
     [Test]
     public void Nesting_prefixes_config_names() {
-      var nestedConfigs = "bar" / Conf.Empty.Const(A, 42);
+      var nestedConfigs = Conf.Empty.Const(A, 42).In("bar");
       Assert.AreEqual(42, nestedConfigs.Get("bar" / A));
     }
 
     [Test]
     public void Nesting_allows_access_to_sibling_configs() {
-      var nestedConfigs = "bar" / Conf.Empty.Set(B, configs => A[configs] + 1)
-                                      .Const(A, 42);
+      var nestedConfigs = Conf.Empty.Set(B, configs => A[configs] + 1)
+                              .Const(A, 42)
+                              .In("bar");
       Assert.AreEqual(43, nestedConfigs.Get("bar" / B));
     }
 
     [Test]
     public void Nested_configs_can_be_modified() {
-      var nestedConfigs = "bar" / Conf.Empty.Const(A, 42);
+      var nestedConfigs = Conf.Empty.Const(A, 42).In("bar");
       var modifiedNestedConfigs = nestedConfigs.Modify("bar" / A, (configs, i) => 58);
       Assert.AreEqual(58, modifiedNestedConfigs.Get("bar" / A));
     }
 
     [Test]
     public void Nesting_with_multiple_modifications() {
-      var nestedConfigs = "bar" / Conf.Empty
-                                      .InitConst(C, 10)
-                                      .Init(B, configs => 1)
-                                      .Modify(B, (configs, i) => i + C[configs])
-                                      .Modify(B, (configs, i) => i + C[configs]);
+      var nestedConfigs = Conf.Empty
+                              .InitConst(C, 10)
+                              .Init(B, configs => 1)
+                              .Modify(B, (configs, i) => i + C[configs])
+                              .Modify(B, (configs, i) => i + C[configs])
+                              .In("bar");
       Assert.AreEqual(21, nestedConfigs.Get("bar" / B));
     }
 

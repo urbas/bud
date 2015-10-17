@@ -19,10 +19,6 @@ namespace Bud {
     public void Set_the_projectId() => Assert.AreEqual("Foo", ProjectId[project]);
 
     [Test]
-    public void Set_the_directory_name_as_the_default_projectId()
-      => Assert.AreEqual(Path.GetFileName("bar/moo"), ProjectId[Project("bar/moo")]);
-
-    [Test]
     public void Dependencies_should_be_empty()
       => Assert.That(Sources[project].ToEnumerable().ToList(),
                      Is.EquivalentTo(ImmutableArray.Create(Enumerable.Empty<ITimestamped>())));
@@ -32,7 +28,7 @@ namespace Bud {
       using (var tempDir = new TemporaryDirectory()) {
         var fileA = tempDir.CreateEmptyFile("A", "A.cs");
         var fileB = tempDir.CreateEmptyFile("B", "B.cs");
-        var twoDirsProject = Project(tempDir.Path).Add(SourceDir("A"), SourceDir("B"));
+        var twoDirsProject = Project(tempDir.Path, "foo").Add(SourceDir("A"), SourceDir("B"));
         Assert.That(Sources[twoDirsProject].ToEnumerable().First(),
                     Is.EquivalentTo(new[] {new Timestamped<string>(fileA, DateTimeOffset.Now), new Timestamped<string>(fileB, DateTimeOffset.Now) }));
       }

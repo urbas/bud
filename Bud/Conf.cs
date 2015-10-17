@@ -62,8 +62,8 @@ namespace Bud {
       => otherConf.Aggregate(this, (aggregatedConf, conf) => new Conf(aggregatedConf.Concat(conf)));
 
     /// <returns>a copy of self with every configuration key prefixed with <paramref name="prefix" />.</returns>
-    public static Conf operator /(string prefix, Conf conf)
-      => new Conf(conf.Select(configTransform => configTransform.Nest(prefix)));
+    public Conf In(string prefix)
+      => new Conf(this.Select(configTransform => configTransform.Nest(prefix)));
 
     public IDictionary<string, IConfigDefinition> Bake() {
       var configDefinitions = new Dictionary<string, IConfigDefinition>();

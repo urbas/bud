@@ -32,11 +32,39 @@ namespace Bud.IO {
       => Assert.IsFalse(barAtTime1 == fooAtTime1);
 
     [Test]
-    public void Hash_equals_when_values_hashes_equal()
-      => Assert.AreEqual(fooAtTime1.GetHashCode(), fooAtTime2.GetHashCode());
+    public void Operator_not_equals_is_false_when_values_equal()
+      => Assert.IsFalse(fooAtTime1 != fooAtTime2);
 
     [Test]
-    public void Hash_differs_when_values_hashes_differ()
-      => Assert.AreNotEqual(fooAtTime1.GetHashCode(), barAtTime1.GetHashCode());
+    public void Operator_not_equals_is_true_when_values_differ()
+      => Assert.IsTrue(barAtTime1 != fooAtTime1);
+
+    [Test]
+    public void Hash_equals_the_hash_to_value()
+      => Assert.AreEqual(fooAtTime1.GetHashCode(), fooAtTime1.Value.GetHashCode());
+
+    [Test]
+    public void Equals_to_own_value()
+      => Assert.IsTrue(fooAtTime1.Equals(fooAtTime1.Value));
+
+    [Test]
+    public void Not_equals_to_different_value()
+      => Assert.IsFalse(fooAtTime1.Equals(barAtTime1.Value));
+
+    [Test]
+    public void Operator_equals_is_true_when_value_equals()
+      => Assert.IsTrue(fooAtTime1 == fooAtTime1.Value);
+
+    [Test]
+    public void Operator_equals_is_false_when_value_differs()
+      => Assert.IsFalse(fooAtTime1 == barAtTime1.Value);
+
+    [Test]
+    public void Operator_not_equals_is_false_when_value_equals()
+      => Assert.IsFalse(fooAtTime1 != fooAtTime1.Value);
+
+    [Test]
+    public void Operator_not_equals_is_false_when_value_differs()
+      => Assert.IsTrue(fooAtTime1 != barAtTime1.Value);
   }
 }

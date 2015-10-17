@@ -1,10 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 using Bud.Compilation;
-using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Path;
@@ -21,7 +19,7 @@ namespace Bud {
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
 
-    public static Conf CSharpProject(string projectDir, string projectId = null)
+    public static Conf CSharpProject(string projectDir, string projectId, params Conf[] additionalConfs)
       => Project(projectDir, projectId)
         .Add(SourceDir(fileFilter: "*.cs"))
         .Add(ExcludeSourceDirs("obj", "bin", "target"))

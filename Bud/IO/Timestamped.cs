@@ -19,7 +19,7 @@ namespace Bud.IO {
       if (ReferenceEquals(null, obj)) {
         return false;
       }
-      return obj is Timestamped<T> && Equals((Timestamped<T>) obj);
+      return (obj is Timestamped<T> && Equals((Timestamped<T>) obj)) || (obj is T && Value.Equals((T)obj));
     }
 
     public override int GetHashCode()
@@ -30,6 +30,12 @@ namespace Bud.IO {
 
     public static bool operator !=(Timestamped<T> left, Timestamped<T> right)
       => !left.Equals(right);
+
+    public static bool operator ==(Timestamped<T> left, T right)
+      => left.Value.Equals(right);
+
+    public static bool operator !=(Timestamped<T> left, T right)
+      => !left.Value.Equals(right);
 
     public override string ToString()
       => $"Timestamped(Value: {Value}, {Timestamp})";

@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -45,8 +43,10 @@ namespace Bud.IO {
     }
 
     [Test]
-    public void Listing_individual_files_should_produce_the_first_observation()
-      => Assert.That(noFileChanges.ObserveFiles(Path.Combine(tempDir.Path, "B")).ToEnumerable().First(),
-                     Is.EquivalentTo(ImmutableArray.Create(new[] {Path.Combine(tempDir.Path, "B")})));
+    public void Listing_individual_files_should_produce_the_first_observation() {
+      var fileB = Path.Combine(tempDir.Path, "B");
+      Assert.That(noFileChanges.ObserveFiles(fileB).ToEnumerable().First(),
+                  Is.EquivalentTo(new[] { Timestamped.CreateFromFile(fileB) }));
+    }
   }
 }
