@@ -19,7 +19,7 @@ namespace Bud {
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
 
-    public static Conf CSharpProject(string projectDir, string projectId, params Conf[] additionalConfs)
+    public static Conf CSharpProject(string projectDir, string projectId)
       => Project(projectDir, projectId)
         .Add(SourceDir(fileFilter: "*.cs"))
         .Add(ExcludeSourceDirs("obj", "bin", "target"))

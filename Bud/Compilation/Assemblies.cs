@@ -4,15 +4,15 @@ using System.Linq;
 using Bud.IO;
 
 namespace Bud.Compilation {
-  public struct Assemblies : IEnumerable<Timestamped<Dependency>>, IExpandable<Assemblies> {
-    public static readonly Assemblies Empty = new Assemblies(Enumerable.Empty<Timestamped<Dependency>>());
-    private readonly IEnumerable<Timestamped<Dependency>> files;
+  public struct Assemblies : IEnumerable<Hashed<Dependency>>, IExpandable<Assemblies> {
+    public static readonly Assemblies Empty = new Assemblies(Enumerable.Empty<Hashed<Dependency>>());
+    private readonly IEnumerable<Hashed<Dependency>> files;
 
-    public Assemblies(IEnumerable<Timestamped<Dependency>> files) {
+    public Assemblies(IEnumerable<Hashed<Dependency>> files) {
       this.files = files;
     }
 
-    public IEnumerator<Timestamped<Dependency>> GetEnumerator() => files.GetEnumerator();
+    public IEnumerator<Hashed<Dependency>> GetEnumerator() => files.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
     public Assemblies ExpandWith(Assemblies other) => new Assemblies(files.Concat(other.files));
   }

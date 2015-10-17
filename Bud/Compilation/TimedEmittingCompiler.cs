@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Reactive;
+using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
@@ -26,7 +26,7 @@ namespace Bud.Compilation {
 
     public CompilationOutput Compile(CompilationInput compilationInput) {
       Stopwatch.Restart();
-      if (IsCompilationUpToDate(compilationInput)) {
+      if (IsOutputUpToDate(compilationInput)) {
         return CreateOutputFromAssembly();
       }
       return EmitDllAndPrintResult(UnderlyingCompiler(compilationInput), Stopwatch);
@@ -40,21 +40,16 @@ namespace Bud.Compilation {
                                Stopwatch.Elapsed,
                                OutputAssemblyPath,
                                true,
-                               File.GetLastWriteTime(OutputAssemblyPath),
+                               Hashed.GetTimeHash(OutputAssemblyPath),
                                MetadataReference.CreateFromFile(OutputAssemblyPath));
 
-    private bool IsCompilationUpToDate(CompilationInput compilationInput)
+    private bool IsOutputUpToDate(CompilationInput compilationInput)
       => File.Exists(OutputAssemblyPath) &&
          IsFileUpToDate(OutputAssemblyPath, compilationInput.Sources) &&
          IsFileUpToDate(OutputAssemblyPath, compilationInput.Assemblies);
 
-    private static bool IsFileUpToDate<T>(string file, IEnumerable<IO.Timestamped<T>> otherResources)
-      => otherResources.Any() &&
-         File.GetLastWriteTime(file) >= otherResources.Select(timestamped => timestamped.Timestamp).Max();
-
-    private static bool IsFileUpToDate(string file, IEnumerable<string> otherFiles)
-      => otherFiles.Any() &&
-         File.GetLastWriteTime(file) >= otherFiles.Select(File.GetLastWriteTime).Max();
+    private static bool IsFileUpToDate<T>(string file, IEnumerable<Hashed<T>> otherResources)
+      => !otherResources.All(hashed => Files.TimeHashEquals(hashed, file));
 
     private CompilationOutput EmitDllAndPrintResult(CSharpCompilation compilation, Stopwatch stopwatch) {
       Directory.CreateDirectory(Path.GetDirectoryName(OutputAssemblyPath));
@@ -67,7 +62,7 @@ namespace Bud.Compilation {
                                    stopwatch.Elapsed,
                                    OutputAssemblyPath,
                                    emitResult.Success,
-                                   DateTime.Now,
+                                   Files.GetTimeHash(),
                                    compilation.ToMetadataReference());
     }
   }

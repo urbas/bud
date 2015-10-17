@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using Bud.IO;
@@ -12,7 +10,7 @@ namespace Bud.Compilation {
       => filesObservatory.ObserveFiles(locations)
                          .Select(_ => new Assemblies(locations.Select(ToTimestampedDependency)));
 
-    private static Timestamped<Dependency> ToTimestampedDependency(string file)
-      => new Timestamped<Dependency>(new Dependency(file, MetadataReference.CreateFromFile(file)), File.GetLastWriteTime(file));
+    private static Hashed<Dependency> ToTimestampedDependency(string file)
+      => new Hashed<Dependency>(new Dependency(file, MetadataReference.CreateFromFile(file)), Hashed.GetTimeHash(file));
   }
 }

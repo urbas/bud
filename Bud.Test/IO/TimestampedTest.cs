@@ -1,11 +1,10 @@
-using System;
 using NUnit.Framework;
 
 namespace Bud.IO {
   public class TimestampedTest {
-    private readonly Timestamped<int> fooAtTime1 = Timestamped.Create(42, DateTimeOffset.FromFileTime(1));
-    private readonly Timestamped<int> fooAtTime2 = Timestamped.Create(42, DateTimeOffset.FromFileTime(2));
-    private readonly Timestamped<int> barAtTime1 = Timestamped.Create(9001, DateTimeOffset.FromFileTime(1));
+    private readonly Hashed<int> fooAtTime1 = Hashed.Create(42, 1);
+    private readonly Hashed<int> fooAtTime2 = Hashed.Create(42, 2);
+    private readonly Hashed<int> barAtTime1 = Hashed.Create(9001, 1);
 
     [Test]
     public void Contains_timestamped_value()
@@ -13,7 +12,7 @@ namespace Bud.IO {
 
     [Test]
     public void Contains_timestamp()
-      => Assert.AreEqual(DateTimeOffset.FromFileTime(1), fooAtTime1.Timestamp);
+      => Assert.AreEqual(1, fooAtTime1.Hash);
 
     [Test]
     public void Equals_when_values_equal()

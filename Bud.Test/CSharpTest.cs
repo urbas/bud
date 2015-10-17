@@ -25,14 +25,14 @@ namespace Bud {
     public void CSharp_sources_must_be_listed() {
       var sourceFile = tempDir.CreateEmptyFile("TestMainClass.cs");
       Assert.That(Sources[cSharpProject].ToEnumerable().First(),
-                  Contains.Item(Timestamped.CreateFromFile(sourceFile)));
+                  Contains.Item(Files.ToTimeHashedFile(sourceFile)));
     }
 
     [Test]
     public void CSharp_sources_in_nested_directories_must_be_listed() {
       var sourceFile = tempDir.CreateEmptyFile("Bud", "TestMainClass.cs");
       Assert.That(Sources[cSharpProject].ToEnumerable().First(),
-                  Contains.Item(Timestamped.CreateFromFile(sourceFile)));
+                  Contains.Item(Files.ToTimeHashedFile(sourceFile)));
     }
 
     [Test]

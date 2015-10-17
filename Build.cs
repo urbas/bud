@@ -9,9 +9,9 @@ public class BudBuild : IBuild {
     => BudProject.Add(BudTestProject)
                  .Add(CompilationDependency("budTest", "bud"));
 
-  private static readonly Conf BudProject = CSharp.CSharpProject(@"../../../Bud", "bud", BudDependencies());
+  private static readonly Conf BudProject = CSharp.CSharpProject(@"../../../Bud", "bud").Add(BudDependencies()).In("bud");
 
-  private static readonly Conf BudTestProject = CSharp.CSharpProject(@"../../../Bud.Test", "budTest", BudTestDependencies());
+  private static readonly Conf BudTestProject = CSharp.CSharpProject(@"../../../Bud.Test", "budTest").Add(BudTestDependencies()).In("budTest");
 
   public static Conf CompilationDependency(string dependentProject, string dependencyProject)
     => Conf.Empty.Modify(dependentProject / CSharp.AssemblyReferences, (configs, assemblyReferences) => {

@@ -7,13 +7,13 @@ using Microsoft.CodeAnalysis;
 namespace Bud.Compilation {
   public class CompilationOutput {
     public MetadataReference Reference { get; }
-    public DateTime Timestamp { get; }
+    public long Timestamp { get; }
     public IEnumerable<Diagnostic> Diagnostics { get; }
     public TimeSpan CompilationTime { get; }
     public string AssemblyPath { get; }
     public bool Success { get; }
 
-    public CompilationOutput(IEnumerable<Diagnostic> diagnostics, TimeSpan compilationTime, string assemblyPath, bool success, DateTime timestamp, MetadataReference reference) {
+    public CompilationOutput(IEnumerable<Diagnostic> diagnostics, TimeSpan compilationTime, string assemblyPath, bool success, long timestamp, MetadataReference reference) {
       Diagnostics = diagnostics;
       CompilationTime = compilationTime;
       AssemblyPath = assemblyPath;
@@ -22,7 +22,7 @@ namespace Bud.Compilation {
       Reference = reference;
     }
 
-    public IO.Timestamped<Dependency> ToTimestampedDependency()
-      => new IO.Timestamped<Dependency>(new Dependency(AssemblyPath, Reference), Timestamp);
+    public IO.Hashed<Dependency> ToTimestampedDependency()
+      => new IO.Hashed<Dependency>(new Dependency(AssemblyPath, Reference), Timestamp);
   }
 }

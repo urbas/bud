@@ -46,7 +46,7 @@ namespace Bud.IO {
     public void Listing_individual_files_should_produce_the_first_observation() {
       var fileB = Path.Combine(tempDir.Path, "B");
       Assert.That(noFileChanges.ObserveFiles(fileB).ToEnumerable().First(),
-                  Is.EquivalentTo(new[] { Timestamped.CreateFromFile(fileB) }));
+                  Is.EquivalentTo(new[] { Files.ToTimeHashedFile(fileB) }));
     }
   }
 }

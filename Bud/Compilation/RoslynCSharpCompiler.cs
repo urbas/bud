@@ -9,9 +9,9 @@ using Microsoft.CodeAnalysis.CSharp;
 namespace Bud.Compilation {
   public class RoslynCSharpCompiler {
     public IConf Conf { get; }
-    private ImmutableDictionary<Timestamped<string>, SyntaxTree> syntaxTrees = ImmutableDictionary<Timestamped<string>, SyntaxTree>.Empty;
-    private Diff<Timestamped<string>> sources = Diff.Empty<Timestamped<string>>();
-    private Diff<Timestamped<Dependency>> oldDependencies = Diff.Empty<Timestamped<Dependency>>();
+    private ImmutableDictionary<Hashed<string>, SyntaxTree> syntaxTrees = ImmutableDictionary<Hashed<string>, SyntaxTree>.Empty;
+    private Diff<Hashed<string>> sources = Diff.Empty<Hashed<string>>();
+    private Diff<Hashed<Dependency>> oldDependencies = Diff.Empty<Hashed<Dependency>>();
     private CSharpCompilation cSharpCompilation;
 
     public RoslynCSharpCompiler(IConf conf) {
@@ -44,16 +44,16 @@ namespace Bud.Compilation {
       return cSharpCompilation;
     }
 
-    private static Timestamped<Dependency> GetDependency(Diff<Timestamped<Dependency>> dependenciesDiff, Timestamped<Dependency> dependency)
+    private static Hashed<Dependency> GetDependency(Diff<Hashed<Dependency>> dependenciesDiff, Hashed<Dependency> dependency)
       => dependenciesDiff.All.TryGetValue(dependency, out dependency) ? dependency : dependency;
 
-    private static KeyValuePair<Timestamped<string>, SyntaxTree> ToFileSyntaxTreePair(Timestamped<string> s)
-      => new KeyValuePair<Timestamped<string>, SyntaxTree>(s, SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s.Value), path: s.Value));
+    private static KeyValuePair<Hashed<string>, SyntaxTree> ToFileSyntaxTreePair(Hashed<string> s)
+      => new KeyValuePair<Hashed<string>, SyntaxTree>(s, SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s.Value), path: s.Value));
 
-    private static MetadataReference ToReference(Timestamped<Dependency> dependency)
+    private static MetadataReference ToReference(Hashed<Dependency> dependency)
       => dependency.Value.MetadataReference;
 
-    private MetadataReference FindOldReference(Timestamped<Dependency> dependency)
+    private MetadataReference FindOldReference(Hashed<Dependency> dependency)
       => GetDependency(oldDependencies, dependency).Value.MetadataReference;
   }
 }
