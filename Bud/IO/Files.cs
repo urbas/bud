@@ -7,12 +7,12 @@ namespace Bud.IO {
   public class Files : WatchedResources<string> {
     public static readonly Files Empty = new Files(WatchedResources<string>.Empty);
 
-    public Files(Func<IEnumerable<string>> fileEnumerationFactory,
-                 Func<IObservable<FileSystemEventArgs>> fileWatcherFactory)
-      : base(fileEnumerationFactory, fileWatcherFactory) {}
+    public Files(IEnumerable<string> fileEnumerationFactory,
+                 IObservable<FileSystemEventArgs> fileWatcher)
+      : base(fileEnumerationFactory, fileWatcher) {}
 
     public Files(IEnumerable<string> files)
-      : this(() => files, Observable.Empty<FileSystemEventArgs>) {}
+      : this(files, Observable.Empty<FileSystemEventArgs>()) {}
 
     public Files(WatchedResources<string> files) : base(files) {}
 

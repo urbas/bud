@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
@@ -34,12 +35,6 @@ namespace Bud.IO {
     [Test]
     public void Throws_for_non_existing_folders()
       => Assert.Throws<DirectoryNotFoundException>(() => noFileChanges.ObserveDir(Path.Combine(tempDir.Path, "B"), "*.txt", true).ToList());
-
-    [Test]
-    public void Observation_does_not_enumerate_the_files_if_nobody_pulls() {
-      var fileEnumerator = new Mock<FileFinder>(MockBehavior.Strict);
-      noFileChanges.ObserveDir(fileEnumerator.Object, Path.Combine(tempDir.Path, "B"), "*.txt", true).Watch().ToEnumerable();
-    }
 
     [Test]
     public void Listing_individual_files_should_produce_the_first_observation() {
