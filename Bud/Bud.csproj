@@ -110,6 +110,7 @@
     <Compile Include="IO\EmptyFilesObservatory.cs" />
     <Compile Include="IConf.cs" />
     <Compile Include="IO\Hashed.cs" />
+    <Compile Include="IO\WatchedResources.cs" />
     <Compile Include="Key.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Build.cs" />

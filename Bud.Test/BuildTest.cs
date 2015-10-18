@@ -17,8 +17,8 @@ namespace Bud {
 
     [Test]
     public void Sources_should_be_initially_empty()
-      => Assert.That(Sources[project].ToEnumerable().ToList(),
-                     Is.EquivalentTo(ImmutableArray.Create(Enumerable.Empty<IHashed>())));
+      => Assert.IsEmpty(Sources[project]);
+
     [Test]
     public void Dependencies_should_be_initially_empty()
       => Assert.IsEmpty(Dependencies[project]);
@@ -29,7 +29,7 @@ namespace Bud {
         var fileA = tempDir.CreateEmptyFile("A", "A.cs");
         var fileB = tempDir.CreateEmptyFile("B", "B.cs");
         var twoDirsProject = Project(tempDir.Path, "foo").Add(SourceDir("A"), SourceDir("B"));
-        Assert.That(Sources[twoDirsProject].ToEnumerable().First(),
+        Assert.That(Sources[twoDirsProject],
                     Is.EquivalentTo(new[] {Files.ToTimeHashedFile(fileA), Files.ToTimeHashedFile(fileB)}));
       }
     }

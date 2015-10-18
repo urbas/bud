@@ -12,7 +12,7 @@ using static Bud.Conf;
 namespace Bud {
   public static class CSharp {
     public static readonly Key<Task> Compile = nameof(Compile);
-    public static readonly Key<IObservable<Assemblies>> AssemblyReferences = nameof(AssemblyReferences);
+    public static readonly Key<Assemblies> AssemblyReferences = nameof(AssemblyReferences);
     public static readonly Key<IObservable<CompilationOutput>> Compilation = nameof(Compilation);
     public static readonly Key<Func<CompilationInput, CompilationOutput>> CSharpCompiler = nameof(CSharpCompiler);
     public static readonly Key<string> OutputDir = nameof(OutputDir);
@@ -30,7 +30,7 @@ namespace Bud {
               .Init(Compile, configs => Compilation[configs].Do(PrintCompilationResult).ToTask())
               .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
               .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
-              .Init(AssemblyReferences, configs => FilesObservatory[configs].ObserveAssemblies(typeof(object).Assembly.Location))
+              .Init(AssemblyReferences, configs => DependencyObservatory.ObserveAssemblies(typeof(object).Assembly.Location))
               .Init(CSharpCompiler, TimedEmittingCompiler.Create)
               .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -45,9 +45,12 @@ namespace Bud {
       }
     }
 
-    private static IObservable<CompilationOutput> DefaultCompilation(IConf conf)
-      => Sources[conf].CombineLatest(AssemblyReferences[conf], CompilationInput.Create)
-                      .Sample(TimeSpan.FromMilliseconds(25))
-                      .Select(CSharpCompiler[conf]);
+    private static IObservable<CompilationOutput> DefaultCompilation(IConf conf) {
+      var watchedSources = Sources[conf].Watch();
+      var watchedAssemblies = AssemblyReferences[conf].Watch();
+      return watchedSources.CombineLatest(watchedAssemblies, CompilationInput.Create)
+                           .Sample(TimeSpan.FromMilliseconds(25))
+                           .Select(CSharpCompiler[conf]);
+    }
   }
 }

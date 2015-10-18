@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Bud.IO {
-  public delegate Files FileFinder(string sourceDir, string fileFilter, bool includeSubdirs);
+  public delegate IEnumerable<string> FileFinder(string sourceDir, string fileFilter, bool includeSubdirs);
 }

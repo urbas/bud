@@ -1,27 +1,34 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
 
 namespace Bud.IO {
-  public struct Files : IEnumerable<Hashed<string>>, IExpandable<Files> {
-    public static readonly Files Empty = new Files(Enumerable.Empty<Hashed<string>>());
-    private readonly IEnumerable<Hashed<string>> files;
+  public class Files : WatchedResources<Hashed<string>> {
+    public static readonly Files Empty = new Files(WatchedResources<Hashed<string>>.Empty);
 
-    public Files(IEnumerable<Hashed<string>> files) {
-      this.files = files;
-    }
+    public Files(Func<IEnumerable<Hashed<string>>> fileEnumerationFactory,
+                 Func<IObservable<FileSystemEventArgs>> fileWatcherFactory)
+      : base(fileEnumerationFactory, fileWatcherFactory) {}
 
-    public Files(IEnumerable<string> files) {
-      this.files = files.Select(ToTimeHashedFile);
-    }
+    public Files(Func<IEnumerable<string>> fileEnumerationFactory,
+                 Func<IObservable<FileSystemEventArgs>> fileWatcherFactory)
+      : this(() => fileEnumerationFactory().Select(ToTimeHashedFile), fileWatcherFactory) {}
 
-    public IEnumerator<Hashed<string>> GetEnumerator() => files.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    public Files(IEnumerable<Hashed<string>> files)
+      : this(() => files, Observable.Empty<FileSystemEventArgs>) {}
+
+    public Files(WatchedResources<Hashed<string>> files) : base(files) {}
 
     public Files ExpandWith(Files other)
-      => new Files(files.Concat(other.files));
+      => new Files(base.ExpandWith(other));
+
+    public new Files WithFilter(Func<Hashed<string>, bool> filter)
+      => new Files(base.WithFilter(filter));
+
+    public new IObservable<Files> Watch()
+      => base.Watch().Select(_ => this);
 
     public static Hashed<string> ToTimeHashedFile(string path)
       => new Hashed<string>(path, GetTimeHash(path));

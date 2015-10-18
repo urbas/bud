@@ -43,7 +43,7 @@ namespace Bud.Cli {
     }
 
     private static Conf BudDependencies()
-      => Conf.Empty.Set(CSharp.AssemblyReferences, c => Build.FilesObservatory[c].ObserveAssemblies(
+      => Conf.Empty.Set(CSharp.AssemblyReferences, c => DependencyObservatory.ObserveAssemblies(
         typeof(BuildTool).Assembly.Location,
         typeof(object).Assembly.Location,
         typeof(Observable).Assembly.Location));

@@ -1,19 +1,26 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using Bud.IO;
 
 namespace Bud.Compilation {
-  public struct Assemblies : IEnumerable<Hashed<AssemblyReference>>, IExpandable<Assemblies> {
+  public class Assemblies : WatchedResources<Hashed<AssemblyReference>> {
     public static readonly Assemblies Empty = new Assemblies(Enumerable.Empty<Hashed<AssemblyReference>>());
-    private readonly IEnumerable<Hashed<AssemblyReference>> files;
 
-    public Assemblies(IEnumerable<Hashed<AssemblyReference>> files) {
-      this.files = files;
-    }
+    public Assemblies(IEnumerable<Hashed<AssemblyReference>> files)
+      : base(() => files, Observable.Empty<object>) {}
 
-    public IEnumerator<Hashed<AssemblyReference>> GetEnumerator() => files.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-    public Assemblies ExpandWith(Assemblies other) => new Assemblies(files.Concat(other.files));
+    public Assemblies(WatchedResources<Hashed<AssemblyReference>> watchedResources)
+      : base(watchedResources) { }
+
+    public Assemblies ExpandWith(Assemblies other)
+      => new Assemblies(base.ExpandWith(other));
+
+    public new Assemblies WithFilter(Func<Hashed<AssemblyReference>, bool> filter)
+      => new Assemblies(base.WithFilter(filter));
+
+    public new IObservable<Assemblies> Watch()
+      => base.Watch().Select(_ => this);
   }
 }

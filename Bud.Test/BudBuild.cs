@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using Bud;
 using Bud.Compilation;
@@ -16,12 +17,12 @@ public class BudBuild : IBuild {
   public static Conf CompilationDependency(string dependentProject, string dependencyProject)
     => Conf.Empty.Modify(dependentProject / CSharp.AssemblyReferences, (configs, assemblyReferences) => {
       var dependencyCompilation = (dependencyProject / CSharp.Compilation)[configs];
-      var dependency = dependencyCompilation.Select(compilationOutput => new Assemblies(new[] {compilationOutput.ToTimestampedDependency()}));
+      var dependency = new Assemblies(new[] { dependencyCompilation.ToEnumerable().First().ToTimestampedDependency() });
       return assemblyReferences.ExpandWith(dependency);
     });
 
   private static Conf BudDependencies()
-    => Conf.Empty.Set(CSharp.AssemblyReferences, c => Build.FilesObservatory[c].ObserveAssemblies(
+    => Conf.Empty.Set(CSharp.AssemblyReferences, c => DependencyObservatory.ObserveAssemblies(
       Path.Combine(Build.ProjectDir[c], "../packages/Microsoft.CodeAnalysis.Common.1.1.0-beta1-20150812-01/lib/net45/Microsoft.CodeAnalysis.dll"),
       Path.Combine(Build.ProjectDir[c], "../packages/Microsoft.CodeAnalysis.CSharp.1.1.0-beta1-20150812-01/lib/net45/Microsoft.CodeAnalysis.CSharp.dll"),
       Path.Combine(Build.ProjectDir[c], "../packages/Microsoft.Web.Xdt.2.1.0/lib/net40/Microsoft.Web.XmlTransform.dll"),
@@ -53,7 +54,7 @@ public class BudBuild : IBuild {
       "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/System.Core.dll"));
 
   private static Conf BudTestDependencies()
-    => BudDependencies().Modify(CSharp.AssemblyReferences, (c, references) => references.ExpandWith(Build.FilesObservatory[c].ObserveAssemblies(
+    => BudDependencies().Modify(CSharp.AssemblyReferences, (c, references) => references.ExpandWith(DependencyObservatory.ObserveAssemblies(
       Path.Combine(Build.ProjectDir[c], "../packages/NUnit.2.6.4/lib/nunit.framework.dll"),
       Path.Combine(Build.ProjectDir[c], "../packages/Moq.4.2.1507.0118/lib/net40/Moq.dll"))));
 }

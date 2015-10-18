@@ -23,21 +23,21 @@ namespace Bud {
     [Test]
     public void CSharp_sources_must_be_listed() {
       var sourceFile = tempDir.CreateEmptyFile("TestMainClass.cs");
-      Assert.That(Sources[cSharpProject].ToEnumerable().First(),
+      Assert.That(Sources[cSharpProject],
                   Contains.Item(Files.ToTimeHashedFile(sourceFile)));
     }
 
     [Test]
     public void CSharp_sources_in_nested_directories_must_be_listed() {
       var sourceFile = tempDir.CreateEmptyFile("Bud", "TestMainClass.cs");
-      Assert.That(Sources[cSharpProject].ToEnumerable().First(),
+      Assert.That(Sources[cSharpProject],
                   Contains.Item(Files.ToTimeHashedFile(sourceFile)));
     }
 
     [Test]
     public void Non_csharp_files_must_not_be_listed() {
       var textFile = tempDir.CreateEmptyFile("Bud", "TextFile.txt");
-      Assert.That(Sources[cSharpProject].ToEnumerable().First(),
+      Assert.That(Sources[cSharpProject],
                   Is.Not.Contains(textFile));
     }
   }

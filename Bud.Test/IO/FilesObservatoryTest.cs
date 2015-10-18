@@ -21,30 +21,30 @@ namespace Bud.IO {
 
     [Test]
     public void List_files_in_the_folder()
-      => Assert.That(noFileChanges.ObserveDir(tempDir.Path, "*.txt", true).ToEnumerable().First(), Contains.Item(fileA));
+      => Assert.That(noFileChanges.ObserveDir(tempDir.Path, "*.txt", true), Contains.Item(fileA));
 
     [Test]
     public void Do_not_list_filtered_files()
-      => Assert.IsEmpty(noFileChanges.ObserveDir(tempDir.Path, "*.cs", true).ToEnumerable().First());
+      => Assert.IsEmpty(noFileChanges.ObserveDir(tempDir.Path, "*.cs", true));
 
     [Test]
     public void Do_not_list_in_subfolders()
-      => Assert.IsEmpty(noFileChanges.ObserveDir(tempDir.Path, "*.txt", false).ToEnumerable().First());
+      => Assert.IsEmpty(noFileChanges.ObserveDir(tempDir.Path, "*.txt", false));
 
     [Test]
     public void Throws_for_non_existing_folders()
-      => Assert.Throws<DirectoryNotFoundException>(() => noFileChanges.ObserveDir(Path.Combine(tempDir.Path, "B"), "*.txt", true).ToEnumerable().First());
+      => Assert.Throws<DirectoryNotFoundException>(() => noFileChanges.ObserveDir(Path.Combine(tempDir.Path, "B"), "*.txt", true).ToList());
 
     [Test]
     public void Observation_does_not_enumerate_the_files_if_nobody_pulls() {
       var fileEnumerator = new Mock<FileFinder>(MockBehavior.Strict);
-      noFileChanges.ObserveDir(fileEnumerator.Object, Path.Combine(tempDir.Path, "B"), "*.txt", true).ToEnumerable();
+      noFileChanges.ObserveDir(fileEnumerator.Object, Path.Combine(tempDir.Path, "B"), "*.txt", true).Watch().ToEnumerable();
     }
 
     [Test]
     public void Listing_individual_files_should_produce_the_first_observation() {
       var fileB = Path.Combine(tempDir.Path, "B");
-      Assert.That(noFileChanges.ObserveFiles(fileB).ToEnumerable().First(),
+      Assert.That(noFileChanges.ObserveFiles(fileB).Watch().ToEnumerable().First(),
                   Is.EquivalentTo(new[] { Files.ToTimeHashedFile(fileB) }));
     }
   }
