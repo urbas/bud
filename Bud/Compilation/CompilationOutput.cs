@@ -21,7 +21,7 @@ namespace Bud.Compilation {
       Reference = reference;
     }
 
-    public Hashed<AssemblyReference> ToTimestampedDependency()
-      => new Hashed<AssemblyReference>(new AssemblyReference(AssemblyPath, Reference), Timestamp);
+    public AssemblyReference ToAssemblyReference()
+      => new AssemblyReference(AssemblyPath, Reference);
   }
 }

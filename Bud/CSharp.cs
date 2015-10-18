@@ -30,7 +30,7 @@ namespace Bud {
               .Init(Compile, configs => Compilation[configs].Do(PrintCompilationResult).ToTask())
               .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
               .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
-              .Init(AssemblyReferences, configs => DependencyObservatory.ObserveAssemblies(typeof(object).Assembly.Location))
+              .Init(AssemblyReferences, configs => new Assemblies(new[] {typeof(object).Assembly.Location}))
               .Init(CSharpCompiler, TimedEmittingCompiler.Create)
               .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -48,9 +48,9 @@ namespace Bud {
     private static IObservable<CompilationOutput> DefaultCompilation(IConf conf) {
       var watchedSources = Sources[conf].Watch();
       var watchedAssemblies = AssemblyReferences[conf].Watch();
-      return watchedSources.CombineLatest(watchedAssemblies, CompilationInput.Create)
+      return watchedSources.CombineLatest(watchedAssemblies, (files, assemblies) => new {files, assemblies})
                            .Sample(TimeSpan.FromMilliseconds(25))
-                           .Select(CSharpCompiler[conf]);
+                           .Select(tuple => CSharpCompiler[conf](new CompilationInput(tuple.files, tuple.assemblies)));
     }
   }
 }

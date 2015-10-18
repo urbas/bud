@@ -1,4 +1,4 @@
-using System;
+using Bud.IO;
 using Microsoft.CodeAnalysis;
 
 namespace Bud.Compilation {
@@ -13,7 +13,8 @@ namespace Bud.Compilation {
 
     public override string ToString() => Path;
 
-    public bool Equals(AssemblyReference other) => String.Equals(Path, other.Path);
+    public bool Equals(AssemblyReference other)
+      => string.Equals(Path, other.Path);
 
     public override bool Equals(object obj) {
       if (ReferenceEquals(null, obj)) {
@@ -22,16 +23,22 @@ namespace Bud.Compilation {
       if (ReferenceEquals(this, obj)) {
         return true;
       }
-      return obj.GetType() == typeof(AssemblyReference) && Equals((AssemblyReference) obj);
+      return obj.GetType() == typeof(AssemblyReference) &&
+             Equals((AssemblyReference) obj);
     }
 
     public override int GetHashCode() => Path.GetHashCode();
 
-    public static bool operator ==(AssemblyReference left, AssemblyReference right) => Equals(left, right);
+    public static bool operator ==(AssemblyReference left, AssemblyReference right)
+      => Equals(left, right);
 
-    public static bool operator !=(AssemblyReference left, AssemblyReference right) => !Equals(left, right);
+    public static bool operator !=(AssemblyReference left, AssemblyReference right)
+      => !Equals(left, right);
 
     public static AssemblyReference CreateFromFile(string file)
       => new AssemblyReference(file, MetadataReference.CreateFromFile(file));
+
+    public Hashed<AssemblyReference> ToHashed()
+      => new Hashed<AssemblyReference>(this, Files.GetTimeHash(Path));
   }
 }

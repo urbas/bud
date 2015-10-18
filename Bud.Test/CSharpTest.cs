@@ -1,5 +1,3 @@
-using System.Linq;
-using System.Reactive.Linq;
 using Bud.IO;
 using NUnit.Framework;
 using static Bud.Build;
@@ -24,14 +22,14 @@ namespace Bud {
     public void CSharp_sources_must_be_listed() {
       var sourceFile = tempDir.CreateEmptyFile("TestMainClass.cs");
       Assert.That(Sources[cSharpProject],
-                  Contains.Item(Files.ToTimeHashedFile(sourceFile)));
+                  Contains.Item(sourceFile));
     }
 
     [Test]
     public void CSharp_sources_in_nested_directories_must_be_listed() {
       var sourceFile = tempDir.CreateEmptyFile("Bud", "TestMainClass.cs");
       Assert.That(Sources[cSharpProject],
-                  Contains.Item(Files.ToTimeHashedFile(sourceFile)));
+                  Contains.Item(sourceFile));
     }
 
     [Test]

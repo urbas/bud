@@ -38,7 +38,7 @@ namespace Bud {
     public static Conf ExcludeSourceDirs(params string[] subDirs)
       => Empty.Modify(Sources, (configs, previousFiles) => {
         var forbiddenDirs = subDirs.Select(s => Combine(ProjectDir[configs], s));
-        return previousFiles.WithFilter(file => !forbiddenDirs.Any(file.Value.StartsWith));
+        return previousFiles.WithFilter(file => !forbiddenDirs.Any(file.StartsWith));
       });
   }
 }
