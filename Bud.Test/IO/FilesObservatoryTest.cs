@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using Moq;
 using NUnit.Framework;
 
 namespace Bud.IO {
@@ -34,13 +32,14 @@ namespace Bud.IO {
 
     [Test]
     public void Throws_for_non_existing_folders()
-      => Assert.Throws<DirectoryNotFoundException>(() => noFileChanges.ObserveDir(Path.Combine(tempDir.Path, "B"), "*.txt", true).ToList());
+      => Assert.Throws<DirectoryNotFoundException>(() =>
+      noFileChanges.ObserveDir(Path.Combine(tempDir.Path, "B"), "*.txt", true).ToList());
 
     [Test]
     public void Listing_individual_files_should_produce_the_first_observation() {
       var fileB = Path.Combine(tempDir.Path, "B");
       Assert.That(noFileChanges.ObserveFiles(fileB).Watch().ToEnumerable().First(),
-                  Is.EquivalentTo(new[] { Files.ToTimeHashedFile(fileB) }));
+                  Is.EquivalentTo(new[] {Files.ToTimeHashedFile(fileB)}));
     }
   }
 }

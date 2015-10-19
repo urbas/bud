@@ -8,10 +8,10 @@ namespace Bud.IO {
   public class WatchedResources<TResource> : IEnumerable<TResource> {
     public static readonly WatchedResources<TResource> Empty =
       new WatchedResources<TResource>(Enumerable.Empty<TResource>(),
-                                      Observable.Empty<object>());
+                                      Observable.Empty<TResource>());
 
     public WatchedResources(IEnumerable<TResource> resources,
-                            IObservable<object> resourceWatcher) {
+                            IObservable<TResource> resourceWatcher) {
       Resources = resources;
       Watcher = resourceWatcher;
     }
@@ -20,7 +20,7 @@ namespace Bud.IO {
       : this(watchedResources.Resources, watchedResources.Watcher) {}
 
     public IEnumerable<TResource> Resources { get; }
-    public IObservable<object> Watcher { get; }
+    public IObservable<TResource> Watcher { get; }
     public IEnumerator<TResource> GetEnumerator() => Resources.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -30,7 +30,7 @@ namespace Bud.IO {
 
     public WatchedResources<TResource> WithFilter(Func<TResource, bool> filter)
       => new WatchedResources<TResource>(Resources.Where(filter),
-                                         Watcher);
+                                         Watcher.Where(filter));
 
     public IObservable<WatchedResources<TResource>> Watch()
       => Observable.Return(this)

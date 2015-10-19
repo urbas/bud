@@ -8,11 +8,11 @@ namespace Bud.IO {
     public static readonly Files Empty = new Files(WatchedResources<string>.Empty);
 
     public Files(IEnumerable<string> fileEnumerationFactory,
-                 IObservable<FileSystemEventArgs> fileWatcher)
+                 IObservable<string> fileWatcher)
       : base(fileEnumerationFactory, fileWatcher) {}
 
     public Files(IEnumerable<string> files)
-      : this(files, Observable.Empty<FileSystemEventArgs>()) {}
+      : this(files, Observable.Empty<string>()) {}
 
     public Files(WatchedResources<string> files) : base(files) {}
 

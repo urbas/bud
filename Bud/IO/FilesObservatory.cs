@@ -26,11 +26,11 @@ namespace Bud.IO {
     private static SearchOption ToSearchOption(bool includeSubdirs)
       => includeSubdirs ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
 
-    private static IObservable<FileSystemEventArgs> WatchersForFiles(IFilesObservatory filesObservatory, IEnumerable<string> absolutePaths)
+    private static IObservable<string> WatchersForFiles(IFilesObservatory filesObservatory, IEnumerable<string> absolutePaths)
       => absolutePaths.Select(file => SingleFileWatcher(filesObservatory, file))
                       .Merge();
 
-    private static IObservable<FileSystemEventArgs> SingleFileWatcher(IFilesObservatory filesObservatory, string file)
+    private static IObservable<string> SingleFileWatcher(IFilesObservatory filesObservatory, string file)
       => filesObservatory.CreateObserver(Path.GetDirectoryName(file), Path.GetFileName(file), false);
   }
 }

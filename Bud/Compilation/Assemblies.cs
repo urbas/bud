@@ -10,7 +10,7 @@ namespace Bud.Compilation {
     public static readonly Assemblies Empty = new Assemblies(Enumerable.Empty<AssemblyReference>());
 
     public Assemblies(IEnumerable<AssemblyReference> files)
-      : base(files, Observable.Empty<object>()) {}
+      : base(files, Observable.Empty<AssemblyReference>()) {}
 
     public Assemblies(WatchedResources<AssemblyReference> watchedResources)
       : base(watchedResources) { }
