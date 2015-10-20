@@ -58,6 +58,9 @@ namespace Bud.Compilation {
         emitResult = compilation.Emit(assemblyOutputFile);
         stopwatch.Stop();
       }
+      if (!emitResult.Success) {
+        File.Delete(OutputAssemblyPath);
+      }
       return new CompilationOutput(emitResult.Diagnostics,
                                    stopwatch.Elapsed,
                                    OutputAssemblyPath,

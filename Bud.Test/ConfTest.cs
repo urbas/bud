@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Bud.Configuration;
 using Moq;
 using NUnit.Framework;
-using static Bud.Key;
+using static Bud.Keys;
 
 namespace Bud {
   public class ConfTest {

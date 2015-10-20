@@ -40,5 +40,8 @@ namespace Bud {
         var forbiddenDirs = subDirs.Select(s => Combine(ProjectDir[configs], s));
         return previousFiles.WithFilter(file => !forbiddenDirs.Any(file.StartsWith));
       });
+
+    public static Conf Projects(params Conf[] projects)
+      => projects.Aggregate(Empty, (aggregation, project) => aggregation.Add(project.In(ProjectId[project])));
   }
 }

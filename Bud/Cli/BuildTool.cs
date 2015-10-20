@@ -12,16 +12,16 @@ using static Bud.Build;
 namespace Bud.Cli {
   public class BuildTool {
     public static void Main(string[] args) {
-      var compilationOutput = CSharp.CSharpProject(Combine(GetCurrentDirectory(), "..", "..", ".."), "BuildConf")
+      var compilationOutput = CSharp.CSharpProject(Combine(GetCurrentDirectory()), "BuildConf")
                                     .Add(BudDependencies())
                                     .Set(Sources, configs => Build.FilesObservatory[configs].ObserveFiles(Combine(ProjectDir[configs], "Build.cs")))
-                                    .Get(CSharp.Compilation)
+                                    .Get(CSharp.Compile)
                                     .ToEnumerable()
                                     .First();
       if (compilationOutput.Success) {
         var configs = LoadBuildConf(compilationOutput);
         foreach (var s in args) {
-          configs.Get<Task>(s).Wait();
+          configs.Get<IObservable<object>>(s).Wait();
         }
       } else {
         PrintCompilationErrors(compilationOutput);
@@ -46,6 +46,7 @@ namespace Bud.Cli {
       => Conf.Empty.Set(CSharp.AssemblyReferences,
                         c => new Assemblies(typeof(BuildTool).Assembly.Location,
                                             typeof(object).Assembly.Location,
+                                            typeof(Enumerable).Assembly.Location,
                                             typeof(Observable).Assembly.Location));
   }
 }
