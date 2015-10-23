@@ -74,5 +74,40 @@ namespace Bud.IO {
       Assert.AreEqual(new[] {expandedResources, expandedResources, expandedResources},
                       expandedResources.Watch().ToEnumerable().ToList());
     }
+
+    [Test]
+    public void WatchResource_must_be_empty_before_being_watched()
+      => Assert.IsEmpty(WatchedResources.WatchResource(Observable.Return(42)));
+
+    [Test]
+    public void WatchResource_must_contain_the_watched_element() {
+      var watchedResource = WatchedResources.WatchResource(Observable.Return(42));
+      watchedResource.Watch().Wait();
+      Assert.AreEqual(new[] {42}, watchedResource);
+    }
+
+    [Test]
+    public void WatchResource_must_not_block_when_the_observable_does_not_produce_the_first_value()
+      => WatchedResources.WatchResource(Observable.Never<int>()).GetEnumerator();
+
+    [Test]
+    public void WatchResource_is_enumerable_multiple_times() {
+      var watchedResource = WatchedResources.WatchResource(Observable.Return(42));
+      watchedResource.Watch().Wait();
+      watchedResource.ToList();
+      Assert.AreEqual(new[] {42}, watchedResource.ToList());
+    }
+
+    [Test]
+    public void WatchResource_must_return_the_last_value() {
+      var watchedSingleton = WatchedResources.WatchResource(Observable.Return(42).Concat(Observable.Return(9001)));
+      watchedSingleton.Watch().Wait();
+      watchedSingleton.ToList();
+      Assert.AreEqual(new[] {9001}, watchedSingleton);
+    }
+
+    [Test]
+    public void WatchResource_must_return_an_empty_enumerable_when_no_value_observed()
+      => Assert.IsEmpty(WatchedResources.WatchResource(Observable.Empty<int>()));
   }
 }

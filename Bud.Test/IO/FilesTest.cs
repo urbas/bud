@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Reactive.Linq;
 using NUnit.Framework;
 
 namespace Bud.IO {
@@ -23,6 +24,21 @@ namespace Bud.IO {
       var files2 = new[] {"bar"};
       Assert.AreEqual(files1.Concat(files2),
                       new Files(files1).ExpandWith(new Files(files2)));
+    }
+
+    [Test]
+    public void Watching_empty_produces_one_observation() {
+      var emptyFilesWatcher = Files.Empty.Watch().GetEnumerator();
+      Assert.IsTrue(emptyFilesWatcher.MoveNext());
+      Assert.IsEmpty(emptyFilesWatcher.Current);
+    }
+
+    [Test]
+    public void Expanding_and_watching_empty_produces_one_observation() {
+      var files = new[] {"foo"};
+      var expandedFilesWatcher = Files.Empty.ExpandWith(new Files(files)).Watch().GetEnumerator();
+      Assert.IsTrue(expandedFilesWatcher.MoveNext());
+      Assert.That(expandedFilesWatcher.Current, Is.EquivalentTo(files));
     }
   }
 }

@@ -102,6 +102,7 @@
     <Compile Include="IO\FileFinder.cs" />
     <Compile Include="IO\Files.cs" />
     <Compile Include="IO\FilesObservatory.cs" />
+    <Compile Include="IO\IWatchedResources.cs" />
     <Compile Include="IO\Pipes.cs" />
     <Compile Include="IO\IExpandable.cs" />
     <Compile Include="IO\IHashed.cs" />
@@ -135,9 +136,7 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0-beta1-20150812-01\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0-beta1-20150812-01\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Pipeline\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -9,8 +9,11 @@ namespace Bud.Compilation {
   public class Assemblies : WatchedResources<AssemblyReference> {
     public static readonly Assemblies Empty = new Assemblies(Enumerable.Empty<AssemblyReference>());
 
-    public Assemblies(IEnumerable<AssemblyReference> files)
-      : base(files, Observable.Empty<AssemblyReference>()) {}
+    public Assemblies(IEnumerable<AssemblyReference> assemblies)
+      : base(assemblies, Observable.Empty<AssemblyReference>()) {}
+
+    public Assemblies(IEnumerable<AssemblyReference> assemblies, IObservable<AssemblyReference> watcher)
+      : base(assemblies, watcher) {}
 
     public Assemblies(WatchedResources<AssemblyReference> watchedResources)
       : base(watchedResources) { }
@@ -19,7 +22,7 @@ namespace Bud.Compilation {
 
     public Assemblies(params string[] locations) : this((IEnumerable<string>)locations) {}
 
-    public Assemblies ExpandWith(Assemblies other)
+    public new Assemblies ExpandWith(IWatchedResources<AssemblyReference> other)
       => new Assemblies(base.ExpandWith(other));
 
     public Assemblies Add(AssemblyReference assemblyReference)

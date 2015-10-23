@@ -14,7 +14,7 @@ namespace Bud.IO {
     public Files(IEnumerable<string> files)
       : this(files, Observable.Empty<string>()) {}
 
-    public Files(WatchedResources<string> files) : base(files) {}
+    public Files(IWatchedResources<string> files) : base(files) {}
 
     public Files ExpandWith(Files other)
       => new Files(base.ExpandWith(other));

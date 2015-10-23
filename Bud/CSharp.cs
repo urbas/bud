@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Reactive.Linq;
 using Bud.Compilation;
 using Microsoft.CodeAnalysis;
@@ -7,7 +6,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Path;
 using static Bud.Build;
 using static Bud.Conf;
-using static Bud.Keys;
 
 namespace Bud {
   public static class CSharp {
@@ -28,7 +26,7 @@ namespace Bud {
       => Empty.Init(Compile, DefaultCompilation)
               .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
               .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
-              .Init(AssemblyReferences, DefaultAssemblyReferences)
+              .InitConst(AssemblyReferences, new Assemblies(typeof(object).Assembly.Location))
               .Init(CSharpCompiler, TimedEmittingCompiler.Create)
               .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
@@ -47,16 +45,8 @@ namespace Bud {
       var watchedSources = Sources[conf].Watch();
       var watchedAssemblies = AssemblyReferences[conf].Watch();
       return watchedSources.CombineLatest(watchedAssemblies, (files, assemblies) => new {files, assemblies})
-                           .Sample(TimeSpan.FromMilliseconds(25))
                            .Select(tuple => CSharpCompiler[conf](new CompilationInput(tuple.files, tuple.assemblies)))
                            .Do(PrintCompilationResult);
-    }
-
-    private static Assemblies DefaultAssemblyReferences(IConf configs) {
-      var dependencyAssemblies = Dependencies[configs]
-        .Select(dependency => configs.Get(Root / dependency / Compile).Take(1).Wait());
-      return new Assemblies(typeof(object).Assembly.Location)
-        .ExpandWith(new Assemblies(dependencyAssemblies.Select(output => output.ToAssemblyReference())));
     }
   }
 }

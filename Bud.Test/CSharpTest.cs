@@ -1,5 +1,7 @@
+using System;
 using System.IO;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using Bud.Compilation;
 using Bud.IO;
 using NUnit.Framework;
@@ -72,10 +74,24 @@ namespace Bud {
     }
 
     [Test]
+    public void Compiler_recompiles_when_a_file_changes() {
+      using (var tempDir = new TemporaryDirectory()) {
+        var projectA = CSharpProject(tempDir.Path, "A");
+        var compilationOutput = Compile[projectA].GetEnumerator();
+
+        tempDir.CreateFile("public class A {}", "A.cs");
+        Assert.IsTrue(compilationOutput.MoveNext());
+        tempDir.CreateFile("public class A {s}", "A.cs");
+        Assert.IsTrue(compilationOutput.MoveNext());
+        Assert.IsFalse(compilationOutput.Current.Success);
+      }
+    }
+
+    [Test]
     public void Compiler_uses_assembly_references() {
       using (var tempDir = new TemporaryDirectory()) {
         var cSharpProject = CSharpProject(tempDir.Path, "Foo")
-                                  .Modify(AssemblyReferences, AddLinqAssembly);
+          .Modify(AssemblyReferences, AddLinqAssembly);
         tempDir.CreateFile("using System; using System.Reactive.Linq; public class A {public IObservable<int> foo = Observable.Return(1);}", "A.cs");
         var compilationOutput = Compile[cSharpProject].Take(1).Wait();
         Assert.IsTrue(compilationOutput.Success);
@@ -83,11 +99,12 @@ namespace Bud {
     }
 
     [Test]
+    [Ignore]
     public void Compiler_uses_dependencies() {
       using (var tempDir = new TemporaryDirectory()) {
         var projectA = CSharpProject(Path.Combine(tempDir.Path, "A"), "A");
         var projectB = CSharpProject(Path.Combine(tempDir.Path, "B"), "B")
-          .Const(Dependencies, new[] { "A" });
+          .Const(Dependencies, new[] {"A"});
 
         var buildConfiguration = Projects(projectA, projectB);
 
@@ -96,6 +113,28 @@ namespace Bud {
 
         var compilationOutput = ("B" / Compile)[buildConfiguration].Take(1).Wait();
         Assert.IsTrue(compilationOutput.Success);
+      }
+    }
+
+    [Test]
+    [Ignore]
+    public async void Compiler_recompiles_when_dependencies_change() {
+      using (var tempDir = new TemporaryDirectory()) {
+        tempDir.CreateFile("public class A {}", "A", "A.cs");
+        tempDir.CreateFile("public class B {public A a;}", "B", "B.cs");
+
+        var projectA = CSharpProject(Path.Combine(tempDir.Path, "A"), "A");
+        var projectB = CSharpProject(Path.Combine(tempDir.Path, "B"), "B")
+          .Const(Dependencies, new[] {"A"});
+        var buildConfiguration = Projects(projectA, projectB);
+
+        var compilationOutput = ("B" / Compile)[buildConfiguration]
+          .Do(output => Console.WriteLine($"Compiled!!!"))
+          .ToTask();
+
+        tempDir.CreateFile("public class A {public object A;}", "A", "A.cs");
+
+        Assert.IsTrue((await compilationOutput).Success);
       }
     }
 
