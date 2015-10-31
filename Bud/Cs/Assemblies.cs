@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
 
-namespace Bud.Compilation {
+namespace Bud.Cs {
   public class Assemblies : WatchedResources<AssemblyReference> {
     public new static readonly Assemblies Empty = new Assemblies(Enumerable.Empty<AssemblyReference>());
 

@@ -1,6 +1,6 @@
 using System;
 using System.Reactive.Linq;
-using Bud.Compilation;
+using Bud.Cs;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Moq;
@@ -59,15 +59,15 @@ namespace Bud {
         .Const(Sources, files)
         .Const(AssemblyReferences, assemblies);
       var compilationInputs = CompilationInput[projectA].ToEnumerable().ToList();
-      Assert.AreEqual(new[] {new CSharpCompilationInput(files, assemblies, Empty<CSharpCompilationOutput>())},
+      Assert.AreEqual(new[] {new CompileInput(files, assemblies, Empty<CompileOutput>())},
                       compilationInputs);
     }
 
     [Test]
     public void CompilationInput_is_passed_to_the_compiler() {
-      var cSharpCompilationInput = new CSharpCompilationInput(Files.Empty, Assemblies.Empty, Empty<CSharpCompilationOutput>());
-      var cSharpCompiler = new Mock<Func<CSharpCompilationInput, CSharpCompilationOutput>>(MockBehavior.Strict);
-      cSharpCompiler.Setup(self => self(It.Is<CSharpCompilationInput>(input => cSharpCompilationInput.Equals(input))))
+      var cSharpCompilationInput = new CompileInput(Files.Empty, Assemblies.Empty, Empty<CompileOutput>());
+      var cSharpCompiler = new Mock<Func<CompileInput, CompileOutput>>(MockBehavior.Strict);
+      cSharpCompiler.Setup(self => self(It.Is<CompileInput>(input => cSharpCompilationInput.Equals(input))))
                     .Returns(GetEmptyCompilerOutput());
       var projectA = CSharpProject("foo", "A")
         .Const(Compiler, cSharpCompiler.Object)
@@ -108,7 +108,7 @@ namespace Bud {
         .Const(Sources, Files.Empty)
         .Const(AssemblyReferences, Assemblies.Empty);
 
-    private static CSharpCompilationOutput GetEmptyCompilerOutput(long timestamp = 0L)
-      => new CSharpCompilationOutput(Empty<Diagnostic>(), Zero, "foo", true, timestamp, null);
+    private static CompileOutput GetEmptyCompilerOutput(long timestamp = 0L)
+      => new CompileOutput(Empty<Diagnostic>(), Zero, "foo", true, timestamp, null);
   }
 }

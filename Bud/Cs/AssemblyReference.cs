@@ -1,7 +1,7 @@
 using Bud.IO;
 using Microsoft.CodeAnalysis;
 
-namespace Bud.Compilation {
+namespace Bud.Cs {
   public class AssemblyReference {
     public AssemblyReference(string path, MetadataReference metadataReference) {
       Path = path;

@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using Microsoft.CodeAnalysis;
 
-namespace Bud.Compilation {
-  public class CSharpCompilationOutput {
+namespace Bud.Cs {
+  public class CompileOutput {
     public MetadataReference Reference { get; }
     public long Timestamp { get; }
     public IEnumerable<Diagnostic> Diagnostics { get; }
@@ -11,7 +11,7 @@ namespace Bud.Compilation {
     public string AssemblyPath { get; }
     public bool Success { get; }
 
-    public CSharpCompilationOutput(IEnumerable<Diagnostic> diagnostics,
+    public CompileOutput(IEnumerable<Diagnostic> diagnostics,
                                    TimeSpan compilationTime,
                                    string assemblyPath,
                                    bool success,
@@ -28,14 +28,14 @@ namespace Bud.Compilation {
     public AssemblyReference ToAssemblyReference()
       => new AssemblyReference(AssemblyPath, Reference);
 
-    protected bool Equals(CSharpCompilationOutput other)
+    protected bool Equals(CompileOutput other)
       => Timestamp == other.Timestamp && string.Equals(AssemblyPath, other.AssemblyPath);
 
     public override bool Equals(object obj)
       => !ReferenceEquals(null, obj) &&
          (ReferenceEquals(this, obj) ||
           obj.GetType() == GetType() &&
-          Equals((CSharpCompilationOutput) obj));
+          Equals((CompileOutput) obj));
 
     public override int GetHashCode() {
       unchecked {
@@ -43,7 +43,7 @@ namespace Bud.Compilation {
       }
     }
 
-    public static bool operator ==(CSharpCompilationOutput left, CSharpCompilationOutput right) => Equals(left, right);
-    public static bool operator !=(CSharpCompilationOutput left, CSharpCompilationOutput right) => !Equals(left, right);
+    public static bool operator ==(CompileOutput left, CompileOutput right) => Equals(left, right);
+    public static bool operator !=(CompileOutput left, CompileOutput right) => !Equals(left, right);
   }
 }

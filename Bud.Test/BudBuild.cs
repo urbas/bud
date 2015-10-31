@@ -2,7 +2,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using Bud;
-using Bud.Compilation;
+using Bud.Cs;
 
 public class BudBuild : IBuild {
   public Conf Init(string dir)

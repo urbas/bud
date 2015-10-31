@@ -7,7 +7,7 @@ using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
-namespace Bud.Compilation {
+namespace Bud.Cs {
   public class RoslynCSharpCompiler {
     private ImmutableDictionary<Hashed<string>, SyntaxTree> syntaxTrees = ImmutableDictionary<Hashed<string>, SyntaxTree>.Empty;
     private Diff<Hashed<string>> sources = Diff.Empty<Hashed<string>>();
@@ -21,7 +21,7 @@ namespace Bud.Compilation {
                                                    cSharpCompilationOptions);
     }
 
-    public CSharpCompilation Compile(CSharpCompilationInput input) {
+    public CSharpCompilation Compile(CompileInput input) {
       sources = sources.NextDiff(input.Sources);
       var newDependencies = oldDependencies.NextDiff(input.Assemblies.Concat(input.Dependencies.Select(output => Hashed.Create(output.ToAssemblyReference(), output.Timestamp))));
 
@@ -55,7 +55,7 @@ namespace Bud.Compilation {
     private MetadataReference FindOldReference(Hashed<AssemblyReference> dependency)
       => GetDependency(oldDependencies, dependency).Value.MetadataReference;
 
-    public static Func<CSharpCompilationInput, CSharpCompilation> Create(string assemblyName, CSharpCompilationOptions cSharpCompilationOptions)
+    public static Func<CompileInput, CSharpCompilation> Create(string assemblyName, CSharpCompilationOptions cSharpCompilationOptions)
       => new RoslynCSharpCompiler(assemblyName, cSharpCompilationOptions).Compile;
   }
 }

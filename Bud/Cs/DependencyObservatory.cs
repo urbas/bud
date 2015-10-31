@@ -1,6 +1,6 @@
 using System.Linq;
 using Microsoft.CodeAnalysis;
 
-namespace Bud.Compilation {
+namespace Bud.Cs {
   public static class DependencyObservatory {}
 }

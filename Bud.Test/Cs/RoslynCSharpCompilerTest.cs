@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using NUnit.Framework;
 using static System.Linq.Enumerable;
 
-namespace Bud.Compilation {
+namespace Bud.Cs {
   public class RoslynCSharpCompilerTest {
     private readonly AssemblyReference[] coreAssemblyReference = {AssemblyReference.CreateFromFile(typeof(object).Assembly.Location)};
 
@@ -94,7 +94,7 @@ namespace Bud.Compilation {
         var fileB = tempDir.CreateFile("public class B : A {}", "B.cs");
         var aOutputAssembly = Path.Combine(tempDir.Path, "A.dll");
         var aCSharpCompilation = compiler(CoreAssemblyReferences(fileA));
-        var b = compiler(CoreAssemblyReferences(fileB, new CSharpCompilationOutput(Empty<Diagnostic>(), TimeSpan.Zero, aOutputAssembly, true, 0L, aCSharpCompilation.ToMetadataReference())));
+        var b = compiler(CoreAssemblyReferences(fileB, new CompileOutput(Empty<Diagnostic>(), TimeSpan.Zero, aOutputAssembly, true, 0L, aCSharpCompilation.ToMetadataReference())));
         var outputPath = Path.Combine(tempDir.Path, "B.dll");
         var emitResult = b.Emit(outputPath);
         Assert.IsTrue(emitResult.Success);
@@ -102,15 +102,15 @@ namespace Bud.Compilation {
     }
 
 
-    private static Func<CSharpCompilationInput, CSharpCompilation> CreateCompiler()
+    private static Func<CompileInput, CSharpCompilation> CreateCompiler()
       => RoslynCSharpCompiler.Create("A.dll", new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-    private CSharpCompilationInput CoreAssemblyReferences(string fileA, CSharpCompilationOutput dependency = null)
-      => new CSharpCompilationInput(new[] {fileA},
+    private CompileInput CoreAssemblyReferences(string fileA, CompileOutput dependency = null)
+      => new CompileInput(new[] {fileA},
                                     coreAssemblyReference,
-                                    dependency == null ? Empty<CSharpCompilationOutput>() : new[] {dependency});
+                                    dependency == null ? Empty<CompileOutput>() : new[] {dependency});
 
-    private static CSharpCompilationInput NoAssemblyReferences(string fileA)
-      => new CSharpCompilationInput(new[] {fileA}, Empty<AssemblyReference>(), Empty<CSharpCompilationOutput>());
+    private static CompileInput NoAssemblyReferences(string fileA)
+      => new CompileInput(new[] {fileA}, Empty<AssemblyReference>(), Empty<CompileOutput>());
   }
 }

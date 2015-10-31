@@ -1,6 +1,6 @@
 using Microsoft.CodeAnalysis;
 
-namespace Bud.Compilation {
+namespace Bud.Cs {
   static internal class OutputAssemblyKind {
     public static string ToExtension(this OutputKind kind) {
       switch (kind) {

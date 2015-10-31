@@ -8,11 +8,11 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 
-namespace Bud.Compilation {
+namespace Bud.Cs {
   public class TimedEmittingCompiler {
     public string OutputAssemblyPath { get; }
     public IConf Conf { get; }
-    public Func<CSharpCompilationInput, CSharpCompilation> UnderlyingCompiler { get; }
+    public Func<CompileInput, CSharpCompilation> UnderlyingCompiler { get; }
     public Stopwatch Stopwatch { get; } = new Stopwatch();
 
     public TimedEmittingCompiler(IConf conf) {
@@ -23,10 +23,10 @@ namespace Bud.Compilation {
       Conf = conf;
     }
 
-    public static Func<CSharpCompilationInput, CSharpCompilationOutput> Create(IConf conf)
+    public static Func<CompileInput, CompileOutput> Create(IConf conf)
       => new TimedEmittingCompiler(conf).Compile;
 
-    public CSharpCompilationOutput Compile(CSharpCompilationInput compilationInput) {
+    public CompileOutput Compile(CompileInput compilationInput) {
       Stopwatch.Restart();
       if (IsOutputUpToDate(compilationInput)) {
         return CreateOutputFromAssembly();
@@ -37,15 +37,15 @@ namespace Bud.Compilation {
     private static string GetOutputAssemblyPath(IConf conf)
       => Path.Combine(CSharp.OutputDir[conf], CSharp.AssemblyName[conf]);
 
-    private CSharpCompilationOutput CreateOutputFromAssembly()
-      => new CSharpCompilationOutput(Enumerable.Empty<Diagnostic>(),
+    private CompileOutput CreateOutputFromAssembly()
+      => new CompileOutput(Enumerable.Empty<Diagnostic>(),
                                      Stopwatch.Elapsed,
                                      OutputAssemblyPath,
                                      true,
                                      Files.GetTimeHash(OutputAssemblyPath),
                                      MetadataReference.CreateFromFile(OutputAssemblyPath));
 
-    private bool IsOutputUpToDate(CSharpCompilationInput compilationInput)
+    private bool IsOutputUpToDate(CompileInput compilationInput)
       => File.Exists(OutputAssemblyPath) &&
          IsFileUpToDate(OutputAssemblyPath, compilationInput.Sources) &&
          IsFileUpToDate(OutputAssemblyPath, compilationInput.Assemblies);
@@ -53,7 +53,7 @@ namespace Bud.Compilation {
     private static bool IsFileUpToDate<T>(string file, IEnumerable<Hashed<T>> otherResources)
       => !otherResources.All(hashed => Files.TimeHashEquals(hashed, file));
 
-    private CSharpCompilationOutput EmitDllAndPrintResult(CSharpCompilation compilation, Stopwatch stopwatch) {
+    private CompileOutput EmitDllAndPrintResult(CSharpCompilation compilation, Stopwatch stopwatch) {
       Directory.CreateDirectory(Path.GetDirectoryName(OutputAssemblyPath));
       EmitResult emitResult;
       using (var assemblyOutputFile = File.Create(OutputAssemblyPath)) {
@@ -63,7 +63,7 @@ namespace Bud.Compilation {
       if (!emitResult.Success) {
         File.Delete(OutputAssemblyPath);
       }
-      return new CSharpCompilationOutput(emitResult.Diagnostics,
+      return new CompileOutput(emitResult.Diagnostics,
                                          stopwatch.Elapsed,
                                          OutputAssemblyPath,
                                          emitResult.Success,
