@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 
 namespace Bud.Compilation {
   public class Assemblies : WatchedResources<AssemblyReference> {
-    public static readonly Assemblies Empty = new Assemblies(Enumerable.Empty<AssemblyReference>());
+    public new static readonly Assemblies Empty = new Assemblies(Enumerable.Empty<AssemblyReference>());
 
     public Assemblies(IEnumerable<AssemblyReference> assemblies)
       : base(assemblies, Observable.Empty<AssemblyReference>()) {}
@@ -15,7 +15,7 @@ namespace Bud.Compilation {
     public Assemblies(IEnumerable<AssemblyReference> assemblies, IObservable<AssemblyReference> watcher)
       : base(assemblies, watcher) {}
 
-    public Assemblies(WatchedResources<AssemblyReference> watchedResources)
+    public Assemblies(IWatchedResources<AssemblyReference> watchedResources)
       : base(watchedResources) { }
 
     public Assemblies(IEnumerable<string> locations) : this(locations.Select(ToAssemblyReferenceFromFile)) {}

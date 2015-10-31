@@ -5,7 +5,7 @@ using System.Reactive.Linq;
 
 namespace Bud.IO {
   public class Files : WatchedResources<string> {
-    public static readonly Files Empty = new Files(WatchedResources<string>.Empty);
+    public new static readonly Files Empty = new Files(WatchedResources<string>.Empty);
 
     public Files(IEnumerable<string> fileEnumerationFactory,
                  IObservable<string> fileWatcher)

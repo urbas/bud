@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using Bud.Compilation;
 using Bud.IO;
 using static System.IO.Directory;
@@ -28,14 +27,14 @@ namespace Bud.Cli {
       }
     }
 
-    private static IConf LoadBuildConf(CompilationOutput compilationOutput) {
+    private static IConf LoadBuildConf(CSharpCompilationOutput compilationOutput) {
       var assembly = Assembly.LoadFile(compilationOutput.AssemblyPath);
       var buildDefinitionType = assembly.GetExportedTypes().First(typeof(IBuild).IsAssignableFrom);
       var buildDefinition = (IBuild) buildDefinitionType.GetConstructor(Type.EmptyTypes).Invoke(new object[] {});
       return buildDefinition.Init(GetCurrentDirectory()).ToCachingConfigs();
     }
 
-    private static void PrintCompilationErrors(CompilationOutput compilationOutput) {
+    private static void PrintCompilationErrors(CSharpCompilationOutput compilationOutput) {
       Console.WriteLine("Could not compile the build configuration.");
       foreach (var diagnostic in compilationOutput.Diagnostics) {
         Console.WriteLine(diagnostic);

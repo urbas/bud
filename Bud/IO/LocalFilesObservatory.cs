@@ -1,7 +1,6 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.IO;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
@@ -12,50 +11,53 @@ namespace Bud.IO {
 
     public static IObservable<string> ObserveFileSystem(string watcherDir,
                                                         string fileFilter,
-                                                        bool includeSubdirectories)
+                                                        bool includeSubdirectories,
+                                                        Action subscribedCallback = null,
+                                                        Action disposedCallback = null)
       => Observable.Create<string>(observer => {
-        var compositeDisposable = new CompositeDisposable();
-
         var fileSystemWatcher = new FileSystemWatcher(watcherDir, fileFilter) {
           IncludeSubdirectories = includeSubdirectories,
           EnableRaisingEvents = true
         };
-        compositeDisposable.Add(fileSystemWatcher);
 
-        var observationDisposable = Observable
-          .Merge(ObserveFileCreations(fileSystemWatcher),
-                 ObserveFileDeletions(fileSystemWatcher),
-                 ObserveFileChanges(fileSystemWatcher))
-          .Select(pattern => pattern.EventArgs.FullPath)
-          .Merge(ObserveFileRenames(fileSystemWatcher))
-          .Subscribe(observer);
-        compositeDisposable.Add(observationDisposable);
+        var blockingCollection = new BlockingCollection<string>();
 
+        fileSystemWatcher.Created += (sender, args) => blockingCollection.Add(args.FullPath);
+        fileSystemWatcher.Deleted += (sender, args) => blockingCollection.Add(args.FullPath);
+        fileSystemWatcher.Changed += (sender, args) => blockingCollection.Add(args.FullPath);
+        fileSystemWatcher.Renamed += (sender, args) => {
+          blockingCollection.Add(args.OldFullPath);
+          blockingCollection.Add(args.FullPath);
+        };
+
+        var compositeDisposable = new CompositeDisposable {
+          fileSystemWatcher,
+          new BlockingCollectionDisposable(blockingCollection),
+          blockingCollection.GetConsumingEnumerable().ToObservable().Subscribe(observer),
+          new CallbackDisposable(disposedCallback)
+        };
+        subscribedCallback?.Invoke();
         return compositeDisposable;
       });
 
-    private static IObservable<EventPattern<FileSystemEventArgs>> ObserveFileChanges(FileSystemWatcher fileSystemWatcher)
-      => Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
-        handler => fileSystemWatcher.Changed += handler,
-        handler => fileSystemWatcher.Changed -= handler);
+    private class CallbackDisposable : IDisposable {
+      private readonly Action disposedCallback;
 
-    private static IObservable<EventPattern<FileSystemEventArgs>> ObserveFileDeletions(FileSystemWatcher fileSystemWatcher)
-      => Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
-        handler => fileSystemWatcher.Deleted += handler,
-        handler => fileSystemWatcher.Deleted -= handler);
+      public CallbackDisposable(Action disposedCallback) {
+        this.disposedCallback = disposedCallback;
+      }
 
-    private static IObservable<EventPattern<FileSystemEventArgs>> ObserveFileCreations(FileSystemWatcher fileSystemWatcher)
-      => Observable.FromEventPattern<FileSystemEventHandler, FileSystemEventArgs>(
-        handler => fileSystemWatcher.Created += handler,
-        handler => fileSystemWatcher.Created -= handler);
+      public void Dispose() => disposedCallback?.Invoke();
+    }
 
-    private static IObservable<string> ObserveFileRenames(FileSystemWatcher fileSystemWatcher)
-      => Observable.FromEventPattern<RenamedEventHandler, RenamedEventArgs>(
-        handler => fileSystemWatcher.Renamed += handler,
-        handler => fileSystemWatcher.Renamed -= handler)
-                   .SelectMany(ToFileChanges);
+    public class BlockingCollectionDisposable : IDisposable {
+      private readonly BlockingCollection<string> blockingCollection;
 
-    private static IEnumerable<string> ToFileChanges(EventPattern<RenamedEventArgs> pattern)
-      => new[] {pattern.EventArgs.OldFullPath, pattern.EventArgs.FullPath};
+      public BlockingCollectionDisposable(BlockingCollection<string> blockingCollection) {
+        this.blockingCollection = blockingCollection;
+      }
+
+      public void Dispose() => blockingCollection.CompleteAdding();
+    }
   }
 }

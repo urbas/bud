@@ -84,8 +84,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Cli\BuildTool.cs" />
-    <Compile Include="Compilation\CompilationInput.cs" />
-    <Compile Include="Compilation\CompilationOutput.cs" />
+    <Compile Include="Collections\EnumerableUtils.cs" />
+    <Compile Include="Compilation\CSharpCompilationInput.cs" />
+    <Compile Include="Compilation\CSharpCompilationOutput.cs" />
     <Compile Include="Compilation\Assemblies.cs" />
     <Compile Include="Compilation\AssemblyReference.cs" />
     <Compile Include="Compilation\OutputAssemblyKind.cs" />
@@ -103,8 +104,6 @@
     <Compile Include="IO\Files.cs" />
     <Compile Include="IO\FilesObservatory.cs" />
     <Compile Include="IO\IWatchedResources.cs" />
-    <Compile Include="IO\Pipes.cs" />
-    <Compile Include="IO\IExpandable.cs" />
     <Compile Include="IO\IHashed.cs" />
     <Compile Include="IO\LocalFilesObservatory.cs" />
     <Compile Include="IO\IFilesObservatory.cs" />

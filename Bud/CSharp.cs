@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reactive.Linq;
 using Bud.Compilation;
+using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Path;
@@ -9,9 +12,10 @@ using static Bud.Conf;
 
 namespace Bud {
   public static class CSharp {
+    public static readonly Key<IObservable<CSharpCompilationOutput>> Compile = nameof(Compile);
+    public static readonly Key<IObservable<CSharpCompilationInput>> CompilationInput = nameof(CompilationInput);
+    public static readonly Key<Func<CSharpCompilationInput, CSharpCompilationOutput>> Compiler = nameof(Compiler);
     public static readonly Key<Assemblies> AssemblyReferences = nameof(AssemblyReferences);
-    public static readonly Key<IObservable<CompilationOutput>> Compile = nameof(Compile);
-    public static readonly Key<Func<CompilationInput, CompilationOutput>> CSharpCompiler = nameof(CSharpCompiler);
     public static readonly Key<string> OutputDir = nameof(OutputDir);
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
@@ -26,11 +30,12 @@ namespace Bud {
       => Empty.Init(Compile, DefaultCompilation)
               .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
               .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
-              .InitConst(AssemblyReferences, new Assemblies(typeof(object).Assembly.Location))
-              .Init(CSharpCompiler, TimedEmittingCompiler.Create)
-              .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+              .Init(AssemblyReferences, conf => new Assemblies(typeof(object).Assembly.Location))
+              .Init(Compiler, TimedEmittingCompiler.Create)
+              .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+              .Init(CompilationInput, DefaultCompilationInput);
 
-    private static void PrintCompilationResult(CompilationOutput output) {
+    private static void PrintCompilationResult(CSharpCompilationOutput output) {
       if (output.Success) {
         Console.WriteLine($"Compiled '{GetFileNameWithoutExtension(output.AssemblyPath)}' in {output.CompilationTime.Milliseconds}ms.");
       } else {
@@ -41,12 +46,28 @@ namespace Bud {
       }
     }
 
-    private static IObservable<CompilationOutput> DefaultCompilation(IConf conf) {
-      var watchedSources = Sources[conf].Watch();
-      var watchedAssemblies = AssemblyReferences[conf].Watch();
-      return watchedSources.CombineLatest(watchedAssemblies, (files, assemblies) => new {files, assemblies})
-                           .Select(tuple => CSharpCompiler[conf](new CompilationInput(tuple.files, tuple.assemblies)))
-                           .Do(PrintCompilationResult);
-    }
+    private static IObservable<CSharpCompilationOutput> DefaultCompilation(IConf conf)
+      => CompilationInput[conf].Select(Compiler[conf])
+                               .Do(PrintCompilationResult);
+
+    private static IObservable<CSharpCompilationInput> DefaultCompilationInput(IConf conf)
+      => DefaultCompilationInput(conf, (files, assemblies, cSharpCompilationOutputs) => ToCompilationInput(files, assemblies, cSharpCompilationOutputs));
+
+    internal static IObservable<CSharpCompilationInput> DefaultCompilationInput(IConf conf,
+                                                                                Func<Files, Assemblies, IEnumerable<CSharpCompilationOutput>, CSharpCompilationInput> compilationInputBuilder)
+      => Observable.CombineLatest(Sources[conf].Watch(),
+                                  AssemblyReferences[conf].Watch(),
+                                  CollectDependencies(conf),
+                                  compilationInputBuilder);
+
+    private static IObservable<IEnumerable<CSharpCompilationOutput>> CollectDependencies(IConf conf)
+      => Dependencies[conf].Any() ?
+        Dependencies[conf].Select(s => conf.Get(Keys.Root / s / Compile)).CombineLatest() :
+        Observable.Return(Enumerable.Empty<CSharpCompilationOutput>());
+
+    private static CSharpCompilationInput ToCompilationInput(Files files,
+                                                             Assemblies assemblies,
+                                                             IEnumerable<CSharpCompilationOutput> cSharpCompilationOutputs)
+      => new CSharpCompilationInput(files, assemblies, cSharpCompilationOutputs);
   }
 }

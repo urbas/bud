@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -8,23 +9,21 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Bud.Compilation {
   public class RoslynCSharpCompiler {
-    public IConf Conf { get; }
     private ImmutableDictionary<Hashed<string>, SyntaxTree> syntaxTrees = ImmutableDictionary<Hashed<string>, SyntaxTree>.Empty;
     private Diff<Hashed<string>> sources = Diff.Empty<Hashed<string>>();
     private Diff<Hashed<AssemblyReference>> oldDependencies = Diff.Empty<Hashed<AssemblyReference>>();
     private CSharpCompilation cSharpCompilation;
 
-    public RoslynCSharpCompiler(IConf conf) {
-      Conf = conf;
-      cSharpCompilation = CSharpCompilation.Create(CSharp.AssemblyName[Conf],
+    public RoslynCSharpCompiler(string assemblyName, CSharpCompilationOptions cSharpCompilationOptions) {
+      cSharpCompilation = CSharpCompilation.Create(assemblyName,
                                                    Enumerable.Empty<SyntaxTree>(),
                                                    Enumerable.Empty<MetadataReference>(),
-                                                   CSharp.CSharpCompilationOptions[Conf]);
+                                                   cSharpCompilationOptions);
     }
 
-    public CSharpCompilation Compile(CompilationInput input) {
+    public CSharpCompilation Compile(CSharpCompilationInput input) {
       sources = sources.NextDiff(input.Sources);
-      var newDependencies = oldDependencies.NextDiff(input.Assemblies);
+      var newDependencies = oldDependencies.NextDiff(input.Assemblies.Concat(input.Dependencies.Select(output => Hashed.Create(output.ToAssemblyReference(), output.Timestamp))));
 
       var addedSources = sources.Added.Select(ToFileSyntaxTreePair).ToList();
       var changedSources = sources.Changed.Select(ToFileSyntaxTreePair).ToList();
@@ -55,5 +54,8 @@ namespace Bud.Compilation {
 
     private MetadataReference FindOldReference(Hashed<AssemblyReference> dependency)
       => GetDependency(oldDependencies, dependency).Value.MetadataReference;
+
+    public static Func<CSharpCompilationInput, CSharpCompilation> Create(string assemblyName, CSharpCompilationOptions cSharpCompilationOptions)
+      => new RoslynCSharpCompiler(assemblyName, cSharpCompilationOptions).Compile;
   }
 }

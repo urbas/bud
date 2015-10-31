@@ -45,25 +45,5 @@ namespace Bud.IO {
       Assert.That(noFileChanges.ObserveFiles(fileB).Watch().ToEnumerable().First(),
                   Is.EquivalentTo(new[] {fileB}));
     }
-
-    [Test]
-    public void Files_observe_changes_in_folders() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var filesObserver = new LocalFilesObservatory().ObserveDir(tempDir.Path, "*.cs", true)
-                                                       .Watch()
-                                                       .GetEnumerator();
-        Assert.IsTrue(filesObserver.MoveNext());
-        Assert.IsEmpty(filesObserver.Current);
-        var fileA = tempDir.CreateEmptyFile("A.cs");
-        Assert.IsTrue(filesObserver.MoveNext());
-        Assert.That(filesObserver.Current, Is.EquivalentTo(new[] {fileA}));
-        tempDir.CreateFile("test", "A.cs");
-        Assert.IsTrue(filesObserver.MoveNext());
-        Assert.That(filesObserver.Current, Is.EquivalentTo(new[] {fileA}));
-        var fileB = tempDir.CreateFile("contentB", "B.cs");
-        Assert.IsTrue(filesObserver.MoveNext());
-        Assert.That(filesObserver.Current, Is.EquivalentTo(new[] {fileA, fileB}));
-      }
-    }
   }
 }

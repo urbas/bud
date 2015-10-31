@@ -1,10 +1,12 @@
 using System;
-using System.IO;
 using System.Reactive.Linq;
-using System.Reactive.Threading.Tasks;
 using Bud.Compilation;
 using Bud.IO;
+using Microsoft.CodeAnalysis;
+using Moq;
 using NUnit.Framework;
+using static System.Linq.Enumerable;
+using static System.TimeSpan;
 using static Bud.Build;
 using static Bud.CSharp;
 
@@ -50,95 +52,63 @@ namespace Bud {
     }
 
     [Test]
-    public void Compiles_a_csharp_file() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var cSharpProject = CSharpProject(tempDir.Path, "Foo");
-        tempDir.CreateFile("public class A {}", "A.cs");
-        var compilationOutput = Compile[cSharpProject].Take(1).Wait();
-        Assert.IsTrue(compilationOutput.Success);
-        Assert.IsEmpty(compilationOutput.Diagnostics);
-        Assert.IsTrue(File.Exists(compilationOutput.AssemblyPath));
-      }
+    public void CompilationInput_includes_Sources_and_AssemblyReferences() {
+      var assemblies = new Assemblies(new[] {new AssemblyReference("Foo.Bar.dll", null)});
+      var files = new Files(new[] {"A.cs"});
+      var projectA = CSharpProject("foo", "A")
+        .Const(Sources, files)
+        .Const(AssemblyReferences, assemblies);
+      var compilationInputs = CompilationInput[projectA].ToEnumerable().ToList();
+      Assert.AreEqual(new[] {new CSharpCompilationInput(files, assemblies, Empty<CSharpCompilationOutput>())},
+                      compilationInputs);
     }
 
     [Test]
-    public void Fails_to_compile_when_the_csharp_file_contains_a_syntax_error() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var cSharpProject = CSharpProject(tempDir.Path, "Foo");
-        tempDir.CreateFile("public class", "A.cs");
-        var compilationOutput = Compile[cSharpProject].Take(1).Wait();
-        Assert.IsFalse(compilationOutput.Success);
-        Assert.IsNotEmpty(compilationOutput.Diagnostics);
-        Assert.IsFalse(File.Exists(compilationOutput.AssemblyPath));
-      }
+    public void CompilationInput_is_passed_to_the_compiler() {
+      var cSharpCompilationInput = new CSharpCompilationInput(Files.Empty, Assemblies.Empty, Empty<CSharpCompilationOutput>());
+      var cSharpCompiler = new Mock<Func<CSharpCompilationInput, CSharpCompilationOutput>>(MockBehavior.Strict);
+      cSharpCompiler.Setup(self => self(It.Is<CSharpCompilationInput>(input => cSharpCompilationInput.Equals(input))))
+                    .Returns(GetEmptyCompilerOutput());
+      var projectA = CSharpProject("foo", "A")
+        .Const(Compiler, cSharpCompiler.Object)
+        .Const(CompilationInput, Observable.Return(cSharpCompilationInput));
+      Compile[projectA].Wait();
+      cSharpCompiler.VerifyAll();
     }
 
     [Test]
-    public void Compiler_recompiles_when_a_file_changes() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var projectA = CSharpProject(tempDir.Path, "A");
-        var compilationOutput = Compile[projectA].GetEnumerator();
-
-        tempDir.CreateFile("public class A {}", "A.cs");
-        Assert.IsTrue(compilationOutput.MoveNext());
-        tempDir.CreateFile("public class A {s}", "A.cs");
-        Assert.IsTrue(compilationOutput.MoveNext());
-        Assert.IsFalse(compilationOutput.Current.Success);
-      }
+    public void Compiler_reinvoked_when_input_changes() {
+      int invocationCount = 0;
+      CSharpProject("foo", "A")
+        .Const(Sources, new Files(Empty<string>(), new[] {"foo", "bar"}.ToObservable()))
+        .Const(AssemblyReferences, Assemblies.Empty)
+        .Const(Compiler, input => {
+          ++invocationCount;
+          return GetEmptyCompilerOutput();
+        })
+        .Get(Compile).Wait();
+      Assert.AreEqual(3, invocationCount);
     }
 
     [Test]
-    public void Compiler_uses_assembly_references() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var cSharpProject = CSharpProject(tempDir.Path, "Foo")
-          .Modify(AssemblyReferences, AddLinqAssembly);
-        tempDir.CreateFile("using System; using System.Reactive.Linq; public class A {public IObservable<int> foo = Observable.Return(1);}", "A.cs");
-        var compilationOutput = Compile[cSharpProject].Take(1).Wait();
-        Assert.IsTrue(compilationOutput.Success);
-      }
-    }
-
-    [Test]
-    [Ignore]
     public void Compiler_uses_dependencies() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var projectA = CSharpProject(Path.Combine(tempDir.Path, "A"), "A");
-        var projectB = CSharpProject(Path.Combine(tempDir.Path, "B"), "B")
-          .Const(Dependencies, new[] {"A"});
-
-        var buildConfiguration = Projects(projectA, projectB);
-
-        tempDir.CreateFile("public class A {}", "A", "A.cs");
-        tempDir.CreateFile("public class B {public A a;}", "B", "B.cs");
-
-        var compilationOutput = ("B" / Compile)[buildConfiguration].Take(1).Wait();
-        Assert.IsTrue(compilationOutput.Success);
-      }
+      var projectACompilationOutput = GetEmptyCompilerOutput(42);
+      var projectA = EmptyCSharpProject("A")
+        .Const(Compile, Observable.Return(projectACompilationOutput));
+      var projectB = EmptyCSharpProject("B")
+        .Const(Dependencies, new[] {"A"});
+      var buildConfiguration = Projects(projectA, projectB);
+      var compilationInput = buildConfiguration.Get("B" / CompilationInput).Take(1).Wait();
+      Assert.AreEqual(new[] {projectACompilationOutput},
+                      compilationInput.Dependencies);
     }
 
-    [Test]
-    [Ignore]
-    public async void Compiler_recompiles_when_dependencies_change() {
-      using (var tempDir = new TemporaryDirectory()) {
-        tempDir.CreateFile("public class A {}", "A", "A.cs");
-        tempDir.CreateFile("public class B {public A a;}", "B", "B.cs");
+    private static Conf EmptyCSharpProject(string projectId)
+      => CSharpProject(projectId, projectId)
+        .Const(Sources, Files.Empty)
+        .Const(AssemblyReferences, Assemblies.Empty);
 
-        var projectA = CSharpProject(Path.Combine(tempDir.Path, "A"), "A");
-        var projectB = CSharpProject(Path.Combine(tempDir.Path, "B"), "B")
-          .Const(Dependencies, new[] {"A"});
-        var buildConfiguration = Projects(projectA, projectB);
-
-        var compilationOutput = ("B" / Compile)[buildConfiguration]
-          .Do(output => Console.WriteLine($"Compiled!!!"))
-          .ToTask();
-
-        tempDir.CreateFile("public class A {public object A;}", "A", "A.cs");
-
-        Assert.IsTrue((await compilationOutput).Success);
-      }
-    }
-
-    private static Assemblies AddLinqAssembly(IConf conf, Assemblies assemblies)
-      => assemblies.ExpandWith(new Assemblies(typeof(Observable).Assembly.Location));
+    private static CSharpCompilationOutput GetEmptyCompilerOutput(long timestamp = 0L)
+      => new CSharpCompilationOutput(Empty<Diagnostic>(), Zero, "foo", true, timestamp, null);
   }
 }

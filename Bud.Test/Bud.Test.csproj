@@ -94,6 +94,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BudBuild.cs" />
+    <Compile Include="Collections\EnumerableUtilsTest.cs" />
+    <Compile Include="Compilation\RoslynCSharpCompilerTest.cs" />
     <Compile Include="ConfTest.cs" />
     <Compile Include="CSharpTest.cs" />
     <Compile Include="IO\DiffTest.cs" />
@@ -120,7 +122,6 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0-beta1-20150812-01\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Compilation\" />
     <Folder Include="Pipeline\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

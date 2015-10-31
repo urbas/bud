@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using static System.IO.Directory;
@@ -12,7 +13,17 @@ namespace Bud.IO {
 
     public string Path { get; }
 
-    public void Dispose() => Delete(Path, true);
+    public void Dispose() {
+      var openedFiles = FindOpenedFiles();
+      if (openedFiles.Count > 0) {
+        throw new Exception($"Could not delete the temporary directory {Path}. There were some locked files: {string.Join(", ", openedFiles)}");
+      }
+      Delete(Path, true);
+    }
+
+    public List<string> FindOpenedFiles()
+      => EnumerateFiles(Path, "*", SearchOption.AllDirectories).Where(IsFileLocked)
+                                                               .ToList();
 
     public override string ToString() => Path;
 
@@ -34,6 +45,18 @@ namespace Bud.IO {
       } while (Exists(tempDir));
       CreateDirectory(tempDir);
       return tempDir;
+    }
+
+    private static bool IsFileLocked(string file) {
+      FileStream stream = null;
+      try {
+        stream = File.Open(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None);
+      } catch (IOException) {
+        return true;
+      } finally {
+        stream?.Close();
+      }
+      return false;
     }
   }
 }

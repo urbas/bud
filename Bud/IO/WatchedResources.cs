@@ -33,11 +33,11 @@ namespace Bud.IO {
     public IEnumerator<TResource> GetEnumerator() => Resources.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public IWatchedResources<TResource> ExpandWith(IWatchedResources<TResource> other)
+    public WatchedResources<TResource> ExpandWith(IWatchedResources<TResource> other)
       => new WatchedResources<TResource>(Resources.Concat(other.Resources),
                                          Watcher.Merge(other.Watcher));
 
-    public IWatchedResources<TResource> WithFilter(Func<TResource, bool> filter)
+    public WatchedResources<TResource> WithFilter(Func<TResource, bool> filter)
       => new WatchedResources<TResource>(Resources.Where(filter),
                                          Watcher.Where(filter));
 
