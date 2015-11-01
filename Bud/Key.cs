@@ -26,11 +26,5 @@ namespace Bud {
     public static Key<T> operator /(Key prefix, Key<T> key) => prefix.Id + "/" + key.Id;
     public bool IsAbsolute => !string.IsNullOrEmpty(Id) && Id[0] == Keys.Separator;
     public override string ToString() => Id;
-
-    public Conf SetValue(T value) => Conf.Empty.SetValue(this, value);
-    public Conf InitValue(T value) => Conf.Empty.InitValue(this, value);
-    public Conf Set(Func<IConf, T> value) => Conf.Empty.Set(this, value);
-    public Conf Init(Func<IConf, T> value) => Conf.Empty.Init(this, value);
-    public Conf Modify(Func<IConf, T, T> value) => Conf.Empty.Modify(this, value);
   }
 }

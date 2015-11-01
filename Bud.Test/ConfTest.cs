@@ -13,48 +13,42 @@ namespace Bud {
     private static readonly Key<int> B = nameof(B);
     private static readonly Key<Task<int>> BAsync = nameof(BAsync);
     private static readonly Key<string> AString = A.Id;
-    private static readonly Key<IEnumerable<int>> FooKeyAsEnumerable = "Foo";
-    private static readonly Key<IList<int>> FooKeyAsList = "Foo";
+    private static readonly Key<IEnumerable<int>> FooEnumerable = "Foo";
+    private static readonly Key<IList<int>> FooList = "Foo";
 
     [Test]
-    public void Const_defines_a_constant_valued_configuration() {
-      Assert.AreEqual(42, Empty.SetValue(A, 42).Get(A));
-    }
+    public void Const_defines_a_constant_valued_configuration()
+      => Assert.AreEqual(42, A.SetValue(42).Get(A));
 
     [Test]
-    public void Const_redefines_configurations() {
-      Assert.AreEqual(1, Empty.SetValue(A, 42).SetValue(A, 1).Get(A));
-    }
+    public void Const_redefines_configurations()
+      => Assert.AreEqual(1, A.SetValue(42).SetValue(A, 1).Get(A));
 
     [Test]
-    public void InitConst_defines_a_constant_valued_configuration() {
-      Assert.AreEqual(42, Empty.InitValue(A, 42).Get(A));
-    }
+    public void InitConst_defines_a_constant_valued_configuration()
+      => Assert.AreEqual(42, A.InitValue(42).Get(A));
 
     [Test]
-    public void InitConst_does_not_redefine_configurations() {
-      Assert.AreEqual(42, Empty.InitValue(A, 42).InitValue(A, 1).Get(A));
-    }
+    public void InitConst_does_not_redefine_configurations()
+      => Assert.AreEqual(42, A.InitValue(42).InitValue(A, 1).Get(A));
 
     [Test]
     public void Redefined_configuration_is_never_invoked() {
       var intConfig = new Mock<Func<IConf, int>>();
-      Assert.AreEqual(1, Empty.Init(A, intConfig.Object).SetValue(A, 1).Get(A));
+      Assert.AreEqual(1, A.Init(intConfig.Object).SetValue(A, 1).Get(A));
       intConfig.Verify(self => self(It.IsAny<IConf>()), Times.Never());
     }
 
     [Test]
-    public void Modified_configurations_modify_old_values() {
-      var value = Empty
-                      .InitValue(A, 42)
-                      .Modify(A, (configs, oldConfig) => oldConfig + 1).Get(A);
-      Assert.AreEqual(43, value);
-    }
+    public void Modified_configurations_modify_old_values()
+      => Assert.AreEqual(43, A.InitValue(42)
+                              .Modify(A, (configs, oldConfig) => oldConfig + 1)
+                              .Get(A));
 
     [Test]
     public void Throw_when_modifying_a_configuration_that_does_not_yet_exist() {
       var exception = Assert.Throws<ConfigDefinitionException>(
-        () => Empty.Modify(A, (configs, oldConfig) => oldConfig + 1).Get(A));
+        () => A.Modify((configs, oldConfig) => oldConfig + 1).Get(A));
       Assert.AreEqual(A.Id, exception.Key);
       Assert.That(exception.Message, Contains.Substring(A.Id));
     }
@@ -62,7 +56,7 @@ namespace Bud {
     [Test]
     public void Throw_when_requiring_the_wrong_value_type() {
       var exception = Assert.Throws<ConfigTypeException>(
-        () => Empty.SetValue(AString, "foo").Get(A));
+        () => AString.SetValue("foo").Get(A));
       Assert.That(exception.Message, Contains.Substring(A.Id));
       Assert.That(exception.Message, Contains.Substring("System.Int32"));
       Assert.That(exception.Message, Contains.Substring("System.String"));
@@ -71,36 +65,32 @@ namespace Bud {
     [Test]
     public void Get_a_subtype() {
       var expectedList = ImmutableArray.Create(42);
-      var actualList = Empty
-                           .InitValue(FooKeyAsEnumerable, expectedList)
-                           .Get(FooKeyAsList);
-      Assert.AreEqual(expectedList, actualList);
+      Assert.AreEqual(expectedList, FooEnumerable.InitValue(expectedList)
+                                                 .Get(FooList));
     }
 
     [Test]
     public void Defining_and_then_invoking_two_configurations_must_return_both_of_their_values() {
-      var configs = Empty
-                        .SetValue(A, 42)
-                        .SetValue(B, 1337);
-      Assert.AreEqual(42, configs.Get(A));
-      Assert.AreEqual(1337, configs.Get(B));
+      var conf = A.SetValue(42)
+                  .SetValue(B, 1337);
+      Assert.AreEqual(42, conf.Get(A));
+      Assert.AreEqual(1337, conf.Get(B));
     }
 
     [Test]
     public void Invoking_a_single_configuration_must_not_invoke_the_other() {
       var intConfig = new Mock<Func<IConf, int>>();
-      Empty
-          .Set(A, intConfig.Object)
-          .SetValue(B, 1337)
-          .Get(B);
+      A.Set(intConfig.Object)
+       .SetValue(B, 1337)
+       .Get(B);
       intConfig.Verify(self => self(It.IsAny<IConf>()), Times.Never);
     }
 
     [Test]
     public void Extended_configs_must_contain_configurations_from_the_original_as_well_as_extending_configs() {
-      var originalConfigs = Empty.SetValue(A, 42);
-      var extendingConfigs = Empty.SetValue(B, 58);
-      var combinedConfigs = originalConfigs.Add(extendingConfigs);
+      var confA = A.SetValue(42);
+      var confB = B.SetValue(58);
+      var combinedConfigs = confA.Add(confB);
       Assert.AreEqual(42, combinedConfigs.Get(A));
       Assert.AreEqual(58, combinedConfigs.Get(B));
     }
@@ -112,33 +102,28 @@ namespace Bud {
     }
 
     [Test]
-    public void A_config_can_invoke_another_config() {
-      var configResult = Empty
-                             .SetValue(A, 42)
-                             .Set(B, configs => configs.Get(A) + 1)
-                             .Get(B);
-      Assert.AreEqual(43, configResult);
-    }
+    public void A_config_can_invoke_another_config()
+      => Assert.AreEqual(43, A.SetValue(42)
+                              .Set(B, configs => configs.Get(A) + 1)
+                              .Get(B));
 
     [Test]
     public void Configurations_are_invoked_once_only_and_their_result_is_cached() {
       var intConfig = new Mock<Func<IConf, int>>();
-      Empty
-          .Set(A, intConfig.Object)
-          .Set(B, configs => A[configs] + A[configs])
-          .Get(B);
+      A.Set(intConfig.Object)
+       .Set(B, configs => A[configs] + A[configs])
+       .Get(B);
       intConfig.Verify(self => self(It.IsAny<IConf>()));
     }
 
     [Test]
     public async void Multithreaded_access_to_configs_should_not_result_in_duplicate_invocations() {
       var intConfig = new Mock<Func<IConf, int>>();
-      var configs = Empty
-                        .Set(A, intConfig.Object)
-                        .Set(BAsync, AddFooTwiceConcurrently);
+      var conf = A.Set(intConfig.Object)
+                  .Set(BAsync, AddFooTwiceConcurrently);
       int repeatCount = 10;
       for (int i = 0; i < repeatCount; i++) {
-        await configs.Get(BAsync);
+        await conf.Get(BAsync);
       }
       intConfig.Verify(self => self(It.IsAny<IConf>()), Times.Exactly(repeatCount));
     }

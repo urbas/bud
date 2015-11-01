@@ -1,3 +1,5 @@
+using System;
+
 namespace Bud {
   public static class Keys {
     public static readonly Key Root = new Key("");
@@ -17,5 +19,11 @@ namespace Bud {
       => string.IsNullOrEmpty(childKey) ?
         parentKey :
         parentKey + Separator + childKey;
+
+    public static Conf SetValue<T>(this Key<T> key, T value) => Conf.Empty.SetValue(key, value);
+    public static Conf InitValue<T>(this Key<T> key, T value) => Conf.Empty.InitValue(key, value);
+    public static Conf Set<T>(this Key<T> key, Func<IConf, T> value) => Conf.Empty.Set(key, value);
+    public static Conf Init<T>(this Key<T> key, Func<IConf, T> value) => Conf.Empty.Init(key, value);
+    public static Conf Modify<T>(this Key<T> key, Func<IConf, T, T> value) => Conf.Empty.Modify(key, value);
   }
 }
