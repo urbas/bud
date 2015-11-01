@@ -107,8 +107,8 @@ namespace Bud.Cs {
 
     private CompileInput CoreAssemblyReferences(string fileA, CompileOutput dependency = null)
       => new CompileInput(new[] {fileA},
-                                    coreAssemblyReference,
-                                    dependency == null ? Empty<CompileOutput>() : new[] {dependency});
+                          coreAssemblyReference,
+                          dependency == null ? Empty<CompileOutput>() : new[] {dependency});
 
     private static CompileInput NoAssemblyReferences(string fileA)
       => new CompileInput(new[] {fileA}, Empty<AssemblyReference>(), Empty<CompileOutput>());

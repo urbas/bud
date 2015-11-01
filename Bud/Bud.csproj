@@ -85,6 +85,8 @@
   <ItemGroup>
     <Compile Include="Cli\BuildTool.cs" />
     <Compile Include="Collections\EnumerableUtils.cs" />
+    <Compile Include="Configuration\PrefixedConfigDefinition.cs" />
+    <Compile Include="Configuration\PrefixingConf.cs" />
     <Compile Include="Cs\CompileInput.cs" />
     <Compile Include="Cs\CompileOutput.cs" />
     <Compile Include="Cs\Assemblies.cs" />
@@ -117,11 +119,9 @@
     <Compile Include="Build.cs" />
     <Compile Include="IO\TemporaryDirectory.cs" />
     <Compile Include="Configuration\InitConfig.cs" />
-    <Compile Include="Configuration\NestedConf.cs" />
     <Compile Include="Configuration\SetConfig.cs" />
     <Compile Include="Configuration\ConfigDefinition.cs" />
     <Compile Include="Configuration\ConfigDefinitionException.cs" />
-    <Compile Include="Configuration\NestConfig.cs" />
     <Compile Include="Configuration\ModifyConfig.cs" />
     <Compile Include="Configuration\ConfigTypeException.cs" />
     <Compile Include="Configuration\ConfigUndefinedException.cs" />

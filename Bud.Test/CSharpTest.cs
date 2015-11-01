@@ -56,8 +56,8 @@ namespace Bud {
       var assemblies = new Assemblies(new[] {new AssemblyReference("Foo.Bar.dll", null)});
       var files = new Files(new[] {"A.cs"});
       var projectA = CSharpProject("foo", "A")
-        .Const(Sources, files)
-        .Const(AssemblyReferences, assemblies);
+        .SetValue(Sources, files)
+        .SetValue(AssemblyReferences, assemblies);
       var compilationInputs = CompilationInput[projectA].ToEnumerable().ToList();
       Assert.AreEqual(new[] {new CompileInput(files, assemblies, Empty<CompileOutput>())},
                       compilationInputs);
@@ -70,8 +70,8 @@ namespace Bud {
       cSharpCompiler.Setup(self => self(It.Is<CompileInput>(input => cSharpCompilationInput.Equals(input))))
                     .Returns(GetEmptyCompilerOutput());
       var projectA = CSharpProject("foo", "A")
-        .Const(Compiler, cSharpCompiler.Object)
-        .Const(CompilationInput, Observable.Return(cSharpCompilationInput));
+        .SetValue(Compiler, cSharpCompiler.Object)
+        .SetValue(CompilationInput, Observable.Return(cSharpCompilationInput));
       Compile[projectA].Wait();
       cSharpCompiler.VerifyAll();
     }
@@ -80,9 +80,9 @@ namespace Bud {
     public void Compiler_reinvoked_when_input_changes() {
       int invocationCount = 0;
       CSharpProject("foo", "A")
-        .Const(Sources, new Files(Empty<string>(), new[] {"foo", "bar"}.ToObservable()))
-        .Const(AssemblyReferences, Assemblies.Empty)
-        .Const(Compiler, input => {
+        .SetValue(Sources, new Files(Empty<string>(), new[] {"foo", "bar"}.ToObservable()))
+        .SetValue(AssemblyReferences, Assemblies.Empty)
+        .SetValue(Compiler, input => {
           ++invocationCount;
           return GetEmptyCompilerOutput();
         })
@@ -94,10 +94,10 @@ namespace Bud {
     public void Compiler_uses_dependencies() {
       var projectACompilationOutput = GetEmptyCompilerOutput(42);
       var projectA = EmptyCSharpProject("A")
-        .Const(Compile, Observable.Return(projectACompilationOutput));
+        .SetValue(Compile, Observable.Return(projectACompilationOutput));
       var projectB = EmptyCSharpProject("B")
-        .Const(Dependencies, new[] {"A"});
-      var buildConfiguration = Projects(projectA, projectB);
+        .SetValue(Dependencies, new[] {"A"});
+      var buildConfiguration = Conf.Group(projectA, projectB);
       var compilationInput = buildConfiguration.Get("B" / CompilationInput).Take(1).Wait();
       Assert.AreEqual(new[] {projectACompilationOutput},
                       compilationInput.Dependencies);
@@ -105,8 +105,8 @@ namespace Bud {
 
     private static Conf EmptyCSharpProject(string projectId)
       => CSharpProject(projectId, projectId)
-        .Const(Sources, Files.Empty)
-        .Const(AssemblyReferences, Assemblies.Empty);
+        .SetValue(Sources, Files.Empty)
+        .SetValue(AssemblyReferences, Assemblies.Empty);
 
     private static CompileOutput GetEmptyCompilerOutput(long timestamp = 0L)
       => new CompileOutput(Empty<Diagnostic>(), Zero, "foo", true, timestamp, null);

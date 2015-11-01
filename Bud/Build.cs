@@ -13,10 +13,10 @@ namespace Bud {
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
 
     public static Conf Project(string projectDir, string projectId = null)
-      => Empty.InitConst(ProjectDir, projectDir)
+      => Empty.InitValue(ProjectDir, projectDir)
               .Init(ProjectId, c => projectId ?? GetFileName(ProjectDir[c]))
-              .InitConst(Sources, Files.Empty)
-              .InitConst(Dependencies, Enumerable.Empty<string>())
+              .InitValue(Sources, Files.Empty)
+              .InitValue(Dependencies, Enumerable.Empty<string>())
               .Init(FilesObservatory, c => new LocalFilesObservatory());
 
     public static Conf SourceDir(string subDir = null, string fileFilter = "*", bool includeSubdirs = true) {
@@ -40,8 +40,5 @@ namespace Bud {
         var forbiddenDirs = subDirs.Select(s => Combine(ProjectDir[configs], s));
         return previousFiles.WithFilter(file => !forbiddenDirs.Any(file.StartsWith));
       });
-
-    public static Conf Projects(params Conf[] projects)
-      => projects.Aggregate(Empty, (aggregation, project) => aggregation.Add(project.In(ProjectId[project])));
   }
 }

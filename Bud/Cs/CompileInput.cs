@@ -7,9 +7,9 @@ using static Bud.Collections.EnumerableUtils;
 namespace Bud.Cs {
   public struct CompileInput {
     public CompileInput(IEnumerable<string> sources,
-                                  IEnumerable<AssemblyReference> assemblies,
-                                  IEnumerable<CompileOutput> cSharpCompilationOutputs) {
-      Dependencies = cSharpCompilationOutputs.ToImmutableArray();
+                        IEnumerable<AssemblyReference> assemblies,
+                        IEnumerable<CompileOutput> dependencies) {
+      Dependencies = dependencies.ToImmutableArray();
       Sources = sources.Select(Files.ToTimeHashedFile).ToImmutableArray();
       Assemblies = assemblies.Select(reference => reference.ToHashed()).ToImmutableArray();
     }

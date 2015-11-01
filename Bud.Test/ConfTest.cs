@@ -5,72 +5,64 @@ using System.Threading.Tasks;
 using Bud.Configuration;
 using Moq;
 using NUnit.Framework;
-using static Bud.Keys;
+using static Bud.Conf;
 
 namespace Bud {
   public class ConfTest {
     private static readonly Key<int> A = nameof(A);
     private static readonly Key<int> B = nameof(B);
-    private static readonly Key<int> C = nameof(C);
     private static readonly Key<Task<int>> BAsync = nameof(BAsync);
     private static readonly Key<string> AString = A.Id;
     private static readonly Key<IEnumerable<int>> FooKeyAsEnumerable = "Foo";
     private static readonly Key<IList<int>> FooKeyAsList = "Foo";
 
     [Test]
-    public void Empty() => Assert.IsEmpty(Conf.Empty);
-
-    [Test]
-    public void Add_must_append_the_config_transformation() {
-      var configTransform = new Mock<IConfigTransform>().Object;
-      Assert.That(Conf.Empty.Add(configTransform), Contains.Item(configTransform));
-    }
-
-    [Test]
     public void Const_defines_a_constant_valued_configuration() {
-      Assert.AreEqual(42, Conf.Empty.Const(A, 42).Get(A));
+      Assert.AreEqual(42, Empty.SetValue(A, 42).Get(A));
     }
 
     [Test]
     public void Const_redefines_configurations() {
-      Assert.AreEqual(1, Conf.Empty.Const(A, 42).Const(A, 1).Get(A));
+      Assert.AreEqual(1, Empty.SetValue(A, 42).SetValue(A, 1).Get(A));
     }
 
     [Test]
     public void InitConst_defines_a_constant_valued_configuration() {
-      Assert.AreEqual(42, Conf.Empty.InitConst(A, 42).Get(A));
+      Assert.AreEqual(42, Empty.InitValue(A, 42).Get(A));
     }
 
     [Test]
     public void InitConst_does_not_redefine_configurations() {
-      Assert.AreEqual(42, Conf.Empty.InitConst(A, 42).InitConst(A, 1).Get(A));
+      Assert.AreEqual(42, Empty.InitValue(A, 42).InitValue(A, 1).Get(A));
     }
 
     [Test]
     public void Redefined_configuration_is_never_invoked() {
       var intConfig = new Mock<Func<IConf, int>>();
-      Assert.AreEqual(1, Conf.Empty.Init(A, intConfig.Object).Const(A, 1).Get(A));
+      Assert.AreEqual(1, Empty.Init(A, intConfig.Object).SetValue(A, 1).Get(A));
       intConfig.Verify(self => self(It.IsAny<IConf>()), Times.Never());
     }
 
     [Test]
     public void Modified_configurations_modify_old_values() {
-      var value = Conf.Empty.InitConst(A, 42).Modify(A, (configs, oldConfig) => oldConfig + 1).Get(A);
+      var value = Empty
+                      .InitValue(A, 42)
+                      .Modify(A, (configs, oldConfig) => oldConfig + 1).Get(A);
       Assert.AreEqual(43, value);
     }
 
     [Test]
     public void Throw_when_modifying_a_configuration_that_does_not_yet_exist() {
       var exception = Assert.Throws<ConfigDefinitionException>(
-        () => Conf.Empty.Modify(A, (configs, oldConfig) => oldConfig + 1).Bake());
-      Assert.AreEqual(A.ToAbsolute().Id, exception.Key);
+        () => Empty.Modify(A, (configs, oldConfig) => oldConfig + 1).Get(A));
+      Assert.AreEqual(A.Id, exception.Key);
       Assert.That(exception.Message, Contains.Substring(A.Id));
     }
 
     [Test]
     public void Throw_when_requiring_the_wrong_value_type() {
       var exception = Assert.Throws<ConfigTypeException>(
-        () => Conf.Empty.Const(AString, "foo").Get(A));
+        () => Empty.SetValue(AString, "foo").Get(A));
       Assert.That(exception.Message, Contains.Substring(A.Id));
       Assert.That(exception.Message, Contains.Substring("System.Int32"));
       Assert.That(exception.Message, Contains.Substring("System.String"));
@@ -79,15 +71,17 @@ namespace Bud {
     [Test]
     public void Get_a_subtype() {
       var expectedList = ImmutableArray.Create(42);
-      var actualList = Conf.Empty
-                           .InitConst(FooKeyAsEnumerable, expectedList)
+      var actualList = Empty
+                           .InitValue(FooKeyAsEnumerable, expectedList)
                            .Get(FooKeyAsList);
       Assert.AreEqual(expectedList, actualList);
     }
 
     [Test]
     public void Defining_and_then_invoking_two_configurations_must_return_both_of_their_values() {
-      var configs = Conf.Empty.Const(A, 42).Const(B, 1337);
+      var configs = Empty
+                        .SetValue(A, 42)
+                        .SetValue(B, 1337);
       Assert.AreEqual(42, configs.Get(A));
       Assert.AreEqual(1337, configs.Get(B));
     }
@@ -95,15 +89,17 @@ namespace Bud {
     [Test]
     public void Invoking_a_single_configuration_must_not_invoke_the_other() {
       var intConfig = new Mock<Func<IConf, int>>();
-      var configs = Conf.Empty.Set(A, intConfig.Object).Const(B, 1337);
-      configs.Get(B);
+      Empty
+          .Set(A, intConfig.Object)
+          .SetValue(B, 1337)
+          .Get(B);
       intConfig.Verify(self => self(It.IsAny<IConf>()), Times.Never);
     }
 
     [Test]
     public void Extended_configs_must_contain_configurations_from_the_original_as_well_as_extending_configs() {
-      var originalConfigs = Conf.Empty.Const(A, 42);
-      var extendingConfigs = Conf.Empty.Const(B, 58);
+      var originalConfigs = Empty.SetValue(A, 42);
+      var extendingConfigs = Empty.SetValue(B, 58);
       var combinedConfigs = originalConfigs.Add(extendingConfigs);
       Assert.AreEqual(42, combinedConfigs.Get(A));
       Assert.AreEqual(58, combinedConfigs.Get(B));
@@ -111,13 +107,14 @@ namespace Bud {
 
     [Test]
     public void Invoking_an_undefined_config_must_throw_an_exception() {
-      var actualException = Assert.Throws<ConfigUndefinedException>(() => Conf.Empty.Get(AString));
+      var actualException = Assert.Throws<ConfigUndefinedException>(() => Empty.Get(AString));
       Assert.That(actualException.Message, Contains.Substring(A));
     }
 
     [Test]
     public void A_config_can_invoke_another_config() {
-      var configResult = Conf.Empty.Const(A, 42)
+      var configResult = Empty
+                             .SetValue(A, 42)
                              .Set(B, configs => configs.Get(A) + 1)
                              .Get(B);
       Assert.AreEqual(43, configResult);
@@ -126,7 +123,8 @@ namespace Bud {
     [Test]
     public void Configurations_are_invoked_once_only_and_their_result_is_cached() {
       var intConfig = new Mock<Func<IConf, int>>();
-      Conf.Empty.Set(A, intConfig.Object)
+      Empty
+          .Set(A, intConfig.Object)
           .Set(B, configs => A[configs] + A[configs])
           .Get(B);
       intConfig.Verify(self => self(It.IsAny<IConf>()));
@@ -135,7 +133,8 @@ namespace Bud {
     [Test]
     public async void Multithreaded_access_to_configs_should_not_result_in_duplicate_invocations() {
       var intConfig = new Mock<Func<IConf, int>>();
-      var configs = Conf.Empty.Set(A, intConfig.Object)
+      var configs = Empty
+                        .Set(A, intConfig.Object)
                         .Set(BAsync, AddFooTwiceConcurrently);
       int repeatCount = 10;
       for (int i = 0; i < repeatCount; i++) {
@@ -145,57 +144,41 @@ namespace Bud {
     }
 
     [Test]
-    public void Nesting_prefixes_config_names() {
-      var nestedConfigs = Conf.Empty.Const(A, 42).In("bar");
-      Assert.AreEqual(42, nestedConfigs.Get("bar" / A));
+    public void Empty_configuration_has_no_scope()
+      => Assert.IsEmpty(Empty.Scope);
+
+    [Test]
+    public void Scoped_configuration_stores_its_scope()
+      => Assert.AreEqual("foo", Empty.In("foo").Scope);
+
+    [Test]
+    public void Nested_scoping_separates_scopes_with_slashes()
+      => Assert.AreEqual("bar/foo", Empty.In("foo").In("bar").Scope);
+
+    [Test]
+    public void Getting_values_of_nested_configurations() {
+      var subConf = A.SetValue(42).In("foo");
+      Assert.AreEqual(42, Group(subConf).Get("foo" / A));
     }
 
     [Test]
-    public void Nesting_allows_access_to_sibling_configs() {
-      var nestedConfigs = Conf.Empty.Set(B, configs => A[configs] + 1)
-                              .Const(A, 42)
-                              .In("bar");
-      Assert.AreEqual(43, nestedConfigs.Get("bar" / B));
+    public void Getting_siblings_in_nested_configurations() {
+      var subConf = A.SetValue(42)
+                     .Set(B, conf => 1 + A[conf])
+                     .In("foo");
+      Assert.AreEqual(43, Group(subConf).Get("foo" / B));
     }
 
     [Test]
-    public void Nested_configs_can_be_modified() {
-      var nestedConfigs = Conf.Empty.Const(A, 42).In("bar");
-      var modifiedNestedConfigs = nestedConfigs.Modify("bar" / A, (configs, i) => 58);
-      Assert.AreEqual(58, modifiedNestedConfigs.Get("bar" / A));
+    public void Nested_configurations_can_access_configurations_by_absolute_path() {
+      var confA = A.SetValue(42);
+      var confB = B.Set(conf => 1 + conf.Get(Keys.Root / A)).In("foo");
+      Assert.AreEqual(43, Group(confA, confB).Get("foo" / B));
     }
 
-    [Test]
-    public void Nesting_with_multiple_modifications() {
-      var nestedConfigs = Conf.Empty
-                              .InitConst(C, 10)
-                              .Init(B, configs => 1)
-                              .Modify(B, (configs, i) => i + C[configs])
-                              .Modify(B, (configs, i) => i + C[configs])
-                              .In("bar");
-      Assert.AreEqual(21, nestedConfigs.Get("bar" / B));
-    }
-
-    [Test]
-    public void Keys_can_access_root_keys() {
-      var nestedConfigs = Conf.Empty
-                              .Init(A, conf => 42 + conf.Get(Root / B))
-                              .Init(B, configs => 1);
-      Assert.AreEqual(43, nestedConfigs.Get(A));
-    }
-
-    [Test]
-    public void Nested_keys_can_access_root_key() {
-      var nestedConfigs = Conf.Empty
-                              .Init(A, conf => 42 + conf.Get(Root / B))
-                              .In("bar")
-                              .Init(B, configs => 1);
-      Assert.AreEqual(43, nestedConfigs.Get("bar" / A));
-    }
-
-    private static async Task<int> AddFooTwiceConcurrently(IConf tsks) {
-      var first = Task.Run(() => tsks.Get(A));
-      var second = Task.Run(() => tsks.Get(A));
+    private static async Task<int> AddFooTwiceConcurrently(IConf conf) {
+      var first = Task.Run(() => A[conf]);
+      var second = Task.Run(() => A[conf]);
       return await first + await second;
     }
   }

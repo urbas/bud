@@ -20,11 +20,15 @@ namespace Bud {
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
 
+    public static Conf CSharpProject(string projectId)
+      => CSharpProject(projectId, projectId);
+
     public static Conf CSharpProject(string projectDir, string projectId)
       => Project(projectDir, projectId)
         .Add(SourceDir(fileFilter: "*.cs"))
         .Add(ExcludeSourceDirs("obj", "bin", "target"))
-        .Add(CSharpCompilation());
+        .Add(CSharpCompilation())
+        .In(projectId);
 
     public static Conf CSharpCompilation()
       => Conf.Empty.Init(Compile, DefaultCompilation)
@@ -32,7 +36,7 @@ namespace Bud {
              .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
              .Init(AssemblyReferences, conf => new Assemblies(typeof(object).Assembly.Location))
              .Init(Compiler, TimedEmittingCompiler.Create)
-             .InitConst(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+             .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
              .Init(CompilationInput, DefaultCompilationInput);
 
     private static void PrintCompilationResult(CompileOutput output) {
@@ -54,7 +58,7 @@ namespace Bud {
       => DefaultCompilationInput(conf, ToCompilationInput);
 
     internal static IObservable<CompileInput> DefaultCompilationInput(IConf conf,
-                                                                                Func<Files, Assemblies, IEnumerable<CompileOutput>, CompileInput> compilationInputBuilder)
+                                                                      Func<Files, Assemblies, IEnumerable<CompileOutput>, CompileInput> compilationInputBuilder)
       => Observable.CombineLatest(Sources[conf].Watch(),
                                   AssemblyReferences[conf].Watch(),
                                   CollectDependencies(conf),
@@ -66,8 +70,8 @@ namespace Bud {
         Return(Enumerable.Empty<CompileOutput>());
 
     private static CompileInput ToCompilationInput(IEnumerable<string> files,
-                                                             IEnumerable<AssemblyReference> assemblies,
-                                                             IEnumerable<CompileOutput> cSharpCompilationOutputs)
-      => new CompileInput(files, assemblies, cSharpCompilationOutputs);
+                                                   IEnumerable<AssemblyReference> assemblies,
+                                                   IEnumerable<CompileOutput> dependencies)
+      => new CompileInput(files, assemblies, dependencies);
   }
 }
