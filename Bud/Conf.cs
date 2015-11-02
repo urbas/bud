@@ -4,14 +4,13 @@ using System.Linq;
 using Bud.Configuration;
 
 namespace Bud {
-  public struct Conf : IConf, IConfigTransform {
-    public static Conf Empty { get; } = new Conf(Enumerable.Empty<IConfigTransform>(), string.Empty);
-    private IEnumerable<IConfigTransform> ConfigTransforms { get; }
+  public struct Conf : IConf, IConfBuilder {
+    public static Conf Empty { get; } = new Conf(Enumerable.Empty<IConfBuilder>(), string.Empty);
+    private IEnumerable<IConfBuilder> ConfBuilders { get; }
     public string Scope { get; }
 
-    public Conf(IEnumerable<IConfigTransform> configTransforms,
-                string scope) {
-      ConfigTransforms = configTransforms;
+    public Conf(IEnumerable<IConfBuilder> confBuilders, string scope) {
+      ConfBuilders = confBuilders;
       Scope = scope;
     }
 
@@ -44,7 +43,6 @@ namespace Bud {
       => Add(new SetConfig<T>(configKey, valueFactory));
 
     /// <summary>
-    ///   2
     ///   Defines a configuration that returns the value produced by <paramref name="valueFactory" />.
     ///   <paramref name="valueFactory" /> is invoked when the configuration is accessed.
     ///   If the configuration is already defined, then this method overwrites the configuration.
@@ -53,16 +51,16 @@ namespace Bud {
       => Add(new ModifyConfig<T>(configKey, valueFactory));
 
     /// <returns>a copy of self with added configurations from <paramref name="otherConfs" />.</returns>
-    public Conf Add(params IConfigTransform[] otherConfs)
-      => Add((IEnumerable<IConfigTransform>) otherConfs);
+    public Conf Add(params IConfBuilder[] otherConfs)
+      => Add((IEnumerable<IConfBuilder>) otherConfs);
 
-    public Conf Add(IEnumerable<IConfigTransform> otherConfs)
-      => new Conf(ConfigTransforms.Concat(otherConfs), Scope);
+    public Conf Add(IEnumerable<IConfBuilder> otherConfs)
+      => new Conf(ConfBuilders.Concat(otherConfs), Scope);
 
-    public static Conf Group(params IConfigTransform[] configTransforms)
-      => Empty.Add(configTransforms);
+    public static Conf Group(params IConfBuilder[] confBuilders)
+      => Empty.Add(confBuilders);
 
-    public static Conf Group(IEnumerable<IConfigTransform> configTransforms)
+    public static Conf Group(IEnumerable<IConfBuilder> configTransforms)
       => Empty.Add(configTransforms);
 
     public Conf Add<T>(Key<IEnumerable<T>> dependencies, params T[] v)
@@ -70,14 +68,14 @@ namespace Bud {
 
     /// <returns>a copy of self where every configuration key is prefixed with <paramref name="scope" />.</returns>
     public Conf In(string scope)
-      => new Conf(ConfigTransforms, Keys.PrefixWith(scope, Scope));
+      => new Conf(ConfBuilders, Keys.PrefixWith(scope, Scope));
 
     /// <returns>the value of the configuration key.</returns>
     /// <exception cref="ConfigTypeException">
     ///   thrown if the actual type of the configuration does not match the requested type <typeparamref name="T" />.
     /// </exception>
-    public T Get<T>(Key<T> configKey)
-      => ToCachingConf().Get(configKey);
+    public T Get<T>(Key<T> key)
+      => ToCachingConf().Get(key);
 
     public void ApplyIn(IDictionary<string, IConfigDefinition> configDefinitions) {
       if (string.IsNullOrEmpty(Scope)) {
@@ -92,7 +90,7 @@ namespace Bud {
 
     private IDictionary<string, IConfigDefinition> CreateUnscopedConfigDefinitions(IDictionary<string, IConfigDefinition> configDefinitions = null) {
       configDefinitions = configDefinitions ?? new Dictionary<string, IConfigDefinition>();
-      foreach (var configTransform in ConfigTransforms) {
+      foreach (var configTransform in ConfBuilders) {
         configTransform.ApplyIn(configDefinitions);
       }
       return configDefinitions;
@@ -100,8 +98,9 @@ namespace Bud {
 
     private void CreateScopedConfigDefinitions(IDictionary<string, IConfigDefinition> configDefinitions) {
       var prefix = Scope + "/";
+      var scopeDepth = prefix.Count(c => c == Keys.Separator);
       foreach (var configDefinition in CreateUnscopedConfigDefinitions()) {
-        var newConfigDefinition = new PrefixedConfigDefinition(prefix, configDefinition.Value);
+        var newConfigDefinition = new PrefixedConfigDefinition(prefix, scopeDepth, configDefinition.Value);
         var prefixedKey = prefix + configDefinition.Key;
         configDefinitions[prefixedKey] = newConfigDefinition;
       }

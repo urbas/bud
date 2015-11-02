@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
 namespace Bud.Configuration {
-  public abstract class ConfigTransform : IConfigTransform {
-    protected ConfigTransform(string key) {
+  public abstract class ConfBuilder : IConfBuilder {
+    protected ConfBuilder(string key) {
       Key = key;
     }
 

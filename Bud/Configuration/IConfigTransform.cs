@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
 namespace Bud.Configuration {
-  public interface IConfigTransform {
+  public interface IConfBuilder {
     void ApplyIn(IDictionary<string, IConfigDefinition> configDefinitions);
   }
 }

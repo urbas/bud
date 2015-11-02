@@ -12,12 +12,12 @@ namespace Bud.Configuration {
       ConfigDefinitions = configDefinitions;
     }
 
-    public T Get<T>(Key<T> configKey) {
-      var configValue = GetFromCacheOrInvoke(configKey.Relativize());
+    public T Get<T>(Key<T> key) {
+      var configValue = GetFromCacheOrInvoke(key.Relativize());
       try {
         return (T) configValue;
       } catch (Exception) {
-        throw new ConfigTypeException($"Trying to read configuration '{(string) configKey}' as type '{typeof(T)}'. Its actual type is '{configValue.GetType()}'.");
+        throw new ConfigTypeException($"Trying to read configuration '{(string) key}' as type '{typeof(T)}'. Its actual type is '{configValue.GetType()}'.");
       }
     }
 

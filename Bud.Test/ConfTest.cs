@@ -155,10 +155,47 @@ namespace Bud {
     }
 
     [Test]
+    public void Modifying_values_of_double_nested_configurations() {
+      var subConf = A.SetValue(42)
+                     .In("foo")
+                     .In("bar")
+                     .Modify(A, (conf, oldValue) => 1 + oldValue);
+      Assert.AreEqual(43, Group(subConf).Get("bar/foo" / A));
+    }
+
+    [Test]
     public void Nested_configurations_can_access_configurations_by_absolute_path() {
       var confA = A.SetValue(42);
       var confB = B.Set(conf => 1 + conf.Get(Keys.Root / A)).In("foo");
       Assert.AreEqual(43, Group(confA, confB).Get("foo" / B));
+    }
+
+    [Test]
+    public void Nested_configurations_can_access_configurations_by_relative_path() {
+      var confA = A.SetValue(42);
+      var confB = B.Set(conf => 1 + conf.Get(".." / A)).In("foo");
+      Assert.AreEqual(43, Group(confA, confB).Get("foo" / B));
+    }
+
+    [Test]
+    public void Doubly_nested_configurations_can_access_configurations_by_relative_path() {
+      var confA = A.SetValue(42);
+      var confB = B.Set(conf => 1 + conf.Get("../.." / A)).In("foo").In("bar");
+      Assert.AreEqual(43, Group(confA, confB).Get("bar/foo" / B));
+    }
+
+    [Test]
+    public void Triply_nested_configurations_can_access_configurations_by_relative_path() {
+      var confA = A.SetValue(42);
+      var confB = B.Set(conf => 1 + conf.Get("../../../moo" / A)).In("foo").In("bar");
+      Assert.AreEqual(43, Group(Group(confA, confB).In("moo")).Get("moo/bar/foo" / B));
+    }
+
+    [Test]
+    public void Nested_configurations_can_access_configurations_in_other_branches_via_relative_paths() {
+      var confA = A.SetValue(42).In("boo");
+      var confB = B.Set(conf => 1 + conf.Get("../boo" / A)).In("foo").In("bar");
+      Assert.AreEqual(43, Group(Group(confA, confB)).Get("bar/foo" / B));
     }
 
     private static async Task<int> AddFooTwiceConcurrently(IConf conf) {

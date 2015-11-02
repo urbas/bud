@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Bud.Configuration {
-  public class ModifyConfig<T> : ConfigTransform {
+  public class ModifyConfig<T> : ConfBuilder {
     public ModifyConfig(Key<T> key, Func<IConf, T, T> valueFactory) : base(key) {
       ValueFactory = valueFactory;
     }

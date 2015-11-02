@@ -97,7 +97,7 @@ namespace Bud {
       var projectA = EmptyCSharpProject("A")
         .SetValue(Compile, Observable.Return(projectACompilationOutput));
       var projectB = EmptyCSharpProject("B")
-        .SetValue(Dependencies, new[] {"A"});
+        .SetValue(Dependencies, new[] {"../A"});
       var buildConfiguration = Group(projectA, projectB);
       var compilationInput = buildConfiguration.Get("B" / CompilationInput).Take(1).Wait();
       Assert.AreEqual(new[] {projectACompilationOutput},

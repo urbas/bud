@@ -66,7 +66,7 @@ namespace Bud {
 
     private static IObservable<IEnumerable<CompileOutput>> CollectDependencies(IConf conf)
       => Dependencies[conf].Any() ?
-        Dependencies[conf].Select(s => conf.Get(Keys.Root / s / Compile)).CombineLatest() :
+        Dependencies[conf].Select(s => conf.Get(s / Compile)).CombineLatest() :
         Return(Enumerable.Empty<CompileOutput>());
 
     private static CompileInput ToCompilationInput(IEnumerable<string> files,

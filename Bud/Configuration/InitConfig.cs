@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Bud.Configuration {
-  public class InitConfig<T> : ConfigTransform {
+  public class InitConfig<T> : ConfBuilder {
     public InitConfig(Key<T> key, Func<IConf, T> valueFactory) : base(key) {
       ValueFactory = valueFactory;
     }
