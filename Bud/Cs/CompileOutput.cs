@@ -12,11 +12,11 @@ namespace Bud.Cs {
     public bool Success { get; }
 
     public CompileOutput(IEnumerable<Diagnostic> diagnostics,
-                                   TimeSpan compilationTime,
-                                   string assemblyPath,
-                                   bool success,
-                                   long timestamp,
-                                   MetadataReference reference) {
+                         TimeSpan compilationTime,
+                         string assemblyPath,
+                         bool success,
+                         long timestamp,
+                         MetadataReference reference) {
       Diagnostics = diagnostics;
       CompilationTime = compilationTime;
       AssemblyPath = assemblyPath;

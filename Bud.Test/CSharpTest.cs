@@ -8,6 +8,7 @@ using NUnit.Framework;
 using static System.Linq.Enumerable;
 using static System.TimeSpan;
 using static Bud.Build;
+using static Bud.Conf;
 using static Bud.CSharp;
 
 namespace Bud {
@@ -97,7 +98,7 @@ namespace Bud {
         .SetValue(Compile, Observable.Return(projectACompilationOutput));
       var projectB = EmptyCSharpProject("B")
         .SetValue(Dependencies, new[] {"A"});
-      var buildConfiguration = Conf.Group(projectA, projectB);
+      var buildConfiguration = Group(projectA, projectB);
       var compilationInput = buildConfiguration.Get("B" / CompilationInput).Take(1).Wait();
       Assert.AreEqual(new[] {projectACompilationOutput},
                       compilationInput.Dependencies);
