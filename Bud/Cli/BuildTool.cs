@@ -15,8 +15,8 @@ namespace Bud.Cli {
                                     .Add(BudDependencies())
                                     .Set(Sources, configs => Build.FilesObservatory[configs].ObserveFiles(Combine(ProjectDir[configs], "Build.cs")))
                                     .Get(CSharp.Compile)
-                                    .ToEnumerable()
-                                    .First();
+                                    .Take(1)
+                                    .Wait();
       if (compilationOutput.Success) {
         var configs = LoadBuildConf(compilationOutput);
         foreach (var s in args) {
@@ -42,10 +42,10 @@ namespace Bud.Cli {
     }
 
     private static Conf BudDependencies()
-      => Conf.Empty.Set(CSharp.AssemblyReferences,
-                        c => new Assemblies(typeof(BuildTool).Assembly.Location,
-                                            typeof(object).Assembly.Location,
-                                            typeof(Enumerable).Assembly.Location,
-                                            typeof(Observable).Assembly.Location));
+      => CSharp.AssemblyReferences.Set(
+        c => new Assemblies(typeof(BuildTool).Assembly.Location,
+                            typeof(object).Assembly.Location,
+                            typeof(Enumerable).Assembly.Location,
+                            typeof(Observable).Assembly.Location));
   }
 }
