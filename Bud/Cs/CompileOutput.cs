@@ -45,5 +45,8 @@ namespace Bud.Cs {
 
     public static bool operator ==(CompileOutput left, CompileOutput right) => Equals(left, right);
     public static bool operator !=(CompileOutput left, CompileOutput right) => !Equals(left, right);
+
+    public override string ToString()
+      => $"CompileOutput(AssemblyPath: {AssemblyPath}, Timestamp: {Timestamp})";
   }
 }

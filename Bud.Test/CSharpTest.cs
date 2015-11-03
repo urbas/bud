@@ -69,7 +69,7 @@ namespace Bud {
       var cSharpCompilationInput = new CompileInput(Files.Empty, Assemblies.Empty, Empty<CompileOutput>());
       var cSharpCompiler = new Mock<Func<CompileInput, CompileOutput>>(MockBehavior.Strict);
       cSharpCompiler.Setup(self => self(It.Is<CompileInput>(input => cSharpCompilationInput.Equals(input))))
-                    .Returns(GetEmptyCompilerOutput());
+                    .Returns(GetEmptyCompileOutput());
       var projectA = CSharpProject("foo", "A")
         .SetValue(Compiler, cSharpCompiler.Object)
         .SetValue(CompilationInput, Observable.Return(cSharpCompilationInput));
@@ -85,7 +85,7 @@ namespace Bud {
         .SetValue(AssemblyReferences, Assemblies.Empty)
         .SetValue(Compiler, input => {
           ++invocationCount;
-          return GetEmptyCompilerOutput();
+          return GetEmptyCompileOutput();
         })
         .Get(Compile).Wait();
       Assert.AreEqual(3, invocationCount);
@@ -93,23 +93,41 @@ namespace Bud {
 
     [Test]
     public void Compiler_uses_dependencies() {
-      var projectACompilationOutput = GetEmptyCompilerOutput(42);
-      var projectA = EmptyCSharpProject("A")
-        .SetValue(Compile, Observable.Return(projectACompilationOutput));
-      var projectB = EmptyCSharpProject("B")
-        .SetValue(Dependencies, new[] {"../A"});
-      var buildConfiguration = Group(projectA, projectB);
-      var compilationInput = buildConfiguration.Get("B" / CompilationInput).Take(1).Wait();
-      Assert.AreEqual(new[] {projectACompilationOutput},
-                      compilationInput.Dependencies);
+      var projects = Group(ProjectAWithFakeOutput(42L),
+                           ProjectBDependingOnA());
+      var compilationInput = projects.Get("B" / Compile).ToEnumerable();
+      Assert.AreEqual(new[] {GetEmptyCompileOutput(1042)},
+                      compilationInput);
     }
+
+    [Test]
+    public void Compiler_reinvoked_when_dependencies_change() {
+      var projects = Group(ProjectAWithFakeOutput(9000L)
+                             .SetValue(Sources, new Files(Empty<string>(), new[] {"foo"}.ToObservable())),
+                           ProjectBDependingOnA());
+      var compileOutputs = projects.Get("B" / Compile).ToEnumerable();
+      Assert.AreEqual(new[] {GetEmptyCompileOutput(10000), GetEmptyCompileOutput(10001)},
+                      compileOutputs);
+    }
+
+    private static Conf ProjectAWithFakeOutput(long initialTimestamp)
+      => EmptyCSharpProject("A")
+        .SetValue(Compiler, input => GetEmptyCompileOutput(initialTimestamp++));
+
+    private Conf ProjectBDependingOnA()
+      => EmptyCSharpProject("B")
+        .SetValue(Dependencies, new[] {"../A"})
+        .SetValue(Compiler, SingleDependencyCompiler);
+
+    private CompileOutput SingleDependencyCompiler(CompileInput input)
+      => GetEmptyCompileOutput(input.Dependencies.Single().Timestamp + 1000);
 
     private static Conf EmptyCSharpProject(string projectId)
       => CSharpProject(projectId, projectId)
         .SetValue(Sources, Files.Empty)
         .SetValue(AssemblyReferences, Assemblies.Empty);
 
-    private static CompileOutput GetEmptyCompilerOutput(long timestamp = 0L)
+    private static CompileOutput GetEmptyCompileOutput(long timestamp = 0L)
       => new CompileOutput(Empty<Diagnostic>(), Zero, "foo", true, timestamp, null);
   }
 }
