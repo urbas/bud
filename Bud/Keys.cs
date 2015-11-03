@@ -25,5 +25,8 @@ namespace Bud {
     public static Conf Set<T>(this Key<T> key, Func<IConf, T> value) => Conf.Empty.Set(key, value);
     public static Conf Init<T>(this Key<T> key, Func<IConf, T> value) => Conf.Empty.Init(key, value);
     public static Conf Modify<T>(this Key<T> key, Func<IConf, T, T> value) => Conf.Empty.Modify(key, value);
+
+    public static bool IsAbsolute(string id)
+      => !string.IsNullOrEmpty(id) && id[0] == Separator;
   }
 }

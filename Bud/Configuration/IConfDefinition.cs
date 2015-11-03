@@ -1,5 +1,5 @@
 namespace Bud.Configuration {
-  public interface IConfigDefinition {
+  public interface IConfDefinition {
     object Value(IConf conf);
   }
 }

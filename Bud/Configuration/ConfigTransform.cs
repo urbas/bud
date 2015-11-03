@@ -7,6 +7,6 @@ namespace Bud.Configuration {
     }
 
     public string Key { get; }
-    public abstract void ApplyIn(IDictionary<string, IConfigDefinition> configDefinitions);
+    public abstract void ApplyIn(IDictionary<string, IConfDefinition> configDefinitions);
   }
 }

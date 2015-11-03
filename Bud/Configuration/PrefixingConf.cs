@@ -1,5 +1,6 @@
 namespace Bud.Configuration {
   internal class PrefixingConf : IConf {
+    public ValueCache Cache { get; }
     public IConf Conf { get; }
     public string Prefix { get; }
     public int ScopeDepth { get; }
@@ -8,14 +9,17 @@ namespace Bud.Configuration {
       Prefix = prefix;
       ScopeDepth = scopeDepth;
       Conf = conf;
+      Cache = new ValueCache(CalculateValue);
     }
 
-    public T Get<T>(Key<T> key)
-      => Conf.Get(key.IsAbsolute ? key : ResolveRelativePath(key));
+    public T Get<T>(Key<T> key) => Cache.Get(key);
 
-    private Key<T> ResolveRelativePath<T>(Key<T> key) {
+    private object CalculateValue(string key)
+      => Conf.Get<object>(Keys.IsAbsolute(key) ? key : ResolveRelativePath(key));
+
+    private string ResolveRelativePath(string key) {
       int backReferenceCount = 0;
-      var keyPath = key.Id;
+      var keyPath = key;
       var maxBacktrackIndex = ScopeDepth * 3;
       while (backReferenceCount < maxBacktrackIndex && backReferenceCount + 3 <= keyPath.Length) {
         if (IsBackreferenceAtIndex(keyPath, backReferenceCount)) {

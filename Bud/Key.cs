@@ -24,7 +24,8 @@ namespace Bud {
     public T this[IConf conf] => conf.Get(this);
     public static Key<T> operator /(string prefix, Key<T> key) => prefix + "/" + key.Id;
     public static Key<T> operator /(Key prefix, Key<T> key) => prefix.Id + "/" + key.Id;
-    public bool IsAbsolute => !string.IsNullOrEmpty(Id) && Id[0] == Keys.Separator;
+    public bool IsAbsolute => Keys.IsAbsolute(Id);
+
     public override string ToString() => Id;
   }
 }

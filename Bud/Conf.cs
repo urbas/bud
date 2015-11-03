@@ -32,7 +32,7 @@ namespace Bud {
     ///   If the configuration is already defined, then this method does nothing.
     /// </summary>
     public Conf Init<T>(Key<T> configKey, Func<IConf, T> valueFactory)
-      => Add(new InitConfig<T>(configKey, valueFactory));
+      => Add(new InitConf<T>(configKey, valueFactory));
 
     /// <summary>
     ///   Defines a configuration that returns the value produced by <paramref name="valueFactory" />.
@@ -40,7 +40,7 @@ namespace Bud {
     ///   If the configuration is already defined, then this method overwrites the configuration.
     /// </summary>
     public Conf Set<T>(Key<T> configKey, Func<IConf, T> valueFactory)
-      => Add(new SetConfig<T>(configKey, valueFactory));
+      => Add(new SetConf<T>(configKey, valueFactory));
 
     /// <summary>
     ///   Defines a configuration that returns the value produced by <paramref name="valueFactory" />.
@@ -48,7 +48,7 @@ namespace Bud {
     ///   If the configuration is already defined, then this method overwrites the configuration.
     /// </summary>
     public Conf Modify<T>(Key<T> configKey, Func<IConf, T, T> valueFactory)
-      => Add(new ModifyConfig<T>(configKey, valueFactory));
+      => Add(new ModifyConf<T>(configKey, valueFactory));
 
     /// <returns>a copy of self with added configurations from <paramref name="otherConfs" />.</returns>
     public Conf Add(params IConfBuilder[] otherConfs)
@@ -77,7 +77,7 @@ namespace Bud {
     public T Get<T>(Key<T> key)
       => ToCachingConf().Get(key);
 
-    public void ApplyIn(IDictionary<string, IConfigDefinition> configDefinitions) {
+    public void ApplyIn(IDictionary<string, IConfDefinition> configDefinitions) {
       if (string.IsNullOrEmpty(Scope)) {
         CreateUnscopedConfigDefinitions(configDefinitions);
       } else {
@@ -88,19 +88,19 @@ namespace Bud {
     public CachingConf ToCachingConf()
       => new CachingConf(CreateUnscopedConfigDefinitions());
 
-    private IDictionary<string, IConfigDefinition> CreateUnscopedConfigDefinitions(IDictionary<string, IConfigDefinition> configDefinitions = null) {
-      configDefinitions = configDefinitions ?? new Dictionary<string, IConfigDefinition>();
+    private IDictionary<string, IConfDefinition> CreateUnscopedConfigDefinitions(IDictionary<string, IConfDefinition> configDefinitions = null) {
+      configDefinitions = configDefinitions ?? new Dictionary<string, IConfDefinition>();
       foreach (var configTransform in ConfBuilders) {
         configTransform.ApplyIn(configDefinitions);
       }
       return configDefinitions;
     }
 
-    private void CreateScopedConfigDefinitions(IDictionary<string, IConfigDefinition> configDefinitions) {
+    private void CreateScopedConfigDefinitions(IDictionary<string, IConfDefinition> configDefinitions) {
       var prefix = Scope + "/";
       var scopeDepth = prefix.Count(c => c == Keys.Separator);
       foreach (var configDefinition in CreateUnscopedConfigDefinitions()) {
-        var newConfigDefinition = new PrefixedConfigDefinition(prefix, scopeDepth, configDefinition.Value);
+        var newConfigDefinition = new PrefixedConfDefinition(prefix, scopeDepth, configDefinition.Value);
         var prefixedKey = prefix + configDefinition.Key;
         configDefinitions[prefixedKey] = newConfigDefinition;
       }
