@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reflection;
 using Bud.Cs;
@@ -20,7 +21,9 @@ namespace Bud.Cli {
       if (compilationOutput.Success) {
         var configs = LoadBuildConf(compilationOutput);
         foreach (var s in args) {
-          configs.Get<IObservable<object>>(s).Wait();
+          configs.Get<IObservable<object>>(s)
+                 .ObserveOn(new EventLoopScheduler())
+                 .Wait();
         }
       } else {
         PrintCompilationErrors(compilationOutput);

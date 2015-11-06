@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Concurrent;
 using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
@@ -15,30 +14,48 @@ namespace Bud.IO {
                                                         Action subscribedCallback = null,
                                                         Action disposedCallback = null)
       => Observable.Create<string>(observer => {
-        var fileSystemWatcher = new FileSystemWatcher(watcherDir, fileFilter) {
-          IncludeSubdirectories = includeSubdirectories,
-          EnableRaisingEvents = true
-        };
-
-        var blockingCollection = new BlockingCollection<string>();
-
-        fileSystemWatcher.Created += (sender, args) => blockingCollection.Add(args.FullPath);
-        fileSystemWatcher.Deleted += (sender, args) => blockingCollection.Add(args.FullPath);
-        fileSystemWatcher.Changed += (sender, args) => blockingCollection.Add(args.FullPath);
-        fileSystemWatcher.Renamed += (sender, args) => {
-          blockingCollection.Add(args.OldFullPath);
-          blockingCollection.Add(args.FullPath);
-        };
-
         var compositeDisposable = new CompositeDisposable {
-          fileSystemWatcher,
-          new BlockingCollectionDisposable(blockingCollection),
-          blockingCollection.GetConsumingEnumerable().ToObservable().Subscribe(observer),
+          new FileSystemObserver(watcherDir, fileFilter, includeSubdirectories, observer),
           new CallbackDisposable(disposedCallback)
         };
         subscribedCallback?.Invoke();
         return compositeDisposable;
       });
+
+    private class FileSystemObserver : IDisposable {
+      private readonly IObserver<string> observer;
+      private readonly FileSystemWatcher fileSystemWatcher;
+
+      public FileSystemObserver(string watcherDir, string fileFilter, bool includeSubdirectories, IObserver<string> observer) {
+        this.observer = observer;
+        fileSystemWatcher = new FileSystemWatcher(watcherDir, fileFilter) {
+          IncludeSubdirectories = includeSubdirectories,
+          EnableRaisingEvents = true
+        };
+
+        fileSystemWatcher.Created += OnFileChanged;
+        fileSystemWatcher.Deleted += OnFileChanged;
+        fileSystemWatcher.Changed += OnFileChanged;
+        fileSystemWatcher.Renamed += OnFileRenamed;
+      }
+
+      private void OnFileRenamed(object sender, RenamedEventArgs args) {
+        observer.OnNext(args.OldFullPath);
+        observer.OnNext(args.FullPath);
+      }
+
+      private void OnFileChanged(object sender, FileSystemEventArgs args)
+        => observer.OnNext(args.FullPath);
+
+      public void Dispose() {
+        fileSystemWatcher.Created -= OnFileChanged;
+        fileSystemWatcher.Deleted -= OnFileChanged;
+        fileSystemWatcher.Changed -= OnFileChanged;
+        fileSystemWatcher.Renamed -= OnFileRenamed;
+        fileSystemWatcher.EnableRaisingEvents = false;
+        fileSystemWatcher.Dispose();
+      }
+    }
 
     private class CallbackDisposable : IDisposable {
       private readonly Action disposedCallback;
@@ -48,16 +65,6 @@ namespace Bud.IO {
       }
 
       public void Dispose() => disposedCallback?.Invoke();
-    }
-
-    public class BlockingCollectionDisposable : IDisposable {
-      private readonly BlockingCollection<string> blockingCollection;
-
-      public BlockingCollectionDisposable(BlockingCollection<string> blockingCollection) {
-        this.blockingCollection = blockingCollection;
-      }
-
-      public void Dispose() => blockingCollection.CompleteAdding();
     }
   }
 }

@@ -55,14 +55,10 @@ namespace Bud {
                                .Do(PrintCompilationResult);
 
     private static IObservable<CompileInput> DefaultCompilationInput(IConf conf)
-      => DefaultCompilationInput(conf, ToCompilationInput);
-
-    internal static IObservable<CompileInput> DefaultCompilationInput(IConf conf,
-                                                                      Func<Files, Assemblies, IEnumerable<CompileOutput>, CompileInput> compilationInputBuilder)
       => Observable.CombineLatest(Sources[conf].Watch(),
                                   AssemblyReferences[conf].Watch(),
                                   CollectDependencies(conf),
-                                  compilationInputBuilder);
+                                  ToCompilationInput);
 
     private static IObservable<IEnumerable<CompileOutput>> CollectDependencies(IConf conf)
       => Dependencies[conf].Any() ?
