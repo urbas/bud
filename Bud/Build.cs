@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
 using Bud.IO;
 using static System.IO.Path;
 using static Bud.Conf;
@@ -11,11 +12,13 @@ namespace Bud {
     public static readonly Key<Files> Sources = nameof(Sources);
     public static readonly Key<IEnumerable<string>> Dependencies = nameof(Dependencies);
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
+    public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
 
     public static Conf Project(string projectDir, string projectId = null)
       => Empty.InitValue(ProjectDir, projectDir)
               .Init(ProjectId, c => projectId ?? GetFileName(ProjectDir[c]))
               .InitValue(Sources, Files.Empty)
+              .Init(BuildPipelineScheduler, conf => new EventLoopScheduler())
               .InitValue(Dependencies, Enumerable.Empty<string>())
               .Init(FilesObservatory, c => new LocalFilesObservatory());
 

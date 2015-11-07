@@ -1,11 +1,14 @@
 using System;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Bud.Cs;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Moq;
 using NUnit.Framework;
 using static System.Linq.Enumerable;
+using static System.Threading.Thread;
 using static System.TimeSpan;
 using static Bud.Build;
 using static Bud.Conf;
@@ -66,10 +69,10 @@ namespace Bud {
 
     [Test]
     public void CompilationInput_is_passed_to_the_compiler() {
-      var cSharpCompilationInput = new CompileInput(Files.Empty, Assemblies.Empty, Empty<CompileOutput>());
+      var cSharpCompilationInput = EmptyCompileInput();
       var cSharpCompiler = new Mock<Func<CompileInput, CompileOutput>>(MockBehavior.Strict);
       cSharpCompiler.Setup(self => self(It.Is<CompileInput>(input => cSharpCompilationInput.Equals(input))))
-                    .Returns(GetEmptyCompileOutput());
+                    .Returns(EmptyCompileOutput());
       var projectA = CSharpProject("foo", "A")
         .SetValue(Compiler, cSharpCompiler.Object)
         .SetValue(CompilationInput, Observable.Return(cSharpCompilationInput));
@@ -85,7 +88,7 @@ namespace Bud {
         .SetValue(AssemblyReferences, Assemblies.Empty)
         .SetValue(Compiler, input => {
           ++invocationCount;
-          return GetEmptyCompileOutput();
+          return EmptyCompileOutput();
         })
         .Get(Compile).Wait();
       Assert.AreEqual(3, invocationCount);
@@ -94,9 +97,9 @@ namespace Bud {
     [Test]
     public void Compiler_uses_dependencies() {
       var projects = Group(ProjectAWithFakeOutput(42L),
-                           ProjectBDependingOnA());
+                           ProjectWithDependencies("B", "../A"));
       var compilationInput = projects.Get("B" / Compile).ToEnumerable();
-      Assert.AreEqual(new[] {GetEmptyCompileOutput(1042)},
+      Assert.AreEqual(new[] {EmptyCompileOutput(1042)},
                       compilationInput);
     }
 
@@ -104,30 +107,59 @@ namespace Bud {
     public void Compiler_reinvoked_when_dependencies_change() {
       var projects = Group(ProjectAWithFakeOutput(9000L)
                              .SetValue(Sources, new Files(Empty<string>(), new[] {"foo"}.ToObservable())),
-                           ProjectBDependingOnA());
+                           ProjectWithDependencies("B", "../A"));
       var compileOutputs = projects.Get("B" / Compile).ToEnumerable();
-      Assert.AreEqual(new[] {GetEmptyCompileOutput(10000), GetEmptyCompileOutput(10001)},
+      Assert.AreEqual(new[] {EmptyCompileOutput(10000), EmptyCompileOutput(10001)},
                       compileOutputs);
+    }
+
+    [Test]
+    public void Compilers_must_be_invoked_on_the_build_pipeline_thread() {
+      int inputThreadId = 0;
+      int compileThreadId = 0;
+      EmptyCSharpProject("A")
+        .SetValue(CompilationInput, Observable.Create<CompileInput>(observer => {
+          Task.Run(() => {
+            inputThreadId = CurrentThread.ManagedThreadId;
+            observer.OnNext(EmptyCompileInput());
+            observer.OnCompleted();
+          });
+          return new CompositeDisposable();
+        }))
+        .SetValue(Compiler, input => {
+          compileThreadId = CurrentThread.ManagedThreadId;
+          return EmptyCompileOutput(42);
+        })
+        .Get(Compile).Wait();
+      Assert.AreNotEqual(inputThreadId, compileThreadId);
     }
 
     private static Conf ProjectAWithFakeOutput(long initialTimestamp)
       => EmptyCSharpProject("A")
-        .SetValue(Compiler, input => GetEmptyCompileOutput(initialTimestamp++));
+        .SetValue(Compiler, input => EmptyCompileOutput(initialTimestamp++));
 
-    private Conf ProjectBDependingOnA()
-      => EmptyCSharpProject("B")
-        .SetValue(Dependencies, new[] {"../A"})
-        .SetValue(Compiler, SingleDependencyCompiler);
+    private static Conf ProjectWithDependencies(string projectId, params string[] dependencies)
+      => EmptyCSharpProject(projectId)
+        .SetValue(Dependencies, dependencies)
+        .SetValue(Compiler, MaxTimestampWithSecondDelayCompiler);
 
-    private CompileOutput SingleDependencyCompiler(CompileInput input)
-      => GetEmptyCompileOutput(input.Dependencies.Single().Timestamp + 1000);
+    private static CompileOutput MaxTimestampWithSecondDelayCompiler(CompileInput input)
+      => EmptyCompileOutput(MaxDependencyTimestamp(input) + 1000);
+
+    private static long MaxDependencyTimestamp(CompileInput input)
+      => input.Dependencies.Any() ? input.Dependencies.Max(output => output.Timestamp) : 0L;
 
     private static Conf EmptyCSharpProject(string projectId)
       => CSharpProject(projectId, projectId)
         .SetValue(Sources, Files.Empty)
         .SetValue(AssemblyReferences, Assemblies.Empty);
 
-    private static CompileOutput GetEmptyCompileOutput(long timestamp = 0L)
+    public static CompileInput EmptyCompileInput()
+      => new CompileInput(Empty<string>(),
+                          Empty<AssemblyReference>(),
+                          Empty<CompileOutput>());
+
+    private static CompileOutput EmptyCompileOutput(long timestamp = 0L)
       => new CompileOutput(Empty<Diagnostic>(), Zero, "foo", true, timestamp, null);
   }
 }

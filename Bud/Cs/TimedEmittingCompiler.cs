@@ -31,7 +31,7 @@ namespace Bud.Cs {
       if (IsOutputUpToDate(compilationInput)) {
         return CreateOutputFromAssembly();
       }
-      return EmitDllAndPrintResult(UnderlyingCompiler(compilationInput), Stopwatch);
+      return EmitDll(UnderlyingCompiler(compilationInput), Stopwatch);
     }
 
     private static string GetOutputAssemblyPath(IConf conf)
@@ -39,11 +39,11 @@ namespace Bud.Cs {
 
     private CompileOutput CreateOutputFromAssembly()
       => new CompileOutput(Enumerable.Empty<Diagnostic>(),
-                                     Stopwatch.Elapsed,
-                                     OutputAssemblyPath,
-                                     true,
-                                     Files.GetTimeHash(OutputAssemblyPath),
-                                     MetadataReference.CreateFromFile(OutputAssemblyPath));
+                           Stopwatch.Elapsed,
+                           OutputAssemblyPath,
+                           true,
+                           Files.GetTimeHash(OutputAssemblyPath),
+                           MetadataReference.CreateFromFile(OutputAssemblyPath));
 
     private bool IsOutputUpToDate(CompileInput compilationInput)
       => File.Exists(OutputAssemblyPath) &&
@@ -53,7 +53,7 @@ namespace Bud.Cs {
     private static bool IsFileUpToDate<T>(string file, IEnumerable<Hashed<T>> otherResources)
       => !otherResources.All(hashed => Files.TimeHashEquals(hashed, file));
 
-    private CompileOutput EmitDllAndPrintResult(CSharpCompilation compilation, Stopwatch stopwatch) {
+    private CompileOutput EmitDll(CSharpCompilation compilation, Stopwatch stopwatch) {
       Directory.CreateDirectory(Path.GetDirectoryName(OutputAssemblyPath));
       EmitResult emitResult;
       using (var assemblyOutputFile = File.Create(OutputAssemblyPath)) {
@@ -64,11 +64,11 @@ namespace Bud.Cs {
         File.Delete(OutputAssemblyPath);
       }
       return new CompileOutput(emitResult.Diagnostics,
-                                         stopwatch.Elapsed,
-                                         OutputAssemblyPath,
-                                         emitResult.Success,
-                                         Files.GetTimeHash(),
-                                         compilation.ToMetadataReference());
+                               stopwatch.Elapsed,
+                               OutputAssemblyPath,
+                               emitResult.Success,
+                               Files.GetTimeHash(),
+                               compilation.ToMetadataReference());
     }
   }
 }

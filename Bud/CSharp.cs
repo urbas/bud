@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
 using Bud.Cs;
-using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Path;
@@ -51,14 +49,15 @@ namespace Bud {
     }
 
     private static IObservable<CompileOutput> DefaultCompilation(IConf conf)
-      => CompilationInput[conf].Select(Compiler[conf])
+      => CompilationInput[conf].ObserveOn(BuildPipelineScheduler[conf])
+                               .Select(Compiler[conf])
                                .Do(PrintCompilationResult);
 
     private static IObservable<CompileInput> DefaultCompilationInput(IConf conf)
-      => Observable.CombineLatest(Sources[conf].Watch(),
-                                  AssemblyReferences[conf].Watch(),
-                                  CollectDependencies(conf),
-                                  ToCompilationInput);
+      => Sources[conf].Watch()
+                      .CombineLatest(AssemblyReferences[conf].Watch(),
+                                     CollectDependencies(conf),
+                                     ToCompilationInput);
 
     private static IObservable<IEnumerable<CompileOutput>> CollectDependencies(IConf conf)
       => Dependencies[conf].Any() ?
