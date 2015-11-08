@@ -10,12 +10,12 @@ namespace Bud.Cs {
                         IEnumerable<AssemblyReference> assemblies,
                         IEnumerable<CompileOutput> dependencies) {
       Dependencies = dependencies.ToImmutableArray();
-      Sources = sources.Select(Files.ToTimeHashedFile).ToImmutableArray();
+      Sources = sources.Select(Files.ToTimestampedFile).ToImmutableArray();
       Assemblies = assemblies.Select(reference => reference.ToHashed()).ToImmutableArray();
     }
 
-    public ImmutableArray<Hashed<string>> Sources { get; }
-    public ImmutableArray<Hashed<AssemblyReference>> Assemblies { get; }
+    public ImmutableArray<Timestamped<string>> Sources { get; }
+    public ImmutableArray<Timestamped<AssemblyReference>> Assemblies { get; }
     public ImmutableArray<CompileOutput> Dependencies { get; }
 
     public bool Equals(CompileInput other)

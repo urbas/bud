@@ -27,7 +27,7 @@ namespace Bud {
         var fileB = tempDir.CreateEmptyFile("B", "B.cs");
         var twoDirsProject = Project(tempDir.Path, "foo").Add(SourceDir("A"), SourceDir("B"));
         Assert.That(Sources[twoDirsProject],
-                    Is.EquivalentTo(new[] {Files.ToTimeHashedFile(fileA), Files.ToTimeHashedFile(fileB)}));
+                    Is.EquivalentTo(new[] {Files.ToTimestampedFile(fileA), Files.ToTimestampedFile(fileB)}));
       }
     }
   }

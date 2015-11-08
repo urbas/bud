@@ -7,20 +7,20 @@ namespace Bud.IO {
   public class DiffTest {
     [Test]
     public void Empty_diff_always_returns_the_same_instance()
-      => Assert.AreSame(Diff.Empty<Hashed<int>>(), Diff.Empty<Hashed<int>>());
+      => Assert.AreSame(Diff.Empty<Timestamped<int>>(), Diff.Empty<Timestamped<int>>());
 
     [Test]
     public void Empty_diff_is_empty() {
-      Assert.IsEmpty(Diff.Empty<Hashed<int>>().Added);
-      Assert.IsEmpty(Diff.Empty<Hashed<int>>().Removed);
-      Assert.IsEmpty(Diff.Empty<Hashed<int>>().Changed);
-      Assert.IsEmpty(Diff.Empty<Hashed<int>>().All);
+      Assert.IsEmpty(Diff.Empty<Timestamped<int>>().Added);
+      Assert.IsEmpty(Diff.Empty<Timestamped<int>>().Removed);
+      Assert.IsEmpty(Diff.Empty<Timestamped<int>>().Changed);
+      Assert.IsEmpty(Diff.Empty<Timestamped<int>>().All);
     }
 
     [Test]
     public void Adding_an_element() {
-      var timestampedValue = Hashed.Create(42, 1);
-      var diff = Diff.Empty<Hashed<int>>()
+      var timestampedValue = Timestamped.Create(42, 1);
+      var diff = Diff.Empty<Timestamped<int>>()
                      .NextDiff(new[] {timestampedValue});
 
       Assert.That(diff.Added, Is.EquivalentTo(new[] {timestampedValue}));
@@ -31,10 +31,10 @@ namespace Bud.IO {
 
     [Test]
     public void Removing_an_element() {
-      var removedElement = new Hashed<int>(42, 1);
-      var diff = Diff.Empty<Hashed<int>>()
+      var removedElement = new Timestamped<int>(42, 1);
+      var diff = Diff.Empty<Timestamped<int>>()
                      .NextDiff(new[] {removedElement})
-                     .NextDiff(Enumerable.Empty<Hashed<int>>());
+                     .NextDiff(Enumerable.Empty<Timestamped<int>>());
 
       Assert.IsEmpty(diff.Added);
       Assert.That(diff.Removed, Is.EquivalentTo(new[] {removedElement}));
@@ -44,17 +44,17 @@ namespace Bud.IO {
 
     [Test]
     public void Enumerate_the_timestamped_elements_only_once() {
-      var timestampedElements = new Mock<IEnumerable<Hashed<int>>>(MockBehavior.Strict);
-      timestampedElements.Setup(self => self.GetEnumerator()).Returns(Enumerable.Empty<Hashed<int>>().GetEnumerator());
-      Diff.Empty<Hashed<int>>().NextDiff(timestampedElements.Object);
+      var timestampedElements = new Mock<IEnumerable<Timestamped<int>>>(MockBehavior.Strict);
+      timestampedElements.Setup(self => self.GetEnumerator()).Returns(Enumerable.Empty<Timestamped<int>>().GetEnumerator());
+      Diff.Empty<Timestamped<int>>().NextDiff(timestampedElements.Object);
       timestampedElements.Verify(self => self.GetEnumerator(), Times.Once);
     }
 
     [Test]
     public void Changing_an_element() {
-      var oldElement = new Hashed<int>(42, 1);
-      var newElement = new Hashed<int>(42, 2);
-      var diff = Diff.Empty<Hashed<int>>()
+      var oldElement = new Timestamped<int>(42, 1);
+      var newElement = new Timestamped<int>(42, 2);
+      var diff = Diff.Empty<Timestamped<int>>()
                      .NextDiff(new[] {oldElement})
                      .NextDiff(new[] {newElement});
 

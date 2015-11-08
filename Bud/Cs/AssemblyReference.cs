@@ -38,7 +38,7 @@ namespace Bud.Cs {
     public static AssemblyReference CreateFromFile(string file)
       => new AssemblyReference(file, MetadataReference.CreateFromFile(file));
 
-    public Hashed<AssemblyReference> ToHashed()
-      => new Hashed<AssemblyReference>(this, Files.GetTimeHash(Path));
+    public Timestamped<AssemblyReference> ToHashed()
+      => new Timestamped<AssemblyReference>(this, Files.GetFileTimestamp(Path));
   }
 }

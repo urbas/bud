@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Bud.IO {
-  public class Diff<T> where T : IHashed {
+  public class Diff<T> where T : ITimestamped {
     public Diff(ImmutableHashSet<T> added, ImmutableHashSet<T> removed, ImmutableHashSet<T> changed, ImmutableHashSet<T> all) {
       Added = added;
       Removed = removed;
@@ -65,23 +65,25 @@ namespace Bud.IO {
   }
 
   public static class Diff {
-    public static Diff<T> Empty<T>() where T : IHashed => EmptyDiff<T>.Instance;
+    public static Diff<T> Empty<T>() where T : ITimestamped => EmptyDiff<T>.Instance;
 
-    public static Diff<T> NextDiff<T>(this Diff<T> previousDiff, IEnumerable<T> timestampedElements) where T : IHashed {
+    public static Diff<T> NextDiff<T>(this Diff<T> previousDiff, IEnumerable<T> timestampedElements) where T : ITimestamped {
       var timestampedElementsList = timestampedElements as IList<T> ?? timestampedElements.ToList();
       var all = timestampedElementsList.ToImmutableHashSet();
       var removed = previousDiff.All.Except(all);
       var added = all.Except(previousDiff.All);
-      var changed = all.Except(added).Where(el => HasElementChanged(previousDiff, el)).ToImmutableHashSet();
+      var changed = all.Except(added)
+                       .Where(el => HasElementChanged(previousDiff, el))
+                       .ToImmutableHashSet();
       return new Diff<T>(added, removed, changed, all);
     }
 
-    private static bool HasElementChanged<T>(Diff<T> previousDiff, T el) where T : IHashed {
+    private static bool HasElementChanged<T>(Diff<T> previousDiff, T el) where T : ITimestamped {
       T oldEl;
-      return previousDiff.All.TryGetValue(el, out oldEl) && el.Hash > oldEl.Hash;
+      return previousDiff.All.TryGetValue(el, out oldEl) && el.Timestamp > oldEl.Timestamp;
     }
 
-    private static class EmptyDiff<T> where T : IHashed {
+    private static class EmptyDiff<T> where T : ITimestamped {
       public static readonly Diff<T> Instance = new Diff<T>(ImmutableHashSet<T>.Empty, ImmutableHashSet<T>.Empty, ImmutableHashSet<T>.Empty, ImmutableHashSet<T>.Empty);
     }
   }

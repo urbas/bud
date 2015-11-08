@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -28,7 +27,7 @@ namespace Bud.Cs {
 
     public CompileOutput Compile(CompileInput compilationInput) {
       Stopwatch.Restart();
-      if (IsOutputUpToDate(compilationInput)) {
+      if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(compilationInput)) {
         return CreateOutputFromAssembly();
       }
       return EmitDll(UnderlyingCompiler(compilationInput), Stopwatch);
@@ -42,16 +41,14 @@ namespace Bud.Cs {
                            Stopwatch.Elapsed,
                            OutputAssemblyPath,
                            true,
-                           Files.GetTimeHash(OutputAssemblyPath),
+                           Files.GetFileTimestamp(OutputAssemblyPath),
                            MetadataReference.CreateFromFile(OutputAssemblyPath));
 
-    private bool IsOutputUpToDate(CompileInput compilationInput)
-      => File.Exists(OutputAssemblyPath) &&
-         IsFileUpToDate(OutputAssemblyPath, compilationInput.Sources) &&
-         IsFileUpToDate(OutputAssemblyPath, compilationInput.Assemblies);
-
-    private static bool IsFileUpToDate<T>(string file, IEnumerable<Hashed<T>> otherResources)
-      => !otherResources.All(hashed => Files.TimeHashEquals(hashed, file));
+    private bool IsOutputUpToDate(CompileInput compilationInput) {
+      var timestampedFile = Files.ToTimestampedFile(OutputAssemblyPath);
+      return timestampedFile.IsUpToDateWith(compilationInput.Sources) &&
+             timestampedFile.IsUpToDateWith(compilationInput.Assemblies);
+    }
 
     private CompileOutput EmitDll(CSharpCompilation compilation, Stopwatch stopwatch) {
       Directory.CreateDirectory(Path.GetDirectoryName(OutputAssemblyPath));
@@ -67,7 +64,7 @@ namespace Bud.Cs {
                                stopwatch.Elapsed,
                                OutputAssemblyPath,
                                emitResult.Success,
-                               Files.GetTimeHash(),
+                               Files.FileTimestampNow(),
                                compilation.ToMetadataReference());
     }
   }

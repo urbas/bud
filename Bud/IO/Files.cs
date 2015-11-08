@@ -25,16 +25,13 @@ namespace Bud.IO {
     public new IObservable<Files> Watch()
       => base.Watch().Select(_ => this);
 
-    public static Hashed<string> ToTimeHashedFile(string path)
-      => new Hashed<string>(path, GetTimeHash(path));
+    public static Timestamped<string> ToTimestampedFile(string path)
+      => new Timestamped<string>(path, GetFileTimestamp(path));
 
-    public static long GetTimeHash(string file)
-      => File.GetLastWriteTime(file).ToFileTime();
+    public static long GetFileTimestamp(string path)
+      => File.GetLastWriteTime(path).ToFileTime();
 
-    public static long GetTimeHash()
+    public static long FileTimestampNow()
       => DateTime.Now.ToFileTime();
-
-    public static bool TimeHashEquals<T>(Hashed<T> timeHashedFile, string file)
-      => timeHashedFile.Hash != GetTimeHash(file);
   }
 }
