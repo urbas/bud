@@ -11,7 +11,7 @@ namespace Bud.Cs {
   public class RoslynCSharpCompiler {
     private ImmutableDictionary<Timestamped<string>, SyntaxTree> syntaxTrees = ImmutableDictionary<Timestamped<string>, SyntaxTree>.Empty;
     private Diff<Timestamped<string>> sources = Diff.Empty<Timestamped<string>>();
-    private Diff<Timestamped<AssemblyReference>> oldDependencies = Diff.Empty<Timestamped<AssemblyReference>>();
+    private Diff<Timestamped<IAssemblyReference>> oldDependencies = Diff.Empty<Timestamped<IAssemblyReference>>();
     private CSharpCompilation cSharpCompilation;
 
     public RoslynCSharpCompiler(string assemblyName, CSharpCompilationOptions cSharpCompilationOptions) {
@@ -43,16 +43,16 @@ namespace Bud.Cs {
       return cSharpCompilation;
     }
 
-    private static Timestamped<AssemblyReference> GetDependency(Diff<Timestamped<AssemblyReference>> dependenciesDiff, Timestamped<AssemblyReference> dependency)
+    private static Timestamped<IAssemblyReference> GetDependency(Diff<Timestamped<IAssemblyReference>> dependenciesDiff, Timestamped<IAssemblyReference> dependency)
       => dependenciesDiff.All.TryGetValue(dependency, out dependency) ? dependency : dependency;
 
     private static KeyValuePair<Timestamped<string>, SyntaxTree> ToFileSyntaxTreePair(Timestamped<string> s)
       => new KeyValuePair<Timestamped<string>, SyntaxTree>(s, SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s.Value), path: s.Value));
 
-    private static MetadataReference ToReference(Timestamped<AssemblyReference> dependency)
+    private static MetadataReference ToReference(Timestamped<IAssemblyReference> dependency)
       => dependency.Value.MetadataReference;
 
-    private MetadataReference FindOldReference(Timestamped<AssemblyReference> dependency)
+    private MetadataReference FindOldReference(Timestamped<IAssemblyReference> dependency)
       => GetDependency(oldDependencies, dependency).Value.MetadataReference;
 
     public static Func<CompileInput, CSharpCompilation> Create(string assemblyName, CSharpCompilationOptions cSharpCompilationOptions)

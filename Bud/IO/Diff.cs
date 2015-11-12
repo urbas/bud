@@ -17,10 +17,11 @@ namespace Bud.IO {
     public ImmutableHashSet<T> Changed { get; }
     public ImmutableHashSet<T> All { get; }
 
-    protected bool Equals(Diff<T> other) => Added.SetEquals(other.Added) &&
-                                            Removed.SetEquals(other.Removed) &&
-                                            Changed.SetEquals(other.Changed) &&
-                                            All.SetEquals(other.All);
+    protected bool Equals(Diff<T> other)
+      => Added.SetEquals(other.Added) &&
+         Removed.SetEquals(other.Removed) &&
+         Changed.SetEquals(other.Changed) &&
+         All.SetEquals(other.All);
 
     public override bool Equals(object obj) {
       if (ReferenceEquals(null, obj)) {

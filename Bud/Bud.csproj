@@ -92,6 +92,7 @@
     <Compile Include="Cs\CompileOutput.cs" />
     <Compile Include="Cs\Assemblies.cs" />
     <Compile Include="Cs\AssemblyReference.cs" />
+    <Compile Include="Cs\IAssemblyReference.cs" />
     <Compile Include="Cs\OutputAssemblyKind.cs" />
     <Compile Include="Cs\DependencyObservatory.cs" />
     <Compile Include="Cs\RoslynCSharpCompiler.cs" />

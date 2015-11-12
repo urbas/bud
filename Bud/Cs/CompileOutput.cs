@@ -25,7 +25,7 @@ namespace Bud.Cs {
       Reference = reference;
     }
 
-    public AssemblyReference ToAssemblyReference()
+    public IAssemblyReference ToAssemblyReference()
       => new AssemblyReference(AssemblyPath, Reference);
 
     protected bool Equals(CompileOutput other)

@@ -8,7 +8,7 @@ using static System.Linq.Enumerable;
 
 namespace Bud.Cs {
   public class RoslynCSharpCompilerTest {
-    private readonly AssemblyReference[] coreAssemblyReference = {AssemblyReference.CreateFromFile(typeof(object).Assembly.Location)};
+    private readonly IAssemblyReference[] coreAssemblyReference = {AssemblyReference.CreateFromFile(typeof(object).Assembly.Location)};
 
     [Test]
     public void Fails_to_compile_when_core_assembly_references_are_missing() {

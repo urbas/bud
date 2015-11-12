@@ -7,15 +7,15 @@ using static Bud.Collections.EnumerableUtils;
 namespace Bud.Cs {
   public struct CompileInput {
     public CompileInput(IEnumerable<string> sources,
-                        IEnumerable<AssemblyReference> assemblies,
+                        IEnumerable<IAssemblyReference> assemblies,
                         IEnumerable<CompileOutput> dependencies) {
       Dependencies = dependencies.ToImmutableArray();
       Sources = sources.Select(Files.ToTimestampedFile).ToImmutableArray();
-      Assemblies = assemblies.Select(reference => reference.ToHashed()).ToImmutableArray();
+      Assemblies = assemblies.Select(reference => reference.ToTimestamped()).ToImmutableArray();
     }
 
     public ImmutableArray<Timestamped<string>> Sources { get; }
-    public ImmutableArray<Timestamped<AssemblyReference>> Assemblies { get; }
+    public ImmutableArray<Timestamped<IAssemblyReference>> Assemblies { get; }
     public ImmutableArray<CompileOutput> Dependencies { get; }
 
     public bool Equals(CompileInput other)
