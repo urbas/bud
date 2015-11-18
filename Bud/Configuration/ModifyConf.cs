@@ -13,7 +13,7 @@ namespace Bud.Configuration {
       IConfDefinition oldConfDefinition;
       if (configDefinitions.TryGetValue(Key, out oldConfDefinition)) {
         var scopedValueFactory = WithScopedValueFactory(oldConfDefinition, configDefinitions.Scope);
-        configDefinitions.Set(Key, new ConfDefinition<T>(scopedValueFactory, configDefinitions.Scope));
+        configDefinitions.Set(Key, new ConfDefinition<T>(scopedValueFactory));
       } else {
         throw new ConfigDefinitionException(Key, typeof(T), $"Could not modify the value of configuration '{Key}'. The configuration has not been initialized yet.");
       }

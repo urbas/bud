@@ -5,8 +5,8 @@ using NUnit.Framework;
 
 namespace Bud.Configuration {
   public class ConfValueCalculatorTest {
-    private readonly ConfDefinition<int> confDefinition42 = new ConfDefinition<int>(_ => 42, ImmutableList<string>.Empty);
-    private readonly ConfDefinition<object> confDefinitionNull = new ConfDefinition<object>(_ => null, ImmutableList<string>.Empty);
+    private readonly ConfDefinition<int> confDefinition42 = new ConfDefinition<int>(_ => 42);
+    private readonly ConfDefinition<object> confDefinitionNull = new ConfDefinition<object>(_ => null);
 
     [Test]
     public void Get_throws_an_exception_when_key_is_undefined() {

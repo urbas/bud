@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Immutable;
 using static Bud.Configuration.SubscopingConf;
 
 namespace Bud.Configuration {
@@ -8,8 +7,7 @@ namespace Bud.Configuration {
     public T Value(IConf conf) => ValueFactory(conf);
     object IConfDefinition.Value(IConf conf) => Value(conf);
 
-    public ConfDefinition(Func<IConf, T> valueFactory,
-                          ImmutableList<string> scope) {
+    public ConfDefinition(Func<IConf, T> valueFactory) {
       ValueFactory = valueFactory;
     }
   }

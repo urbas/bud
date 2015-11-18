@@ -17,7 +17,7 @@ namespace Bud.Configuration {
       var confDefinition = new ConfDefinition<T>(conf => {
         var scopedConf = SubscopingConf.MakeScoped(configDefinitions.Scope, conf);
         return valueFactory(scopedConf);
-      }, configDefinitions.Scope);
+      });
       configDefinitions.Set(key, confDefinition);
     }
   }
