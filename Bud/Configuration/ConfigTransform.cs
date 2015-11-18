@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Bud.Configuration {
   public abstract class ConfBuilder : IConfBuilder {
     protected ConfBuilder(string key) {
@@ -7,6 +5,6 @@ namespace Bud.Configuration {
     }
 
     public string Key { get; }
-    public abstract void ApplyIn(IDictionary<string, IConfDefinition> configDefinitions);
+    public abstract void ApplyIn(ScopedDictionaryBuilder<IConfDefinition> configDefinitions);
   }
 }

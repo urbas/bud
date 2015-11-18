@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Bud.Configuration;
 
 namespace Bud {
-  public struct Conf : IConf, IConfBuilder {
-    public static Conf Empty { get; } = new Conf(Enumerable.Empty<IConfBuilder>(), string.Empty);
-    private IEnumerable<IConfBuilder> ConfBuilders { get; }
-    public string Scope { get; }
+  public class Conf : IConf, IConfBuilder {
+    public static Conf Empty { get; } = new Conf(ImmutableList<ScopedConfBuilder>.Empty, ImmutableList<string>.Empty);
+    public ImmutableList<ScopedConfBuilder> ScopedConfBuilders { get; }
+    public ImmutableList<string> Scope { get; }
 
-    public Conf(IEnumerable<IConfBuilder> confBuilders, string scope) {
-      ConfBuilders = confBuilders;
+    public Conf(ImmutableList<ScopedConfBuilder> scopedConfBuilders, ImmutableList<string> scope) {
+      ScopedConfBuilders = scopedConfBuilders;
       Scope = scope;
     }
 
@@ -18,13 +19,15 @@ namespace Bud {
     ///   Defines a constant-valued configuration.
     ///   If the configuration is already defined, then this method overwrites it.
     /// </summary>
-    public Conf SetValue<T>(Key<T> configKey, T value) => Set(configKey, cfg => value);
+    public Conf SetValue<T>(Key<T> configKey, T value)
+      => Set(configKey, cfg => value);
 
     /// <summary>
     ///   Defines a constant-valued configuration.
     ///   If the configuration is already defined, then this method does nothing.
     /// </summary>
-    public Conf InitValue<T>(Key<T> configKey, T value) => Init(configKey, cfg => value);
+    public Conf InitValue<T>(Key<T> configKey, T value)
+      => Init(configKey, cfg => value);
 
     /// <summary>
     ///   Defines a configuration that returns the value produced by <paramref name="valueFactory" />.
@@ -55,55 +58,58 @@ namespace Bud {
       => Add((IEnumerable<IConfBuilder>) otherConfs);
 
     public Conf Add(IEnumerable<IConfBuilder> otherConfs)
-      => new Conf(ConfBuilders.Concat(otherConfs), Scope);
+      => new Conf(ScopedConfBuilders.AddRange(otherConfs.Select(MakeScopedConfBuilder)),
+                  Scope);
 
-    public static Conf Group(params IConfBuilder[] confBuilders)
-      => Empty.Add(confBuilders);
-
-    public static Conf Group(IEnumerable<IConfBuilder> configTransforms)
-      => Empty.Add(configTransforms);
-
+    /// <summary>
+    ///   TODO: Remove. Consider creating a separate helper API for collections.
+    /// </summary>
     public Conf Add<T>(Key<IEnumerable<T>> dependencies, params T[] v)
       => Modify(dependencies, (conf, enumerable) => enumerable.Concat(v));
 
-    /// <returns>a copy of self where every configuration key is prefixed with <paramref name="scope" />.</returns>
+    /// <returns>
+    ///   a copy of self where the Scope is appended with <paramref name="scope" />.
+    /// </returns>
     public Conf In(string scope)
-      => new Conf(ConfBuilders, Keys.PrefixWith(scope, Scope));
+      => new Conf(ScopedConfBuilders, Scope.Add(scope));
+
+    /// <returns>
+    ///   a copy of self where the Scope has one element removed from the back.
+    /// </returns>
+    public Conf Out() {
+      if (Scope.IsEmpty) {
+        throw new InvalidOperationException("Can not backtrack further. The Scope is already empty.");
+      }
+      return new Conf(ScopedConfBuilders, Scope.RemoveAt(Scope.Count - 1));
+    }
 
     /// <returns>the value of the configuration key.</returns>
-    /// <exception cref="ConfigTypeException">
-    ///   thrown if the actual type of the configuration does not match the requested type <typeparamref name="T" />.
-    /// </exception>
     public T Get<T>(Key<T> key)
-      => ToCachingConf().Get(key);
+      => ToCachingConf().Get<T>(Keys.InterpretFromScope(key, Scope));
 
-    public void ApplyIn(IDictionary<string, IConfDefinition> configDefinitions) {
-      if (string.IsNullOrEmpty(Scope)) {
-        CreateUnscopedConfigDefinitions(configDefinitions);
-      } else {
-        CreateScopedConfigDefinitions(configDefinitions);
+    public void ApplyIn(ScopedDictionaryBuilder<IConfDefinition> configDefinitions) {
+      foreach (var scopedConfBuilder in ScopedConfBuilders) {
+        scopedConfBuilder.ConfBuilder
+                         .ApplyIn(configDefinitions.In(scopedConfBuilder.Scope));
       }
     }
 
-    public CachingConf ToCachingConf()
-      => new CachingConf(CreateUnscopedConfigDefinitions());
-
-    private IDictionary<string, IConfDefinition> CreateUnscopedConfigDefinitions(IDictionary<string, IConfDefinition> configDefinitions = null) {
-      configDefinitions = configDefinitions ?? new Dictionary<string, IConfDefinition>();
-      foreach (var configTransform in ConfBuilders) {
-        configTransform.ApplyIn(configDefinitions);
-      }
-      return configDefinitions;
+    public CachingConf ToCachingConf() {
+      var definitions = new Dictionary<string, IConfDefinition>();
+      ApplyIn(new ScopedDictionaryBuilder<IConfDefinition>(definitions, ImmutableList<string>.Empty));
+      return new CachingConf(new ConfValueCalculator(definitions));
     }
 
-    private void CreateScopedConfigDefinitions(IDictionary<string, IConfDefinition> configDefinitions) {
-      var prefix = Scope + "/";
-      var scopeDepth = prefix.Count(c => c == Keys.Separator);
-      foreach (var configDefinition in CreateUnscopedConfigDefinitions()) {
-        var newConfigDefinition = new PrefixedConfDefinition(prefix, scopeDepth, configDefinition.Value);
-        var prefixedKey = prefix + configDefinition.Key;
-        configDefinitions[prefixedKey] = newConfigDefinition;
-      }
-    }
+    public static Conf InConf(string scope)
+      => new Conf(ImmutableList<ScopedConfBuilder>.Empty, ImmutableList.Create(scope));
+
+    public static Conf Group(params IConfBuilder[] confs)
+      => Group((IEnumerable<IConfBuilder>) confs);
+
+    public static Conf Group(IEnumerable<IConfBuilder> confs)
+      => Empty.Add(confs);
+
+    private ScopedConfBuilder MakeScopedConfBuilder(IConfBuilder builder)
+      => new ScopedConfBuilder(Scope, builder);
   }
 }

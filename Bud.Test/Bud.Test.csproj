@@ -95,6 +95,10 @@
   <ItemGroup>
     <Compile Include="BudBuild.cs" />
     <Compile Include="Collections\EnumerableUtilsTest.cs" />
+    <Compile Include="Configuration\CachingConfTest.cs" />
+    <Compile Include="Configuration\ConfValueCalculatorTest.cs" />
+    <Compile Include="Configuration\SubscopingConfTest.cs" />
+    <Compile Include="Configuration\ScopedDictionaryBuilderTest.cs" />
     <Compile Include="Cs\RoslynCSharpCompilerTest.cs" />
     <Compile Include="ConfTest.cs" />
     <Compile Include="CSharpTest.cs" />
@@ -104,8 +108,10 @@
     <Compile Include="IO\FilesObservatoryTest.cs" />
     <Compile Include="IO\TimestampedTest.cs" />
     <Compile Include="IO\WatchedResourcesTest.cs" />
+    <Compile Include="KeysTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BuildTest.cs" />
+    <Compile Include="Util\StringsTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

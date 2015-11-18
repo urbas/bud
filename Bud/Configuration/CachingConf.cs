@@ -1,23 +1,23 @@
-using System.Collections.Generic;
-
 namespace Bud.Configuration {
   public class CachingConf : IConf {
-    private IDictionary<string, IConfDefinition> ConfigDefinitions { get; }
-    private readonly ValueCache valueCache;
+    private readonly ConfValueCache confValueCache;
 
-    internal CachingConf(IDictionary<string, IConfDefinition> configDefinitions) {
-      ConfigDefinitions = configDefinitions;
-      valueCache = new ValueCache(CalculateValue);
+    public CachingConf(ConfValueCalculator wrappedConf) {
+      confValueCache = new ConfValueCache(new ValueCalcWrapper(this, wrappedConf));
     }
 
-    public T Get<T>(Key<T> key) => valueCache.Get(key.Relativize());
+    public T Get<T>(Key<T> key) => confValueCache.Get(key.Relativize());
 
-    private object CalculateValue(string configKey) {
-      IConfDefinition confDefinition;
-      if (ConfigDefinitions.TryGetValue(configKey, out confDefinition)) {
-        return confDefinition.Value(this);
+    private class ValueCalcWrapper : IConf {
+      private readonly IConf conf;
+      private readonly ConfValueCalculator valueCalculator;
+
+      public ValueCalcWrapper(IConf conf, ConfValueCalculator valueCalculator) {
+        this.conf = conf;
+        this.valueCalculator = valueCalculator;
       }
-      throw new ConfigUndefinedException($"Configuration '{configKey ?? "<null>"}' is undefined.");
+
+      public T Get<T>(Key<T> key) => valueCalculator.Get(key, conf);
     }
   }
 }

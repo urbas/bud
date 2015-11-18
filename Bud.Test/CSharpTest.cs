@@ -30,8 +30,7 @@ namespace Bud {
       using (var tempDir = new TemporaryDirectory()) {
         var cSharpProject = CSharpProject(tempDir.Path, "Foo");
         var sourceFile = tempDir.CreateEmptyFile("TestMainClass.cs");
-        Assert.That(Sources[cSharpProject],
-                    Contains.Item(sourceFile));
+        Assert.That(Sources[cSharpProject], Contains.Item(sourceFile));
       }
     }
 

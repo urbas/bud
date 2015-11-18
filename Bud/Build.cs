@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -14,33 +15,34 @@ namespace Bud {
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
     public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
 
-    public static Conf Project(string projectDir, string projectId = null)
-      => Empty.InitValue(ProjectDir, projectDir)
-              .Init(ProjectId, c => projectId ?? GetFileName(ProjectDir[c]))
-              .InitValue(Sources, Files.Empty)
-              .Init(BuildPipelineScheduler, conf => new EventLoopScheduler())
-              .InitValue(Dependencies, Enumerable.Empty<string>())
-              .Init(FilesObservatory, c => new LocalFilesObservatory());
+    public static Conf Project(string projectDir, string projectId)
+      => InConf(projectId)
+        .InitValue(ProjectDir, projectDir)
+        .Init(ProjectId, c => projectId ?? GetFileName(ProjectDir[c]))
+        .InitValue(Sources, Files.Empty)
+        .Init(BuildPipelineScheduler, conf => new EventLoopScheduler())
+        .InitValue(Dependencies, Enumerable.Empty<string>())
+        .Init(FilesObservatory, c => new LocalFilesObservatory());
 
     public static Conf SourceDir(string subDir = null, string fileFilter = "*", bool includeSubdirs = true) {
-      return Empty.Modify(Sources, (configs, sources) => {
-        var sourceDir = subDir == null ? ProjectDir[configs] : Combine(ProjectDir[configs], subDir);
-        var newSources = FilesObservatory[configs].ObserveDir(sourceDir, fileFilter, includeSubdirs);
+      return Empty.Modify(Sources, (conf, sources) => {
+        var sourceDir = subDir == null ? ProjectDir[conf] : Combine(ProjectDir[conf], subDir);
+        var newSources = FilesObservatory[conf].ObserveDir(sourceDir, fileFilter, includeSubdirs);
         return sources.ExpandWith(newSources);
       });
     }
 
     public static Conf SourceFiles(params string[] relativeFilePaths)
-      => Empty.Modify(Sources, (configs, existingSources) => {
-        var projectDir = ProjectDir[configs];
+      => Empty.Modify(Sources, (conf, existingSources) => {
+        var projectDir = ProjectDir[conf];
         var absolutePaths = relativeFilePaths.Select(relativeFilePath => Combine(projectDir, relativeFilePath));
-        var newSources = FilesObservatory[configs].ObserveFiles(absolutePaths);
+        var newSources = FilesObservatory[conf].ObserveFiles(absolutePaths);
         return existingSources.ExpandWith(newSources);
       });
 
     public static Conf ExcludeSourceDirs(params string[] subDirs)
-      => Empty.Modify(Sources, (configs, previousFiles) => {
-        var forbiddenDirs = subDirs.Select(s => Combine(ProjectDir[configs], s));
+      => Empty.Modify(Sources, (conf, previousFiles) => {
+        var forbiddenDirs = subDirs.Select(s => Combine(ProjectDir[conf], s));
         return previousFiles.WithFilter(file => !forbiddenDirs.Any(file.StartsWith));
       });
   }

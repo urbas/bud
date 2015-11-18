@@ -1,5 +1,3 @@
-using System;
-
 namespace Bud {
   public struct Key {
     public readonly string Id;

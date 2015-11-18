@@ -25,17 +25,13 @@ namespace Bud {
       => Project(projectDir, projectId)
         .Add(SourceDir(fileFilter: "*.cs"))
         .Add(ExcludeSourceDirs("obj", "bin", "target"))
-        .Add(CSharpCompilation())
-        .In(projectId);
-
-    public static Conf CSharpCompilation()
-      => Conf.Empty.Init(Compile, DefaultCompilation)
-             .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
-             .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
-             .Init(AssemblyReferences, conf => new Assemblies(typeof(object).Assembly.Location))
-             .Init(Compiler, TimedEmittingCompiler.Create)
-             .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
-             .Init(CompilationInput, DefaultCompilationInput);
+        .Init(Compile, DefaultCompilation)
+        .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
+        .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
+        .Init(AssemblyReferences, conf => new Assemblies(typeof(object).Assembly.Location))
+        .Init(Compiler, TimedEmittingCompiler.Create)
+        .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+        .Init(CompilationInput, DefaultCompilationInput);
 
     private static void PrintCompilationResult(CompileOutput output) {
       if (output.Success) {
