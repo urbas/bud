@@ -83,6 +83,10 @@ namespace Bud {
       return new Conf(ScopedConfBuilders, Scope.RemoveAt(Scope.Count - 1));
     }
 
+    /// <param name="key">
+    ///   The key for which to get the value. If the path of the key is relative,
+    ///   it will be interpreted with the <see cref="Scope" /> as the base path.
+    /// </param>
     /// <returns>the value of the configuration key.</returns>
     public T Get<T>(Key<T> key)
       => ToCompiled().Get<T>(Keys.InterpretFromScope(key, Scope));
