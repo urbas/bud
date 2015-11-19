@@ -15,7 +15,7 @@ namespace Bud.Configuration {
   public static class SetConf {
     public static void DefineConfIn<T>(ScopedDictionaryBuilder<IConfDefinition> configDefinitions, Func<IConf, T> valueFactory, string key) {
       var confDefinition = new ConfDefinition<T>(conf => {
-        var scopedConf = SubscopingConf.MakeScoped(configDefinitions.Scope, conf);
+        var scopedConf = ScopedConf.MakeScoped(configDefinitions.Scope, conf);
         return valueFactory(scopedConf);
       });
       configDefinitions.Set(key, confDefinition);

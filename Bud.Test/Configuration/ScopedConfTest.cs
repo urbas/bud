@@ -3,7 +3,7 @@ using Moq;
 using NUnit.Framework;
 
 namespace Bud.Configuration {
-  public class SubscopingConfTest {
+  public class ScopedConfTest {
     private readonly ImmutableList<string> fooBarScope = ImmutableList.Create("foo", "bar");
     private Mock<IConf> wrappedConf;
     private IConf scopedConf;
@@ -12,16 +12,16 @@ namespace Bud.Configuration {
     public void SetUp() {
       wrappedConf = new Mock<IConf>();
       wrappedConf.Setup(self => self.Get<int>("foo/A")).Returns(42);
-      scopedConf = SubscopingConf.MakeScoped(fooBarScope, wrappedConf.Object);
+      scopedConf = ScopedConf.MakeScoped(fooBarScope, wrappedConf.Object);
     }
 
     [Test]
     public void Do_not_wrap_conf_if_scope_is_empty()
-      => Assert.AreSame(wrappedConf.Object, SubscopingConf.MakeScoped(ImmutableList<string>.Empty, wrappedConf.Object));
+      => Assert.AreSame(wrappedConf.Object, ScopedConf.MakeScoped(ImmutableList<string>.Empty, wrappedConf.Object));
 
     [Test]
     public void Wrap_if_the_scope_is_non_empty()
-      => Assert.AreNotSame(wrappedConf.Object, SubscopingConf.MakeScoped(fooBarScope, wrappedConf.Object));
+      => Assert.AreNotSame(wrappedConf.Object, ScopedConf.MakeScoped(fooBarScope, wrappedConf.Object));
 
     [Test]
     public void Delegate_absolute_keys() {

@@ -85,11 +85,10 @@
   <ItemGroup>
     <Compile Include="Cli\BuildTool.cs" />
     <Compile Include="Collections\EnumerableUtils.cs" />
-    <Compile Include="Configuration\ConfValueCalculator.cs" />
+    <Compile Include="Configuration\RawConf.cs" />
     <Compile Include="Configuration\ScopedConfBuilder.cs" />
-    <Compile Include="Configuration\SubscopingConf.cs" />
+    <Compile Include="Configuration\ScopedConf.cs" />
     <Compile Include="Configuration\ScopedDictionaryBuilder.cs" />
-    <Compile Include="Configuration\ConfValueCache.cs" />
     <Compile Include="Cs\CompileInput.cs" />
     <Compile Include="Cs\CompileOutput.cs" />
     <Compile Include="Cs\Assemblies.cs" />
@@ -100,7 +99,7 @@
     <Compile Include="Cs\RoslynCSharpCompiler.cs" />
     <Compile Include="Cs\TimedEmittingCompiler.cs" />
     <Compile Include="Configuration\CachingConf.cs" />
-    <Compile Include="Configuration\ConfigTransform.cs" />
+    <Compile Include="Configuration\ConfBuilder.cs" />
     <Compile Include="Configuration\IConfDefinition.cs" />
     <Compile Include="Configuration\IConfBuilder.cs" />
     <Compile Include="CSharp.cs" />
@@ -125,7 +124,7 @@
     <Compile Include="Configuration\InitConf.cs" />
     <Compile Include="Configuration\SetConf.cs" />
     <Compile Include="Configuration\ConfDefinition.cs" />
-    <Compile Include="Configuration\ConfigDefinitionException.cs" />
+    <Compile Include="Configuration\ConfDefinitionException.cs" />
     <Compile Include="Configuration\ModifyConf.cs" />
     <Compile Include="Configuration\ConfUndefinedException.cs" />
     <Compile Include="Conf.cs" />

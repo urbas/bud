@@ -34,7 +34,7 @@ namespace Bud.Cli {
       var assembly = Assembly.LoadFile(compilationOutput.AssemblyPath);
       var buildDefinitionType = assembly.GetExportedTypes().First(typeof(IBuild).IsAssignableFrom);
       var buildDefinition = (IBuild) buildDefinitionType.GetConstructor(Type.EmptyTypes).Invoke(new object[] {});
-      return buildDefinition.Init().ToCachingConf();
+      return buildDefinition.Init().ToCompiled();
     }
 
     private static void PrintCompilationErrors(CompileOutput compilationOutput) {

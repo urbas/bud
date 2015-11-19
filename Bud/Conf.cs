@@ -7,10 +7,10 @@ using Bud.Configuration;
 namespace Bud {
   public class Conf : IConf, IConfBuilder {
     public static Conf Empty { get; } = new Conf(ImmutableList<ScopedConfBuilder>.Empty, ImmutableList<string>.Empty);
-    public ImmutableList<ScopedConfBuilder> ScopedConfBuilders { get; }
+    private ImmutableList<ScopedConfBuilder> ScopedConfBuilders { get; }
     public ImmutableList<string> Scope { get; }
 
-    public Conf(ImmutableList<ScopedConfBuilder> scopedConfBuilders, ImmutableList<string> scope) {
+    private Conf(ImmutableList<ScopedConfBuilder> scopedConfBuilders, ImmutableList<string> scope) {
       ScopedConfBuilders = scopedConfBuilders;
       Scope = scope;
     }
@@ -85,7 +85,7 @@ namespace Bud {
 
     /// <returns>the value of the configuration key.</returns>
     public T Get<T>(Key<T> key)
-      => ToCachingConf().Get<T>(Keys.InterpretFromScope(key, Scope));
+      => ToCompiled().Get<T>(Keys.InterpretFromScope(key, Scope));
 
     public void ApplyIn(ScopedDictionaryBuilder<IConfDefinition> configDefinitions) {
       foreach (var scopedConfBuilder in ScopedConfBuilders) {
@@ -94,10 +94,10 @@ namespace Bud {
       }
     }
 
-    public CachingConf ToCachingConf() {
+    public IConf ToCompiled() {
       var definitions = new Dictionary<string, IConfDefinition>();
       ApplyIn(new ScopedDictionaryBuilder<IConfDefinition>(definitions, ImmutableList<string>.Empty));
-      return new CachingConf(new ConfValueCalculator(definitions));
+      return new RawConf(definitions);
     }
 
     public static Conf InConf(string scope)

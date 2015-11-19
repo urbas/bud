@@ -15,14 +15,14 @@ namespace Bud.Configuration {
         var scopedValueFactory = WithScopedValueFactory(oldConfDefinition, configDefinitions.Scope);
         configDefinitions.Set(Key, new ConfDefinition<T>(scopedValueFactory));
       } else {
-        throw new ConfigDefinitionException(Key, typeof(T), $"Could not modify the value of configuration '{Key}'. The configuration has not been initialized yet.");
+        throw new ConfDefinitionException(Key, typeof(T), $"Could not modify the value of configuration '{Key}'. The configuration has not been initialized yet.");
       }
     }
 
     private Func<IConf, T> WithScopedValueFactory(IConfDefinition oldConfDefinition,
                                                   ImmutableList<string> scope) {
       return conf => {
-        var scopedConf = SubscopingConf.MakeScoped(scope, conf);
+        var scopedConf = ScopedConf.MakeScoped(scope, conf);
         return ValueFactory(scopedConf, (T) oldConfDefinition.Value(conf));
       };
     }

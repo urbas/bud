@@ -96,8 +96,8 @@
     <Compile Include="BudBuild.cs" />
     <Compile Include="Collections\EnumerableUtilsTest.cs" />
     <Compile Include="Configuration\CachingConfTest.cs" />
-    <Compile Include="Configuration\ConfValueCalculatorTest.cs" />
-    <Compile Include="Configuration\SubscopingConfTest.cs" />
+    <Compile Include="Configuration\RawConfTest.cs" />
+    <Compile Include="Configuration\ScopedConfTest.cs" />
     <Compile Include="Configuration\ScopedDictionaryBuilderTest.cs" />
     <Compile Include="Cs\RoslynCSharpCompilerTest.cs" />
     <Compile Include="ConfTest.cs" />

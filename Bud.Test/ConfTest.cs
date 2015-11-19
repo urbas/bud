@@ -48,7 +48,7 @@ namespace Bud {
 
     [Test]
     public void Throw_when_modifying_a_configuration_that_does_not_yet_exist() {
-      var exception = Assert.Throws<ConfigDefinitionException>(
+      var exception = Assert.Throws<ConfDefinitionException>(
         () => A.Modify((configs, oldConfig) => oldConfig + 1).Get(A));
       Assert.AreEqual(A.Id, exception.Key);
       Assert.That(exception.Message, Contains.Substring(A.Id));
@@ -227,6 +227,18 @@ namespace Bud {
       var confB1 = InConf("b").Modify("../a" / B, (conf, oldValue) => oldValue + ("../a" / A)[conf]);
       var confB2 = InConf("c").In("d").Modify("../../a" / B, (conf, oldValue) => oldValue + ("../../a" / A)[conf]);
       Assert.AreEqual(253, Empty.Add(confA.Add(confB0), confB0, confB1, confB2, confB1, confB2, confB2).Get("a" / B));
+    }
+
+    [Test]
+    public void Calculate_value_only_once_when_invoking_relative_references_multiple_times() {
+      var valueFactoryA = new Mock<Func<IConf, int>>(MockBehavior.Strict);
+      valueFactoryA.Setup(self => self(It.IsAny<IConf>())).Returns(42);
+      var conf = Group(InConf("a").Set(A, valueFactoryA.Object),
+                       InConf("b").Set(B, c => c.Get("../a" / A)))
+        .ToCompiled();
+      conf.Get("b" / B);
+      conf.Get("b" / B);
+      valueFactoryA.VerifyAll();
     }
 
     private static async Task<int> AddFooTwiceConcurrently(IConf conf) {

@@ -1,5 +1,4 @@
 using System;
-using static Bud.Configuration.SubscopingConf;
 
 namespace Bud.Configuration {
   public class ConfDefinition<T> : IConfDefinition {
