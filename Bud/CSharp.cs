@@ -50,6 +50,7 @@ namespace Bud {
                                .Select(Compiler[conf])
                                .Do(PrintCompilationResult);
 
+    // TODO: File watchers are triggering duplicate updates in bursts. Throttle them.
     private static IObservable<CompileInput> DefaultCompilationInput(IConf conf)
       => Sources[conf].Watch()
                       .CombineLatest(AssemblyReferences[conf].Watch(),
