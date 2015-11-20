@@ -1,9 +1,7 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using Microsoft.CodeAnalysis;
 
 namespace Bud.IO {
   public class WatchedResources<TResource> : IWatchedResources<TResource> {
@@ -11,7 +9,7 @@ namespace Bud.IO {
       new WatchedResources<TResource>(Enumerable.Empty<TResource>(),
                                       Observable.Empty<TResource>());
 
-    /// <param name="resources">
+    /// <param name="lister">
     ///   an enumeration of watched resources.
     ///   Must be enumerable multiple times and should
     ///   reflect changes that are reported by the watcher.
@@ -19,57 +17,36 @@ namespace Bud.IO {
     /// <param name="resourceWatcher">
     ///   a stream of changes to the enumeration of watched resources.
     /// </param>
-    public WatchedResources(IEnumerable<TResource> resources,
+    public WatchedResources(IEnumerable<TResource> lister,
                             IObservable<TResource> resourceWatcher) {
-      Resources = resources;
+      Lister = lister;
       Watcher = resourceWatcher;
     }
 
     public WatchedResources(IWatchedResources<TResource> watchedResources)
-      : this(watchedResources.Resources, watchedResources.Watcher) {}
+      : this(watchedResources.Lister, watchedResources.Watcher) {}
 
-    public IEnumerable<TResource> Resources { get; }
+    public IEnumerable<TResource> Lister { get; }
     public IObservable<TResource> Watcher { get; }
-    public IEnumerator<TResource> GetEnumerator() => Resources.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public WatchedResources<TResource> ExpandWith(IWatchedResources<TResource> other)
-      => new WatchedResources<TResource>(Resources.Concat(other.Resources),
+      => new WatchedResources<TResource>(Lister.Concat(other.Lister),
                                          Watcher.Merge(other.Watcher));
 
     public WatchedResources<TResource> WithFilter(Func<TResource, bool> filter)
-      => new WatchedResources<TResource>(Resources.Where(filter),
+      => new WatchedResources<TResource>(Lister.Where(filter),
                                          Watcher.Where(filter));
-
-    public IObservable<IWatchedResources<TResource>> Watch()
-      => Observable.Return(this)
-                   .Concat(Watcher.Select(_ => this));
   }
 
   public static class WatchedResources {
-    public static IWatchedResources<T> WatchResource<T>(IObservable<T> observedValue) {
-      return new WatchedSingletonResource<T>(observedValue);
-    }
-
-    internal class WatchedSingletonResource<T> : IWatchedResources<T> {
-      private Optional<T> Subject { get; set; }
-      public IEnumerable<T> Resources => this;
-      public IObservable<T> Watcher { get; }
-
-      public WatchedSingletonResource(IObservable<T> observedValue) {
-        Watcher = observedValue;
-      }
-
-      public IEnumerator<T> GetEnumerator() {
-        if (Subject.HasValue) {
-          yield return Subject.Value;
-        }
-      }
-
-      IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-      public IObservable<IWatchedResources<T>> Watch()
-        => Watcher.Do(obj => Subject = obj).Select(_ => this);
-    }
+    /// <remarks>
+    ///   The returned observable will immediately produce an initial observation.
+    ///   After the first observation, more will be triggered by the watcher
+    ///   in <paramref name="watchedResources" />.
+    /// </remarks>
+    public static IObservable<IEnumerable<TResource>> Watch<TResource>(this IWatchedResources<TResource> watchedResources)
+      => Observable
+        .Return(watchedResources.Lister)
+        .Concat(watchedResources.Watcher.Select(_ => watchedResources.Lister));
   }
 }

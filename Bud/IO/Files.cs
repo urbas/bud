@@ -22,9 +22,6 @@ namespace Bud.IO {
     public new Files WithFilter(Func<string, bool> filter)
       => new Files(base.WithFilter(filter));
 
-    public new IObservable<Files> Watch()
-      => base.Watch().Select(_ => this);
-
     public static Timestamped<string> ToTimestampedFile(string path)
       => new Timestamped<string>(path, GetFileTimestamp(path));
 

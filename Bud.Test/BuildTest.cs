@@ -14,7 +14,7 @@ namespace Bud {
 
     [Test]
     public void Sources_should_be_initially_empty()
-      => Assert.IsEmpty(Sources[project]);
+      => Assert.IsEmpty(Sources[project].Lister);
 
     [Test]
     public void Dependencies_should_be_initially_empty()
@@ -26,7 +26,7 @@ namespace Bud {
         var fileA = tempDir.CreateEmptyFile("A", "A.cs");
         var fileB = tempDir.CreateEmptyFile("B", "B.cs");
         var twoDirsProject = Project(tempDir.Path, "foo").Add(SourceDir("A"), SourceDir("B"));
-        Assert.That(Sources[twoDirsProject],
+        Assert.That(Sources[twoDirsProject].Lister,
                     Is.EquivalentTo(new[] {Files.ToTimestampedFile(fileA), Files.ToTimestampedFile(fileB)}));
       }
     }

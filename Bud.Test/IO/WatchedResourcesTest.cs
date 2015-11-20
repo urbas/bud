@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using Moq;
 using NUnit.Framework;
+using static System.Linq.Enumerable;
 
 namespace Bud.IO {
   public class WatchedResourcesTest {
@@ -12,7 +13,7 @@ namespace Bud.IO {
     [Test]
     public void Equals_to_the_enumeration_of_resources() {
       var watchedResources = new WatchedResources<int>(resources, Observable.Empty<int>());
-      Assert.AreEqual(resources, watchedResources);
+      Assert.AreEqual(resources, watchedResources.Lister);
     }
 
     [Test]
@@ -20,13 +21,13 @@ namespace Bud.IO {
       var watchedResources = new WatchedResources<int>(resources, Observable.Empty<int>());
       var otherWatchedResources = new WatchedResources<int>(otherResources, Observable.Empty<int>());
       Assert.AreEqual(resources.Concat(otherResources),
-                      watchedResources.ExpandWith(otherWatchedResources));
+                      watchedResources.ExpandWith(otherWatchedResources).Lister);
     }
 
     [Test]
     public void Filter_produces_a_filtered_watch_stream() {
       var watchedResources = new WatchedResources<int>(resources, Observable.Empty<int>());
-      Assert.IsEmpty(watchedResources.WithFilter(i => 42 != i));
+      Assert.IsEmpty(watchedResources.WithFilter(i => 42 != i).Lister);
     }
 
     [Test]
@@ -46,7 +47,7 @@ namespace Bud.IO {
     public void Produces_watch_notifications_from_the_given_watcher() {
       var singleNotificationWatcher = Observable.Return(42);
       var watchedResources = new WatchedResources<int>(resources, singleNotificationWatcher);
-      Assert.AreEqual(new[] {watchedResources, watchedResources},
+      Assert.AreEqual(new[] { resources, resources },
                       watchedResources.Watch().ToEnumerable().ToList());
     }
 
@@ -54,7 +55,7 @@ namespace Bud.IO {
     public void Filter_produces_a_filtered_enumeration() {
       var watchedResources = new WatchedResources<int>(resources, Observable.Return(42));
       var withFilter = watchedResources.WithFilter(i => 42 != i);
-      Assert.AreEqual(new[] {withFilter},
+      Assert.AreEqual(new[] {Empty<int>()},
                       withFilter.Watch().ToEnumerable().ToList());
     }
 
@@ -71,43 +72,11 @@ namespace Bud.IO {
       var singleNotificationWatcher = Observable.Return(1);
       var expandedResources = new WatchedResources<int>(resources, singleNotificationWatcher)
         .ExpandWith(new WatchedResources<int>(otherResources, singleNotificationWatcher));
-      Assert.AreEqual(new[] {expandedResources, expandedResources, expandedResources},
-                      expandedResources.Watch().ToEnumerable().ToList());
+      var expandedList = resources.Concat(otherResources);
+      var actual = expandedResources.Watch().ToEnumerable().ToList();
+      foreach (var list in actual) {
+        Assert.AreEqual(expandedList, list);
+      }
     }
-
-    [Test]
-    public void WatchResource_must_be_empty_before_being_watched()
-      => Assert.IsEmpty(WatchedResources.WatchResource(Observable.Return(42)));
-
-    [Test]
-    public void WatchResource_must_contain_the_watched_element() {
-      var watchedResource = WatchedResources.WatchResource(Observable.Return(42));
-      watchedResource.Watch().Wait();
-      Assert.AreEqual(new[] {42}, watchedResource);
-    }
-
-    [Test]
-    public void WatchResource_must_not_block_when_the_observable_does_not_produce_the_first_value()
-      => WatchedResources.WatchResource(Observable.Never<int>()).GetEnumerator();
-
-    [Test]
-    public void WatchResource_is_enumerable_multiple_times() {
-      var watchedResource = WatchedResources.WatchResource(Observable.Return(42));
-      watchedResource.Watch().Wait();
-      watchedResource.ToList();
-      Assert.AreEqual(new[] {42}, watchedResource.ToList());
-    }
-
-    [Test]
-    public void WatchResource_must_return_the_last_value() {
-      var watchedSingleton = WatchedResources.WatchResource(Observable.Return(42).Concat(Observable.Return(9001)));
-      watchedSingleton.Watch().Wait();
-      watchedSingleton.ToList();
-      Assert.AreEqual(new[] {9001}, watchedSingleton);
-    }
-
-    [Test]
-    public void WatchResource_must_return_an_empty_enumerable_when_no_value_observed()
-      => Assert.IsEmpty(WatchedResources.WatchResource(Observable.Empty<int>()));
   }
 }

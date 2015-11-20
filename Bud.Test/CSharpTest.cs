@@ -30,7 +30,7 @@ namespace Bud {
       using (var tempDir = new TemporaryDirectory()) {
         var cSharpProject = CSharpProject(tempDir.Path, "Foo");
         var sourceFile = tempDir.CreateEmptyFile("TestMainClass.cs");
-        Assert.That(Sources[cSharpProject], Contains.Item(sourceFile));
+        Assert.That(Sources[cSharpProject].Lister, Contains.Item(sourceFile));
       }
     }
 
@@ -39,7 +39,7 @@ namespace Bud {
       using (var tempDir = new TemporaryDirectory()) {
         var cSharpProject = CSharpProject(tempDir.Path, "Foo");
         var sourceFile = tempDir.CreateEmptyFile("Bud", "TestMainClass.cs");
-        Assert.That(Sources[cSharpProject],
+        Assert.That(Sources[cSharpProject].Lister,
                     Contains.Item(sourceFile));
       }
     }
@@ -49,7 +49,7 @@ namespace Bud {
       using (var tempDir = new TemporaryDirectory()) {
         var cSharpProject = CSharpProject(tempDir.Path, "Foo");
         var textFile = tempDir.CreateEmptyFile("Bud", "TextFile.txt");
-        Assert.That(Sources[cSharpProject],
+        Assert.That(Sources[cSharpProject].Lister,
                     Is.Not.Contains(textFile));
       }
     }
@@ -62,7 +62,7 @@ namespace Bud {
         .SetValue(Sources, files)
         .SetValue(AssemblyReferences, assemblies);
       var compilationInputs = CompilationInput[projectA].ToEnumerable().ToList();
-      Assert.AreEqual(new[] {new CompileInput(files, assemblies, Empty<CompileOutput>())},
+      Assert.AreEqual(new[] {new CompileInput(files.Lister, assemblies.Lister, Empty<CompileOutput>())},
                       compilationInputs);
     }
 

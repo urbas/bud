@@ -31,9 +31,6 @@ namespace Bud.Cs {
     public new Assemblies WithFilter(Func<AssemblyReference, bool> filter)
       => new Assemblies(base.WithFilter(filter));
 
-    public new IObservable<Assemblies> Watch()
-      => base.Watch().Select(_ => this);
-
     private static AssemblyReference ToAssemblyReferenceFromFile(string file)
       => new AssemblyReference(file, MetadataReference.CreateFromFile(file));
   }

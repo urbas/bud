@@ -7,7 +7,7 @@ namespace Bud.IO {
     [Test]
     public void Files_equals_to_the_initialising_enumeration() {
       var files = new[] {"foo", "bar"};
-      Assert.AreEqual(files, new Files(files));
+      Assert.AreEqual(files, new Files(files).Lister);
     }
 
     [Test]
@@ -15,7 +15,7 @@ namespace Bud.IO {
       var files1 = new[] {"foo"};
       var files2 = Enumerable.Empty<string>();
       Assert.AreEqual(files1,
-                      new Files(files1).ExpandWith(new Files(files2)));
+                      new Files(files1).ExpandWith(new Files(files2)).Lister);
     }
 
     [Test]
@@ -23,7 +23,7 @@ namespace Bud.IO {
       var files1 = new[] {"foo"};
       var files2 = new[] {"bar"};
       Assert.AreEqual(files1.Concat(files2),
-                      new Files(files1).ExpandWith(new Files(files2)));
+                      new Files(files1).ExpandWith(new Files(files2)).Lister);
     }
 
     [Test]

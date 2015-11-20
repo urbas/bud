@@ -201,10 +201,8 @@ namespace Bud {
     }
 
     [Test]
-    public void Root_config_can_be_accessed_from_current_scope() {
-      var confA = Empty.SetValue(Root / A, 42);
-      Assert.AreEqual(42, confA.Get(A));
-    }
+    public void Root_config_can_be_accessed_from_current_scope()
+      => Assert.AreEqual(42, (Root / A).SetValue(42).Get(A));
 
     [Test]
     public void Relative_reference_in_a_nested_modified_conf() {

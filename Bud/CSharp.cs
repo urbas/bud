@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Bud.Cs;
+using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Path;
@@ -62,7 +63,7 @@ namespace Bud {
 
     private static CompileInput ToCompilationInput(IEnumerable<string> files,
                                                    IEnumerable<AssemblyReference> assemblies,
-                                                   IEnumerable<CompileOutput> dependencies)
-      => new CompileInput(files, assemblies, dependencies);
+                                                   IEnumerable<CompileOutput> deps)
+      => new CompileInput(files, assemblies, deps);
   }
 }

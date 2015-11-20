@@ -11,7 +11,7 @@ namespace Bud.IO {
     public void List_files_in_the_folder() {
       using (var tempDir = new TemporaryDirectory()) {
         var fileA = tempDir.CreateEmptyFile("A", "A.txt");
-        Assert.That(noFileChanges.ObserveDir(tempDir.Path, "*.txt", true),
+        Assert.That(noFileChanges.ObserveDir(tempDir.Path, "*.txt", true).Lister,
                     Is.EquivalentTo(new[] {fileA}));
       }
     }
@@ -20,7 +20,7 @@ namespace Bud.IO {
     public void Do_not_list_filtered_files() {
       using (var tempDir = new TemporaryDirectory()) {
         tempDir.CreateEmptyFile("A", "A.txt");
-        Assert.IsEmpty(noFileChanges.ObserveDir(tempDir.Path, "*.cs", true));
+        Assert.IsEmpty(noFileChanges.ObserveDir(tempDir.Path, "*.cs", true).Lister);
       }
     }
 
@@ -28,14 +28,14 @@ namespace Bud.IO {
     public void Do_not_list_in_subfolders() {
       using (var tempDir = new TemporaryDirectory()) {
         tempDir.CreateEmptyFile("A", "A.txt");
-        Assert.IsEmpty(noFileChanges.ObserveDir(tempDir.Path, "*.txt", false));
+        Assert.IsEmpty(noFileChanges.ObserveDir(tempDir.Path, "*.txt", false).Lister);
       }
     }
 
     [Test]
     public void Throws_for_non_existing_folders() {
       using (var tempDir = new TemporaryDirectory()) {
-        Assert.Throws<DirectoryNotFoundException>(() => { noFileChanges.ObserveDir(Path.Combine(tempDir.Path, "B"), "*.txt", true).ToList(); });
+        Assert.Throws<DirectoryNotFoundException>(() => { noFileChanges.ObserveDir(Path.Combine(tempDir.Path, "B"), "*.txt", true).Lister.ToList(); });
       }
     }
 
