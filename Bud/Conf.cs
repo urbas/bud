@@ -107,10 +107,10 @@ namespace Bud {
     public static Conf InConf(string scope)
       => new Conf(ImmutableList<ScopedConfBuilder>.Empty, ImmutableList.Create(scope));
 
-    public static Conf Group(params IConfBuilder[] confs)
-      => Group((IEnumerable<IConfBuilder>) confs);
+    public static Conf New(params IConfBuilder[] confs)
+      => New((IEnumerable<IConfBuilder>) confs);
 
-    public static Conf Group(IEnumerable<IConfBuilder> confs)
+    public static Conf New(IEnumerable<IConfBuilder> confs)
       => Empty.Add(confs);
 
     private ScopedConfBuilder MakeScopedConfBuilder(IConfBuilder builder)

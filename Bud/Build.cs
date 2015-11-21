@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -8,9 +7,9 @@ using static Bud.Conf;
 
 namespace Bud {
   public static class Build {
-    public static readonly Key<string> ProjectDir = nameof(ProjectDir);
-    public static readonly Key<string> ProjectId = nameof(ProjectId);
     public static readonly Key<Files> Sources = nameof(Sources);
+    public static readonly Key<string> ProjectId = nameof(ProjectId);
+    public static readonly Key<string> ProjectDir = nameof(ProjectDir);
     public static readonly Key<IEnumerable<string>> Dependencies = nameof(Dependencies);
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
     public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
@@ -18,11 +17,11 @@ namespace Bud {
     public static Conf Project(string projectDir, string projectId)
       => InConf(projectId)
         .InitValue(ProjectDir, projectDir)
-        .Init(ProjectId, c => projectId ?? GetFileName(ProjectDir[c]))
+        .InitValue(ProjectId, projectId)
         .InitValue(Sources, Files.Empty)
-        .Init(BuildPipelineScheduler, conf => new EventLoopScheduler())
         .InitValue(Dependencies, Enumerable.Empty<string>())
-        .Init(FilesObservatory, c => new LocalFilesObservatory());
+        .Init(BuildPipelineScheduler, _ => new EventLoopScheduler())
+        .Init(FilesObservatory, _ => new LocalFilesObservatory());
 
     public static Conf SourceDir(string subDir = null, string fileFilter = "*", bool includeSubdirs = true) {
       return Empty.Modify(Sources, (conf, sources) => {

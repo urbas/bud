@@ -95,8 +95,8 @@ namespace Bud {
 
     [Test]
     public void Compiler_uses_dependencies() {
-      var projects = Group(ProjectAWithFakeOutput(42L),
-                           ProjectWithDependencies("B", "../A"));
+      var projects = New(ProjectAWithFakeOutput(42L),
+                         ProjectWithDependencies("B", "../A"));
       var compilationInput = projects.Get("B" / Compile).ToEnumerable();
       Assert.AreEqual(new[] {EmptyCompileOutput(1042)},
                       compilationInput);
@@ -104,9 +104,9 @@ namespace Bud {
 
     [Test]
     public void Compiler_reinvoked_when_dependencies_change() {
-      var projects = Group(ProjectAWithFakeOutput(9000L)
-                             .SetValue(Sources, new Files(Empty<string>(), new[] {"foo"}.ToObservable())),
-                           ProjectWithDependencies("B", "../A"));
+      var projects = New(ProjectAWithFakeOutput(9000L)
+                           .SetValue(Sources, new Files(Empty<string>(), new[] {"foo"}.ToObservable())),
+                         ProjectWithDependencies("B", "../A"));
       var compileOutputs = projects.Get("B" / Compile).ToEnumerable();
       Assert.AreEqual(new[] {EmptyCompileOutput(10000), EmptyCompileOutput(10001)},
                       compileOutputs);
