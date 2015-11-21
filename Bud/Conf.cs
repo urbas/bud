@@ -58,14 +58,8 @@ namespace Bud {
       => Add((IEnumerable<IConfBuilder>) otherConfs);
 
     public Conf Add(IEnumerable<IConfBuilder> otherConfs)
-      => new Conf(ScopedConfBuilders.AddRange(otherConfs.Select(MakeScopedConfBuilder)),
+      => new Conf(ScopedConfBuilders.AddRange(ToScopedConfBuilders(otherConfs, Scope)),
                   Scope);
-
-    /// <summary>
-    ///   TODO: Remove. Consider creating a separate helper API for collections.
-    /// </summary>
-    public Conf Add<T>(Key<IEnumerable<T>> dependencies, params T[] v)
-      => Modify(dependencies, (conf, enumerable) => enumerable.Concat(v));
 
     /// <returns>
     ///   a copy of self where the Scope is appended with <paramref name="scope" />.
@@ -104,8 +98,11 @@ namespace Bud {
       return new RawConf(definitions);
     }
 
-    public static Conf InConf(string scope)
-      => new Conf(ImmutableList<ScopedConfBuilder>.Empty, ImmutableList.Create(scope));
+    public static Conf Group(string scope, params IConfBuilder[] confs) {
+      var scopeAsList = ImmutableList.Create(scope);
+      return new Conf(ToScopedConfBuilders(confs, scopeAsList).ToImmutableList(),
+                      scopeAsList);
+    }
 
     public static Conf New(params IConfBuilder[] confs)
       => New((IEnumerable<IConfBuilder>) confs);
@@ -113,7 +110,7 @@ namespace Bud {
     public static Conf New(IEnumerable<IConfBuilder> confs)
       => Empty.Add(confs);
 
-    private ScopedConfBuilder MakeScopedConfBuilder(IConfBuilder builder)
-      => new ScopedConfBuilder(Scope, builder);
+    private static IEnumerable<ScopedConfBuilder> ToScopedConfBuilders(IEnumerable<IConfBuilder> otherConfs, ImmutableList<string> scope)
+      => otherConfs.Select(builder => new ScopedConfBuilder(scope, builder));
   }
 }

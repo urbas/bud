@@ -15,7 +15,7 @@ namespace Bud {
     public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
 
     public static Conf Project(string projectDir, string projectId)
-      => InConf(projectId)
+      => Group(projectId)
         .InitValue(ProjectDir, projectDir)
         .InitValue(ProjectId, projectId)
         .InitValue(Sources, Files.Empty)

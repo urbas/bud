@@ -138,7 +138,7 @@ namespace Bud {
 
     [Test]
     public void Scope_backtracking()
-      => Assert.IsEmpty(InConf("foo").Out().Scope);
+      => Assert.IsEmpty(Group("foo").Out().Scope);
 
     [Test]
     public void Throws_when_backtracking_from_empty_scope()
@@ -146,57 +146,57 @@ namespace Bud {
 
     [Test]
     public void Getting_values_of_nested_configurations() {
-      var subConf = InConf("foo").SetValue(A, 42);
+      var subConf = Group("foo").SetValue(A, 42);
       Assert.AreEqual(42, subConf.Out().Get("foo" / A));
     }
 
     [Test]
     public void Getting_siblings_in_nested_configurations() {
-      var subConf = InConf("foo").SetValue(A, 42)
-                                 .Set(B, conf => 1 + A[conf]);
+      var subConf = Group("foo").SetValue(A, 42)
+                                .Set(B, conf => 1 + A[conf]);
       Assert.AreEqual(43, subConf.Get(B));
     }
 
     [Test]
     public void Modifying_values_of_double_nested_configurations() {
-      var subConf = InConf("foo").In("bar")
-                                 .SetValue(A, 42)
-                                 .Modify(A, (conf, oldValue) => 1 + oldValue);
+      var subConf = Group("foo").In("bar")
+                                .SetValue(A, 42)
+                                .Modify(A, (conf, oldValue) => 1 + oldValue);
       Assert.AreEqual(43, subConf.Get(A));
     }
 
     [Test]
     public void Nested_configurations_can_access_configurations_by_absolute_path() {
       var confA = A.SetValue(42);
-      var confB = InConf("foo").Set(B, conf => 1 + conf.Get(Root / A));
+      var confB = Group("foo").Set(B, conf => 1 + conf.Get(Root / A));
       Assert.AreEqual(43, New(confA, confB).Get("foo" / B));
     }
 
     [Test]
     public void Nested_configurations_can_access_configurations_by_relative_path() {
       var confA = A.SetValue(42);
-      var confB = InConf("foo").Set(B, conf => 1 + conf.Get(".." / A));
+      var confB = Group("foo").Set(B, conf => 1 + conf.Get(".." / A));
       Assert.AreEqual(43, New(confA, confB).Get("foo" / B));
     }
 
     [Test]
     public void Doubly_nested_configurations_can_access_configurations_by_relative_path() {
       var confA = A.SetValue(42);
-      var confB = InConf("foo").In("bar").Set(B, conf => 1 + conf.Get("../.." / A));
+      var confB = Group("foo").In("bar").Set(B, conf => 1 + conf.Get("../.." / A));
       Assert.AreEqual(43, New(confA, confB).Get("foo/bar" / B));
     }
 
     [Test]
     public void Triply_nested_configurations_can_access_configurations_by_relative_path() {
       var confA = A.SetValue(42);
-      var confB = InConf("foo").In("bar").Set(B, conf => 1 + conf.Get("../../../moo" / A));
-      Assert.AreEqual(43, InConf("moo").Add(confA, confB).Get("foo/bar" / B));
+      var confB = Group("foo").In("bar").Set(B, conf => 1 + conf.Get("../../../moo" / A));
+      Assert.AreEqual(43, Group("moo").Add(confA, confB).Get("foo/bar" / B));
     }
 
     [Test]
     public void Nested_configurations_can_access_configurations_in_other_branches_via_relative_paths() {
-      var confA = InConf("foo").In("boo").SetValue(A, 42);
-      var confB = InConf("foo").In("bar").Set(B, conf => 1 + conf.Get("../boo" / A));
+      var confA = Group("foo").In("boo").SetValue(A, 42);
+      var confB = Group("foo").In("bar").Set(B, conf => 1 + conf.Get("../boo" / A));
       Assert.AreEqual(43, Empty.Add(confA, confB).Get("foo/bar" / B));
     }
 
@@ -206,24 +206,24 @@ namespace Bud {
 
     [Test]
     public void Relative_reference_in_a_nested_modified_conf() {
-      var confA = InConf("a").InitValue(A, 42).InitValue(B, 1);
+      var confA = Group("a").InitValue(A, 42).InitValue(B, 1);
       var confB = Empty.Modify(B, (conf, oldValue) => oldValue + A[conf]);
       Assert.AreEqual(43, confA.Add(confB).Get(B));
     }
 
     [Test]
     public void Relative_reference_in_a_nested_and_doubly_modified_conf() {
-      var confA = InConf("a").InitValue(A, 42).InitValue(B, 1);
+      var confA = Group("a").InitValue(A, 42).InitValue(B, 1);
       var confB = Empty.Modify(B, (conf, oldValue) => oldValue + A[conf]);
       Assert.AreEqual(85, confA.Add(confB, confB).Get(B));
     }
 
     [Test]
     public void Relative_reference_in_a_nested_and_modified_conf_defined_in_another_scope() {
-      var confA = InConf("a").InitValue(A, 42);
-      var confB0 = InConf("e").In("f").In("g").Set("../../.." / B, conf => 1 + ("../../.." / A)[conf]);
-      var confB1 = InConf("b").Modify("../a" / B, (conf, oldValue) => oldValue + ("../a" / A)[conf]);
-      var confB2 = InConf("c").In("d").Modify("../../a" / B, (conf, oldValue) => oldValue + ("../../a" / A)[conf]);
+      var confA = Group("a").InitValue(A, 42);
+      var confB0 = Group("e").In("f").In("g").Set("../../.." / B, conf => 1 + ("../../.." / A)[conf]);
+      var confB1 = Group("b").Modify("../a" / B, (conf, oldValue) => oldValue + ("../a" / A)[conf]);
+      var confB2 = Group("c").In("d").Modify("../../a" / B, (conf, oldValue) => oldValue + ("../../a" / A)[conf]);
       Assert.AreEqual(253, Empty.Add(confA.Add(confB0), confB0, confB1, confB2, confB1, confB2, confB2).Get("a" / B));
     }
 
@@ -231,8 +231,8 @@ namespace Bud {
     public void Calculate_value_only_once_when_invoking_relative_references_multiple_times() {
       var valueFactoryA = new Mock<Func<IConf, int>>(MockBehavior.Strict);
       valueFactoryA.Setup(self => self(It.IsAny<IConf>())).Returns(42);
-      var conf = New(InConf("a").Set(A, valueFactoryA.Object),
-                       InConf("b").Set(B, c => c.Get("../a" / A)))
+      var conf = New(Group("a").Set(A, valueFactoryA.Object),
+                     Group("b").Set(B, c => c.Get("../a" / A)))
         .ToCompiled();
       conf.Get("b" / B);
       conf.Get("b" / B);

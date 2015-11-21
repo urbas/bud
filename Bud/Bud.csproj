@@ -103,6 +103,7 @@
     <Compile Include="Configuration\IConfDefinition.cs" />
     <Compile Include="Configuration\IConfBuilder.cs" />
     <Compile Include="CSharp.cs" />
+    <Compile Include="EnumerableConfApi.cs" />
     <Compile Include="IBuild.cs" />
     <Compile Include="IO\Diff.cs" />
     <Compile Include="IO\FileFinder.cs" />
