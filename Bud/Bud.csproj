@@ -85,6 +85,7 @@
   <ItemGroup>
     <Compile Include="Cli\BuildTool.cs" />
     <Compile Include="Collections\EnumerableUtils.cs" />
+    <Compile Include="Configuration\ApiV1\EnumerableConfApi.cs" />
     <Compile Include="Configuration\RawConf.cs" />
     <Compile Include="Configuration\ScopedConfBuilder.cs" />
     <Compile Include="Configuration\ScopedConf.cs" />
@@ -103,7 +104,6 @@
     <Compile Include="Configuration\IConfDefinition.cs" />
     <Compile Include="Configuration\IConfBuilder.cs" />
     <Compile Include="CSharp.cs" />
-    <Compile Include="EnumerableConfApi.cs" />
     <Compile Include="IBuild.cs" />
     <Compile Include="IO\Diff.cs" />
     <Compile Include="IO\FileFinder.cs" />
