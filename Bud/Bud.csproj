@@ -111,6 +111,7 @@
     <Compile Include="IO\FilesObservatory.cs" />
     <Compile Include="IO\IWatchedResources.cs" />
     <Compile Include="IO\ITimestamped.cs" />
+    <Compile Include="IO\IFilesProcessor.cs" />
     <Compile Include="IO\LocalFilesObservatory.cs" />
     <Compile Include="IO\IFilesObservatory.cs" />
     <Compile Include="IO\EmptyFilesObservatory.cs" />

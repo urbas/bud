@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Bud.Cs;
 using Bud.IO;
@@ -52,17 +53,16 @@ namespace Bud {
 
     // TODO: File watchers are triggering duplicate updates in bursts. Throttle them.
     private static IObservable<CompileInput> DefaultCompilationInput(IConf conf)
-      => Sources[conf].Watch()
-                      .CombineLatest(AssemblyReferences[conf].Watch(),
-                                     CollectDependencies(conf),
-                                     ToCompilationInput);
+      => SourceInput[conf].CombineLatest(AssemblyReferences[conf].Watch(),
+                                         CollectDependencies(conf),
+                                         ToCompilationInput);
 
     private static IObservable<IEnumerable<CompileOutput>> CollectDependencies(IConf conf)
       => Dependencies[conf].Any() ?
         Dependencies[conf].Select(s => conf.Get(s / Compile)).CombineLatest() :
         Return(Enumerable.Empty<CompileOutput>());
 
-    private static CompileInput ToCompilationInput(IEnumerable<string> files,
+    private static CompileInput ToCompilationInput(ImmutableArray<Timestamped<string>> files,
                                                    IEnumerable<AssemblyReference> assemblies,
                                                    IEnumerable<CompileOutput> deps)
       => new CompileInput(files, assemblies, deps);

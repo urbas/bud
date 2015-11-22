@@ -1,4 +1,8 @@
+using System;
+using System.Collections.Immutable;
+using System.Reactive.Linq;
 using Bud.IO;
+using Moq;
 using NUnit.Framework;
 using static Bud.Build;
 
@@ -29,6 +33,20 @@ namespace Bud {
         Assert.That(Sources[twoDirsProject].Lister,
                     Is.EquivalentTo(new[] {Files.ToTimestampedFile(fileA), Files.ToTimestampedFile(fileB)}));
       }
+    }
+
+    [Test]
+    public void Source_processor_changes_source_input() {
+      var fileProcessor = new Mock<IFilesProcessor>(MockBehavior.Strict);
+      var expectedOutputFiles = ImmutableArray.Create(Timestamped.Create("foo", 42L));
+      fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<ImmutableArray<Timestamped<string>>>>()))
+                   .Returns(Observable.Return(expectedOutputFiles));
+      var actualOutputFiles = Project("FooDir", "Foo")
+        .AddSourceProcessor(conf => fileProcessor.Object)
+        .Get(SourceInput)
+        .Wait();
+      fileProcessor.VerifyAll();
+      Assert.AreEqual(expectedOutputFiles, actualOutputFiles);
     }
   }
 }

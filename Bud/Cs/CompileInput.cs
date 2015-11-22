@@ -8,9 +8,14 @@ namespace Bud.Cs {
   public struct CompileInput {
     public CompileInput(IEnumerable<string> sources,
                         IEnumerable<IAssemblyReference> assemblies,
+                        IEnumerable<CompileOutput> dependencies)
+      : this(Files.ToTimestampedFiles(sources), assemblies, dependencies) {}
+
+    public CompileInput(ImmutableArray<Timestamped<string>> sources,
+                        IEnumerable<IAssemblyReference> assemblies,
                         IEnumerable<CompileOutput> dependencies) {
       Dependencies = dependencies.ToImmutableArray();
-      Sources = sources.Select(Files.ToTimestampedFile).ToImmutableArray();
+      Sources = sources;
       Assemblies = assemblies.Select(reference => reference.ToTimestamped()).ToImmutableArray();
     }
 

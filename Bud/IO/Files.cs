@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 
 namespace Bud.IO {
@@ -30,5 +32,8 @@ namespace Bud.IO {
 
     public static long FileTimestampNow()
       => DateTime.Now.ToFileTime();
+
+    public static ImmutableArray<Timestamped<string>> ToTimestampedFiles(IEnumerable<string> sources)
+      => sources.Select(ToTimestampedFile).ToImmutableArray();
   }
 }
