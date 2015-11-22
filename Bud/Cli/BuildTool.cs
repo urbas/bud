@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -49,6 +50,8 @@ namespace Bud.Cli {
         c => new Assemblies(typeof(BuildTool).Assembly.Location,
                             typeof(object).Assembly.Location,
                             typeof(Enumerable).Assembly.Location,
-                            typeof(Observable).Assembly.Location));
+                            typeof(ImmutableArray).Assembly.Location,
+                            typeof(Observable).Assembly.Location,
+                            "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.Runtime.dll"));
   }
 }

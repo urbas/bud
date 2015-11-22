@@ -65,6 +65,8 @@ namespace Bud {
     private static CompileInput ToCompilationInput(ImmutableArray<Timestamped<string>> files,
                                                    IEnumerable<AssemblyReference> assemblies,
                                                    IEnumerable<CompileOutput> deps)
-      => new CompileInput(files, assemblies, deps);
+      => new CompileInput(files,
+                          CompileInput.ToTimestampedAssemblyReferences(assemblies),
+                          deps.ToImmutableArray());
   }
 }

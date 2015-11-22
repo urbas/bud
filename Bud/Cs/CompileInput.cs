@@ -9,15 +9,20 @@ namespace Bud.Cs {
     public CompileInput(IEnumerable<string> sources,
                         IEnumerable<IAssemblyReference> assemblies,
                         IEnumerable<CompileOutput> dependencies)
-      : this(Files.ToTimestampedFiles(sources), assemblies, dependencies) {}
+      : this(Files.ToTimestampedFiles(sources),
+             ToTimestampedAssemblyReferences(assemblies),
+             dependencies.ToImmutableArray()) {}
 
     public CompileInput(ImmutableArray<Timestamped<string>> sources,
-                        IEnumerable<IAssemblyReference> assemblies,
-                        IEnumerable<CompileOutput> dependencies) {
-      Dependencies = dependencies.ToImmutableArray();
+                        ImmutableArray<Timestamped<IAssemblyReference>> assemblies,
+                        ImmutableArray<CompileOutput> dependencies) {
+      Dependencies = dependencies;
       Sources = sources;
-      Assemblies = assemblies.Select(reference => reference.ToTimestamped()).ToImmutableArray();
+      Assemblies = assemblies;
     }
+
+    public static ImmutableArray<Timestamped<IAssemblyReference>> ToTimestampedAssemblyReferences(IEnumerable<IAssemblyReference> assemblies)
+      => assemblies.Select(reference => reference.ToTimestamped()).ToImmutableArray();
 
     public ImmutableArray<Timestamped<string>> Sources { get; }
     public ImmutableArray<Timestamped<IAssemblyReference>> Assemblies { get; }
