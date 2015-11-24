@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reactive.Concurrency;
 using Bud.Cs;
 using Bud.IO;
 using Bud.Reactive;
@@ -48,14 +49,13 @@ namespace Bud {
     }
 
     private static IObservable<CompileOutput> DefaultCompilation(IConf conf)
-      => ThrottledInput(conf).ObserveOn(BuildPipelineScheduler[conf])
-                             .Select(Compiler[conf])
-                             .Do(PrintCompilationResult);
+      => CompilationInput[conf].Select(Compiler[conf]).Do(PrintCompilationResult);
 
     private static IObservable<CompileInput> DefaultCompilationInput(IConf conf)
-      => SourceInput[conf].CombineLatest(AssemblyReferences[conf].Watch(),
-                                         CollectDependencies(conf),
-                                         ToCompilationInput);
+      => ProcessedSources[conf]
+        .CombineLatest(AssemblyReferences[conf].Watch(),
+                       CollectDependencies(conf),
+                       ToCompilationInput);
 
     private static IObservable<IEnumerable<CompileOutput>> CollectDependencies(IConf conf)
       => Dependencies[conf].Any() ?
@@ -68,12 +68,5 @@ namespace Bud {
       => new CompileInput(files,
                           CompileInput.ToTimestampedAssemblyReferences(assemblies),
                           deps.ToImmutableArray());
-
-    private static IObservable<CompileInput> ThrottledInput(IConf conf) {
-      var sharedInput = CompilationInput[conf].Publish().RefCount();
-      var first = sharedInput.Take(1);
-      var rest = sharedInput.Skip(1).SkipUntilCalm(TimeSpan.FromMilliseconds(75), BuildPipelineScheduler[conf]);
-      return first.Concat(rest).Do(input => Console.WriteLine($"WTF!"));
-    }
   }
 }

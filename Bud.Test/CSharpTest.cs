@@ -1,8 +1,6 @@
 using System;
 using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using Bud.Cs;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
@@ -10,7 +8,6 @@ using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
 using static System.Linq.Enumerable;
-using static System.Threading.Thread;
 using static System.TimeSpan;
 using static Bud.Build;
 using static Bud.Conf;
@@ -113,27 +110,6 @@ namespace Bud {
       testScheduler.AdvanceBy(FromSeconds(5).Ticks);
       while (compilation.MoveNext()) {}
       compilerMock.Verify(self => self(It.IsAny<CompileInput>()), Times.Exactly(3));
-    }
-
-    [Test]
-    public void Compilers_must_be_invoked_on_the_build_pipeline_thread() {
-      int inputThreadId = 0;
-      int compileThreadId = 0;
-      EmptyCSharpProject("A")
-        .SetValue(CompilationInput, Observable.Create<CompileInput>(observer => {
-          Task.Run(() => {
-            inputThreadId = CurrentThread.ManagedThreadId;
-            observer.OnNext(EmptyCompileInput());
-            observer.OnCompleted();
-          });
-          return new CompositeDisposable();
-        }))
-        .SetValue(Compiler, input => {
-          compileThreadId = CurrentThread.ManagedThreadId;
-          return EmptyCompileOutput(42);
-        })
-        .Get(Compile).Wait();
-      Assert.AreNotEqual(inputThreadId, compileThreadId);
     }
 
     private static Conf ProjectAWithFakeOutput(long initialTimestamp)

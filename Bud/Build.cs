@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Bud.IO;
+using Bud.Reactive;
 using static System.IO.Path;
 using static Bud.Conf;
 
@@ -16,8 +17,8 @@ namespace Bud {
     public static readonly Key<IEnumerable<string>> Dependencies = nameof(Dependencies);
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
     public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
-    public static readonly Key<IObservable<ImmutableArray<Timestamped<string>>>> SourceInput = nameof(SourceInput);
-    public static readonly Key<ImmutableList<IFilesProcessor>> SourceInputProcessors = nameof(SourceInputProcessors);
+    public static readonly Key<IObservable<ImmutableArray<Timestamped<string>>>> ProcessedSources = nameof(ProcessedSources);
+    public static readonly Key<ImmutableList<IFilesProcessor>> SourceProcessors = nameof(SourceProcessors);
     private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler = new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
 
     public static Conf Project(string projectDir, string projectId)
@@ -27,8 +28,8 @@ namespace Bud {
         .InitValue(Sources, Files.Empty)
         .InitValue(Dependencies, Enumerable.Empty<string>())
         .Init(BuildPipelineScheduler, _ => DefauBuildPipelineScheduler.Value)
-        .Init(SourceInput, ProcessSources)
-        .InitValue(SourceInputProcessors, ImmutableList<IFilesProcessor>.Empty)
+        .Init(ProcessedSources, ProcessSources)
+        .InitValue(SourceProcessors, ImmutableList<IFilesProcessor>.Empty)
         .Init(FilesObservatory, _ => new LocalFilesObservatory());
 
     public static Conf SourceDir(string subDir = null, string fileFilter = "*", bool includeSubdirs = true) {
@@ -54,13 +55,23 @@ namespace Bud {
       });
 
     private static IObservable<ImmutableArray<Timestamped<string>>> ProcessSources(IConf project)
-      => SourceInputProcessors[project]
-        .Aggregate(CollectTimestampedSources(project), (sources, processor) => processor.Process(sources));
+      => SourceProcessors[project]
+        .Aggregate(CollectTimestampedSources(project),
+                   (sources, processor) => processor.Process(sources));
 
     private static IObservable<ImmutableArray<Timestamped<string>>> CollectTimestampedSources(IConf c)
-      => Sources[c].Watch().Select(Files.ToTimestampedFiles);
+      => ThrottleInput(Sources[c].Watch(), BuildPipelineScheduler[c])
+      .ObserveOn(BuildPipelineScheduler[c])
+      .Select(Files.ToTimestampedFiles);
 
     public static Conf AddSourceProcessor(this Conf project, Func<IConf, IFilesProcessor> fileProcessorFactory)
-      => project.Modify(SourceInputProcessors, (conf, processors) => processors.Add(fileProcessorFactory(conf)));
+      => project.Modify(SourceProcessors, (conf, processors) => processors.Add(fileProcessorFactory(conf)));
+
+    private static IObservable<T> ThrottleInput<T>(IObservable<T> observableToThrottle, IScheduler scheduler) {
+      var sharedInput = observableToThrottle.Publish().RefCount();
+      var first = sharedInput.Take(1);
+      var rest = sharedInput.Skip(1).SkipUntilCalm(TimeSpan.FromMilliseconds(75), scheduler);
+      return first.Concat(rest).Do(input => Console.WriteLine($"WTF!"));
+    }
   }
 }

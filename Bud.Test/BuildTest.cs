@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Immutable;
+using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Bud.IO;
 using Moq;
 using NUnit.Framework;
@@ -43,10 +47,38 @@ namespace Bud {
                    .Returns(Observable.Return(expectedOutputFiles));
       var actualOutputFiles = Project("FooDir", "Foo")
         .AddSourceProcessor(conf => fileProcessor.Object)
-        .Get(SourceInput)
+        .Get(ProcessedSources)
         .Wait();
       fileProcessor.VerifyAll();
       Assert.AreEqual(expectedOutputFiles, actualOutputFiles);
+    }
+
+    [Test]
+    public void Source_processors_must_be_invoked_on_the_build_pipeline_thread() {
+      int inputThreadId = 0;
+      var fileProcessor = new ThreadIdRecordingFileProcessor();
+      Project("fooDir", "A")
+        .SetValue(Sources, new Files(Enumerable.Empty<string>(), Observable.Create<string>(observer => {
+          Task.Run(() => {
+            inputThreadId = Thread.CurrentThread.ManagedThreadId;
+            observer.OnNext("foo");
+            observer.OnCompleted();
+          });
+          return new CompositeDisposable();
+        })))
+        .AddSourceProcessor(_ => fileProcessor)
+        .Get(ProcessedSources).Wait();
+      Assert.AreNotEqual(0, fileProcessor.InvocationThreadId);
+      Assert.AreNotEqual(inputThreadId, fileProcessor.InvocationThreadId);
+    }
+
+    public class ThreadIdRecordingFileProcessor : IFilesProcessor {
+      public int InvocationThreadId { get; private set; }
+
+      public IObservable<ImmutableArray<Timestamped<string>>> Process(IObservable<ImmutableArray<Timestamped<string>>> sources) {
+        InvocationThreadId = Thread.CurrentThread.ManagedThreadId;
+        return sources;
+      }
     }
   }
 }
