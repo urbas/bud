@@ -1,5 +1,4 @@
 using System;
-using System.Reactive.Linq;
 using Microsoft.Reactive.Testing;
 using NUnit.Framework;
 using static System.Reactive.Linq.Observable;
@@ -42,12 +41,8 @@ namespace Bud.Reactive {
     }
 
     [Test]
-    public void SkipUntilCalm_produces_skips_some_elements() {
-      var observable = tenTickInterval.Take(3)
-                                      .Merge(tenTickInterval.Select(l => l + 10).Take(2).Delay(FromTicks(100), scheduler))
-                                      .Merge(tenTickInterval.Select(l => l + 20).Take(1).Delay(FromTicks(200), scheduler))
-                                      .SkipUntilCalm(FromTicks(20), scheduler)
-                                      .GetEnumerator();
+    public void SkipUntilCalm_skips_some_elements() {
+      var observable = ThreeBursts().SkipUntilCalm(FromTicks(20), scheduler).GetEnumerator();
       scheduler.AdvanceBy(9001);
       IsTrue(observable.MoveNext());
       AreEqual(2, observable.Current);
@@ -72,5 +67,37 @@ namespace Bud.Reactive {
       AreEqual(2, observable.Current);
       IsFalse(observable.MoveNext());
     }
+
+    [Test]
+    public void CalmAfterFirst_returns_empty()
+      => IsEmpty(Empty<int>().CalmAfterFirst(FromTicks(100), scheduler).ToEnumerable());
+
+    [Test]
+    public void CalmAfterFirst_produces_the_first_observation_when_next_happens_within_calming_period() {
+      var enumerator = tenTickInterval.Take(5).CalmAfterFirst(FromTicks(100), scheduler).GetEnumerator();
+      scheduler.AdvanceBy(50);
+      IsTrue(enumerator.MoveNext());
+      AreEqual(0, enumerator.Current);
+    }
+
+    [Test]
+    public void CalmAfterFirst_produces_the_second_observation_when_after_calming_period() {
+      var observable = ThreeBursts().CalmAfterFirst(FromTicks(20), scheduler).GetEnumerator();
+      scheduler.AdvanceBy(9001);
+      IsTrue(observable.MoveNext());
+      AreEqual(0, observable.Current);
+      IsTrue(observable.MoveNext());
+      AreEqual(2, observable.Current);
+      IsTrue(observable.MoveNext());
+      AreEqual(11, observable.Current);
+      IsTrue(observable.MoveNext());
+      AreEqual(20, observable.Current);
+      IsFalse(observable.MoveNext());
+    }
+
+    private IObservable<long> ThreeBursts()
+      => tenTickInterval.Take(3)
+                        .Merge(tenTickInterval.Select(l => l + 10).Take(2).Delay(FromTicks(100), scheduler))
+                        .Merge(tenTickInterval.Select(l => l + 20).Take(1).Delay(FromTicks(200), scheduler));
   }
 }

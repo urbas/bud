@@ -60,18 +60,12 @@ namespace Bud {
                    (sources, processor) => processor.Process(sources));
 
     private static IObservable<ImmutableArray<Timestamped<string>>> CollectTimestampedSources(IConf c)
-      => ThrottleInput(Sources[c].Watch(), BuildPipelineScheduler[c])
-      .ObserveOn(BuildPipelineScheduler[c])
-      .Select(Files.ToTimestampedFiles);
+      => Sources[c].Watch()
+                   .CalmAfterFirst(TimeSpan.FromMilliseconds(75), BuildPipelineScheduler[c])
+                   .ObserveOn(BuildPipelineScheduler[c])
+                   .Select(Files.ToTimestampedFiles);
 
     public static Conf AddSourceProcessor(this Conf project, Func<IConf, IFilesProcessor> fileProcessorFactory)
       => project.Modify(SourceProcessors, (conf, processors) => processors.Add(fileProcessorFactory(conf)));
-
-    private static IObservable<T> ThrottleInput<T>(IObservable<T> observableToThrottle, IScheduler scheduler) {
-      var sharedInput = observableToThrottle.Publish().RefCount();
-      var first = sharedInput.Take(1);
-      var rest = sharedInput.Skip(1).SkipUntilCalm(TimeSpan.FromMilliseconds(75), scheduler);
-      return first.Concat(rest).Do(input => Console.WriteLine($"WTF!"));
-    }
   }
 }

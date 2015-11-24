@@ -16,17 +16,30 @@ namespace Bud.Reactive {
                                                   TimeSpan calmingPeriod,
                                                   IScheduler scheduler) {
       var shared = observable.Publish().RefCount();
-      var closer = Observable.Create<Unit>(observer => {
+      return shared.Window(CalmingWindows(shared, calmingPeriod, scheduler))
+                   .SelectMany(o => o.Aggregate(new Optional<T>(), (element, nextElement) => new Optional<T>(nextElement)))
+                   .Where(optional => optional.HasValue)
+                   .Select(optional => optional.Value);
+    }
+
+    public static IObservable<T> CalmAfterFirst<T>(this IObservable<T> observableToThrottle,
+                                                   TimeSpan calmingPeriod,
+                                                   IScheduler scheduler) {
+      var sharedInput = observableToThrottle.Publish().RefCount();
+      return sharedInput.Take(1)
+                        .Concat(sharedInput.Skip(1).SkipUntilCalm(calmingPeriod, scheduler));
+    }
+
+    private static IObservable<Unit> CalmingWindows<T>(IObservable<T> observable, TimeSpan calmingPeriod, IScheduler scheduler)
+      => Observable.Create<Unit>(observer => {
         var calmingTimer = new MultipleAssignmentDisposable();
         IDisposable localTimer = null;
         var subject = new Subject<Unit>();
         var closerSubscription = subject.Subscribe(observer);
-        var calmerSubscription = shared
+        var calmerSubscription = observable
           .Subscribe(next => {
             localTimer?.Dispose();
-            localTimer = scheduler.Schedule(calmingPeriod, () => {
-              subject.OnNext(Unit.Default);
-            });
+            localTimer = scheduler.Schedule(calmingPeriod, () => subject.OnNext(Unit.Default));
             calmingTimer.Disposable = localTimer;
           }, exception => {
             calmingTimer.Dispose();
@@ -37,10 +50,5 @@ namespace Bud.Reactive {
           });
         return new CompositeDisposable {calmingTimer, calmerSubscription, closerSubscription, subject};
       });
-      return Observable.SelectMany(shared.Window(closer),
-                                   o => o.Aggregate(new Optional<T>(), (element, nextElement) => new Optional<T>(nextElement)))
-                       .Where(optional => optional.HasValue)
-                       .Select(optional => optional.Value);
-    }
   }
 }
