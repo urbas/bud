@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -5,7 +6,9 @@ using Bud.IO;
 using static Bud.Collections.EnumerableUtils;
 
 namespace Bud.Cs {
-  public struct CompileInput {
+  public class CompileInput {
+    private readonly Lazy<int> cachedHashCode;
+
     public CompileInput(IEnumerable<string> sources,
                         IEnumerable<IAssemblyReference> assemblies,
                         IEnumerable<CompileOutput> dependencies)
@@ -19,6 +22,7 @@ namespace Bud.Cs {
       Dependencies = dependencies;
       Sources = sources;
       Assemblies = assemblies;
+      cachedHashCode = new Lazy<int>(ComputeHashCode);
     }
 
     public static ImmutableArray<Timestamped<IAssemblyReference>> ToTimestampedAssemblyReferences(IEnumerable<IAssemblyReference> assemblies)
@@ -38,15 +42,18 @@ namespace Bud.Cs {
          obj is CompileInput &&
          Equals((CompileInput) obj);
 
-    public override int GetHashCode() {
+    public override int GetHashCode() => cachedHashCode.Value;
+
+    public static bool operator ==(CompileInput left, CompileInput right) => left.Equals(right);
+
+    public static bool operator !=(CompileInput left, CompileInput right) => !left.Equals(right);
+
+    private int ComputeHashCode() {
       unchecked {
         var hashCode = ElementwiseHashCode(Dependencies) * 397;
         hashCode = (hashCode ^ ElementwiseHashCode(Sources)) * 397;
         return hashCode ^ ElementwiseHashCode(Assemblies);
       }
     }
-
-    public static bool operator ==(CompileInput left, CompileInput right) => left.Equals(right);
-    public static bool operator !=(CompileInput left, CompileInput right) => !left.Equals(right);
   }
 }

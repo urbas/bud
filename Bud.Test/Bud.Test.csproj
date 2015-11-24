@@ -99,6 +99,7 @@
     <Compile Include="Configuration\RawConfTest.cs" />
     <Compile Include="Configuration\ScopedConfTest.cs" />
     <Compile Include="Configuration\ScopedDictionaryBuilderTest.cs" />
+    <Compile Include="Cs\CompileInputTest.cs" />
     <Compile Include="Cs\RoslynCSharpCompilerTest.cs" />
     <Compile Include="ConfTest.cs" />
     <Compile Include="CSharpTest.cs" />
