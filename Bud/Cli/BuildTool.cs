@@ -20,11 +20,11 @@ namespace Bud.Cli {
                                     .Take(1)
                                     .Wait();
       if (compilationOutput.Success) {
-        var configs = LoadBuildConf(compilationOutput);
-        foreach (var s in args) {
-          configs.Get<IObservable<object>>(s)
-                 .ObserveOn(new EventLoopScheduler())
-                 .Wait();
+        var buildDefinition = LoadBuildConf(compilationOutput);
+        foreach (var command in args) {
+          buildDefinition.Get<IObservable<object>>(command)
+                         .ObserveOn(new EventLoopScheduler())
+                         .Wait();
         }
       } else {
         PrintCompilationErrors(compilationOutput);
