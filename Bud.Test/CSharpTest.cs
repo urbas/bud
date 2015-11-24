@@ -1,10 +1,12 @@
 using System;
+using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Bud.Cs;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
+using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
 using static System.Linq.Enumerable;
@@ -81,16 +83,13 @@ namespace Bud {
 
     [Test]
     public void Compiler_reinvoked_when_input_changes() {
-      int invocationCount = 0;
-      CSharpProject("foo", "A")
-        .SetValue(Sources, new Files(Empty<string>(), new[] {"foo", "bar"}.ToObservable()))
-        .SetValue(AssemblyReferences, Assemblies.Empty)
-        .SetValue(Compiler, input => {
-          ++invocationCount;
-          return EmptyCompileOutput();
-        })
-        .Get(Compile).Wait();
-      Assert.AreEqual(3, invocationCount);
+      var testScheduler = new TestScheduler();
+      var compiler = NoOpCompiler();
+      var compilation = ProjectAWithUpdatingSources(testScheduler, compiler.Object)
+        .Get(Compile).GetEnumerator();
+      testScheduler.AdvanceBy(FromSeconds(5).Ticks);
+      while (compilation.MoveNext()) {}
+      compiler.Verify(self => self(It.IsAny<CompileInput>()), Times.Exactly(3));
     }
 
     [Test]
@@ -104,12 +103,16 @@ namespace Bud {
 
     [Test]
     public void Compiler_reinvoked_when_dependencies_change() {
-      var projects = New(ProjectAWithFakeOutput(9000L)
-                           .SetValue(Sources, new Files(Empty<string>(), new[] {"foo"}.ToObservable())),
-                         ProjectWithDependencies("B", "../A"));
-      var compileOutputs = projects.Get("B" / Compile).ToEnumerable();
-      Assert.AreEqual(new[] {EmptyCompileOutput(10000), EmptyCompileOutput(10001)},
-                      compileOutputs);
+      var testScheduler = new TestScheduler();
+      var compilerMock = NoOpCompiler();
+      var compilation = New(ProjectAWithUpdatingSources(testScheduler, _ => EmptyCompileOutput()),
+                            ProjectWithDependencies("B", "../A")
+                              .SetValue(BuildPipelineScheduler, testScheduler)
+                              .SetValue(Compiler, compilerMock.Object))
+        .Get("B" / Compile).GetEnumerator();
+      testScheduler.AdvanceBy(FromSeconds(5).Ticks);
+      while (compilation.MoveNext()) {}
+      compilerMock.Verify(self => self(It.IsAny<CompileInput>()), Times.Exactly(3));
     }
 
     [Test]
@@ -160,5 +163,24 @@ namespace Bud {
 
     private static CompileOutput EmptyCompileOutput(long timestamp = 0L)
       => new CompileOutput(Empty<Diagnostic>(), Zero, "foo", true, timestamp, null);
+
+    private static Mock<Func<CompileInput, CompileOutput>> NoOpCompiler() {
+      var compiler = new Mock<Func<CompileInput, CompileOutput>>();
+      compiler.Setup(self => self(It.IsAny<CompileInput>())).Returns(EmptyCompileOutput());
+      return compiler;
+    }
+
+    private static Files EmptyFilesWithDelayedUpdates(IScheduler testScheduler) {
+      var fileUpdates = Observable.Return("foo").Delay(FromSeconds(1), testScheduler)
+                                  .Concat(Observable.Return("bar").Delay(FromSeconds(1), testScheduler));
+      return new Files(Empty<string>(), fileUpdates);
+    }
+
+    private static Conf ProjectAWithUpdatingSources(IScheduler testScheduler, Func<CompileInput, CompileOutput> compiler)
+      => CSharpProject("a", "A")
+        .SetValue(BuildPipelineScheduler, testScheduler)
+        .SetValue(Sources, EmptyFilesWithDelayedUpdates(testScheduler))
+        .SetValue(AssemblyReferences, Assemblies.Empty)
+        .SetValue(Compiler, compiler);
   }
 }

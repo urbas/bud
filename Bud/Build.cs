@@ -18,6 +18,7 @@ namespace Bud {
     public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
     public static readonly Key<IObservable<ImmutableArray<Timestamped<string>>>> SourceInput = nameof(SourceInput);
     public static readonly Key<ImmutableList<IFilesProcessor>> SourceInputProcessors = nameof(SourceInputProcessors);
+    private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler = new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
 
     public static Conf Project(string projectDir, string projectId)
       => Group(projectId)
@@ -25,7 +26,7 @@ namespace Bud {
         .InitValue(ProjectId, projectId)
         .InitValue(Sources, Files.Empty)
         .InitValue(Dependencies, Enumerable.Empty<string>())
-        .Init(BuildPipelineScheduler, _ => new EventLoopScheduler())
+        .Init(BuildPipelineScheduler, _ => DefauBuildPipelineScheduler.Value)
         .Init(SourceInput, ProcessSources)
         .InitValue(SourceInputProcessors, ImmutableList<IFilesProcessor>.Empty)
         .Init(FilesObservatory, _ => new LocalFilesObservatory());

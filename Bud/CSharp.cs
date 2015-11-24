@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using Bud.Cs;
 using Bud.IO;
+using Bud.Reactive;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Path;
@@ -32,7 +33,7 @@ namespace Bud {
         .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
         .Init(AssemblyReferences, conf => new Assemblies(typeof(object).Assembly.Location))
         .Init(Compiler, TimedEmittingCompiler.Create)
-        .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+        .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, warningLevel: 1))
         .Init(CompilationInput, DefaultCompilationInput);
 
     private static void PrintCompilationResult(CompileOutput output) {
@@ -47,11 +48,10 @@ namespace Bud {
     }
 
     private static IObservable<CompileOutput> DefaultCompilation(IConf conf)
-      => CompilationInput[conf].ObserveOn(BuildPipelineScheduler[conf])
-                               .Select(Compiler[conf])
-                               .Do(PrintCompilationResult);
+      => ThrottledInput(conf).ObserveOn(BuildPipelineScheduler[conf])
+                             .Select(Compiler[conf])
+                             .Do(PrintCompilationResult);
 
-    // TODO: File watchers are triggering duplicate updates in bursts. Throttle them.
     private static IObservable<CompileInput> DefaultCompilationInput(IConf conf)
       => SourceInput[conf].CombineLatest(AssemblyReferences[conf].Watch(),
                                          CollectDependencies(conf),
@@ -68,5 +68,12 @@ namespace Bud {
       => new CompileInput(files,
                           CompileInput.ToTimestampedAssemblyReferences(assemblies),
                           deps.ToImmutableArray());
+
+    private static IObservable<CompileInput> ThrottledInput(IConf conf) {
+      var sharedInput = CompilationInput[conf].Publish().RefCount();
+      var first = sharedInput.Take(1);
+      var rest = sharedInput.Skip(1).SkipUntilCalm(TimeSpan.FromMilliseconds(75), BuildPipelineScheduler[conf]);
+      return first.Concat(rest).Do(input => Console.WriteLine($"WTF!"));
+    }
   }
 }
