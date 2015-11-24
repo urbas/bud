@@ -1,15 +1,20 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
+using Bud.Collections;
 
 namespace Bud.IO {
   public class Diff<T> where T : ITimestamped {
+    private readonly Lazy<int> cachedHashCode;
+
     public Diff(ImmutableHashSet<T> added, ImmutableHashSet<T> removed, ImmutableHashSet<T> changed, ImmutableHashSet<T> all) {
       Added = added;
       Removed = removed;
       Changed = changed;
       All = all;
+      cachedHashCode = new Lazy<int>(CalculateHashCode);
     }
 
     public ImmutableHashSet<T> Added { get; }
@@ -33,15 +38,7 @@ namespace Bud.IO {
       return obj.GetType() == typeof(Diff<T>) && Equals((Diff<T>) obj);
     }
 
-    public override int GetHashCode() {
-      unchecked {
-        var hashCode = Added.GetHashCode();
-        hashCode = (hashCode * 397) ^ Removed.GetHashCode();
-        hashCode = (hashCode * 397) ^ Changed.GetHashCode();
-        hashCode = (hashCode * 397) ^ All.GetHashCode();
-        return hashCode;
-      }
-    }
+    public override int GetHashCode() => cachedHashCode.Value;
 
     public static bool operator ==(Diff<T> left, Diff<T> right) => Equals(left, right);
 
@@ -63,10 +60,21 @@ namespace Bud.IO {
       }
       return sb.ToString();
     }
+
+    private int CalculateHashCode() {
+      unchecked {
+        var hashCode = EnumerableUtils.ElementwiseHashCode(Added);
+        hashCode = (hashCode * 397) ^ EnumerableUtils.ElementwiseHashCode(Removed);
+        hashCode = (hashCode * 397) ^ EnumerableUtils.ElementwiseHashCode(Changed);
+        hashCode = (hashCode * 397) ^ EnumerableUtils.ElementwiseHashCode(All);
+        return hashCode;
+      }
+    }
   }
 
   public static class Diff {
-    public static Diff<T> Empty<T>() where T : ITimestamped => EmptyDiff<T>.Instance;
+    public static Diff<T> Empty<T>() where T : ITimestamped
+      => EmptyDiff<T>.Instance;
 
     public static Diff<T> NextDiff<T>(this Diff<T> previousDiff, IEnumerable<T> timestampedElements) where T : ITimestamped {
       var timestampedElementsList = timestampedElements as IList<T> ?? timestampedElements.ToList();

@@ -20,8 +20,7 @@ namespace Bud.IO {
     [Test]
     public void Adding_an_element() {
       var timestampedValue = Timestamped.Create(42, 1);
-      var diff = Diff.Empty<Timestamped<int>>()
-                     .NextDiff(new[] {timestampedValue});
+      var diff = SingleElementDiff(timestampedValue);
 
       Assert.That(diff.Added, Is.EquivalentTo(new[] {timestampedValue}));
       Assert.IsEmpty(diff.Removed);
@@ -54,14 +53,24 @@ namespace Bud.IO {
     public void Changing_an_element() {
       var oldElement = new Timestamped<int>(42, 1);
       var newElement = new Timestamped<int>(42, 2);
-      var diff = Diff.Empty<Timestamped<int>>()
-                     .NextDiff(new[] {oldElement})
-                     .NextDiff(new[] {newElement});
-
+      var diff = SingleElementDiff(oldElement, newElement);
       Assert.IsEmpty(diff.Added);
       Assert.IsEmpty(diff.Removed);
       Assert.That(diff.Changed, Is.EquivalentTo(new[] {newElement}));
       Assert.That(diff.All, Is.EquivalentTo(new[] {newElement}));
     }
+
+    [Test]
+    public void Hash_codes_must_equal_for_equal_diffs() {
+      var oldElement = Timestamped.Create(42, 1);
+      var newElement = Timestamped.Create(42, 2);
+      var diff1 = SingleElementDiff(oldElement, newElement);
+      var diff2 = SingleElementDiff(oldElement, newElement);
+      Assert.AreEqual(diff1.GetHashCode(), diff2.GetHashCode());
+    }
+
+    private static Diff<Timestamped<T>> SingleElementDiff<T>(params Timestamped<T>[] elementHistory)
+      => elementHistory.Aggregate(Diff.Empty<Timestamped<T>>(),
+                                  (diff, nextElement) => diff.NextDiff(new[] {nextElement}));
   }
 }
