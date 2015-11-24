@@ -19,6 +19,7 @@ namespace Bud {
     public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
     public static readonly Key<IObservable<ImmutableArray<Timestamped<string>>>> ProcessedSources = nameof(ProcessedSources);
     public static readonly Key<ImmutableList<IFilesProcessor>> SourceProcessors = nameof(SourceProcessors);
+    public static readonly Key<TimeSpan> InputCalmingPeriod = nameof(InputCalmingPeriod);
     private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler = new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
 
     public static Conf Project(string projectDir, string projectId)
@@ -29,6 +30,7 @@ namespace Bud {
         .InitValue(Dependencies, Enumerable.Empty<string>())
         .Init(BuildPipelineScheduler, _ => DefauBuildPipelineScheduler.Value)
         .Init(ProcessedSources, ProcessSources)
+        .InitValue(InputCalmingPeriod, TimeSpan.FromMilliseconds(300))
         .InitValue(SourceProcessors, ImmutableList<IFilesProcessor>.Empty)
         .Init(FilesObservatory, _ => new LocalFilesObservatory());
 
@@ -61,8 +63,8 @@ namespace Bud {
 
     private static IObservable<ImmutableArray<Timestamped<string>>> CollectTimestampedSources(IConf c)
       => Sources[c].Watch()
-                   .CalmAfterFirst(TimeSpan.FromMilliseconds(75), BuildPipelineScheduler[c])
                    .ObserveOn(BuildPipelineScheduler[c])
+                   .CalmAfterFirst(InputCalmingPeriod[c], BuildPipelineScheduler[c])
                    .Select(Files.ToTimestampedFiles);
 
     public static Conf AddSourceProcessor(this Conf project, Func<IConf, IFilesProcessor> fileProcessorFactory)
