@@ -32,23 +32,28 @@ namespace Bud.Reactive {
 
     private static IObservable<Unit> CalmingWindows<T>(IObservable<T> observable, TimeSpan calmingPeriod, IScheduler scheduler)
       => Observable.Create<Unit>(observer => {
-        var calmingTimer = new MultipleAssignmentDisposable();
-        IDisposable localTimer = null;
-        var subject = new Subject<Unit>();
-        var closerSubscription = subject.Subscribe(observer);
+        var timerDisposable = new MultipleAssignmentDisposable();
+        var calmingWindows = new Subject<Unit>();
+        IDisposable localTimerDisposable = null;
         var calmerSubscription = observable
           .Subscribe(next => {
-            localTimer?.Dispose();
-            localTimer = scheduler.Schedule(calmingPeriod, () => subject.OnNext(Unit.Default));
-            calmingTimer.Disposable = localTimer;
+            localTimerDisposable?.Dispose();
+            localTimerDisposable = scheduler
+              .Schedule(calmingPeriod, () => calmingWindows.OnNext(Unit.Default));
+            timerDisposable.Disposable = localTimerDisposable;
           }, exception => {
-            calmingTimer.Dispose();
-            subject.OnError(exception);
+            timerDisposable.Dispose();
+            calmingWindows.OnError(exception);
           }, () => {
-            calmingTimer.Dispose();
-            subject.OnCompleted();
+            timerDisposable.Dispose();
+            calmingWindows.OnCompleted();
           });
-        return new CompositeDisposable {calmingTimer, calmerSubscription, closerSubscription, subject};
+        return new CompositeDisposable {
+          timerDisposable,
+          calmerSubscription,
+          calmingWindows.Subscribe(observer),
+          calmingWindows
+        };
       });
   }
 }
