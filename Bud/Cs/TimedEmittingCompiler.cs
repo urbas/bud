@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace Bud.Cs {
       if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(compilationInput)) {
         return CreateOutputFromAssembly();
       }
-      return EmitDll(UnderlyingCompiler(compilationInput), Stopwatch);
+      return EmitDll(UnderlyingCompiler(compilationInput), Stopwatch, CSharp.EmbeddedResources[Conf]);
     }
 
     private static string GetOutputAssemblyPath(IConf conf)
@@ -50,11 +51,11 @@ namespace Bud.Cs {
              timestampedFile.IsUpToDateWith(compilationInput.Assemblies);
     }
 
-    private CompileOutput EmitDll(CSharpCompilation compilation, Stopwatch stopwatch) {
+    private CompileOutput EmitDll(CSharpCompilation compilation, Stopwatch stopwatch, IEnumerable<ResourceDescription> manifestResources) {
       Directory.CreateDirectory(Path.GetDirectoryName(OutputAssemblyPath));
       EmitResult emitResult;
       using (var assemblyOutputFile = File.Create(OutputAssemblyPath)) {
-        emitResult = compilation.Emit(assemblyOutputFile);
+        emitResult = compilation.Emit(assemblyOutputFile, manifestResources: manifestResources);
         stopwatch.Stop();
       }
       if (!emitResult.Success) {

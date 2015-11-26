@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using Bud.Cs;
 using Bud.IO;
@@ -19,6 +20,7 @@ namespace Bud {
     public static readonly Key<string> OutputDir = nameof(OutputDir);
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
+    public static readonly Key<ImmutableList<ResourceDescription>> EmbeddedResources = nameof(EmbeddedResources);
 
     public static Conf CSharpProject(string projectId)
       => CSharpProject(projectId, projectId);
@@ -33,7 +35,15 @@ namespace Bud {
         .Init(AssemblyReferences, conf => new Assemblies(typeof(object).Assembly.Location))
         .Init(Compiler, TimedEmittingCompiler.Create)
         .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, warningLevel: 1))
+        .InitValue(EmbeddedResources, ImmutableList<ResourceDescription>.Empty)
         .Init(CompilationInput, DefaultCompilationInput);
+
+    public static Conf EmbedResource(this Conf conf, string path, string nameInAssembly)
+      => conf.Modify(EmbeddedResources,
+                     (c, embeddedResources) => {
+                       var resourceFile = IsPathRooted(path) ? path : Combine(ProjectDir[c], path);
+                       return embeddedResources.Add(ToResourceDescriptor(resourceFile, nameInAssembly));
+                     });
 
     private static void PrintCompilationResult(CompileOutput output) {
       if (output.Success) {
@@ -66,5 +76,8 @@ namespace Bud {
       => new CompileInput(files,
                           CompileInput.ToTimestampedAssemblyReferences(assemblies),
                           deps.ToImmutableArray());
+
+    private static ResourceDescription ToResourceDescriptor(string resourceFile, string nameInAssembly)
+      => new ResourceDescription(nameInAssembly, () => File.OpenRead(resourceFile), true);
   }
 }

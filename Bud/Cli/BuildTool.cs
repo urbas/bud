@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reflection;
 using Bud.Cs;
 using Bud.IO;
+using Microsoft.CodeAnalysis;
 using static System.IO.Directory;
 using static System.IO.Path;
 using static Bud.Build;
@@ -52,6 +54,8 @@ namespace Bud.Cli {
                             typeof(Enumerable).Assembly.Location,
                             typeof(ImmutableArray).Assembly.Location,
                             typeof(Observable).Assembly.Location,
-                            "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.Runtime.dll"));
+                            typeof(ResourceDescription).Assembly.Location,
+                            "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.Runtime.dll",
+                            "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.IO.dll"));
   }
 }
