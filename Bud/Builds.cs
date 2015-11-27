@@ -11,8 +11,10 @@ using static Bud.Conf;
 
 namespace Bud {
   public static class Builds {
-    public static readonly Key<Files> Sources = nameof(Sources);
+    public static readonly Key<IObservable<IEnumerable<string>>> Input = nameof(Input);
+    public static readonly Key<Func<IObservable<IEnumerable<string>>, IObservable<IEnumerable<string>>>> Build = nameof(Build);
     public static readonly Key<IObservable<IEnumerable<string>>> Output = nameof(Output);
+    public static readonly Key<Files> Sources = nameof(Sources);
     public static readonly Key<string> ProjectId = nameof(ProjectId);
     public static readonly Key<string> ProjectDir = nameof(ProjectDir);
     public static readonly Key<IEnumerable<string>> Dependencies = nameof(Dependencies);
@@ -28,15 +30,17 @@ namespace Bud {
         .InitValue(ProjectDir, projectDir)
         .InitValue(ProjectId, projectId)
         .InitValue(Sources, Files.Empty)
+        .Init(Input, DefaultInput)
+        .InitValue(Build, b => b)
+        .Init(Output, c => Build[c](Input[c]))
         .InitValue(Dependencies, Enumerable.Empty<string>())
         .Init(BuildPipelineScheduler, _ => DefauBuildPipelineScheduler.Value)
         .Init(ProcessedSources, ProcessSources)
         .InitValue(InputCalmingPeriod, TimeSpan.FromMilliseconds(300))
         .InitValue(SourceProcessors, ImmutableList<IFilesProcessor>.Empty)
-        .Init(Output, DefaultBuild)
         .Init(FilesObservatory, _ => new LocalFilesObservatory());
 
-    private static IObservable<IEnumerable<string>> DefaultBuild(IConf conf)
+    private static IObservable<IEnumerable<string>> DefaultInput(IConf conf)
       => Dependencies[conf].Select(dependency => (dependency / Output)[conf])
                            .Concat(new[] {ProcessedSources[conf]})
                            .CombineLatest(outputs => outputs.SelectMany(enumerable => enumerable));
@@ -74,6 +78,6 @@ namespace Bud {
                    .CalmAfterFirst(InputCalmingPeriod[c], BuildPipelineScheduler[c]);
 
     public static Conf AddSourceProcessor(this Conf project, Func<IConf, IFilesProcessor> fileProcessorFactory)
-      => project.Modify(SourceProcessors, (conf, processors) => processors.Concat(new [] { fileProcessorFactory(conf) }));
+      => project.Modify(SourceProcessors, (conf, processors) => processors.Concat(new[] {fileProcessorFactory(conf)}));
   }
 }

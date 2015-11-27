@@ -30,7 +30,7 @@ namespace Bud {
         .Add(SourceDir(fileFilter: "*.cs"))
         .Add(ExcludeSourceDirs("obj", "bin", "target"))
         .Init(Compile, DefaultCompilation)
-        .Modify(Output, DefaultCSharpBuild)
+        .Modify(Build, DefaultCSharpBuild)
         .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
         .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
         .Init(AssemblyReferences, conf => new Assemblies(typeof(object).Assembly.Location))
@@ -39,8 +39,26 @@ namespace Bud {
         .InitValue(EmbeddedResources, ImmutableList<ResourceDescription>.Empty)
         .Init(CompilationInput, DefaultCompilationInput);
 
-    private static IObservable<IEnumerable<string>> DefaultCSharpBuild(IConf conf, IObservable<IEnumerable<string>> input)
-      => Compile[conf].Select(output => new [] { output.AssemblyPath });
+    private static Func<IObservable<IEnumerable<string>>, IObservable<IEnumerable<string>>> DefaultCSharpBuild(IConf conf, Func<IObservable<IEnumerable<string>>, IObservable<IEnumerable<string>>> func)
+      => input => func(input).CombineLatest(AssemblyReferences[conf].Watch(),
+                                            ToCompileInput)
+                             .Select(Compiler[conf])
+                             .Do(PrintCompilationResult)
+                             .Where(output => output.Success)
+                             .Select(output => new[] {output.AssemblyPath});
+
+    private static CompileInput ToCompileInput(IEnumerable<string> inputFiles, IEnumerable<AssemblyReference> references) {
+      var sources = new List<string>();
+      var dependencies = new List<IAssemblyReference>();
+      foreach (var inputFile in inputFiles) {
+        if (inputFile.EndsWith(".dll")) {
+          dependencies.Add(AssemblyReference.CreateFromFile(inputFile));
+        } else {
+          sources.Add(inputFile);
+        }
+      }
+      return new CompileInput(sources, dependencies.Concat(references), Enumerable.Empty<CompileOutput>());
+    }
 
     public static Conf EmbedResource(this Conf conf, string path, string nameInAssembly)
       => conf.Modify(EmbeddedResources,
