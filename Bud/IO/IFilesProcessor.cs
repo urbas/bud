@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 
 namespace Bud.IO {
   public interface IFilesProcessor {
-    IObservable<ImmutableArray<Timestamped<string>>> Process(IObservable<ImmutableArray<Timestamped<string>>> sources);
+    IObservable<IEnumerable<string>> Process(IObservable<IEnumerable<string>> sources);
   }
 }

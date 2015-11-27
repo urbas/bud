@@ -12,13 +12,14 @@ using static Bud.Conf;
 namespace Bud {
   public static class Build {
     public static readonly Key<Files> Sources = nameof(Sources);
+    public static readonly Key<IObservable<IEnumerable<string>>> Output = nameof(Output);
     public static readonly Key<string> ProjectId = nameof(ProjectId);
     public static readonly Key<string> ProjectDir = nameof(ProjectDir);
     public static readonly Key<IEnumerable<string>> Dependencies = nameof(Dependencies);
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
     public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
-    public static readonly Key<IObservable<ImmutableArray<Timestamped<string>>>> ProcessedSources = nameof(ProcessedSources);
-    public static readonly Key<ImmutableList<IFilesProcessor>> SourceProcessors = nameof(SourceProcessors);
+    public static readonly Key<IObservable<IEnumerable<string>>> ProcessedSources = nameof(ProcessedSources);
+    public static readonly Key<IEnumerable<IFilesProcessor>> SourceProcessors = nameof(SourceProcessors);
     public static readonly Key<TimeSpan> InputCalmingPeriod = nameof(InputCalmingPeriod);
     private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler = new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
 
@@ -32,7 +33,13 @@ namespace Bud {
         .Init(ProcessedSources, ProcessSources)
         .InitValue(InputCalmingPeriod, TimeSpan.FromMilliseconds(300))
         .InitValue(SourceProcessors, ImmutableList<IFilesProcessor>.Empty)
+        .Init(Output, DefaultBuild)
         .Init(FilesObservatory, _ => new LocalFilesObservatory());
+
+    private static IObservable<IEnumerable<string>> DefaultBuild(IConf conf)
+      => Dependencies[conf].Select(dependency => (dependency / Output)[conf])
+                           .Concat(new[] {ProcessedSources[conf]})
+                           .CombineLatest(outputs => outputs.SelectMany(enumerable => enumerable));
 
     public static Conf SourceDir(string subDir = null, string fileFilter = "*", bool includeSubdirs = true) {
       return Empty.Modify(Sources, (conf, sources) => {
@@ -56,18 +63,17 @@ namespace Bud {
         return previousFiles.WithFilter(file => !forbiddenDirs.Any(file.StartsWith));
       });
 
-    private static IObservable<ImmutableArray<Timestamped<string>>> ProcessSources(IConf project)
+    private static IObservable<IEnumerable<string>> ProcessSources(IConf project)
       => SourceProcessors[project]
-        .Aggregate(CollectTimestampedSources(project),
+        .Aggregate(ObservedSources(project),
                    (sources, processor) => processor.Process(sources));
 
-    private static IObservable<ImmutableArray<Timestamped<string>>> CollectTimestampedSources(IConf c)
+    private static IObservable<IEnumerable<string>> ObservedSources(IConf c)
       => Sources[c].Watch()
                    .ObserveOn(BuildPipelineScheduler[c])
-                   .CalmAfterFirst(InputCalmingPeriod[c], BuildPipelineScheduler[c])
-                   .Select(Files.ToTimestampedFiles);
+                   .CalmAfterFirst(InputCalmingPeriod[c], BuildPipelineScheduler[c]);
 
     public static Conf AddSourceProcessor(this Conf project, Func<IConf, IFilesProcessor> fileProcessorFactory)
-      => project.Modify(SourceProcessors, (conf, processors) => processors.Add(fileProcessorFactory(conf)));
+      => project.Modify(SourceProcessors, (conf, processors) => processors.Concat(new [] { fileProcessorFactory(conf) }));
   }
 }

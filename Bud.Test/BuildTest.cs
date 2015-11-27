@@ -1,10 +1,11 @@
 using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Bud.Configuration.ApiV1;
 using Bud.IO;
 using Moq;
 using NUnit.Framework;
@@ -42,8 +43,8 @@ namespace Bud {
     [Test]
     public void Source_processor_changes_source_input() {
       var fileProcessor = new Mock<IFilesProcessor>(MockBehavior.Strict);
-      var expectedOutputFiles = ImmutableArray.Create(Timestamped.Create("foo", 42L));
-      fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<ImmutableArray<Timestamped<string>>>>()))
+      var expectedOutputFiles = new[] {"foo"};
+      fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<IEnumerable<string>>>()))
                    .Returns(Observable.Return(expectedOutputFiles));
       var actualOutputFiles = Project("FooDir", "Foo")
         .AddSourceProcessor(conf => fileProcessor.Object)
@@ -72,10 +73,40 @@ namespace Bud {
       Assert.AreNotEqual(inputThreadId, fileProcessor.InvocationThreadId);
     }
 
+    [Test]
+    public void Default_build_forwards_the_sources_from_dependencies() {
+      var projects = Conf.New(Project("aDir", "A")
+                                .SetValue(Sources, new Files(new[] {"a"})),
+                              Project("bDir", "B")
+                                .SetValue(Sources, new Files(new[] {"b"}))
+                                .Add(Dependencies, "../A"));
+      Assert.AreEqual(new[] {Timestamped.Create("a", 0L), Timestamped.Create("b", 0L)},
+                      projects.Get("B" / Output).Wait());
+    }
+
+    [Test]
+    public void Default_build_processes_own_sources_before_output() {
+      var projects = Conf.New(Project("aDir", "A")
+                                .SetValue(Sources, new Files(new[] {"a"}))
+                                .AddSourceProcessor(conf => new FooAppenderFileProcessor()),
+                              Project("bDir", "B")
+                                .SetValue(Sources, new Files(new[] {"b"}))
+                                .AddSourceProcessor(conf => new FooAppenderFileProcessor())
+                                .Add(Dependencies, "../A"));
+      Assert.AreEqual(new[] {Timestamped.Create("afoo", 0L), Timestamped.Create("bfoo", 0L)},
+                      projects.Get("B" / Output).Wait());
+    }
+
+    private class FooAppenderFileProcessor : IFilesProcessor {
+      public IObservable<IEnumerable<string>> Process(IObservable<IEnumerable<string>> sources) {
+        return sources.Select(files => files.Select(file => file + "foo"));
+      }
+    }
+
     public class ThreadIdRecordingFileProcessor : IFilesProcessor {
       public int InvocationThreadId { get; private set; }
 
-      public IObservable<ImmutableArray<Timestamped<string>>> Process(IObservable<ImmutableArray<Timestamped<string>>> sources) {
+      public IObservable<IEnumerable<string>> Process(IObservable<IEnumerable<string>> sources) {
         InvocationThreadId = Thread.CurrentThread.ManagedThreadId;
         return sources;
       }

@@ -30,6 +30,7 @@ namespace Bud {
         .Add(SourceDir(fileFilter: "*.cs"))
         .Add(ExcludeSourceDirs("obj", "bin", "target"))
         .Init(Compile, DefaultCompilation)
+        .Modify(Output, DefaultCSharpBuild)
         .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
         .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
         .Init(AssemblyReferences, conf => new Assemblies(typeof(object).Assembly.Location))
@@ -37,6 +38,9 @@ namespace Bud {
         .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, warningLevel: 1))
         .InitValue(EmbeddedResources, ImmutableList<ResourceDescription>.Empty)
         .Init(CompilationInput, DefaultCompilationInput);
+
+    private static IObservable<IEnumerable<string>> DefaultCSharpBuild(IConf conf, IObservable<IEnumerable<string>> input)
+      => Compile[conf].Select(output => new [] { output.AssemblyPath });
 
     public static Conf EmbedResource(this Conf conf, string path, string nameInAssembly)
       => conf.Modify(EmbeddedResources,
@@ -70,10 +74,10 @@ namespace Bud {
         Dependencies[conf].Select(s => conf.Get(s / Compile)).CombineLatest() :
         Return(Enumerable.Empty<CompileOutput>());
 
-    private static CompileInput ToCompilationInput(ImmutableArray<Timestamped<string>> files,
+    private static CompileInput ToCompilationInput(IEnumerable<string> files,
                                                    IEnumerable<AssemblyReference> assemblies,
                                                    IEnumerable<CompileOutput> deps)
-      => new CompileInput(files,
+      => new CompileInput(files.Select(Files.ToTimestampedFile).ToImmutableArray(),
                           CompileInput.ToTimestampedAssemblyReferences(assemblies),
                           deps.ToImmutableArray());
 

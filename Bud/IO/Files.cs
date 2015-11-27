@@ -33,7 +33,7 @@ namespace Bud.IO {
     public static long FileTimestampNow()
       => DateTime.Now.ToFileTime();
 
-    public static ImmutableArray<Timestamped<string>> ToTimestampedFiles(IEnumerable<string> sources)
-      => sources.Select(ToTimestampedFile).ToImmutableArray();
+    public static IEnumerable<Timestamped<string>> ToTimestampedFiles(IEnumerable<string> sources)
+      => sources.Select(ToTimestampedFile);
   }
 }

@@ -12,7 +12,7 @@ namespace Bud.Cs {
     public CompileInput(IEnumerable<string> sources,
                         IEnumerable<IAssemblyReference> assemblies,
                         IEnumerable<CompileOutput> dependencies)
-      : this(Files.ToTimestampedFiles(sources),
+      : this(Files.ToTimestampedFiles(sources).ToImmutableArray(),
              ToTimestampedAssemblyReferences(assemblies),
              dependencies.ToImmutableArray()) {}
 
