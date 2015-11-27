@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Path;
 using static System.Reactive.Linq.Observable;
-using static Bud.Build;
+using static Bud.Builds;
 
 namespace Bud {
   public static class CSharp {

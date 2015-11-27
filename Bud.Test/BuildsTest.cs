@@ -9,10 +9,10 @@ using Bud.Configuration.ApiV1;
 using Bud.IO;
 using Moq;
 using NUnit.Framework;
-using static Bud.Build;
+using static Bud.Builds;
 
 namespace Bud {
-  public class BuildTest {
+  public class BuildsTest {
     private readonly Conf project = Project("bar", "Foo");
 
     [Test]

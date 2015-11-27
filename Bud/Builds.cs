@@ -10,7 +10,7 @@ using static System.IO.Path;
 using static Bud.Conf;
 
 namespace Bud {
-  public static class Build {
+  public static class Builds {
     public static readonly Key<Files> Sources = nameof(Sources);
     public static readonly Key<IObservable<IEnumerable<string>>> Output = nameof(Output);
     public static readonly Key<string> ProjectId = nameof(ProjectId);

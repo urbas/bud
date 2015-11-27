@@ -2,7 +2,7 @@ using Bud;
 using Bud.Configuration.ApiV1;
 using Bud.Cs;
 using static System.IO.Path;
-using static Bud.Build;
+using static Bud.Builds;
 using static Bud.CSharp;
 
 public class BudBuild : IBuild {

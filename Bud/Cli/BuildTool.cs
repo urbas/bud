@@ -10,14 +10,14 @@ using Bud.IO;
 using Microsoft.CodeAnalysis;
 using static System.IO.Directory;
 using static System.IO.Path;
-using static Bud.Build;
+using static Bud.Builds;
 
 namespace Bud.Cli {
   public class BuildTool {
     public static void Main(string[] args) {
       var compilationOutput = CSharp.CSharpProject(Combine(GetCurrentDirectory()), "BuildConf")
                                     .Add(BudDependencies())
-                                    .Set(Sources, configs => Build.FilesObservatory[configs].ObserveFiles(Combine(ProjectDir[configs], "Build.cs")))
+                                    .Set(Sources, configs => Builds.FilesObservatory[configs].ObserveFiles(Combine(ProjectDir[configs], "Build.cs")))
                                     .Get(CSharp.Compile)
                                     .Take(1)
                                     .Wait();

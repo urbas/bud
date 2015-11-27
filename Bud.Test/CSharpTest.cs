@@ -9,7 +9,7 @@ using Moq;
 using NUnit.Framework;
 using static System.Linq.Enumerable;
 using static System.TimeSpan;
-using static Bud.Build;
+using static Bud.Builds;
 using static Bud.Conf;
 using static Bud.CSharp;
 

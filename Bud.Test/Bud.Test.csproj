@@ -111,7 +111,7 @@
     <Compile Include="IO\WatchedResourcesTest.cs" />
     <Compile Include="KeysTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BuildTest.cs" />
+    <Compile Include="BuildsTest.cs" />
     <Compile Include="Reactive\WaitingObservablesTest.cs" />
     <Compile Include="Util\StringsTest.cs" />
   </ItemGroup>
