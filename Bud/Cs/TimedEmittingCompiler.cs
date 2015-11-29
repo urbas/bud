@@ -23,15 +23,16 @@ namespace Bud.Cs {
       Conf = conf;
     }
 
-    public static Func<CompileInput, CompileOutput> Create(IConf conf)
+    public static Func<InOut, CompileOutput> Create(IConf conf)
       => new TimedEmittingCompiler(conf).Compile;
 
-    public CompileOutput Compile(CompileInput compilationInput) {
+    public CompileOutput Compile(InOut inOutInput) {
       Stopwatch.Restart();
-      if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(compilationInput)) {
+      var input = CompileInput.FromInOut(inOutInput);
+      if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(input)) {
         return CreateOutputFromAssembly();
       }
-      return EmitDll(UnderlyingCompiler(compilationInput), Stopwatch, CSharp.EmbeddedResources[Conf]);
+      return EmitDll(UnderlyingCompiler(input), Stopwatch, CSharp.EmbeddedResources[Conf]);
     }
 
     private static string GetOutputAssemblyPath(IConf conf)

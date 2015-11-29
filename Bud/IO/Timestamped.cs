@@ -37,7 +37,7 @@ namespace Bud.IO {
       => !left.Value.Equals(right);
 
     public override string ToString()
-      => $"Hashed(Value: {Value}, Hash: {Timestamp})";
+      => $"Timestamped(Value: {Value}, Timestamp: {Timestamp})";
   }
 
   public static class Timestamped {

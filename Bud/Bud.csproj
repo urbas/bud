@@ -109,6 +109,8 @@
     <Compile Include="IO\FileFinder.cs" />
     <Compile Include="IO\Files.cs" />
     <Compile Include="IO\FilesObservatory.cs" />
+    <Compile Include="IO\InOut.cs" />
+    <Compile Include="IO\InOutFile.cs" />
     <Compile Include="IO\IWatchedResources.cs" />
     <Compile Include="IO\ITimestamped.cs" />
     <Compile Include="IO\IFilesProcessor.cs" />

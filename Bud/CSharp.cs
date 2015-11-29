@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -14,8 +13,7 @@ using static Bud.Builds;
 namespace Bud {
   public static class CSharp {
     public static readonly Key<IObservable<CompileOutput>> Compile = nameof(Compile);
-    public static readonly Key<IObservable<CompileInput>> CompilationInput = nameof(CompilationInput);
-    public static readonly Key<Func<CompileInput, CompileOutput>> Compiler = nameof(Compiler);
+    public static readonly Key<Func<InOut, CompileOutput>> Compiler = nameof(Compiler);
     public static readonly Key<Assemblies> AssemblyReferences = nameof(AssemblyReferences);
     public static readonly Key<string> OutputDir = nameof(OutputDir);
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
@@ -29,36 +27,23 @@ namespace Bud {
       => Project(projectDir, projectId)
         .Add(SourceDir(fileFilter: "*.cs"))
         .Add(ExcludeSourceDirs("obj", "bin", "target"))
-        .Init(Compile, DefaultCompilation)
-        .Modify(Build, DefaultCSharpBuild)
-        .Init(OutputDir, configs => Combine(ProjectDir[configs], "target"))
-        .Init(AssemblyName, configs => ProjectId[configs] + CSharpCompilationOptions[configs].OutputKind.ToExtension())
-        .Init(AssemblyReferences, conf => new Assemblies(typeof(object).Assembly.Location))
+        .Modify(Input, AddAssemblyReferencesToInput)
+        .Init(Compile, DefaultCSharpCompilation)
+        .Set(Build, c => Compile[c].Select(CompileOutput.ToInOut))
+        .Init(OutputDir, c => Combine(ProjectDir[c], "target"))
+        .Init(AssemblyName, c => ProjectId[c] + CSharpCompilationOptions[c].OutputKind.ToExtension())
+        .Init(AssemblyReferences, c => new Assemblies(typeof(object).Assembly.Location))
         .Init(Compiler, TimedEmittingCompiler.Create)
         .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, warningLevel: 1))
-        .InitValue(EmbeddedResources, ImmutableList<ResourceDescription>.Empty)
-        .Init(CompilationInput, DefaultCompilationInput);
+        .InitValue(EmbeddedResources, ImmutableList<ResourceDescription>.Empty);
 
-    private static Func<IObservable<IEnumerable<string>>, IObservable<IEnumerable<string>>> DefaultCSharpBuild(IConf conf, Func<IObservable<IEnumerable<string>>, IObservable<IEnumerable<string>>> func)
-      => input => func(input).CombineLatest(AssemblyReferences[conf].Watch(),
-                                            ToCompileInput)
-                             .Select(Compiler[conf])
-                             .Do(PrintCompilationResult)
-                             .Where(output => output.Success)
-                             .Select(output => new[] {output.AssemblyPath});
+    private static IObservable<InOut> AddAssemblyReferencesToInput(IConf conf, IObservable<InOut> input)
+      => input.CombineLatest(AssemblyReferences[conf].Watch(),
+                                (inOut, references) => inOut.AddFiles(references.Select(reference => reference.Path)));
 
-    private static CompileInput ToCompileInput(IEnumerable<string> inputFiles, IEnumerable<AssemblyReference> references) {
-      var sources = new List<string>();
-      var dependencies = new List<IAssemblyReference>();
-      foreach (var inputFile in inputFiles) {
-        if (inputFile.EndsWith(".dll")) {
-          dependencies.Add(AssemblyReference.CreateFromFile(inputFile));
-        } else {
-          sources.Add(inputFile);
-        }
-      }
-      return new CompileInput(sources, dependencies.Concat(references), Enumerable.Empty<CompileOutput>());
-    }
+    private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
+      => Input[conf].Select(Compiler[conf])
+                    .Do(PrintCompilationResult);
 
     public static Conf EmbedResource(this Conf conf, string path, string nameInAssembly)
       => conf.Modify(EmbeddedResources,
@@ -77,27 +62,6 @@ namespace Bud {
         }
       }
     }
-
-    private static IObservable<CompileOutput> DefaultCompilation(IConf conf)
-      => CompilationInput[conf].Select(Compiler[conf]).Do(PrintCompilationResult);
-
-    private static IObservable<CompileInput> DefaultCompilationInput(IConf conf)
-      => ProcessedSources[conf]
-        .CombineLatest(AssemblyReferences[conf].Watch(),
-                       CollectDependencies(conf),
-                       ToCompilationInput);
-
-    private static IObservable<IEnumerable<CompileOutput>> CollectDependencies(IConf conf)
-      => Dependencies[conf].Any() ?
-        Dependencies[conf].Select(s => conf.Get(s / Compile)).CombineLatest() :
-        Return(Enumerable.Empty<CompileOutput>());
-
-    private static CompileInput ToCompilationInput(IEnumerable<string> files,
-                                                   IEnumerable<AssemblyReference> assemblies,
-                                                   IEnumerable<CompileOutput> deps)
-      => new CompileInput(files.Select(Files.ToTimestampedFile).ToImmutableArray(),
-                          CompileInput.ToTimestampedAssemblyReferences(assemblies),
-                          deps.ToImmutableArray());
 
     private static ResourceDescription ToResourceDescriptor(string resourceFile, string nameInAssembly)
       => new ResourceDescription(nameInAssembly, () => File.OpenRead(resourceFile), true);

@@ -11,16 +11,16 @@ using static Bud.Conf;
 
 namespace Bud {
   public static class Builds {
-    public static readonly Key<IObservable<IEnumerable<string>>> Input = nameof(Input);
-    public static readonly Key<Func<IObservable<IEnumerable<string>>, IObservable<IEnumerable<string>>>> Build = nameof(Build);
-    public static readonly Key<IObservable<IEnumerable<string>>> Output = nameof(Output);
+    public static readonly Key<IObservable<InOut>> Input = nameof(Input);
+    public static readonly Key<IObservable<InOut>> Build = nameof(Build);
+    public static readonly Key<IObservable<InOut>> Output = nameof(Output);
     public static readonly Key<Files> Sources = nameof(Sources);
     public static readonly Key<string> ProjectId = nameof(ProjectId);
     public static readonly Key<string> ProjectDir = nameof(ProjectDir);
     public static readonly Key<IEnumerable<string>> Dependencies = nameof(Dependencies);
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
     public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
-    public static readonly Key<IObservable<IEnumerable<string>>> ProcessedSources = nameof(ProcessedSources);
+    public static readonly Key<IObservable<InOut>> ProcessedSources = nameof(ProcessedSources);
     public static readonly Key<IEnumerable<IFilesProcessor>> SourceProcessors = nameof(SourceProcessors);
     public static readonly Key<TimeSpan> InputCalmingPeriod = nameof(InputCalmingPeriod);
     private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler = new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
@@ -31,8 +31,8 @@ namespace Bud {
         .InitValue(ProjectId, projectId)
         .InitValue(Sources, Files.Empty)
         .Init(Input, DefaultInput)
-        .InitValue(Build, b => b)
-        .Init(Output, c => Build[c](Input[c]))
+        .Init(Build, c => Input[c])
+        .Init(Output, c => Build[c])
         .InitValue(Dependencies, Enumerable.Empty<string>())
         .Init(BuildPipelineScheduler, _ => DefauBuildPipelineScheduler.Value)
         .Init(ProcessedSources, ProcessSources)
@@ -40,10 +40,10 @@ namespace Bud {
         .InitValue(SourceProcessors, ImmutableList<IFilesProcessor>.Empty)
         .Init(FilesObservatory, _ => new LocalFilesObservatory());
 
-    private static IObservable<IEnumerable<string>> DefaultInput(IConf conf)
+    private static IObservable<InOut> DefaultInput(IConf conf)
       => Dependencies[conf].Select(dependency => (dependency / Output)[conf])
                            .Concat(new[] {ProcessedSources[conf]})
-                           .CombineLatest(outputs => outputs.SelectMany(enumerable => enumerable));
+                           .CombineLatest(InOut.Merge);
 
     public static Conf SourceDir(string subDir = null, string fileFilter = "*", bool includeSubdirs = true) {
       return Empty.Modify(Sources, (conf, sources) => {
@@ -67,15 +67,16 @@ namespace Bud {
         return previousFiles.WithFilter(file => !forbiddenDirs.Any(file.StartsWith));
       });
 
-    private static IObservable<IEnumerable<string>> ProcessSources(IConf project)
+    private static IObservable<InOut> ProcessSources(IConf project)
       => SourceProcessors[project]
         .Aggregate(ObservedSources(project),
                    (sources, processor) => processor.Process(sources));
 
-    private static IObservable<IEnumerable<string>> ObservedSources(IConf c)
+    private static IObservable<InOut> ObservedSources(IConf c)
       => Sources[c].Watch()
                    .ObserveOn(BuildPipelineScheduler[c])
-                   .CalmAfterFirst(InputCalmingPeriod[c], BuildPipelineScheduler[c]);
+                   .CalmAfterFirst(InputCalmingPeriod[c], BuildPipelineScheduler[c])
+                   .Select(InOut.Create);
 
     public static Conf AddSourceProcessor(this Conf project, Func<IConf, IFilesProcessor> fileProcessorFactory)
       => project.Modify(SourceProcessors, (conf, processors) => processors.Concat(new[] {fileProcessorFactory(conf)}));

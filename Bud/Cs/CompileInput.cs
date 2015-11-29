@@ -10,16 +10,12 @@ namespace Bud.Cs {
     private readonly Lazy<int> cachedHashCode;
 
     public CompileInput(IEnumerable<string> sources,
-                        IEnumerable<IAssemblyReference> assemblies,
-                        IEnumerable<CompileOutput> dependencies)
+                        IEnumerable<IAssemblyReference> assemblies)
       : this(Files.ToTimestampedFiles(sources).ToImmutableArray(),
-             ToTimestampedAssemblyReferences(assemblies),
-             dependencies.ToImmutableArray()) {}
+             ToTimestampedAssemblyReferences(assemblies)) {}
 
     public CompileInput(ImmutableArray<Timestamped<string>> sources,
-                        ImmutableArray<Timestamped<IAssemblyReference>> assemblies,
-                        ImmutableArray<CompileOutput> dependencies) {
-      Dependencies = dependencies;
+                        ImmutableArray<Timestamped<IAssemblyReference>> assemblies) {
       Sources = sources;
       Assemblies = assemblies;
       cachedHashCode = new Lazy<int>(ComputeHashCode);
@@ -30,12 +26,10 @@ namespace Bud.Cs {
 
     public ImmutableArray<Timestamped<string>> Sources { get; }
     public ImmutableArray<Timestamped<IAssemblyReference>> Assemblies { get; }
-    public ImmutableArray<CompileOutput> Dependencies { get; }
 
     public bool Equals(CompileInput other)
       => Sources.SequenceEqual(other.Sources) &&
-         Assemblies.SequenceEqual(other.Assemblies) &&
-         Dependencies.SequenceEqual(other.Dependencies);
+         Assemblies.SequenceEqual(other.Assemblies);
 
     public override bool Equals(object obj)
       => !ReferenceEquals(null, obj) &&
@@ -50,10 +44,23 @@ namespace Bud.Cs {
 
     private int ComputeHashCode() {
       unchecked {
-        var hashCode = ElementwiseHashCode(Dependencies) * 397;
-        hashCode = (hashCode ^ ElementwiseHashCode(Sources)) * 397;
-        return hashCode ^ ElementwiseHashCode(Assemblies);
+        return ElementwiseHashCode(Sources) * 397 ^ ElementwiseHashCode(Assemblies);
       }
+    }
+
+    public static CompileInput FromInOut(InOut input) => FromFiles(input.Files.Select(file => file.Path));
+
+    public static CompileInput FromFiles(IEnumerable<string> inputFiles) {
+      var sources = new List<string>();
+      var dependencies = new List<IAssemblyReference>();
+      foreach (var inputFile in inputFiles) {
+        if (inputFile.EndsWith(".cs", StringComparison.InvariantCultureIgnoreCase)) {
+          sources.Add(inputFile);
+        } else {
+          dependencies.Add(AssemblyReference.CreateFromFile(inputFile));
+        }
+      }
+      return new CompileInput(sources, dependencies);
     }
   }
 }

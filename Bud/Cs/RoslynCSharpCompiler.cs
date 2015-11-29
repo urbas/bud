@@ -23,7 +23,7 @@ namespace Bud.Cs {
 
     public CSharpCompilation Compile(CompileInput input) {
       sources = sources.NextDiff(input.Sources);
-      var newDependencies = oldDependencies.NextDiff(input.Assemblies.Concat(input.Dependencies.Select(output => Timestamped.Create(output.ToAssemblyReference(), output.Timestamp))));
+      var newDependencies = oldDependencies.NextDiff(input.Assemblies);
 
       var addedSources = sources.Added.Select(ToFileSyntaxTreePair).ToList();
       var changedSources = sources.Changed.Select(ToFileSyntaxTreePair).ToList();

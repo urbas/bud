@@ -1,14 +1,15 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Bud.Configuration.ApiV1;
 using Bud.IO;
+using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
+using static System.Linq.Enumerable;
+using static System.TimeSpan;
 using static Bud.Builds;
 
 namespace Bud {
@@ -43,8 +44,8 @@ namespace Bud {
     [Test]
     public void Source_processor_changes_source_input() {
       var fileProcessor = new Mock<IFilesProcessor>(MockBehavior.Strict);
-      var expectedOutputFiles = new[] {"foo"};
-      fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<IEnumerable<string>>>()))
+      var expectedOutputFiles = InOut.Create("foo");
+      fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<InOut>>()))
                    .Returns(Observable.Return(expectedOutputFiles));
       var actualOutputFiles = Project("FooDir", "Foo")
         .AddSourceProcessor(conf => fileProcessor.Object)
@@ -59,7 +60,7 @@ namespace Bud {
       int inputThreadId = 0;
       var fileProcessor = new ThreadIdRecordingFileProcessor();
       Project("fooDir", "A")
-        .SetValue(Sources, new Files(Enumerable.Empty<string>(), Observable.Create<string>(observer => {
+        .SetValue(Sources, new Files(Empty<string>(), Observable.Create<string>(observer => {
           Task.Run(() => {
             inputThreadId = Thread.CurrentThread.ManagedThreadId;
             observer.OnNext("foo");
@@ -74,14 +75,31 @@ namespace Bud {
     }
 
     [Test]
-    public void Default_build_forwards_the_sources_from_dependencies() {
+    public void Default_build_forwards_the_output_from_dependencies() {
       var projects = Conf.New(Project("aDir", "A")
                                 .SetValue(Sources, new Files(new[] {"a"})),
                               Project("bDir", "B")
                                 .SetValue(Sources, new Files(new[] {"b"}))
                                 .Add(Dependencies, "../A"));
-      Assert.AreEqual(new[] {Timestamped.Create("a", 0L), Timestamped.Create("b", 0L)},
+      Assert.AreEqual(InOut.Create("a", "b"),
                       projects.Get("B" / Output).Wait());
+    }
+
+    [Test]
+    public void Input_reobserved_when_dependencies_change() {
+      var testScheduler = new TestScheduler();
+      var projects = Conf.New(Project("aDir", "A")
+                                .SetValue(BuildPipelineScheduler, testScheduler)
+                                .SetValue(Sources, new Files(Empty<string>(), Observable.Return("foo").Delay(FromSeconds(1), testScheduler)
+                                                                                        .Concat(Observable.Return("bar").Delay(FromSeconds(1), testScheduler)))),
+                              Project("bDir", "B")
+                                .SetValue(BuildPipelineScheduler, testScheduler)
+                                .Add(Dependencies, "../A"));
+      var output = projects.Get("B" / Output).GetEnumerator();
+      testScheduler.AdvanceBy(FromSeconds(5).Ticks);
+      Assert.IsTrue(output.MoveNext());
+      Assert.IsTrue(output.MoveNext());
+      Assert.IsTrue(output.MoveNext());
     }
 
     [Test]
@@ -93,20 +111,19 @@ namespace Bud {
                                 .SetValue(Sources, new Files(new[] {"b"}))
                                 .AddSourceProcessor(conf => new FooAppenderFileProcessor())
                                 .Add(Dependencies, "../A"));
-      Assert.AreEqual(new[] {Timestamped.Create("afoo", 0L), Timestamped.Create("bfoo", 0L)},
+      Assert.AreEqual(InOut.Create("afoo", "bfoo"),
                       projects.Get("B" / Output).Wait());
     }
 
     private class FooAppenderFileProcessor : IFilesProcessor {
-      public IObservable<IEnumerable<string>> Process(IObservable<IEnumerable<string>> sources) {
-        return sources.Select(files => files.Select(file => file + "foo"));
-      }
+      public IObservable<InOut> Process(IObservable<InOut> sources)
+        => sources.Select(files => InOut.Create(files.Files.Select(file => file.Path + "foo")));
     }
 
     public class ThreadIdRecordingFileProcessor : IFilesProcessor {
       public int InvocationThreadId { get; private set; }
 
-      public IObservable<IEnumerable<string>> Process(IObservable<IEnumerable<string>> sources) {
+      public IObservable<InOut> Process(IObservable<InOut> sources) {
         InvocationThreadId = Thread.CurrentThread.ManagedThreadId;
         return sources;
       }

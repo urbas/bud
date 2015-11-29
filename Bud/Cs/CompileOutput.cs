@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Bud.IO;
 using Microsoft.CodeAnalysis;
 
 namespace Bud.Cs {
@@ -48,5 +49,7 @@ namespace Bud.Cs {
 
     public override string ToString()
       => $"CompileOutput(AssemblyPath: {AssemblyPath}, Timestamp: {Timestamp})";
+
+    public static InOut ToInOut(CompileOutput compileOutput) => InOut.Create(compileOutput.Success, compileOutput.AssemblyPath);
   }
 }
