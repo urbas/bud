@@ -49,7 +49,7 @@ namespace Bud.Cli {
 
     private static Conf BudDependencies()
       => CSharp.AssemblyReferences.Set(
-        c => new Assemblies(typeof(BuildTool).Assembly.Location,
+        c => new Files(typeof(BuildTool).Assembly.Location,
                             typeof(object).Assembly.Location,
                             typeof(Enumerable).Assembly.Location,
                             typeof(ImmutableArray).Assembly.Location,

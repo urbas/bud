@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Immutable;
 using System.IO;
-using System.Linq;
 using Bud.Cs;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
@@ -14,7 +13,7 @@ namespace Bud {
   public static class CSharp {
     public static readonly Key<IObservable<CompileOutput>> Compile = nameof(Compile);
     public static readonly Key<Func<InOut, CompileOutput>> Compiler = nameof(Compiler);
-    public static readonly Key<Assemblies> AssemblyReferences = nameof(AssemblyReferences);
+    public static readonly Key<Files> AssemblyReferences = nameof(AssemblyReferences);
     public static readonly Key<string> OutputDir = nameof(OutputDir);
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
@@ -32,14 +31,14 @@ namespace Bud {
         .Set(Build, c => Compile[c].Select(CompileOutput.ToInOut))
         .Init(OutputDir, c => Combine(ProjectDir[c], "target"))
         .Init(AssemblyName, c => ProjectId[c] + CSharpCompilationOptions[c].OutputKind.ToExtension())
-        .Init(AssemblyReferences, c => new Assemblies(typeof(object).Assembly.Location))
+        .Init(AssemblyReferences, c => new Files(typeof(object).Assembly.Location))
         .Init(Compiler, TimedEmittingCompiler.Create)
         .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, warningLevel: 1))
         .InitValue(EmbeddedResources, ImmutableList<ResourceDescription>.Empty);
 
     private static IObservable<InOut> AddAssemblyReferencesToInput(IConf conf, IObservable<InOut> input)
       => input.CombineLatest(AssemblyReferences[conf].Watch(),
-                                (inOut, references) => inOut.AddFiles(references.Select(reference => reference.Path)));
+                             (inOut, references) => inOut.AddFiles(references));
 
     private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
       => Input[conf].Select(Compiler[conf])

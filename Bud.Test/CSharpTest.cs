@@ -55,8 +55,8 @@ namespace Bud {
 
     [Test]
     public void CompilationInput_includes_Sources_and_AssemblyReferences() {
-      var assemblies = new Assemblies(new[] {new AssemblyReference("Foo.Bar.dll", null)});
-      var files = new Files(new[] {"A.cs"});
+      var assemblies = new Files("Foo.Bar.dll");
+      var files = new Files("A.cs");
       var projectA = CSharpProject("foo", "A")
         .SetValue(Sources, files)
         .SetValue(AssemblyReferences, assemblies);
@@ -114,7 +114,7 @@ namespace Bud {
     private static Conf EmptyCSharpProject(string projectId)
       => CSharpProject(projectId, projectId)
         .SetValue(Sources, Files.Empty)
-        .SetValue(AssemblyReferences, Assemblies.Empty);
+        .SetValue(AssemblyReferences, Files.Empty);
 
     private static CompileOutput EmptyCompileOutput(long timestamp = 0L)
       => new CompileOutput(Empty<Diagnostic>(), FromMilliseconds(123), "Foo.dll", true, timestamp, null);
@@ -135,7 +135,7 @@ namespace Bud {
       => CSharpProject("a", "A")
         .SetValue(BuildPipelineScheduler, testScheduler)
         .SetValue(Sources, EmptyFilesWithDelayedUpdates(testScheduler))
-        .SetValue(AssemblyReferences, Assemblies.Empty)
+        .SetValue(AssemblyReferences, Files.Empty)
         .SetValue(Compiler, compiler);
   }
 }

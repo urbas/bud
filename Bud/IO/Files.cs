@@ -12,6 +12,8 @@ namespace Bud.IO {
                  IObservable<string> fileWatcher)
       : base(fileEnumerationFactory, fileWatcher) {}
 
+    public Files(params string[] files) : this((IEnumerable<string>)files) {}
+
     public Files(IEnumerable<string> files)
       : this(files, Observable.Empty<string>()) {}
 
