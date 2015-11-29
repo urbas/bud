@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace Bud.Cs {
   public class CompileInputTest {
     private readonly ImmutableArray<Timestamped<string>> sources = ImmutableArray.Create(Timestamped.Create("foo", 1));
-    private readonly ImmutableArray<Timestamped<IAssemblyReference>> assemblies = ImmutableArray.Create(Timestamped.Create(new Mock<IAssemblyReference>().Object, 1));
+    private readonly ImmutableArray<Timestamped<string>> assemblies = ImmutableArray.Create(Timestamped.Create("Foo.Bar.dll", 1));
     private CompileInput compileInput;
 
     [SetUp]
@@ -26,7 +26,7 @@ namespace Bud.Cs {
 
     [Test]
     public void CompileInput_does_not_equal()
-      => Assert.AreNotEqual(new CompileInput(sources, ImmutableArray<Timestamped<IAssemblyReference>>.Empty),
+      => Assert.AreNotEqual(new CompileInput(sources, ImmutableArray<Timestamped<string>>.Empty),
                             compileInput);
 
     [Test]

@@ -6,7 +6,7 @@ using System.Text;
 using Bud.Collections;
 
 namespace Bud.IO {
-  public class Diff<T> where T : ITimestamped {
+  public class Diff<T> : IDiff<T> where T : ITimestamped {
     private readonly Lazy<int> cachedHashCode;
 
     public Diff(ImmutableHashSet<T> added, ImmutableHashSet<T> removed, ImmutableHashSet<T> changed, ImmutableHashSet<T> all) {
@@ -94,6 +94,14 @@ namespace Bud.IO {
 
     private static class EmptyDiff<T> where T : ITimestamped {
       public static readonly Diff<T> Instance = new Diff<T>(ImmutableHashSet<T>.Empty, ImmutableHashSet<T>.Empty, ImmutableHashSet<T>.Empty, ImmutableHashSet<T>.Empty);
+    }
+
+    public static ImmutableDictionary<TKey, TValue> UpdateCache<TKey, TValue>(ImmutableDictionary<TKey, TValue> cache,
+                                                                              IDiff<TKey> diff,
+                                                                              Func<TKey, TValue> valueFactory) {
+      cache = cache.AddRange(diff.Added.Select(key => new KeyValuePair<TKey, TValue>(key, valueFactory(key))));
+      cache = cache.RemoveRange(diff.Removed);
+      return cache.SetItems(diff.Changed.Select(key => new KeyValuePair<TKey, TValue>(key, valueFactory(key))));
     }
   }
 }

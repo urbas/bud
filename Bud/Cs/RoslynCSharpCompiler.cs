@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -11,7 +10,8 @@ namespace Bud.Cs {
   public class RoslynCSharpCompiler {
     private ImmutableDictionary<Timestamped<string>, SyntaxTree> syntaxTrees = ImmutableDictionary<Timestamped<string>, SyntaxTree>.Empty;
     private Diff<Timestamped<string>> sources = Diff.Empty<Timestamped<string>>();
-    private Diff<Timestamped<IAssemblyReference>> oldDependencies = Diff.Empty<Timestamped<IAssemblyReference>>();
+    private Diff<Timestamped<string>> oldDependencies = Diff.Empty<Timestamped<string>>();
+    private ImmutableDictionary<Timestamped<string>, MetadataReference> referencesCache = ImmutableDictionary<Timestamped<string>, MetadataReference>.Empty;
     private CSharpCompilation cSharpCompilation;
 
     public RoslynCSharpCompiler(string assemblyName, CSharpCompilationOptions cSharpCompilationOptions) {
@@ -23,37 +23,23 @@ namespace Bud.Cs {
 
     public CSharpCompilation Compile(CompileInput input) {
       sources = sources.NextDiff(input.Sources);
-      var newDependencies = oldDependencies.NextDiff(input.Assemblies);
+      oldDependencies = oldDependencies.NextDiff(input.Assemblies);
+      var oldReferencesCache = referencesCache;
+      referencesCache = Diff.UpdateCache(referencesCache, oldDependencies, path => MetadataReference.CreateFromFile(path.Value));
+      var oldSyntaxTrees = syntaxTrees;
+      syntaxTrees = Diff.UpdateCache(syntaxTrees, sources, s => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s.Value), path: s.Value));
 
-      var addedSources = sources.Added.Select(ToFileSyntaxTreePair).ToList();
-      var changedSources = sources.Changed.Select(ToFileSyntaxTreePair).ToList();
-      cSharpCompilation = cSharpCompilation.AddSyntaxTrees(addedSources.Select(pair => pair.Value))
-                                           .RemoveSyntaxTrees(sources.Removed.Select(s => syntaxTrees[s]))
-                                           .RemoveSyntaxTrees(changedSources.Select(s => syntaxTrees[s.Key]))
-                                           .AddSyntaxTrees(changedSources.Select(s => s.Value));
+      cSharpCompilation = cSharpCompilation.AddSyntaxTrees(sources.Added.Select(s => syntaxTrees[s]))
+                                           .RemoveSyntaxTrees(sources.Removed.Select(s => oldSyntaxTrees[s]))
+                                           .RemoveSyntaxTrees(sources.Changed.Select(s => oldSyntaxTrees[s]))
+                                           .AddSyntaxTrees(sources.Changed.Select(s => syntaxTrees[s]));
 
-      cSharpCompilation = cSharpCompilation.RemoveReferences(newDependencies.Removed.Select(ToReference))
-                                           .AddReferences(newDependencies.Added.Select(ToReference))
-                                           .RemoveReferences(newDependencies.Changed.Select(FindOldReference))
-                                           .AddReferences(newDependencies.Changed.Select(ToReference));
-
-      syntaxTrees = syntaxTrees.RemoveRange(sources.Removed).AddRange(addedSources).SetItems(changedSources);
-      oldDependencies = newDependencies;
-
+      cSharpCompilation = cSharpCompilation.AddReferences(oldDependencies.Added.Select(timestamped => referencesCache[timestamped]))
+                                           .RemoveReferences(oldDependencies.Removed.Select(timestamped => oldReferencesCache[timestamped]))
+                                           .RemoveReferences(oldDependencies.Changed.Select(timestamped => oldReferencesCache[timestamped]))
+                                           .AddReferences(oldDependencies.Changed.Select(timestamped => referencesCache[timestamped]));
       return cSharpCompilation;
     }
-
-    private static Timestamped<IAssemblyReference> GetDependency(Diff<Timestamped<IAssemblyReference>> dependenciesDiff, Timestamped<IAssemblyReference> dependency)
-      => dependenciesDiff.All.TryGetValue(dependency, out dependency) ? dependency : dependency;
-
-    private static KeyValuePair<Timestamped<string>, SyntaxTree> ToFileSyntaxTreePair(Timestamped<string> s)
-      => new KeyValuePair<Timestamped<string>, SyntaxTree>(s, SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s.Value), path: s.Value));
-
-    private static MetadataReference ToReference(Timestamped<IAssemblyReference> dependency)
-      => dependency.Value.MetadataReference;
-
-    private MetadataReference FindOldReference(Timestamped<IAssemblyReference> dependency)
-      => GetDependency(oldDependencies, dependency).Value.MetadataReference;
 
     public static Func<CompileInput, CSharpCompilation> Create(string assemblyName, CSharpCompilationOptions cSharpCompilationOptions)
       => new RoslynCSharpCompiler(assemblyName, cSharpCompilationOptions).Compile;

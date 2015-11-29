@@ -10,22 +10,19 @@ namespace Bud.Cs {
     private readonly Lazy<int> cachedHashCode;
 
     public CompileInput(IEnumerable<string> sources,
-                        IEnumerable<IAssemblyReference> assemblies)
+                        IEnumerable<string> assemblies)
       : this(Files.ToTimestampedFiles(sources).ToImmutableArray(),
-             ToTimestampedAssemblyReferences(assemblies)) {}
+             Files.ToTimestampedFiles(assemblies).ToImmutableArray()) {}
 
     public CompileInput(ImmutableArray<Timestamped<string>> sources,
-                        ImmutableArray<Timestamped<IAssemblyReference>> assemblies) {
+                        ImmutableArray<Timestamped<string>> assemblies) {
       Sources = sources;
       Assemblies = assemblies;
       cachedHashCode = new Lazy<int>(ComputeHashCode);
     }
 
-    public static ImmutableArray<Timestamped<IAssemblyReference>> ToTimestampedAssemblyReferences(IEnumerable<IAssemblyReference> assemblies)
-      => assemblies.Select(reference => reference.ToTimestamped()).ToImmutableArray();
-
     public ImmutableArray<Timestamped<string>> Sources { get; }
-    public ImmutableArray<Timestamped<IAssemblyReference>> Assemblies { get; }
+    public ImmutableArray<Timestamped<string>> Assemblies { get; }
 
     public bool Equals(CompileInput other)
       => Sources.SequenceEqual(other.Sources) &&
@@ -52,12 +49,12 @@ namespace Bud.Cs {
 
     public static CompileInput FromFiles(IEnumerable<string> inputFiles) {
       var sources = new List<string>();
-      var dependencies = new List<IAssemblyReference>();
+      var dependencies = new List<string>();
       foreach (var inputFile in inputFiles) {
         if (inputFile.EndsWith(".cs", StringComparison.InvariantCultureIgnoreCase)) {
           sources.Add(inputFile);
         } else {
-          dependencies.Add(AssemblyReference.CreateFromFile(inputFile));
+          dependencies.Add(inputFile);
         }
       }
       return new CompileInput(sources, dependencies);

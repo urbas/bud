@@ -107,6 +107,6 @@ namespace Bud.Cs {
       => CompileInput.FromFiles(sources.Concat(new[] {typeof(object).Assembly.Location}));
 
     private static CompileInput NoAssemblyReferences(string fileA)
-      => new CompileInput(new[] {fileA}, Empty<AssemblyReference>());
+      => new CompileInput(new[] {fileA}, Empty<string>());
   }
 }
