@@ -31,13 +31,17 @@ namespace Bud {
       => Assert.IsEmpty(Dependencies[project]);
 
     [Test]
+    public void Input_should_initially_observe_a_single_empty_inout()
+      => Assert.AreEqual(new [] {InOut.Empty}, Input[project].ToList().Wait());
+
+    [Test]
     public void Multiple_source_directories() {
       using (var tempDir = new TemporaryDirectory()) {
         var fileA = tempDir.CreateEmptyFile("A", "A.cs");
         var fileB = tempDir.CreateEmptyFile("B", "B.cs");
         var twoDirsProject = Project(tempDir.Path, "foo").Add(SourceDir("A"), SourceDir("B"));
         Assert.That(Sources[twoDirsProject].Lister,
-                    Is.EquivalentTo(new[] {Files.ToTimestampedFile(fileA), Files.ToTimestampedFile(fileB)}));
+                    Is.EquivalentTo(new[] {fileA, fileB}));
       }
     }
 

@@ -105,6 +105,8 @@
     <Compile Include="CSharpTest.cs" />
     <Compile Include="IO\DiffTest.cs" />
     <Compile Include="IO\FilesTest.cs" />
+    <Compile Include="IO\InOutFileTest.cs" />
+    <Compile Include="IO\InOutTest.cs" />
     <Compile Include="IO\LocalFilesObservatoryTest.cs" />
     <Compile Include="IO\FilesObservatoryTest.cs" />
     <Compile Include="IO\TimestampedTest.cs" />

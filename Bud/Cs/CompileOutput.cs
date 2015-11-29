@@ -50,6 +50,6 @@ namespace Bud.Cs {
     public override string ToString()
       => $"CompileOutput(AssemblyPath: {AssemblyPath}, Timestamp: {Timestamp})";
 
-    public static InOut ToInOut(CompileOutput compileOutput) => InOut.Create(compileOutput.Success, compileOutput.AssemblyPath);
+    public static InOut ToInOut(CompileOutput compileOutput) => InOut.Create(compileOutput.AssemblyPath, compileOutput.Success);
   }
 }

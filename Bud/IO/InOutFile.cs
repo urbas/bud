@@ -8,9 +8,11 @@ namespace Bud.IO {
       IsOkay = isOkay;
     }
 
-    public static InOutFile Create(string file) => new InOutFile(file, true);
+    public static InOutFile Create(string file, bool isOkay) => new InOutFile(file, isOkay);
 
-    protected bool Equals(InOutFile other) => string.Equals(Path, other.Path);
+    public static InOutFile Create(string file) => Create(file, true);
+
+    protected bool Equals(InOutFile other) => string.Equals(Path, other.Path) && IsOkay == other.IsOkay;
 
     public override bool Equals(object obj) {
       if (ReferenceEquals(null, obj)) {
@@ -22,7 +24,11 @@ namespace Bud.IO {
       return obj.GetType() == GetType() && Equals((InOutFile) obj);
     }
 
-    public override int GetHashCode() => Path.GetHashCode();
+    public override int GetHashCode() {
+      unchecked {
+        return (Path.GetHashCode() * 397) ^ IsOkay.GetHashCode();
+      }
+    }
 
     public static bool operator ==(InOutFile left, InOutFile right) => Equals(left, right);
 

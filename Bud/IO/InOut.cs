@@ -15,17 +15,21 @@ namespace Bud.IO {
 
     public bool IsOkay => Files.TrueForAll(file => file.IsOkay);
 
+    public InOut AddFiles(params string[] files) => AddFiles((IEnumerable<string>)files);
+
     public InOut AddFiles(IEnumerable<string> files) => new InOut(Files.AddRange(files.Select(InOutFile.Create)));
 
     public static InOut Create(params string[] files) => Create((IEnumerable<string>) files);
 
     public static InOut Create(IEnumerable<string> files) => new InOut(files.Select(InOutFile.Create).ToImmutableList());
 
-    public static InOut Create(bool success, string assemblyPath)
-      => new InOut(ImmutableList.Create(new InOutFile(assemblyPath, success)));
+    public static InOut Create(string file, bool isOkay)
+      => new InOut(ImmutableList.Create(InOutFile.Create(file, isOkay)));
 
-    public static InOut Merge(IEnumerable<InOut> arg)
-      => new InOut(arg.Aggregate(ImmutableList.CreateBuilder<InOutFile>(), (builder, inOut) => {
+    public static InOut Merge(params InOut[] inOuts) => Merge((IEnumerable<InOut>) inOuts);
+
+    public static InOut Merge(IEnumerable<InOut> inOuts)
+      => new InOut(inOuts.Aggregate(ImmutableList.CreateBuilder<InOutFile>(), (builder, inOut) => {
         builder.AddRange(inOut.Files);
         return builder;
       }).ToImmutable());
