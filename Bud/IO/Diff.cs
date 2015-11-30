@@ -38,14 +38,14 @@ namespace Bud.IO {
       if (ReferenceEquals(this, obj)) {
         return true;
       }
-      return obj.GetType() == typeof(Diff<T>) && Equals((IDiff<T>) obj);
+      return obj is IDiff<T> && Equals((IDiff<T>) obj);
     }
 
     public override int GetHashCode() => cachedHashCode.Value;
 
-    public static bool operator ==(Diff<T> left, Diff<T> right) => Equals(left, right);
+    public static bool operator ==(Diff<T> left, IDiff<T> right) => Equals(left, right);
 
-    public static bool operator !=(Diff<T> left, Diff<T> right) => !Equals(left, right);
+    public static bool operator !=(Diff<T> left, IDiff<T> right) => !Equals(left, right);
 
     public override string ToString()
       => $"Added: [{string.Join(", ", Added)}], Removed: [{string.Join(", ", Removed)}], Changed: [{string.Join(", ", Changed)}], Unchanged: [{string.Join(", ", All.Except(Added).Except(Changed))}]";

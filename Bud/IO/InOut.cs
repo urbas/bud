@@ -7,13 +7,13 @@ namespace Bud.IO {
   public class InOut {
     public static readonly InOut Empty = new InOut(ImmutableList<InOutFile>.Empty);
 
-    public InOut(ImmutableList<InOutFile> files) {
+    public InOut(IImmutableList<InOutFile> files) {
       Files = files;
     }
 
-    public ImmutableList<InOutFile> Files { get; }
+    public IImmutableList<InOutFile> Files { get; }
 
-    public bool IsOkay => Files.TrueForAll(file => file.IsOkay);
+    public bool IsOkay => Files.All(file => file.IsOkay);
 
     public InOut AddFiles(params string[] files) => AddFiles((IEnumerable<string>)files);
 

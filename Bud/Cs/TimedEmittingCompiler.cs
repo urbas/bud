@@ -32,7 +32,7 @@ namespace Bud.Cs {
       if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(input)) {
         return CreateOutputFromAssembly();
       }
-      return EmitDll(UnderlyingCompiler(input), Stopwatch, CSharp.EmbeddedResources[Conf]);
+      return EmitDll(UnderlyingCompiler(input), Stopwatch, CSharp.EmbeddedResources[Conf], OutputAssemblyPath);
     }
 
     private static string GetOutputAssemblyPath(IConf conf)
@@ -52,19 +52,19 @@ namespace Bud.Cs {
              timestampedFile.IsUpToDateWith(compilationInput.Assemblies);
     }
 
-    private CompileOutput EmitDll(CSharpCompilation compilation, Stopwatch stopwatch, IEnumerable<ResourceDescription> manifestResources) {
-      Directory.CreateDirectory(Path.GetDirectoryName(OutputAssemblyPath));
+    private static CompileOutput EmitDll(Compilation compilation, Stopwatch stopwatch, IEnumerable<ResourceDescription> manifestResources, string outputAssemblyPath) {
+      Directory.CreateDirectory(Path.GetDirectoryName(outputAssemblyPath));
       EmitResult emitResult;
-      using (var assemblyOutputFile = File.Create(OutputAssemblyPath)) {
+      using (var assemblyOutputFile = File.Create(outputAssemblyPath)) {
         emitResult = compilation.Emit(assemblyOutputFile, manifestResources: manifestResources);
         stopwatch.Stop();
       }
       if (!emitResult.Success) {
-        File.Delete(OutputAssemblyPath);
+        File.Delete(outputAssemblyPath);
       }
       return new CompileOutput(emitResult.Diagnostics,
                                stopwatch.Elapsed,
-                               OutputAssemblyPath,
+                               outputAssemblyPath,
                                emitResult.Success,
                                Files.FileTimestampNow(),
                                compilation.ToMetadataReference());

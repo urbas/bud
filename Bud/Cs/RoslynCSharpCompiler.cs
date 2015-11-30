@@ -27,6 +27,9 @@ namespace Bud.Cs {
       return cSharpCompilation;
     }
 
+    public static Func<CompileInput, CSharpCompilation> Create(string assemblyName, CSharpCompilationOptions cSharpCompilationOptions)
+      => new RoslynCSharpCompiler(assemblyName, cSharpCompilationOptions).Compile;
+
     private void UpdateReferences(CompileInput input) {
       references = references.DoTimestampDiff(input.Assemblies);
       var oldReferencesCache = referencesCache;
@@ -46,8 +49,5 @@ namespace Bud.Cs {
                                            .RemoveSyntaxTrees(sources.Changed.Select(s => oldSyntaxTreesCache[s]))
                                            .AddSyntaxTrees(sources.Changed.Select(s => syntaxTreesCache[s]));
     }
-
-    public static Func<CompileInput, CSharpCompilation> Create(string assemblyName, CSharpCompilationOptions cSharpCompilationOptions)
-      => new RoslynCSharpCompiler(assemblyName, cSharpCompilationOptions).Compile;
   }
 }
