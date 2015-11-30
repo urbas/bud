@@ -6,10 +6,13 @@ using System.Text;
 using Bud.Collections;
 
 namespace Bud.IO {
-  public class Diff<T> : IDiff<T> where T : ITimestamped {
+  public class Diff<T> : IDiff<T> {
     private readonly Lazy<int> cachedHashCode;
 
-    public Diff(ImmutableHashSet<T> added, ImmutableHashSet<T> removed, ImmutableHashSet<T> changed, ImmutableHashSet<T> all) {
+    public Diff(IImmutableSet<T> added,
+                IImmutableSet<T> removed,
+                IImmutableSet<T> changed,
+                IImmutableSet<T> all) {
       Added = added;
       Removed = removed;
       Changed = changed;
@@ -17,12 +20,12 @@ namespace Bud.IO {
       cachedHashCode = new Lazy<int>(CalculateHashCode);
     }
 
-    public ImmutableHashSet<T> Added { get; }
-    public ImmutableHashSet<T> Removed { get; }
-    public ImmutableHashSet<T> Changed { get; }
-    public ImmutableHashSet<T> All { get; }
+    public IImmutableSet<T> Added { get; }
+    public IImmutableSet<T> Removed { get; }
+    public IImmutableSet<T> Changed { get; }
+    public IImmutableSet<T> All { get; }
 
-    protected bool Equals(Diff<T> other)
+    protected bool Equals(IDiff<T> other)
       => Added.SetEquals(other.Added) &&
          Removed.SetEquals(other.Removed) &&
          Changed.SetEquals(other.Changed) &&
@@ -35,7 +38,7 @@ namespace Bud.IO {
       if (ReferenceEquals(this, obj)) {
         return true;
       }
-      return obj.GetType() == typeof(Diff<T>) && Equals((Diff<T>) obj);
+      return obj.GetType() == typeof(Diff<T>) && Equals((IDiff<T>) obj);
     }
 
     public override int GetHashCode() => cachedHashCode.Value;
@@ -73,26 +76,24 @@ namespace Bud.IO {
   }
 
   public static class Diff {
-    public static Diff<T> Empty<T>() where T : ITimestamped
-      => EmptyDiff<T>.Instance;
+    public static Diff<T> Empty<T>() => EmptyDiff<T>.Instance;
 
-    public static Diff<T> NextDiff<T>(this Diff<T> previousDiff, IEnumerable<T> timestampedElements) where T : ITimestamped {
-      var timestampedElementsList = timestampedElements as IList<T> ?? timestampedElements.ToList();
-      var all = timestampedElementsList.ToImmutableHashSet();
+    public static Diff<T> DoTimestampDiff<T>(this IDiff<T> previousDiff, IEnumerable<T> timestampedElements) where T : ITimestamped {
+      var all = timestampedElements.ToImmutableHashSet();
       var removed = previousDiff.All.Except(all);
       var added = all.Except(previousDiff.All);
       var changed = all.Except(added)
-                       .Where(el => HasElementChanged(previousDiff, el))
+                       .Where(el => HasElementChanged(previousDiff.All, el))
                        .ToImmutableHashSet();
       return new Diff<T>(added, removed, changed, all);
     }
 
-    private static bool HasElementChanged<T>(Diff<T> previousDiff, T el) where T : ITimestamped {
+    private static bool HasElementChanged<T>(IImmutableSet<T> previousDiff, T el) where T : ITimestamped {
       T oldEl;
-      return previousDiff.All.TryGetValue(el, out oldEl) && el.Timestamp > oldEl.Timestamp;
+      return previousDiff.TryGetValue(el, out oldEl) && el.Timestamp > oldEl.Timestamp;
     }
 
-    private static class EmptyDiff<T> where T : ITimestamped {
+    private static class EmptyDiff<T> {
       public static readonly Diff<T> Instance = new Diff<T>(ImmutableHashSet<T>.Empty, ImmutableHashSet<T>.Empty, ImmutableHashSet<T>.Empty, ImmutableHashSet<T>.Empty);
     }
 
