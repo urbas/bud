@@ -1,63 +1,35 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 using Bud.IO;
-using static Bud.Collections.EnumerableUtils;
 
 namespace Bud.Cs {
-  public class CompileInput {
-    private readonly Lazy<int> cachedHashCode;
+  public struct CompileInput {
+    public List<string> Sources { get; }
+    public List<string> Assemblies { get; }
 
-    public CompileInput(IEnumerable<string> sources,
-                        IEnumerable<string> assemblies)
-      : this(Files.ToTimestampedFiles(sources).ToImmutableArray(),
-             Files.ToTimestampedFiles(assemblies).ToImmutableArray()) {}
-
-    public CompileInput(ImmutableArray<Timestamped<string>> sources,
-                        ImmutableArray<Timestamped<string>> assemblies) {
+    public CompileInput(List<string> sources, List<string> dependencies) {
       Sources = sources;
-      Assemblies = assemblies;
-      cachedHashCode = new Lazy<int>(ComputeHashCode);
+      Assemblies = dependencies;
     }
 
-    public ImmutableArray<Timestamped<string>> Sources { get; }
-    public ImmutableArray<Timestamped<string>> Assemblies { get; }
-
-    public bool Equals(CompileInput other)
-      => Sources.SequenceEqual(other.Sources) &&
-         Assemblies.SequenceEqual(other.Assemblies);
-
-    public override bool Equals(object obj)
-      => !ReferenceEquals(null, obj) &&
-         obj is CompileInput &&
-         Equals((CompileInput) obj);
-
-    public override int GetHashCode() => cachedHashCode.Value;
-
-    public static bool operator ==(CompileInput left, CompileInput right) => left.Equals(right);
-
-    public static bool operator !=(CompileInput left, CompileInput right) => !left.Equals(right);
-
-    private int ComputeHashCode() {
-      unchecked {
-        return ElementwiseHashCode(Sources) * 397 ^ ElementwiseHashCode(Assemblies);
-      }
-    }
-
-    public static CompileInput FromInOut(InOut input) => FromFiles(input.Files.Select(file => file.Path));
-
-    public static CompileInput FromFiles(IEnumerable<string> inputFiles) {
+    public static CompileInput FromInOut(InOut input) {
       var sources = new List<string>();
-      var dependencies = new List<string>();
-      foreach (var inputFile in inputFiles) {
-        if (inputFile.EndsWith(".cs", StringComparison.InvariantCultureIgnoreCase)) {
-          sources.Add(inputFile);
-        } else {
-          dependencies.Add(inputFile);
+      var assemblies = new List<string>();
+      foreach (var element in input.Elements) {
+        var assembly = element as Assembly;
+        if (assembly != null) {
+          assemblies.Add(assembly.Path);
+          continue;
         }
+        var file = element as InOutFile;
+        if (file != null) {
+          sources.Add(file.Path);
+          continue;
+        }
+        throw new NotSupportedException($"Unknown input of type \"{input.Elements.Single().GetType().FullName}\".");
       }
-      return new CompileInput(sources, dependencies);
+      return new CompileInput(sources, assemblies);
     }
   }
 }

@@ -1,25 +1,25 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 
 namespace Bud.Cs {
   public class TimedEmittingCompiler {
     public string OutputAssemblyPath { get; }
     public IConf Conf { get; }
-    public Func<CompileInput, CSharpCompilation> UnderlyingCompiler { get; }
+    public RoslynCSharpCompiler UnderlyingCompiler { get; }
     public Stopwatch Stopwatch { get; } = new Stopwatch();
 
     public TimedEmittingCompiler(IConf conf) {
       OutputAssemblyPath = GetOutputAssemblyPath(conf);
       var assemblyName = CSharp.AssemblyName[conf];
       var cSharpCompilationOptions = CSharp.CSharpCompilationOptions[conf];
-      UnderlyingCompiler = RoslynCSharpCompiler.Create(assemblyName, cSharpCompilationOptions);
+      UnderlyingCompiler = new RoslynCSharpCompiler(assemblyName, cSharpCompilationOptions);
       Conf = conf;
     }
 
@@ -28,11 +28,17 @@ namespace Bud.Cs {
 
     public CompileOutput Compile(InOut inOutInput) {
       Stopwatch.Restart();
+
       var input = CompileInput.FromInOut(inOutInput);
-      if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(input)) {
+      var sources = Files.ToTimestampedFiles(input.Sources).ToList();
+      var assemblies = Files.ToTimestampedFiles(input.Assemblies).ToList();
+
+      if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(sources, assemblies)) {
         return CreateOutputFromAssembly();
       }
-      return EmitDll(UnderlyingCompiler(input), Stopwatch, CSharp.EmbeddedResources[Conf], OutputAssemblyPath);
+
+      var cSharpCompilation = UnderlyingCompiler.Compile(sources, assemblies);
+      return EmitDll(cSharpCompilation, Stopwatch, CSharp.EmbeddedResources[Conf], OutputAssemblyPath);
     }
 
     private static string GetOutputAssemblyPath(IConf conf)
@@ -46,10 +52,10 @@ namespace Bud.Cs {
                            Files.GetFileTimestamp(OutputAssemblyPath),
                            MetadataReference.CreateFromFile(OutputAssemblyPath));
 
-    private bool IsOutputUpToDate(CompileInput compilationInput) {
+    private bool IsOutputUpToDate(IEnumerable<Timestamped<string>> sources, IEnumerable<Timestamped<string>> assemblies) {
       var timestampedFile = Files.ToTimestampedFile(OutputAssemblyPath);
-      return timestampedFile.IsUpToDateWith(compilationInput.Sources) &&
-             timestampedFile.IsUpToDateWith(compilationInput.Assemblies);
+      return timestampedFile.IsUpToDateWith(sources) &&
+             timestampedFile.IsUpToDateWith(assemblies);
     }
 
     private static CompileOutput EmitDll(Compilation compilation, Stopwatch stopwatch, IEnumerable<ResourceDescription> manifestResources, string outputAssemblyPath) {

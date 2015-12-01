@@ -32,8 +32,8 @@ namespace Bud.IO {
     public void Removing_an_element() {
       var removedElement = new Timestamped<int>(42, 1);
       var diff = Diff.Empty<Timestamped<int>>()
-                     .DoTimestampDiff(new[] {removedElement})
-                     .DoTimestampDiff(Enumerable.Empty<Timestamped<int>>());
+                     .DiffByTimestamp(new[] {removedElement})
+                     .DiffByTimestamp(Enumerable.Empty<Timestamped<int>>());
 
       Assert.IsEmpty(diff.Added);
       Assert.That(diff.Removed, Is.EquivalentTo(new[] {removedElement}));
@@ -45,7 +45,7 @@ namespace Bud.IO {
     public void Enumerate_the_timestamped_elements_only_once() {
       var timestampedElements = new Mock<IEnumerable<Timestamped<int>>>(MockBehavior.Strict);
       timestampedElements.Setup(self => self.GetEnumerator()).Returns(Enumerable.Empty<Timestamped<int>>().GetEnumerator());
-      Diff.Empty<Timestamped<int>>().DoTimestampDiff(timestampedElements.Object);
+      Diff.Empty<Timestamped<int>>().DiffByTimestamp(timestampedElements.Object);
       timestampedElements.Verify(self => self.GetEnumerator(), Times.Once);
     }
 
@@ -71,6 +71,6 @@ namespace Bud.IO {
 
     private static Diff<Timestamped<T>> SingleElementDiff<T>(params Timestamped<T>[] elementHistory)
       => elementHistory.Aggregate(Diff.Empty<Timestamped<T>>(),
-                                  (diff, nextElement) => diff.DoTimestampDiff(new[] {nextElement}));
+                                  (diff, nextElement) => diff.DiffByTimestamp(new[] {nextElement}));
   }
 }

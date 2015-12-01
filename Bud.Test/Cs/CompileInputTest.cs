@@ -1,37 +1,39 @@
+using System;
 using System.Collections.Immutable;
 using Bud.IO;
-using Moq;
 using NUnit.Framework;
+using static Bud.Cs.Assembly;
+using static Bud.Cs.CompileInput;
+using static Bud.IO.InOutFile;
 
 namespace Bud.Cs {
   public class CompileInputTest {
-    private readonly ImmutableArray<Timestamped<string>> sources = ImmutableArray.Create(Timestamped.Create("foo", 1));
-    private readonly ImmutableArray<Timestamped<string>> assemblies = ImmutableArray.Create(Timestamped.Create("Foo.Bar.dll", 1));
-    private CompileInput compileInput;
-
-    [SetUp]
-    public void SetUp()
-      => compileInput = new CompileInput(sources, assemblies);
-
     [Test]
-    public void Sources_assemblies_and_dependencies() {
-      Assert.AreEqual(sources, compileInput.Sources);
-      Assert.AreEqual(assemblies, compileInput.Assemblies);
+    public void FromInOut_throws_when_unknown_input_is_provided() {
+      var exception = Assert.Throws<NotSupportedException>(() => FromInOut(new InOut(ImmutableList.Create(new TestInOut()))));
+      Assert.That(exception.Message, Contains.Substring(typeof(TestInOut).FullName));
     }
 
     [Test]
-    public void CompileInput_equals()
-      => Assert.AreEqual(new CompileInput(sources, assemblies),
-                         compileInput);
+    public void FromInOut_returns_empty_sources_when_given_empty_input()
+      => Assert.IsEmpty(FromInOut(InOut.Empty).Sources);
 
     [Test]
-    public void CompileInput_does_not_equal()
-      => Assert.AreNotEqual(new CompileInput(sources, ImmutableArray<Timestamped<string>>.Empty),
-                            compileInput);
+    public void FromInOut_returns_empty_assemblies_when_given_empty_input()
+      => Assert.IsEmpty(FromInOut(InOut.Empty).Assemblies);
 
     [Test]
-    public void CompileInput_hashes_equal()
-      => Assert.AreEqual(new CompileInput(sources, assemblies).GetHashCode(),
-                         compileInput.GetHashCode());
+    public void FromInOut_collects_sources()
+      => Assert.AreEqual(new[] {"A.cs"},
+                         FromInOut(new InOut(ToInOutFile("A.cs"))).Sources);
+
+    [Test]
+    public void FromInOut_collects_assemblies()
+      => Assert.AreEqual(new[] {"A.dll"},
+                         FromInOut(new InOut(ToAssembly("A.dll", true))).Assemblies);
+
+    private class TestInOut : IInOut {
+      public bool IsOkay { get; } = true;
+    }
   }
 }

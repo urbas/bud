@@ -78,7 +78,7 @@ namespace Bud.IO {
   public static class Diff {
     public static Diff<T> Empty<T>() => EmptyDiff<T>.Instance;
 
-    public static Diff<T> DoTimestampDiff<T>(this IDiff<T> previousDiff, IEnumerable<T> timestampedElements) where T : ITimestamped {
+    public static Diff<T> DiffByTimestamp<T>(this IDiff<T> previousDiff, IEnumerable<T> timestampedElements) where T : ITimestamped {
       var all = timestampedElements.ToImmutableHashSet();
       var removed = previousDiff.All.Except(all);
       var added = all.Except(previousDiff.All);

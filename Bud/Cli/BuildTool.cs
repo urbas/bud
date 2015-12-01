@@ -11,6 +11,7 @@ using Microsoft.CodeAnalysis;
 using static System.IO.Directory;
 using static System.IO.Path;
 using static Bud.Builds;
+using Assembly = System.Reflection.Assembly;
 
 namespace Bud.Cli {
   public class BuildTool {

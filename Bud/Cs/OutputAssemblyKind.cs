@@ -1,7 +1,7 @@
 using Microsoft.CodeAnalysis;
 
 namespace Bud.Cs {
-  static internal class OutputAssemblyKind {
+  public static class OutputAssemblyKind {
     public static string ToExtension(this OutputKind kind) {
       switch (kind) {
         case OutputKind.ConsoleApplication:

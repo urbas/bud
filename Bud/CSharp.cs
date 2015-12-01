@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using Bud.Cs;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
@@ -38,7 +39,7 @@ namespace Bud {
 
     private static IObservable<InOut> AddAssemblyReferencesToInput(IConf conf, IObservable<InOut> input)
       => input.CombineLatest(AssemblyReferences[conf].Watch(),
-                             (inOut, references) => inOut.AddFiles(references));
+                             (inOut, references) => inOut.Add(references.Select(reference => Assembly.ToAssembly(reference))));
 
     private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
       => Input[conf].Select(Compiler[conf])

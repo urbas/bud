@@ -1,5 +1,9 @@
 namespace Bud.IO {
-  public class InOutFile {
+  public interface IInOut {
+    bool IsOkay { get; }
+  }
+
+  public class InOutFile : IInOut {
     public string Path { get; }
     public bool IsOkay { get; }
 
@@ -8,9 +12,9 @@ namespace Bud.IO {
       IsOkay = isOkay;
     }
 
-    public static InOutFile Create(string file, bool isOkay) => new InOutFile(file, isOkay);
+    public static InOutFile ToInOutFile(string file, bool isOkay) => new InOutFile(file, isOkay);
 
-    public static InOutFile Create(string file) => Create(file, true);
+    public static InOutFile ToInOutFile(string file) => ToInOutFile(file, true);
 
     protected bool Equals(InOutFile other) => string.Equals(Path, other.Path) && IsOkay == other.IsOkay;
 
@@ -34,6 +38,6 @@ namespace Bud.IO {
 
     public static bool operator !=(InOutFile left, InOutFile right) => !Equals(left, right);
 
-    public override string ToString() => $"InOutFile(Path: {Path}, IsOkay: {IsOkay})";
+    public override string ToString() => $"{GetType().Name}(Path: {Path}, IsOkay: {IsOkay})";
   }
 }

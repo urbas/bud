@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -21,17 +21,17 @@ namespace Bud.Cs {
                                                    compilationOptions);
     }
 
-    public CSharpCompilation Compile(CompileInput input) {
-      UpdateSources(input);
-      UpdateReferences(input);
+    public CSharpCompilation Compile(IEnumerable<string> sources, IEnumerable<string> assemblyReferences)
+      => Compile(Files.ToTimestampedFiles(sources), Files.ToTimestampedFiles(assemblyReferences));
+
+    public CSharpCompilation Compile(IEnumerable<Timestamped<string>> inputSources, IEnumerable<Timestamped<string>> inputAssemblies) {
+      UpdateSources(inputSources);
+      UpdateReferences(inputAssemblies);
       return cSharpCompilation;
     }
 
-    public static Func<CompileInput, CSharpCompilation> Create(string assemblyName, CSharpCompilationOptions cSharpCompilationOptions)
-      => new RoslynCSharpCompiler(assemblyName, cSharpCompilationOptions).Compile;
-
-    private void UpdateReferences(CompileInput input) {
-      references = references.DoTimestampDiff(input.Assemblies);
+    private void UpdateReferences(IEnumerable<Timestamped<string>> newAssemblies) {
+      references = references.DiffByTimestamp(newAssemblies);
       var oldReferencesCache = referencesCache;
       referencesCache = Diff.UpdateCache(referencesCache, references, path => MetadataReference.CreateFromFile(path.Value));
       cSharpCompilation = cSharpCompilation.AddReferences(references.Added.Select(r => referencesCache[r]))
@@ -40,8 +40,8 @@ namespace Bud.Cs {
                                            .AddReferences(references.Changed.Select(r => referencesCache[r]));
     }
 
-    private void UpdateSources(CompileInput input) {
-      sources = sources.DoTimestampDiff(input.Sources);
+    private void UpdateSources(IEnumerable<Timestamped<string>> newSources) {
+      sources = sources.DiffByTimestamp(newSources);
       var oldSyntaxTreesCache = syntaxTreesCache;
       syntaxTreesCache = Diff.UpdateCache(syntaxTreesCache, sources, s => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s.Value), path: s.Value));
       cSharpCompilation = cSharpCompilation.AddSyntaxTrees(sources.Added.Select(s => syntaxTreesCache[s]))

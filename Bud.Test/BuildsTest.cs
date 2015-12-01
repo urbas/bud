@@ -11,6 +11,7 @@ using NUnit.Framework;
 using static System.Linq.Enumerable;
 using static System.TimeSpan;
 using static Bud.Builds;
+using static Bud.IO.InOutFile;
 
 namespace Bud {
   public class BuildsTest {
@@ -48,7 +49,7 @@ namespace Bud {
     [Test]
     public void Source_processor_changes_source_input() {
       var fileProcessor = new Mock<IFilesProcessor>(MockBehavior.Strict);
-      var expectedOutputFiles = InOut.Create("foo");
+      var expectedOutputFiles = new InOut(ToInOutFile("foo"));
       fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<InOut>>()))
                    .Returns(Observable.Return(expectedOutputFiles));
       var actualOutputFiles = Project("FooDir", "Foo")
@@ -81,11 +82,11 @@ namespace Bud {
     [Test]
     public void Default_build_forwards_the_output_from_dependencies() {
       var projects = Conf.New(Project("aDir", "A")
-                                .SetValue(Sources, new Files(new[] {"a"})),
+                                .SetValue(Sources, new Files("a")),
                               Project("bDir", "B")
-                                .SetValue(Sources, new Files(new[] {"b"}))
+                                .SetValue(Sources, new Files("b"))
                                 .Add(Dependencies, "../A"));
-      Assert.AreEqual(InOut.Create("a", "b"),
+      Assert.AreEqual(new InOut(ToInOutFile("a"), ToInOutFile("b")),
                       projects.Get("B" / Output).Wait());
     }
 
@@ -109,19 +110,19 @@ namespace Bud {
     [Test]
     public void Default_build_processes_own_sources_before_output() {
       var projects = Conf.New(Project("aDir", "A")
-                                .SetValue(Sources, new Files(new[] {"a"}))
+                                .SetValue(Sources, new Files("a"))
                                 .AddSourceProcessor(conf => new FooAppenderFileProcessor()),
                               Project("bDir", "B")
-                                .SetValue(Sources, new Files(new[] {"b"}))
+                                .SetValue(Sources, new Files("b"))
                                 .AddSourceProcessor(conf => new FooAppenderFileProcessor())
                                 .Add(Dependencies, "../A"));
-      Assert.AreEqual(InOut.Create("afoo", "bfoo"),
+      Assert.AreEqual(new InOut(ToInOutFile("afoo"), ToInOutFile("bfoo")),
                       projects.Get("B" / Output).Wait());
     }
 
     private class FooAppenderFileProcessor : IFilesProcessor {
       public IObservable<InOut> Process(IObservable<InOut> sources)
-        => sources.Select(files => InOut.Create(files.Files.Select(file => file.Path + "foo")));
+        => sources.Select(io => new InOut(io.Elements.OfType<InOutFile>().Select(file => ToInOutFile(file.Path + "foo"))));
     }
 
     public class ThreadIdRecordingFileProcessor : IFilesProcessor {

@@ -76,7 +76,7 @@ namespace Bud {
       => Sources[c].Watch()
                    .ObserveOn(BuildPipelineScheduler[c])
                    .CalmAfterFirst(InputCalmingPeriod[c], BuildPipelineScheduler[c])
-                   .Select(InOut.Create);
+                   .Select(sources => new InOut(sources.Select(InOutFile.ToInOutFile)));
 
     public static Conf AddSourceProcessor(this Conf project, Func<IConf, IFilesProcessor> fileProcessorFactory)
       => project.Modify(SourceProcessors, (conf, processors) => processors.Concat(new[] {fileProcessorFactory(conf)}));

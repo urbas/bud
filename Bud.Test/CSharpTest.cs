@@ -11,7 +11,9 @@ using static System.Linq.Enumerable;
 using static System.TimeSpan;
 using static Bud.Builds;
 using static Bud.Conf;
+using static Bud.Cs.Assembly;
 using static Bud.CSharp;
+using static Bud.IO.InOutFile;
 
 namespace Bud {
   public class CSharpTest {
@@ -61,13 +63,13 @@ namespace Bud {
         .SetValue(Sources, files)
         .SetValue(AssemblyReferences, assemblies);
       var compilationInputs = Input[projectA].ToEnumerable().ToList();
-      Assert.AreEqual(new[] {InOut.Create("A.cs", "Foo.Bar.dll")},
+      Assert.AreEqual(new[] {new InOut(ToInOutFile("A.cs"), ToAssembly("Foo.Bar.dll"))},
                       compilationInputs);
     }
 
     [Test]
     public void CompilationInput_is_passed_to_the_compiler() {
-      var inOut = InOut.Create("A.cs", "Foo.Bar.dll");
+      var inOut = new InOut(ToInOutFile("A.cs"), ToAssembly("Foo.Bar.dll"));
       var cSharpCompiler = new Mock<Func<InOut, CompileOutput>>(MockBehavior.Strict);
       cSharpCompiler.Setup(self => self(It.Is<InOut>(input => inOut.Equals(input))))
                     .Returns(EmptyCompileOutput());
@@ -91,7 +93,7 @@ namespace Bud {
 
     [Test]
     public void Compiler_uses_dependencies()
-      => Assert.AreEqual(new[] {InOut.Create("Foo.dll")},
+      => Assert.AreEqual(new[] {new InOut(ToAssembly("Foo.dll", true))},
                          New(ProjectAOutputsFooDll(42L),
                              ProjectWithDependencies("B", "../A"))
                            .Get("B" / Input).ToEnumerable());
@@ -103,13 +105,7 @@ namespace Bud {
     private static Conf ProjectWithDependencies(string projectId, params string[] dependencies)
       => EmptyCSharpProject(projectId)
         .SetValue(Dependencies, dependencies)
-        .SetValue(Compiler, MaxTimestampWithSecondDelayCompiler);
-
-    private static CompileOutput MaxTimestampWithSecondDelayCompiler(InOut input)
-      => EmptyCompileOutput(MaxDependencyTimestamp(input) + 1000);
-
-    private static long MaxDependencyTimestamp(InOut input)
-      => input.Files.Any() ? input.Files.Max(output => Files.GetFileTimestamp(output.Path)) : 0L;
+        .SetValue(Compiler, input => EmptyCompileOutput(10001L));
 
     private static Conf EmptyCSharpProject(string projectId)
       => CSharpProject(projectId, projectId)
