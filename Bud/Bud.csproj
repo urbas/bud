@@ -93,6 +93,7 @@
     <Compile Include="Cs\Assembly.cs" />
     <Compile Include="Cs\CompileInput.cs" />
     <Compile Include="Cs\CompileOutput.cs" />
+    <Compile Include="Cs\ICompiler.cs" />
     <Compile Include="Cs\OutputAssemblyKind.cs" />
     <Compile Include="Cs\RoslynCSharpCompiler.cs" />
     <Compile Include="Cs\TimedEmittingCompiler.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="IO\Files.cs" />
     <Compile Include="IO\FilesObservatory.cs" />
     <Compile Include="IO\IDiff.cs" />
+    <Compile Include="IO\IInOut.cs" />
     <Compile Include="IO\InOut.cs" />
     <Compile Include="IO\InOutFile.cs" />
     <Compile Include="IO\IWatchedResources.cs" />

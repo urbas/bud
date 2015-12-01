@@ -7,48 +7,47 @@ using System.Linq;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Emit;
+using static Bud.CSharp;
 
 namespace Bud.Cs {
   public class TimedEmittingCompiler {
     public string OutputAssemblyPath { get; }
-    public IConf Conf { get; }
-    public RoslynCSharpCompiler UnderlyingCompiler { get; }
+    public IImmutableList<ResourceDescription> EmbeddedResources { get; }
+    public ICompiler UnderlyingCompiler { get; }
     public Stopwatch Stopwatch { get; } = new Stopwatch();
 
-    public TimedEmittingCompiler(IConf conf) {
-      OutputAssemblyPath = GetOutputAssemblyPath(conf);
-      var assemblyName = CSharp.AssemblyName[conf];
-      var cSharpCompilationOptions = CSharp.CSharpCompilationOptions[conf];
-      UnderlyingCompiler = new RoslynCSharpCompiler(assemblyName, cSharpCompilationOptions);
-      Conf = conf;
+    public TimedEmittingCompiler(IImmutableList<ResourceDescription> embeddedResources, ICompiler underlyingCompiler, string outputAssemblyPath) {
+      OutputAssemblyPath = outputAssemblyPath;
+      EmbeddedResources = embeddedResources;
+      UnderlyingCompiler = underlyingCompiler;
     }
 
     public static Func<InOut, CompileOutput> Create(IConf conf)
-      => new TimedEmittingCompiler(conf).Compile;
+      => new TimedEmittingCompiler(CSharp.EmbeddedResources[conf], new RoslynCSharpCompiler(AssemblyName[conf], CSharpCompilationOptions[conf]), Path.Combine(OutputDir[conf], AssemblyName[conf])).Compile;
 
     public CompileOutput Compile(InOut inOutInput) {
-      Stopwatch.Restart();
-
-      var input = CompileInput.FromInOut(inOutInput);
-      var sources = Files.ToTimestampedFiles(input.Sources).ToList();
-      var assemblies = Files.ToTimestampedFiles(input.Assemblies).ToList();
-
-      if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(sources, assemblies)) {
-        return CreateOutputFromAssembly();
+      if (!inOutInput.IsOkay) {
+        return CreateOutputFromAssembly(false);
       }
 
+      List<Timestamped<string>> sources;
+      List<Timestamped<string>> assemblies;
+      CompileInput.ExtractInput(inOutInput, out sources, out assemblies);
+
+      if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(sources, assemblies)) {
+        return CreateOutputFromAssembly(true);
+      }
+
+      Stopwatch.Restart();
       var cSharpCompilation = UnderlyingCompiler.Compile(sources, assemblies);
-      return EmitDll(cSharpCompilation, Stopwatch, CSharp.EmbeddedResources[Conf], OutputAssemblyPath);
+      return EmitDll(cSharpCompilation, Stopwatch, EmbeddedResources, OutputAssemblyPath);
     }
 
-    private static string GetOutputAssemblyPath(IConf conf)
-      => Path.Combine(CSharp.OutputDir[conf], CSharp.AssemblyName[conf]);
-
-    private CompileOutput CreateOutputFromAssembly()
+    private CompileOutput CreateOutputFromAssembly(bool isSuccess)
       => new CompileOutput(Enumerable.Empty<Diagnostic>(),
                            Stopwatch.Elapsed,
                            OutputAssemblyPath,
-                           true,
+                           isSuccess,
                            Files.GetFileTimestamp(OutputAssemblyPath),
                            MetadataReference.CreateFromFile(OutputAssemblyPath));
 

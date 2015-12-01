@@ -103,6 +103,7 @@
     <Compile Include="Cs\RoslynCSharpCompilerTest.cs" />
     <Compile Include="ConfTest.cs" />
     <Compile Include="CSharpTest.cs" />
+    <Compile Include="Cs\TimedEmittingCompilerTest.cs" />
     <Compile Include="IO\DiffTest.cs" />
     <Compile Include="IO\FilesTest.cs" />
     <Compile Include="IO\InOutFileTest.cs" />

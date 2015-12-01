@@ -1,8 +1,4 @@
 namespace Bud.IO {
-  public interface IInOut {
-    bool IsOkay { get; }
-  }
-
   public class InOutFile : IInOut {
     public string Path { get; }
     public bool IsOkay { get; }

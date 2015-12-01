@@ -5,31 +5,22 @@ using Bud.IO;
 
 namespace Bud.Cs {
   public struct CompileInput {
-    public List<string> Sources { get; }
-    public List<string> Assemblies { get; }
-
-    public CompileInput(List<string> sources, List<string> dependencies) {
-      Sources = sources;
-      Assemblies = dependencies;
-    }
-
-    public static CompileInput FromInOut(InOut input) {
-      var sources = new List<string>();
-      var assemblies = new List<string>();
-      foreach (var element in input.Elements) {
+    public static void ExtractInput(InOut inOutInput, out List<Timestamped<string>> sources, out List<Timestamped<string>> assemblies) {
+      sources = new List<Timestamped<string>>();
+      assemblies = new List<Timestamped<string>>();
+      foreach (var element in inOutInput.Elements) {
         var assembly = element as Assembly;
         if (assembly != null) {
-          assemblies.Add(assembly.Path);
+          assemblies.Add(Files.ToTimestampedFile(assembly.Path));
           continue;
         }
         var file = element as InOutFile;
         if (file != null) {
-          sources.Add(file.Path);
+          sources.Add(Files.ToTimestampedFile(file.Path));
           continue;
         }
-        throw new NotSupportedException($"Unknown input of type \"{input.Elements.Single().GetType().FullName}\".");
+        throw new NotSupportedException($"Unknown input of type \"{inOutInput.Elements.Single().GetType().FullName}\".");
       }
-      return new CompileInput(sources, assemblies);
     }
   }
 }

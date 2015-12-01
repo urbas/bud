@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace Bud.Cs {
-  public class RoslynCSharpCompiler {
+  public class RoslynCSharpCompiler : ICompiler {
     private Diff<Timestamped<string>> sources = Diff.Empty<Timestamped<string>>();
     private ImmutableDictionary<Timestamped<string>, SyntaxTree> syntaxTreesCache = ImmutableDictionary<Timestamped<string>, SyntaxTree>.Empty;
     private Diff<Timestamped<string>> references = Diff.Empty<Timestamped<string>>();
