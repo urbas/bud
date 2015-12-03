@@ -110,6 +110,7 @@
     <Compile Include="IO\InOutTest.cs" />
     <Compile Include="IO\LocalFilesObservatoryTest.cs" />
     <Compile Include="IO\FilesObservatoryTest.cs" />
+    <Compile Include="IO\PathUtilsTest.cs" />
     <Compile Include="IO\TimestampedTest.cs" />
     <Compile Include="IO\WatchedResourcesTest.cs" />
     <Compile Include="KeysTest.cs" />

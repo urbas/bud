@@ -118,6 +118,7 @@
     <Compile Include="IO\IFilesObservatory.cs" />
     <Compile Include="IO\EmptyFilesObservatory.cs" />
     <Compile Include="IConf.cs" />
+    <Compile Include="IO\PathUtils.cs" />
     <Compile Include="IO\Timestamped.cs" />
     <Compile Include="IO\WatchedResources.cs" />
     <Compile Include="Key.cs" />

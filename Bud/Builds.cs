@@ -8,6 +8,7 @@ using Bud.IO;
 using Bud.Reactive;
 using static System.IO.Path;
 using static Bud.Conf;
+using static Bud.IO.PathUtils;
 
 namespace Bud {
   public static class Builds {
@@ -63,9 +64,13 @@ namespace Bud {
 
     public static Conf ExcludeSourceDirs(params string[] subDirs)
       => Empty.Modify(Sources, (conf, previousFiles) => {
-        var forbiddenDirs = subDirs.Select(s => Combine(ProjectDir[conf], s));
-        return previousFiles.WithFilter(file => !forbiddenDirs.Any(file.StartsWith));
+        var baseDir = ProjectDir[conf];
+        var dirs = subDirs.Select(s => Combine(baseDir, s));
+        return previousFiles.WithFilter(NotInAnyDirFilter(dirs));
       });
+
+    public static Conf AddSourceProcessor(this Conf project, Func<IConf, IFilesProcessor> fileProcessorFactory)
+      => project.Modify(SourceProcessors, (conf, processors) => processors.Concat(new[] {fileProcessorFactory(conf)}));
 
     private static IObservable<InOut> ProcessSources(IConf project)
       => SourceProcessors[project]
@@ -77,8 +82,5 @@ namespace Bud {
                    .ObserveOn(BuildPipelineScheduler[c])
                    .CalmAfterFirst(InputCalmingPeriod[c], BuildPipelineScheduler[c])
                    .Select(sources => new InOut(sources.Select(InOutFile.ToInOutFile)));
-
-    public static Conf AddSourceProcessor(this Conf project, Func<IConf, IFilesProcessor> fileProcessorFactory)
-      => project.Modify(SourceProcessors, (conf, processors) => processors.Concat(new[] {fileProcessorFactory(conf)}));
   }
 }
