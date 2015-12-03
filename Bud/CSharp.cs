@@ -37,9 +37,9 @@ namespace Bud {
         .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, warningLevel: 1))
         .InitValue(EmbeddedResources, ImmutableList<ResourceDescription>.Empty);
 
-    private static IObservable<InOut> AddAssemblyReferencesToInput(IConf conf, IObservable<InOut> input)
-      => input.CombineLatest(AssemblyReferences[conf].Watch(),
-                             (inOut, references) => inOut.Add(references.Select(reference => Assembly.ToAssembly(reference))));
+    private static IObservable<InOut> AddAssemblyReferencesToInput(IConf c, IObservable<InOut> input)
+      => input.CombineLatest(AssemblyReferences[c].Watch().Calmed(c),
+                             (inOut, references) => inOut.Add(references.Select(Assembly.ToAssembly)));
 
     private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
       => Input[conf].Select(Compiler[conf])

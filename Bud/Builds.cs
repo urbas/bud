@@ -72,6 +72,9 @@ namespace Bud {
     public static Conf AddSourceProcessor(this Conf project, Func<IConf, IFilesProcessor> fileProcessorFactory)
       => project.Modify(SourceProcessors, (conf, processors) => processors.Concat(new[] {fileProcessorFactory(conf)}));
 
+    public static IObservable<T> Calmed<T>(this IObservable<T> input, IConf conf)
+      => input.CalmAfterFirst(InputCalmingPeriod[conf], BuildPipelineScheduler[conf]);
+
     private static IObservable<InOut> ProcessSources(IConf project)
       => SourceProcessors[project]
         .Aggregate(ObservedSources(project),
@@ -80,7 +83,7 @@ namespace Bud {
     private static IObservable<InOut> ObservedSources(IConf c)
       => Sources[c].Watch()
                    .ObserveOn(BuildPipelineScheduler[c])
-                   .CalmAfterFirst(InputCalmingPeriod[c], BuildPipelineScheduler[c])
+                   .Calmed(c)
                    .Select(sources => new InOut(sources.Select(InOutFile.ToInOutFile)));
   }
 }
