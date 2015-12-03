@@ -19,20 +19,22 @@ namespace Bud.IO {
                                 ToSlashedPath(dir));
     }
 
+    /// <returns>
+    ///   A filter that returns <c>true</c> iff the given file is not
+    ///   in any of the given directories.
+    /// </returns>
     public static Func<string, bool> NotInAnyDirFilter(IEnumerable<string> dirs) {
       var unixDirPaths = dirs.Select(ToSlashedPath).ToList();
       return file => !unixDirPaths.Any(dir => IsSlashedPathInDir(ToSlashedPath(file), dir));
     }
 
-    /// <param name="path">
-    ///   This path must use slashes as directory separators.
-    /// </param>
-    /// <param name="dir">
-    ///   This path must use slashes as directory separators.
-    /// </param>
     /// <returns>
     ///   <c>true</c> iff <paramref name="path" /> is a subpath of <paramref name="dir" />.
     /// </returns>
+    /// <remarks>
+    ///   parameters <paramref name="path" /> and <paramref name="dir" /> must use slashes
+    ///   as directory separators (<see cref="ToSlashedPath" />).
+    /// </remarks>
     private static bool IsSlashedPathInDir(string path, string dir) {
       if (path.StartsWith(dir)) {
         return path.Length == dir.Length ||
@@ -42,6 +44,9 @@ namespace Bud.IO {
              dir[path.Length] == '/';
     }
 
+    /// <returns>
+    ///   a path that uses strictly slashes as directory separators.
+    /// </returns>
     private static string ToSlashedPath(string path)
       => path.Replace(Path.DirectorySeparatorChar, '/');
   }
