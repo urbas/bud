@@ -72,8 +72,8 @@ namespace Bud {
     public static Conf AddSourceProcessor(this Conf project, Func<IConf, IFilesProcessor> fileProcessorFactory)
       => project.Modify(SourceProcessors, (conf, processors) => processors.Concat(new[] {fileProcessorFactory(conf)}));
 
-    public static IObservable<T> Calmed<T>(this IObservable<T> input, IConf conf)
-      => input.CalmAfterFirst(InputCalmingPeriod[conf], BuildPipelineScheduler[conf]);
+    public static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf conf)
+      => observable.CalmAfterFirst(InputCalmingPeriod[conf], BuildPipelineScheduler[conf]);
 
     private static IObservable<InOut> ProcessSources(IConf project)
       => SourceProcessors[project]

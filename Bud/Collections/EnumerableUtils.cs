@@ -3,13 +3,12 @@ using System.Linq;
 
 namespace Bud.Collections {
   public static class EnumerableUtils {
-    public static int ElementwiseHashCode<TElement>(IEnumerable<TElement> enumerable) {
+    public static int ElementwiseHashCode<TElement>(IEnumerable<TElement> enumerable)
+      => enumerable?.Aggregate(487, MergeHash) ?? 0;
+
+    private static int MergeHash<TElement>(int hashCode, TElement element) {
       unchecked {
-        if (enumerable != null) {
-          return enumerable.Aggregate(487,
-                                      (hashCode, element) => hashCode * 31 + element.GetHashCode());
-        }
-        return 0;
+        return hashCode * 31 + element.GetHashCode();
       }
     }
   }
