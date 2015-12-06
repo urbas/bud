@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Microsoft.CodeAnalysis;
 
 namespace Bud.Configuration {
   public class RawConf : IConf {
@@ -10,14 +11,14 @@ namespace Bud.Configuration {
       CachingConf = new CachingConf();
     }
 
-    public T Get<T>(Key<T> key) => CachingConf.Get(key.Relativize(), RawGet);
+    public Optional<T> TryGet<T>(Key<T> key) => RawTryGet(key.Relativize());
 
-    public T RawGet<T>(Key<T> key) {
+    private Optional<T> RawTryGet<T>(Key<T> key) {
       IConfDefinition confDefinition;
       if (ConfDefinitions.TryGetValue(key, out confDefinition)) {
-        return (T) confDefinition.Value(this);
+        return new Optional<T>((T) confDefinition.Value(this));
       }
-      throw new ConfUndefinedException($"Configuration '{key}' is undefined.");
+      return new Optional<T>();
     }
   }
 }

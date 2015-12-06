@@ -11,7 +11,7 @@ namespace Bud.Configuration {
     [SetUp]
     public void SetUp() {
       wrappedConf = new Mock<IConf>();
-      wrappedConf.Setup(self => self.Get<int>("foo/A")).Returns(42);
+      wrappedConf.Setup(self => self.TryGet<int>("foo/A")).Returns(42);
       scopedConf = ScopedConf.MakeScoped(fooBarScope, wrappedConf.Object);
     }
 
@@ -25,24 +25,24 @@ namespace Bud.Configuration {
 
     [Test]
     public void Delegate_absolute_keys() {
-      scopedConf.Get<int>("/A");
-      wrappedConf.Verify(self => self.Get<int>("/A"));
+      scopedConf.TryGet<int>("/A");
+      wrappedConf.Verify(self => self.TryGet<int>("/A"));
     }
 
     [Test]
     public void Delegate_relative_keys() {
-      scopedConf.Get<int>("../A");
-      wrappedConf.Verify(self => self.Get<int>("foo/A"));
+      scopedConf.TryGet<int>("../A");
+      wrappedConf.Verify(self => self.TryGet<int>("foo/A"));
     }
 
     [Test]
     public void Delegate_keys_that_go_out_of_scope() {
-      scopedConf.Get<int>("../../../A");
-      wrappedConf.Verify(self => self.Get<int>("../A"));
+      scopedConf.TryGet<int>("../../../A");
+      wrappedConf.Verify(self => self.TryGet<int>("../A"));
     }
 
     [Test]
     public void Return_value_calculated_by_wrapped_conf()
-      => Assert.AreEqual(42, scopedConf.Get<int>("../A"));
+      => Assert.AreEqual(42, scopedConf.TryGet<int>("../A").Value);
   }
 }

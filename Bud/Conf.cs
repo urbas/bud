@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Bud.Configuration;
+using Microsoft.CodeAnalysis;
 
 namespace Bud {
   public class Conf : IConf, IConfBuilder {
@@ -81,9 +82,8 @@ namespace Bud {
     ///   The key for which to get the value. If the path of the key is relative,
     ///   it will be interpreted with the <see cref="Scope" /> as the base path.
     /// </param>
-    /// <returns>the value of the configuration key.</returns>
-    public T Get<T>(Key<T> key)
-      => ToCompiled().Get<T>(Keys.InterpretFromScope(key, Scope));
+    public Optional<T> TryGet<T>(Key<T> key)
+      => ToCompiled().TryGet<T>(Keys.InterpretFromScope(key, Scope));
 
     public void ApplyIn(ScopedDictionaryBuilder<IConfDefinition> configDefinitions) {
       foreach (var scopedConfBuilder in ScopedConfBuilders) {

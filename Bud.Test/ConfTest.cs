@@ -239,6 +239,18 @@ namespace Bud {
       valueFactoryA.VerifyAll();
     }
 
+    [Test]
+    public void TryGet_returns_an_empty_optional_for_undefined_keys()
+      => Assert.IsFalse(Empty.TryGet(A).HasValue);
+
+    [Test]
+    public void TryGet_returns_an_optional_with_a_value_when_the_key_is_defined()
+      => Assert.IsTrue(Empty.SetValue(A, 42).TryGet(A).HasValue);
+
+    [Test]
+    public void TryGet_returns_an_optional_containing_the_value_of_the_key()
+      => Assert.AreEqual(42, Empty.SetValue(A, 42).TryGet(A).Value);
+
     private static async Task<int> AddFooTwiceConcurrently(IConf conf) {
       var first = Task.Run(() => A[conf]);
       var second = Task.Run(() => A[conf]);

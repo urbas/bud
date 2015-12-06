@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Microsoft.CodeAnalysis;
 
 namespace Bud.Configuration {
   public class ScopedConf : IConf {
@@ -12,11 +13,11 @@ namespace Bud.Configuration {
       CachingConf = new CachingConf();
     }
 
-    public T Get<T>(Key<T> key)
-      => CachingConf.Get(key, RawGet);
+    public Optional<T> TryGet<T>(Key<T> key)
+      => CachingConf.TryGet(key, RawTryGet);
 
-    private T RawGet<T>(Key<T> key)
-      => Conf.Get<T>(Keys.InterpretFromScope(key.Id, Scope));
+    private Optional<T> RawTryGet<T>(Key<T> key)
+      => Conf.TryGet<T>(Keys.InterpretFromScope(key.Id, Scope));
 
     public static IConf MakeScoped(ImmutableList<string> scope, IConf conf)
       => scope.IsEmpty ? conf : new ScopedConf(scope, conf);

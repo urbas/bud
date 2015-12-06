@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Bud.Configuration;
 using Bud.Util;
 
 namespace Bud {
@@ -82,6 +83,14 @@ namespace Bud {
       var backtrackedScope = scope.Take(scope.Count - backtracks);
       var keyWithBacktracksRemoved = key.Substring(backtracks * BacktrackPath.Length);
       return ConvertScopeToString(backtrackedScope) + Separator + keyWithBacktracksRemoved;
+    }
+
+    public static T Get<T>(this IConf conf, Key<T> key) {
+      var val = conf.TryGet(key);
+      if (val.HasValue) {
+        return val.Value;
+      }
+      throw new ConfUndefinedException($"Configuration '{key}' is undefined.");
     }
   }
 }

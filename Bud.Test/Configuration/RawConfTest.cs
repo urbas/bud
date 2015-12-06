@@ -17,22 +17,12 @@ namespace Bud.Configuration {
     }
 
     [Test]
-    public void Get_returns_the_defined_value() {
-      var conf = new RawConf(new Dictionary<string, IConfDefinition> {
-        {"A", confDefinition42}
-      });
-      Assert.AreEqual(42, conf.Get<int>("A"));
-    }
+    public void Get_returns_the_defined_value()
+      => Assert.AreEqual(42, ConfWithA42().Get<int>("A"));
 
     [Test]
-    public void Get_throws_when_the_requested_type_mismatches_the_defined_type() {
-      Assert.Throws<InvalidCastException>(() => {
-        var conf = new RawConf(new Dictionary<string, IConfDefinition> {
-          {"A", confDefinition42}
-        });
-        conf.Get<string>("A");
-      });
-    }
+    public void Get_throws_when_the_requested_type_mismatches_the_defined_type()
+      => Assert.Throws<InvalidCastException>(() => ConfWithA42().Get<string>("A"));
 
     [Test]
     public void Get_returns_null() {
@@ -41,5 +31,24 @@ namespace Bud.Configuration {
       });
       Assert.IsNull(conf.Get<object>("A"));
     }
+
+    [Test]
+    public void TryGet_returns_empty_optional() {
+      var conf = new RawConf(ImmutableDictionary<string, IConfDefinition>.Empty);
+      Assert.IsFalse(conf.TryGet<object>("A").HasValue);
+    }
+
+    [Test]
+    public void TryGet_returns_an_optional_with_a_value_when_the_key_is_defined()
+      => Assert.IsTrue(ConfWithA42().TryGet<int>("A").HasValue);
+
+    [Test]
+    public void TryGet_returns_an_optional_containing_the_value_of_the_key()
+      => Assert.AreEqual(42, ConfWithA42().TryGet<int>("A").Value);
+
+    private RawConf ConfWithA42()
+      => new RawConf(new Dictionary<string, IConfDefinition> {
+        {"A", confDefinition42}
+      });
   }
 }
