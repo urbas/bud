@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Immutable;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using Bud.Configuration.ApiV1;
 using Bud.Cs;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
@@ -94,9 +96,28 @@ namespace Bud {
     [Test]
     public void Compiler_uses_dependencies()
       => Assert.AreEqual(new[] {new InOut(ToAssembly("Foo.dll", true))},
-                         New(ProjectAOutputsFooDll(42L),
-                             ProjectWithDependencies("B", "../A"))
+                         Group(ProjectAOutputsFooDll(42L),
+                               ProjectWithDependencies("B", "../A"))
                            .Get("B" / Input).ToEnumerable());
+
+    [Test]
+    public void Default_csharp_projects_have_no_package_dependencies()
+      => Assert.IsEmpty(CSharpProject("A").Get(PackageDependencies));
+
+    [Test]
+    public void Projects_inherit_package_dependencies_from_their_project_dependencies()
+      => Assert.AreEqual(new[] {new Package("Foo.Bar", "1.2.3", "net45")},
+                         Group(CSharpProject("A")
+                                 .Add(PackageDependencies, new Package("Foo.Bar", "1.2.3", "net45")),
+                               CSharpProject("B")
+                                 .Add(Dependencies, "../A"))
+                           .Get("B" / TransitivePackageDependencies));
+
+    [Test]
+    public void No_packages_are_inheritted_from_projects_without_package_dependence_support()
+      => Assert.IsEmpty(Group(Project("aDir", "A"),
+                              CSharpProject("B").Add(Dependencies, "../A"))
+                          .Get("B" / TransitivePackageDependencies));
 
     private static Conf ProjectAOutputsFooDll(long initialTimestamp)
       => EmptyCSharpProject("A")
@@ -104,7 +125,7 @@ namespace Bud {
 
     private static Conf ProjectWithDependencies(string projectId, params string[] dependencies)
       => EmptyCSharpProject(projectId)
-        .SetValue(Dependencies, dependencies)
+        .SetValue(Dependencies, dependencies.ToImmutableHashSet())
         .SetValue(Compiler, input => EmptyCompileOutput(10001L));
 
     private static Conf EmptyCSharpProject(string projectId)

@@ -18,11 +18,11 @@ namespace Bud {
     public static readonly Key<Files> Sources = nameof(Sources);
     public static readonly Key<string> ProjectId = nameof(ProjectId);
     public static readonly Key<string> ProjectDir = nameof(ProjectDir);
-    public static readonly Key<IEnumerable<string>> Dependencies = nameof(Dependencies);
+    public static readonly Key<IImmutableSet<string>> Dependencies = nameof(Dependencies);
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
     public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
     public static readonly Key<IObservable<InOut>> ProcessedSources = nameof(ProcessedSources);
-    public static readonly Key<IEnumerable<IFilesProcessor>> SourceProcessors = nameof(SourceProcessors);
+    public static readonly Key<IImmutableList<IFilesProcessor>> SourceProcessors = nameof(SourceProcessors);
     public static readonly Key<TimeSpan> InputCalmingPeriod = nameof(InputCalmingPeriod);
     private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler = new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
 
@@ -34,7 +34,7 @@ namespace Bud {
         .Init(Input, DefaultInput)
         .Init(Build, c => Input[c])
         .Init(Output, c => Build[c])
-        .InitValue(Dependencies, Enumerable.Empty<string>())
+        .InitValue(Dependencies, ImmutableHashSet<string>.Empty)
         .Init(BuildPipelineScheduler, _ => DefauBuildPipelineScheduler.Value)
         .Init(ProcessedSources, ProcessSources)
         .InitValue(InputCalmingPeriod, TimeSpan.FromMilliseconds(300))
@@ -68,9 +68,6 @@ namespace Bud {
         var dirs = subDirs.Select(s => Combine(baseDir, s));
         return previousFiles.WithFilter(NotInAnyDirFilter(dirs));
       });
-
-    public static Conf AddSourceProcessor(this Conf project, Func<IConf, IFilesProcessor> fileProcessorFactory)
-      => project.Modify(SourceProcessors, (conf, processors) => processors.Concat(new[] {fileProcessorFactory(conf)}));
 
     public static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf conf)
       => observable.CalmAfterFirst(InputCalmingPeriod[conf], BuildPipelineScheduler[conf]);

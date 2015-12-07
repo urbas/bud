@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Bud.Cs;
 using Bud.IO;
+using Bud.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Path;
@@ -19,6 +20,13 @@ namespace Bud {
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
     public static readonly Key<ImmutableList<ResourceDescription>> EmbeddedResources = nameof(EmbeddedResources);
+    public static readonly Key<IImmutableSet<Package>> PackageDependencies = nameof(PackageDependencies);
+    public static readonly Key<IImmutableSet<Package>> TransitivePackageDependencies = nameof(TransitivePackageDependencies);
+
+    public static readonly Conf PackageDependenceSupport = Conf
+      .Empty
+      .InitValue(PackageDependencies, ImmutableHashSet<Package>.Empty)
+      .Init(TransitivePackageDependencies, CollectTransitivePackageDependencies);
 
     public static Conf CSharpProject(string projectId)
       => CSharpProject(projectId, projectId);
@@ -35,11 +43,19 @@ namespace Bud {
         .Init(AssemblyReferences, c => new Files(typeof(object).Assembly.Location))
         .Init(Compiler, TimedEmittingCompiler.Create)
         .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, warningLevel: 1))
-        .InitValue(EmbeddedResources, ImmutableList<ResourceDescription>.Empty);
+        .InitValue(EmbeddedResources, ImmutableList<ResourceDescription>.Empty)
+        .Add(PackageDependenceSupport);
+
+    private static IImmutableSet<Package> CollectTransitivePackageDependencies(IConf c)
+      => Dependencies[c].Select(dependency => c.TryGet(dependency / TransitivePackageDependencies)
+                                               .GetOrElse(ImmutableHashSet<Package>.Empty))
+                        .Concat(new[] {PackageDependencies[c]})
+                        .SelectMany(set => set)
+                        .ToImmutableHashSet();
 
     private static IObservable<InOut> AddAssemblyReferencesToInput(IConf c, IObservable<InOut> input)
       => input.CombineLatest(AssemblyReferences[c].Watch().Calmed(c),
-                             (inOut, references) => inOut.Add(references.Select(Assembly.ToAssembly)));
+                             (inOut, references) => inOut.Add(Enumerable.Select(references, Assembly.ToAssembly)));
 
     private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
       => Input[conf].Select(Compiler[conf])

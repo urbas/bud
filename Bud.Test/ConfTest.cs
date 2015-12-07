@@ -117,7 +117,7 @@ namespace Bud {
       var intConfig = new Mock<Func<IConf, int>>();
       var conf = A.Set(intConfig.Object)
                   .Set(BAsync, AddFooTwiceConcurrently);
-      int repeatCount = 10;
+      const int repeatCount = 10;
       for (int i = 0; i < repeatCount; i++) {
         await conf.Get(BAsync);
       }
@@ -169,21 +169,21 @@ namespace Bud {
     public void Nested_configurations_can_access_configurations_by_absolute_path() {
       var confA = A.SetValue(42);
       var confB = Group("foo").Set(B, conf => 1 + conf.Get(Root / A));
-      Assert.AreEqual(43, New(confA, confB).Get("foo" / B));
+      Assert.AreEqual(43, Group(confA, confB).Get("foo" / B));
     }
 
     [Test]
     public void Nested_configurations_can_access_configurations_by_relative_path() {
       var confA = A.SetValue(42);
       var confB = Group("foo").Set(B, conf => 1 + conf.Get(".." / A));
-      Assert.AreEqual(43, New(confA, confB).Get("foo" / B));
+      Assert.AreEqual(43, Group(confA, confB).Get("foo" / B));
     }
 
     [Test]
     public void Doubly_nested_configurations_can_access_configurations_by_relative_path() {
       var confA = A.SetValue(42);
       var confB = Group("foo").In("bar").Set(B, conf => 1 + conf.Get("../.." / A));
-      Assert.AreEqual(43, New(confA, confB).Get("foo/bar" / B));
+      Assert.AreEqual(43, Group(confA, confB).Get("foo/bar" / B));
     }
 
     [Test]
@@ -231,8 +231,8 @@ namespace Bud {
     public void Calculate_value_only_once_when_invoking_relative_references_multiple_times() {
       var valueFactoryA = new Mock<Func<IConf, int>>(MockBehavior.Strict);
       valueFactoryA.Setup(self => self(It.IsAny<IConf>())).Returns(42);
-      var conf = New(Group("a").Set(A, valueFactoryA.Object),
-                     Group("b").Set(B, c => c.Get("../a" / A)))
+      var conf = Group(Group("a").Set(A, valueFactoryA.Object),
+                       Group("b").Set(B, c => c.Get("../a" / A)))
         .ToCompiled();
       conf.Get("b" / B);
       conf.Get("b" / B);

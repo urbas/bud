@@ -95,6 +95,7 @@
     <Compile Include="Cs\CompileOutput.cs" />
     <Compile Include="Cs\ICompiler.cs" />
     <Compile Include="Cs\OutputAssemblyKind.cs" />
+    <Compile Include="Cs\Package.cs" />
     <Compile Include="Cs\RoslynCSharpCompiler.cs" />
     <Compile Include="Cs\TimedEmittingCompiler.cs" />
     <Compile Include="Configuration\CachingConf.cs" />

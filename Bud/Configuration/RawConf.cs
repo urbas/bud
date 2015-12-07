@@ -11,7 +11,8 @@ namespace Bud.Configuration {
       CachingConf = new CachingConf();
     }
 
-    public Optional<T> TryGet<T>(Key<T> key) => RawTryGet(key.Relativize());
+    public Optional<T> TryGet<T>(Key<T> key)
+      => CachingConf.TryGet(key.Relativize(), RawTryGet);
 
     private Optional<T> RawTryGet<T>(Key<T> key) {
       IConfDefinition confDefinition;

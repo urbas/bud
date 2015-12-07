@@ -11,6 +11,7 @@ using NUnit.Framework;
 using static System.Linq.Enumerable;
 using static System.TimeSpan;
 using static Bud.Builds;
+using static Bud.Conf;
 using static Bud.IO.InOutFile;
 
 namespace Bud {
@@ -33,7 +34,7 @@ namespace Bud {
 
     [Test]
     public void Input_should_initially_observe_a_single_empty_inout()
-      => Assert.AreEqual(new [] {InOut.Empty}, Input[project].ToList().Wait());
+      => Assert.AreEqual(new[] {InOut.Empty}, Input[project].ToList().Wait());
 
     [Test]
     public void Multiple_source_directories() {
@@ -53,7 +54,7 @@ namespace Bud {
       fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<InOut>>()))
                    .Returns(Observable.Return(expectedOutputFiles));
       var actualOutputFiles = Project("FooDir", "Foo")
-        .AddSourceProcessor(conf => fileProcessor.Object)
+        .Add(SourceProcessors, fileProcessor.Object)
         .Get(ProcessedSources)
         .Wait();
       fileProcessor.VerifyAll();
@@ -73,7 +74,7 @@ namespace Bud {
           });
           return new CompositeDisposable();
         })))
-        .AddSourceProcessor(_ => fileProcessor)
+        .Add(SourceProcessors, fileProcessor)
         .Get(ProcessedSources).Wait();
       Assert.AreNotEqual(0, fileProcessor.InvocationThreadId);
       Assert.AreNotEqual(inputThreadId, fileProcessor.InvocationThreadId);
@@ -81,11 +82,11 @@ namespace Bud {
 
     [Test]
     public void Default_build_forwards_the_output_from_dependencies() {
-      var projects = Conf.New(Project("aDir", "A")
-                                .SetValue(Sources, new Files("a")),
-                              Project("bDir", "B")
-                                .SetValue(Sources, new Files("b"))
-                                .Add(Dependencies, "../A"));
+      var projects = Group(Project("aDir", "A")
+                             .SetValue(Sources, new Files("a")),
+                           Project("bDir", "B")
+                             .SetValue(Sources, new Files("b"))
+                             .Add(Dependencies, "../A"));
       Assert.AreEqual(new InOut(ToInOutFile("a"), ToInOutFile("b")),
                       projects.Get("B" / Output).Wait());
     }
@@ -93,13 +94,13 @@ namespace Bud {
     [Test]
     public void Input_reobserved_when_dependencies_change() {
       var testScheduler = new TestScheduler();
-      var projects = Conf.New(Project("aDir", "A")
-                                .SetValue(BuildPipelineScheduler, testScheduler)
-                                .SetValue(Sources, new Files(Empty<string>(), Observable.Return("foo").Delay(FromSeconds(1), testScheduler)
-                                                                                        .Concat(Observable.Return("bar").Delay(FromSeconds(1), testScheduler)))),
-                              Project("bDir", "B")
-                                .SetValue(BuildPipelineScheduler, testScheduler)
-                                .Add(Dependencies, "../A"));
+      var projects = Group(Project("aDir", "A")
+                             .SetValue(BuildPipelineScheduler, testScheduler)
+                             .SetValue(Sources, new Files(Empty<string>(), Observable.Return("foo").Delay(FromSeconds(1), testScheduler)
+                                                                                     .Concat(Observable.Return("bar").Delay(FromSeconds(1), testScheduler)))),
+                           Project("bDir", "B")
+                             .SetValue(BuildPipelineScheduler, testScheduler)
+                             .Add(Dependencies, "../A"));
       var output = projects.Get("B" / Output).GetEnumerator();
       testScheduler.AdvanceBy(FromSeconds(5).Ticks);
       Assert.IsTrue(output.MoveNext());
@@ -109,13 +110,13 @@ namespace Bud {
 
     [Test]
     public void Default_build_processes_own_sources_before_output() {
-      var projects = Conf.New(Project("aDir", "A")
-                                .SetValue(Sources, new Files("a"))
-                                .AddSourceProcessor(conf => new FooAppenderFileProcessor()),
-                              Project("bDir", "B")
-                                .SetValue(Sources, new Files("b"))
-                                .AddSourceProcessor(conf => new FooAppenderFileProcessor())
-                                .Add(Dependencies, "../A"));
+      var projects = Group(Project("aDir", "A")
+                             .SetValue(Sources, new Files("a"))
+                             .Add(SourceProcessors, new FooAppenderFileProcessor()),
+                           Project("bDir", "B")
+                             .SetValue(Sources, new Files("b"))
+                             .Add(SourceProcessors, new FooAppenderFileProcessor())
+                             .Add(Dependencies, "../A"));
       Assert.AreEqual(new InOut(ToInOutFile("afoo"), ToInOutFile("bfoo")),
                       projects.Get("B" / Output).Wait());
     }
