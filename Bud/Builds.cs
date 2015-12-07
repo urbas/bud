@@ -44,13 +44,12 @@ namespace Bud {
         .Init(FilesObservatory, _ => new LocalFilesObservatory())
         .Init(Clean, DefaultClean);
 
-    public static Conf SourceDir(string subDir = null, string fileFilter = "*", bool includeSubdirs = true) {
-      return Empty.Modify(Sources, (conf, sources) => {
+    public static Conf SourceDir(string subDir = null, string fileFilter = "*", bool includeSubdirs = true)
+      => Empty.Modify(Sources, (conf, sources) => {
         var sourceDir = subDir == null ? ProjectDir[conf] : Combine(ProjectDir[conf], subDir);
         var newSources = FilesObservatory[conf].ObserveDir(sourceDir, fileFilter, includeSubdirs);
         return sources.ExpandWith(newSources);
       });
-    }
 
     public static Conf SourceFiles(params string[] relativeFilePaths)
       => Empty.Modify(Sources, (conf, existingSources) => {
