@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
@@ -13,6 +14,7 @@ using static System.TimeSpan;
 using static Bud.Builds;
 using static Bud.Conf;
 using static Bud.IO.InOutFile;
+using Path = System.IO.Path;
 
 namespace Bud {
   public class BuildsTest {
@@ -119,6 +121,24 @@ namespace Bud {
                              .Add(Dependencies, "../A"));
       Assert.AreEqual(new InOut(ToInOutFile("afoo"), ToInOutFile("bfoo")),
                       projects.Get("B" / Output).Wait());
+    }
+
+    [Test]
+    public void Clean_deletes_non_empty_target_folders() {
+      using (var tmpDir = new TemporaryDirectory()) {
+        tmpDir.CreateEmptyFile("target", "foo.txt");
+        tmpDir.CreateEmptyFile("target", "dir", "bar.txt");
+        Project(Path.Combine(tmpDir.Path), "A").Get(Clean);
+        Assert.IsFalse(Directory.Exists(Path.Combine(tmpDir.Path, "target")));
+      }
+    }
+
+    [Test]
+    public void Clean_does_nothing_when_the_target_folder_does_not_exist() {
+      using (var tmpDir = new TemporaryDirectory()) {
+        Project(Path.Combine(tmpDir.Path), "A").Get(Clean);
+        Assert.IsFalse(Directory.Exists(Path.Combine(tmpDir.Path, "target")));
+      }
     }
 
     private class FooAppenderFileProcessor : IFilesProcessor {

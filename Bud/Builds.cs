@@ -1,7 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Bud.IO;
@@ -15,6 +16,7 @@ namespace Bud {
     public static readonly Key<IObservable<InOut>> Input = nameof(Input);
     public static readonly Key<IObservable<InOut>> Build = nameof(Build);
     public static readonly Key<IObservable<InOut>> Output = nameof(Output);
+    public static readonly Key<Unit> Clean = nameof(Clean);
     public static readonly Key<Files> Sources = nameof(Sources);
     public static readonly Key<string> ProjectId = nameof(ProjectId);
     public static readonly Key<string> ProjectDir = nameof(ProjectDir);
@@ -39,12 +41,8 @@ namespace Bud {
         .Init(ProcessedSources, ProcessSources)
         .InitValue(InputCalmingPeriod, TimeSpan.FromMilliseconds(300))
         .InitValue(SourceProcessors, ImmutableList<IFilesProcessor>.Empty)
-        .Init(FilesObservatory, _ => new LocalFilesObservatory());
-
-    private static IObservable<InOut> DefaultInput(IConf conf)
-      => Dependencies[conf].Select(dependency => (dependency / Output)[conf])
-                           .Concat(new[] {ProcessedSources[conf]})
-                           .CombineLatest(InOut.Merge);
+        .Init(FilesObservatory, _ => new LocalFilesObservatory())
+        .Init(Clean, DefaultClean);
 
     public static Conf SourceDir(string subDir = null, string fileFilter = "*", bool includeSubdirs = true) {
       return Empty.Modify(Sources, (conf, sources) => {
@@ -82,5 +80,18 @@ namespace Bud {
                    .ObserveOn(BuildPipelineScheduler[c])
                    .Calmed(c)
                    .Select(sources => new InOut(sources.Select(InOutFile.ToInOutFile)));
+
+    private static IObservable<InOut> DefaultInput(IConf conf)
+      => Dependencies[conf].Select(dependency => (dependency / Output)[conf])
+                           .Concat(new[] {ProcessedSources[conf]})
+                           .CombineLatest(InOut.Merge);
+
+    private static Unit DefaultClean(IConf conf) {
+      var targetDir = Combine(ProjectDir[conf], "target");
+      if (Directory.Exists(targetDir)) {
+        Directory.Delete(targetDir, true);
+      }
+      return Unit.Default;
+    }
   }
 }
