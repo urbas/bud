@@ -36,5 +36,6 @@ namespace Bud.Cs {
 
     public static bool operator ==(Package left, Package right) => Equals(left, right);
     public static bool operator !=(Package left, Package right) => !Equals(left, right);
+    public override string ToString() => $"Package({PackageId}, {Version}, {TargetFramework})";
   }
 }
