@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using Bud.Configuration.ApiV1;
 using Bud.Cs;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
@@ -15,7 +17,7 @@ namespace Bud.Cli {
   public class BuildTool {
     public static void Main(string[] args) {
       var compilationOutput = CSharp.CSharpProject(Combine(GetCurrentDirectory()), "BuildConf")
-                                    .Add(BudDependencies())
+                                    .Add(CSharp.AssemblyReferences, BudDependencies)
                                     .Set(SourceIncludes, configs => ImmutableList.Create(Builds.FilesObservatory[configs].ObserveFiles(Combine(ProjectDir[configs], "Build.cs"))))
                                     .Get(CSharp.Compile)
                                     .Take(1)
@@ -46,16 +48,14 @@ namespace Bud.Cli {
       }
     }
 
-    private static Conf BudDependencies()
-      => CSharp.AssemblyReferences.Set(
-        c => ImmutableList.Create(
-          typeof(BuildTool).Assembly.Location,
-          typeof(object).Assembly.Location,
-          typeof(Enumerable).Assembly.Location,
-          typeof(ImmutableArray).Assembly.Location,
-          typeof(Observable).Assembly.Location,
-          typeof(ResourceDescription).Assembly.Location,
-          "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.Runtime.dll",
-          "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.IO.dll"));
+    private static IEnumerable<string> BudDependencies { get; } = ImmutableList.Create(
+      typeof(BuildTool).Assembly.Location,
+      typeof(object).Assembly.Location,
+      typeof(Enumerable).Assembly.Location,
+      typeof(ImmutableArray).Assembly.Location,
+      typeof(Observable).Assembly.Location,
+      typeof(ResourceDescription).Assembly.Location,
+      "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.Runtime.dll",
+      "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.IO.dll");
   }
 }

@@ -154,21 +154,21 @@ namespace Bud {
       => Group(projectId)
         .InitValue(ProjectDir, projectDir)
         .InitValue(ProjectId, projectId)
-        .Init(Sources, ObserveSources)
+        .Init(TargetDir, c => Combine(ProjectDir[c], "target"))
         .InitValue(SourceIncludes, ImmutableList<Watched<string>>.Empty)
+        .InitValue(SourceExcludeFilters, ImmutableList<Func<string, bool>>.Empty)
+        .Init(Sources, DefaultSources)
+        .InitValue(SourceProcessors, ImmutableList<IInputProcessor>.Empty)
+        .Init(ProcessedSources, DefaultProcessSources)
         .Init(Input, DefaultInput)
         .Init(Build, c => Input[c])
         .Init(Output, c => Build[c])
+        .Init(Clean, DefaultClean)
         .InitValue(Dependencies, ImmutableHashSet<string>.Empty)
         .Init(BuildPipelineScheduler, _ => DefauBuildPipelineScheduler.Value)
-        .Init(ProcessedSources, ProcessSources)
         .InitValue(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
-        .InitValue(SourceProcessors, ImmutableList<IInputProcessor>.Empty)
         .Init(FilesObservatory, _ => new LocalFilesObservatory())
-        .Init(Clean, DefaultClean)
-        .Init(TargetDir, c => Combine(ProjectDir[c], "target"))
-        .InitValue(SourceExcludeFilters, ImmutableList<Func<string, bool>>.Empty)
-        .ExcludeSourceDirs(c => ImmutableList.Create(TargetDir[c]));
+        .ExcludeSourceDir(c => TargetDir[c]);
 
     /// <summary>
     ///   Adds files found in <paramref name="subDir" /> to <see cref="Sources" />.
@@ -209,6 +209,12 @@ namespace Bud {
       => c.ExcludeSourceDirs(_ => subDirs);
 
     /// <summary>
+    ///   Removes the given subdirectory from sources.
+    /// </summary>
+    public static Conf ExcludeSourceDir(this Conf c, Func<IConf, string> subDir)
+      => c.ExcludeSourceDirs(conf => new [] {subDir(conf)});
+
+    /// <summary>
     ///   Removes the given list of subdirectories from sources.
     /// </summary>
     public static Conf ExcludeSourceDirs(this Conf c, Func<IConf, IEnumerable<string>> subDirs)
@@ -222,12 +228,12 @@ namespace Bud {
       => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c],
                                    BuildPipelineScheduler[c]);
 
-    private static IObservable<InOut> ProcessSources(IConf project)
+    private static IObservable<InOut> DefaultProcessSources(IConf project)
       => SourceProcessors[project]
         .Aggregate(ObservedSources(project),
                    (sources, processor) => processor.Process(sources));
 
-    private static IObservable<IEnumerable<string>> ObserveSources(IConf c)
+    private static IObservable<IEnumerable<string>> DefaultSources(IConf c)
       => ObserveResources(SourceIncludes[c], SourceExcludeFilter(c))
         .ObserveOn(BuildPipelineScheduler[c])
         .Calmed(c);
