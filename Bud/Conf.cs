@@ -6,7 +6,7 @@ using Bud.Configuration;
 using Microsoft.CodeAnalysis;
 
 namespace Bud {
-  public class Conf : IConf, IConfBuilder {
+  public class Conf : IConfBuilder {
     public static Conf Empty { get; } = new Conf(ImmutableList<ScopedConfBuilder>.Empty, ImmutableList<string>.Empty);
     private ImmutableList<ScopedConfBuilder> ScopedConfBuilders { get; }
     public ImmutableList<string> Scope { get; }

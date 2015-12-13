@@ -33,7 +33,7 @@ namespace Bud {
     public static Conf CSharpProject(string projectDir, string projectId)
       => Project(projectDir, projectId)
         .AddSources(fileFilter: "*.cs")
-        .ExcludeSourceDirs("obj", "bin", "target")
+        .ExcludeSourceDirs("obj", "bin", TargetDirName)
         .Modify(Input, AddAssemblyReferencesToInput)
         .Init(Compile, DefaultCSharpCompilation)
         .Set(Build, c => Compile[c].Select(CompileOutput.ToInOut))

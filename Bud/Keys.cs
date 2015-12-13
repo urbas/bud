@@ -92,5 +92,13 @@ namespace Bud {
       }
       throw new ConfUndefinedException($"Configuration '{key}' is undefined.");
     }
+
+    internal static T Get<T>(this Conf conf, Key<T> key) {
+      var val = conf.TryGet(key);
+      if (val.HasValue) {
+        return val.Value;
+      }
+      throw new ConfUndefinedException($"Configuration '{key}' is undefined.");
+    }
   }
 }

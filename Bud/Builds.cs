@@ -32,6 +32,8 @@ namespace Bud {
   ///   </para>
   /// </summary>
   public static class Builds {
+    public const string TargetDirName = "target";
+
     /// <summary>
     ///   By default, input consists of <see cref="ProcessedSources" /> and
     ///   outputs of <see cref="Dependencies" />.
@@ -154,7 +156,7 @@ namespace Bud {
       => Group(projectId)
         .InitValue(ProjectDir, projectDir)
         .InitValue(ProjectId, projectId)
-        .Init(TargetDir, c => Combine(ProjectDir[c], "target"))
+        .Init(TargetDir, c => Combine(ProjectDir[c], TargetDirName))
         .InitValue(SourceIncludes, ImmutableList<Watched<string>>.Empty)
         .InitValue(SourceExcludeFilters, ImmutableList<Func<string, bool>>.Empty)
         .Init(Sources, DefaultSources)
@@ -256,7 +258,7 @@ namespace Bud {
                         .CombineLatest(InOut.Merge);
 
     private static Unit DefaultClean(IConf c) {
-      var targetDir = Combine(ProjectDir[c], "target");
+      var targetDir = TargetDir[c];
       if (Directory.Exists(targetDir)) {
         Directory.Delete(targetDir, true);
       }
