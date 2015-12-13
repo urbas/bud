@@ -7,6 +7,7 @@ using System.Linq;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Emit;
+using static Bud.Builds;
 using static Bud.CSharp;
 
 namespace Bud.Cs {
@@ -23,7 +24,7 @@ namespace Bud.Cs {
     }
 
     public static Func<InOut, CompileOutput> Create(IConf conf)
-      => new TimedEmittingCompiler(CSharp.EmbeddedResources[conf], new RoslynCSharpCompiler(AssemblyName[conf], CSharpCompilationOptions[conf]), Path.Combine(OutputDir[conf], AssemblyName[conf])).Compile;
+      => new TimedEmittingCompiler(CSharp.EmbeddedResources[conf], new RoslynCSharpCompiler(AssemblyName[conf], CSharpCompilationOptions[conf]), Path.Combine(TargetDir[conf], AssemblyName[conf])).Compile;
 
     public CompileOutput Compile(InOut inOutInput) {
       if (!inOutInput.IsOkay) {

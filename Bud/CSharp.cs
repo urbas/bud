@@ -16,7 +16,6 @@ namespace Bud {
     public static readonly Key<IObservable<CompileOutput>> Compile = nameof(Compile);
     public static readonly Key<Func<InOut, CompileOutput>> Compiler = nameof(Compiler);
     public static readonly Key<IImmutableList<string>> AssemblyReferences = nameof(AssemblyReferences);
-    public static readonly Key<string> OutputDir = nameof(OutputDir);
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
     public static readonly Key<ImmutableList<ResourceDescription>> EmbeddedResources = nameof(EmbeddedResources);
@@ -38,7 +37,6 @@ namespace Bud {
         .Modify(Input, AddAssemblyReferencesToInput)
         .Init(Compile, DefaultCSharpCompilation)
         .Set(Build, c => Compile[c].Select(CompileOutput.ToInOut))
-        .Init(OutputDir, c => Combine(ProjectDir[c], "target"))
         .Init(AssemblyName, c => ProjectId[c] + CSharpCompilationOptions[c].OutputKind.ToExtension())
         .Init(AssemblyReferences, c => ImmutableList.Create(typeof(object).Assembly.Location))
         .Init(Compiler, TimedEmittingCompiler.Create)
