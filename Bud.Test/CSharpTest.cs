@@ -16,6 +16,7 @@ using static Bud.Conf;
 using static Bud.Cs.Assembly;
 using static Bud.CSharp;
 using static Bud.IO.InOutFile;
+using static Bud.IO.Watched;
 
 namespace Bud {
   public class CSharpTest {
@@ -33,7 +34,7 @@ namespace Bud {
       using (var tempDir = new TemporaryDirectory()) {
         var cSharpProject = CSharpProject(tempDir.Path, "Foo");
         var sourceFile = tempDir.CreateEmptyFile("TestMainClass.cs");
-        Assert.That(Sources[cSharpProject].Lister, Contains.Item(sourceFile));
+        Assert.That(Sources[cSharpProject].Take(1).Wait(), Contains.Item(sourceFile));
       }
     }
 
@@ -42,7 +43,7 @@ namespace Bud {
       using (var tempDir = new TemporaryDirectory()) {
         var cSharpProject = CSharpProject(tempDir.Path, "Foo");
         var sourceFile = tempDir.CreateEmptyFile("Bud", "TestMainClass.cs");
-        Assert.That(Sources[cSharpProject].Lister,
+        Assert.That(Sources[cSharpProject].Take(1).Wait(),
                     Contains.Item(sourceFile));
       }
     }
@@ -52,18 +53,16 @@ namespace Bud {
       using (var tempDir = new TemporaryDirectory()) {
         var cSharpProject = CSharpProject(tempDir.Path, "Foo");
         var textFile = tempDir.CreateEmptyFile("Bud", "TextFile.txt");
-        Assert.That(Sources[cSharpProject].Lister,
+        Assert.That(Sources[cSharpProject].Take(1).Wait(),
                     Is.Not.Contains(textFile));
       }
     }
 
     [Test]
     public void CompilationInput_includes_Sources_and_AssemblyReferences() {
-      var assemblies = new Files("Foo.Bar.dll");
-      var files = new Files("A.cs");
       var projectA = CSharpProject("foo", "A")
-        .SetValue(Sources, files)
-        .SetValue(AssemblyReferences, assemblies);
+        .SetValue(SourceIncludes, ImmutableList.Create(Watch(new[] { "A.cs" })))
+        .SetValue(AssemblyReferences, ImmutableList.Create("Foo.Bar.dll"));
       var compilationInputs = Input[projectA].ToEnumerable().ToList();
       Assert.AreEqual(new[] {new InOut(ToInOutFile("A.cs"), ToAssembly("Foo.Bar.dll"))},
                       compilationInputs);
@@ -130,8 +129,8 @@ namespace Bud {
 
     private static Conf EmptyCSharpProject(string projectId)
       => CSharpProject(projectId, projectId)
-        .SetValue(Sources, Files.Empty)
-        .SetValue(AssemblyReferences, Files.Empty);
+        .SetValue(SourceIncludes, ImmutableList.Create(Watched<string>.Empty))
+        .SetValue(AssemblyReferences, ImmutableList<string>.Empty);
 
     private static CompileOutput EmptyCompileOutput(long timestamp = 0L)
       => new CompileOutput(Empty<Diagnostic>(), FromMilliseconds(123), "Foo.dll", true, timestamp, null);
@@ -142,17 +141,17 @@ namespace Bud {
       return compiler;
     }
 
-    private static Files EmptyFilesWithDelayedUpdates(IScheduler testScheduler) {
+    private static Watched<string> EmptyFilesWithDelayedUpdates(IScheduler testScheduler) {
       var fileUpdates = Observable.Return("foo").Delay(FromSeconds(1), testScheduler)
                                   .Concat(Observable.Return("bar").Delay(FromSeconds(1), testScheduler));
-      return new Files(Empty<string>(), fileUpdates);
+      return Watch(Empty<string>(), fileUpdates);
     }
 
     private static Conf ProjectAWithUpdatingSources(IScheduler testScheduler, Func<InOut, CompileOutput> compiler)
       => CSharpProject("a", "A")
         .SetValue(BuildPipelineScheduler, testScheduler)
-        .SetValue(Sources, EmptyFilesWithDelayedUpdates(testScheduler))
-        .SetValue(AssemblyReferences, Files.Empty)
+        .SetValue(SourceIncludes, ImmutableList.Create(EmptyFilesWithDelayedUpdates(testScheduler)))
+        .SetValue(AssemblyReferences, ImmutableList<string>.Empty)
         .SetValue(Compiler, compiler);
   }
 }

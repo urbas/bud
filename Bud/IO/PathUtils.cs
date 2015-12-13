@@ -25,7 +25,10 @@ namespace Bud.IO {
     /// </returns>
     public static Func<string, bool> NotInAnyDirFilter(IEnumerable<string> dirs) {
       var unixDirPaths = dirs.Select(ToSlashedPath).ToList();
-      return file => !unixDirPaths.Any(dir => IsSlashedPathInDir(ToSlashedPath(file), dir));
+      return file => {
+        var slashedPath = ToSlashedPath(file);
+        return !unixDirPaths.Any(dir => IsSlashedPathInDir(slashedPath, dir));
+      };
     }
 
     /// <returns>

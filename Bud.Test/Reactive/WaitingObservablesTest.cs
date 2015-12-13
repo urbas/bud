@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.Linq;
 using Microsoft.Reactive.Testing;
 using NUnit.Framework;
 using static System.Reactive.Linq.Observable;

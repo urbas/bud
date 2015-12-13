@@ -1,7 +1,7 @@
 using System;
 
 namespace Bud.IO {
-  public interface IFilesProcessor {
+  public interface IInputProcessor {
     IObservable<InOut> Process(IObservable<InOut> sources);
   }
 }

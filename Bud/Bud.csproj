@@ -45,10 +45,6 @@
       <HintPath>..\packages\Microsoft.Web.Xdt.2.1.0\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NuGet.Core, Version=2.8.60717.93, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\NuGet.Core.2.8.6\lib\net40-Client\NuGet.Core.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.1.38.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Collections.Immutable.1.1.38-beta-23225\lib\dotnet\System.Collections.Immutable.dll</HintPath>
@@ -112,16 +108,15 @@
     <Compile Include="IO\IInOut.cs" />
     <Compile Include="IO\InOut.cs" />
     <Compile Include="IO\InOutFile.cs" />
-    <Compile Include="IO\IWatchedResources.cs" />
     <Compile Include="IO\ITimestamped.cs" />
-    <Compile Include="IO\IFilesProcessor.cs" />
+    <Compile Include="IO\IInputProcessor.cs" />
     <Compile Include="IO\LocalFilesObservatory.cs" />
     <Compile Include="IO\IFilesObservatory.cs" />
     <Compile Include="IO\EmptyFilesObservatory.cs" />
     <Compile Include="IConf.cs" />
     <Compile Include="IO\PathUtils.cs" />
     <Compile Include="IO\Timestamped.cs" />
-    <Compile Include="IO\WatchedResources.cs" />
+    <Compile Include="IO\Watched.cs" />
     <Compile Include="Key.cs" />
     <Compile Include="Keys.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -134,6 +129,7 @@
     <Compile Include="Configuration\ModifyConf.cs" />
     <Compile Include="Configuration\ConfUndefinedException.cs" />
     <Compile Include="Conf.cs" />
+    <Compile Include="Reactive\ObservableResources.cs" />
     <Compile Include="Reactive\WaitingObservables.cs" />
     <Compile Include="Util\OptionalExtensions.cs" />
     <Compile Include="Util\Strings.cs" />

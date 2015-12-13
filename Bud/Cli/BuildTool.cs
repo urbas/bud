@@ -16,7 +16,7 @@ namespace Bud.Cli {
     public static void Main(string[] args) {
       var compilationOutput = CSharp.CSharpProject(Combine(GetCurrentDirectory()), "BuildConf")
                                     .Add(BudDependencies())
-                                    .Set(Sources, configs => Builds.FilesObservatory[configs].ObserveFiles(Combine(ProjectDir[configs], "Build.cs")))
+                                    .Set(SourceIncludes, configs => ImmutableList.Create(Builds.FilesObservatory[configs].ObserveFiles(Combine(ProjectDir[configs], "Build.cs"))))
                                     .Get(CSharp.Compile)
                                     .Take(1)
                                     .Wait();
@@ -48,13 +48,14 @@ namespace Bud.Cli {
 
     private static Conf BudDependencies()
       => CSharp.AssemblyReferences.Set(
-        c => new Files(typeof(BuildTool).Assembly.Location,
-                       typeof(object).Assembly.Location,
-                       typeof(Enumerable).Assembly.Location,
-                       typeof(ImmutableArray).Assembly.Location,
-                       typeof(Observable).Assembly.Location,
-                       typeof(ResourceDescription).Assembly.Location,
-                       "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.Runtime.dll",
-                       "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.IO.dll"));
+        c => ImmutableList.Create(
+          typeof(BuildTool).Assembly.Location,
+          typeof(object).Assembly.Location,
+          typeof(Enumerable).Assembly.Location,
+          typeof(ImmutableArray).Assembly.Location,
+          typeof(Observable).Assembly.Location,
+          typeof(ResourceDescription).Assembly.Location,
+          "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.Runtime.dll",
+          "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.IO.dll"));
   }
 }
