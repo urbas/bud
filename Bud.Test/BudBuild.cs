@@ -17,7 +17,6 @@ public class BudBuild : IBuild {
     new Package("Microsoft.CodeAnalysis.Common", "1.1.0-beta1-20150812-01", "net46"),
     new Package("Microsoft.CodeAnalysis.CSharp", "1.1.0-beta1-20150812-01", "net46"),
     new Package("Microsoft.Web.Xdt", "2.1.0", "net46"),
-    new Package("NuGet.Core", "2.8.6", "net46"),
     new Package("Rx-Core", "2.2.5", "net46"),
     new Package("Rx-Interfaces", "2.2.5", "net46"),
     new Package("Rx-Linq", "2.2.5", "net46"),
