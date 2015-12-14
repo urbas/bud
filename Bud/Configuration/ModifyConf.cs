@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using Bud.V1;
 
 namespace Bud.Configuration {
   public class ModifyConf<T> : ConfBuilder {

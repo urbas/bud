@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using static Bud.Keys;
+using static Bud.V1.Keys;
 
 namespace Bud.Configuration {
   /// <remarks>

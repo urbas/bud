@@ -91,15 +91,12 @@
   <ItemGroup>
     <Compile Include="BudBuild.cs" />
     <Compile Include="Collections\EnumerableUtilsTest.cs" />
-    <Compile Include="Configuration\ApiV1\EnumerableConfApiTest.cs" />
     <Compile Include="Configuration\CachingConfTest.cs" />
     <Compile Include="Configuration\RawConfTest.cs" />
     <Compile Include="Configuration\ScopedConfTest.cs" />
     <Compile Include="Configuration\ScopedDictionaryBuilderTest.cs" />
     <Compile Include="Cs\CompileInputTest.cs" />
     <Compile Include="Cs\RoslynCSharpCompilerTest.cs" />
-    <Compile Include="ConfTest.cs" />
-    <Compile Include="CSharpTest.cs" />
     <Compile Include="Cs\TimedEmittingCompilerTest.cs" />
     <Compile Include="IO\DiffTest.cs" />
     <Compile Include="IO\FilesTest.cs" />
@@ -110,13 +107,16 @@
     <Compile Include="IO\PathUtilsTest.cs" />
     <Compile Include="IO\TimestampedTest.cs" />
     <Compile Include="IO\WatchedTest.cs" />
-    <Compile Include="KeysTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="BuildsTest.cs" />
     <Compile Include="Reactive\ObservableResourcesTest.cs" />
     <Compile Include="Reactive\WaitingObservablesTest.cs" />
     <Compile Include="Util\OptionalExtensionsTest.cs" />
     <Compile Include="Util\StringsTest.cs" />
+    <Compile Include="V1\ApiCSharpTest.cs" />
+    <Compile Include="V1\ApiCoreBuildsTest.cs" />
+    <Compile Include="V1\ConfTest.cs" />
+    <Compile Include="V1\EnumerableConfApiTest.cs" />
+    <Compile Include="V1\KeysTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

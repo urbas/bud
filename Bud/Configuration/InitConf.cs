@@ -1,4 +1,5 @@
 using System;
+using Bud.V1;
 
 namespace Bud.Configuration {
   public class InitConf<T> : ConfBuilder {

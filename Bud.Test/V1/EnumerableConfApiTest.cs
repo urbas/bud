@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using NUnit.Framework;
 
-namespace Bud.Configuration.ApiV1 {
+namespace Bud.V1 {
   public class EnumerableConfApiTest {
     private readonly Key<IEnumerable<int>> enumerableKey = nameof(enumerableKey);
     private readonly Key<IImmutableList<int>> immutableListKey = nameof(immutableListKey);

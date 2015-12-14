@@ -1,4 +1,4 @@
-namespace Bud.Cs {
+namespace Bud.V1 {
   public class Package {
     public string PackageId { get; }
     public string Version { get; }

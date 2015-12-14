@@ -4,7 +4,7 @@ using System.Linq;
 using Bud.Configuration;
 using Bud.Util;
 
-namespace Bud {
+namespace Bud.V1 {
   public static class Keys {
     public static readonly Key Root = new Key("");
     public const char Separator = '/';

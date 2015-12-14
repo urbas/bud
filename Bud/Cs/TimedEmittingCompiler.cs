@@ -5,10 +5,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Bud.IO;
+using Bud.V1;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Emit;
-using static Bud.Builds;
-using static Bud.CSharp;
+using static Bud.V1.Api;
 
 namespace Bud.Cs {
   public class TimedEmittingCompiler {
@@ -24,7 +24,7 @@ namespace Bud.Cs {
     }
 
     public static Func<InOut, CompileOutput> Create(IConf conf)
-      => new TimedEmittingCompiler(CSharp.EmbeddedResources[conf], new RoslynCSharpCompiler(AssemblyName[conf], CSharpCompilationOptions[conf]), Path.Combine(TargetDir[conf], AssemblyName[conf])).Compile;
+      => new TimedEmittingCompiler(Api.EmbeddedResources[conf], new RoslynCSharpCompiler(AssemblyName[conf], CSharpCompilationOptions[conf]), Path.Combine(TargetDir[conf], AssemblyName[conf])).Compile;
 
     public CompileOutput Compile(InOut inOutInput) {
       if (!inOutInput.IsOkay) {

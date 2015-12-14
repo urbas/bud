@@ -79,9 +79,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="V1\Api.cs" />
+    <Compile Include="V1\Conf.cs" />
+    <Compile Include="V1\EnumerableConfApi.cs" />
+    <Compile Include="V1\IBuild.cs" />
+    <Compile Include="V1\IConf.cs" />
+    <Compile Include="V1\Key.cs" />
+    <Compile Include="V1\Keys.cs" />
+    <Compile Include="V1\Package.cs" />
     <Compile Include="Cli\BuildTool.cs" />
     <Compile Include="Collections\EnumerableUtils.cs" />
-    <Compile Include="Configuration\ApiV1\EnumerableConfApi.cs" />
     <Compile Include="Configuration\RawConf.cs" />
     <Compile Include="Configuration\ScopedConfBuilder.cs" />
     <Compile Include="Configuration\ScopedConf.cs" />
@@ -91,15 +98,12 @@
     <Compile Include="Cs\CompileOutput.cs" />
     <Compile Include="Cs\ICompiler.cs" />
     <Compile Include="Cs\OutputAssemblyKind.cs" />
-    <Compile Include="Cs\Package.cs" />
     <Compile Include="Cs\RoslynCSharpCompiler.cs" />
     <Compile Include="Cs\TimedEmittingCompiler.cs" />
     <Compile Include="Configuration\CachingConf.cs" />
     <Compile Include="Configuration\ConfBuilder.cs" />
     <Compile Include="Configuration\IConfDefinition.cs" />
     <Compile Include="Configuration\IConfBuilder.cs" />
-    <Compile Include="CSharp.cs" />
-    <Compile Include="IBuild.cs" />
     <Compile Include="IO\Diff.cs" />
     <Compile Include="IO\FileFinder.cs" />
     <Compile Include="IO\Files.cs" />
@@ -113,14 +117,10 @@
     <Compile Include="IO\LocalFilesObservatory.cs" />
     <Compile Include="IO\IFilesObservatory.cs" />
     <Compile Include="IO\EmptyFilesObservatory.cs" />
-    <Compile Include="IConf.cs" />
     <Compile Include="IO\PathUtils.cs" />
     <Compile Include="IO\Timestamped.cs" />
     <Compile Include="IO\Watched.cs" />
-    <Compile Include="Key.cs" />
-    <Compile Include="Keys.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Builds.cs" />
     <Compile Include="IO\TemporaryDirectory.cs" />
     <Compile Include="Configuration\InitConf.cs" />
     <Compile Include="Configuration\SetConf.cs" />
@@ -128,7 +128,6 @@
     <Compile Include="Configuration\ConfDefinitionException.cs" />
     <Compile Include="Configuration\ModifyConf.cs" />
     <Compile Include="Configuration\ConfUndefinedException.cs" />
-    <Compile Include="Conf.cs" />
     <Compile Include="Reactive\ObservableResources.cs" />
     <Compile Include="Reactive\WaitingObservables.cs" />
     <Compile Include="Util\OptionalExtensions.cs" />

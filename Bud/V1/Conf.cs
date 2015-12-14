@@ -5,7 +5,7 @@ using System.Linq;
 using Bud.Configuration;
 using Microsoft.CodeAnalysis;
 
-namespace Bud {
+namespace Bud.V1 {
   public class Conf : IConfBuilder {
     public static Conf Empty { get; } = new Conf(ImmutableList<ScopedConfBuilder>.Empty, ImmutableList<string>.Empty);
     private ImmutableList<ScopedConfBuilder> ScopedConfBuilders { get; }
@@ -105,12 +105,12 @@ namespace Bud {
     }
 
     public static Conf Group(params IConfBuilder[] confs)
-      => Group((IEnumerable<IConfBuilder>) confs);
+      => Group((IEnumerable<IConfBuilder>)confs);
 
     public static Conf Group(IEnumerable<IConfBuilder> confs)
       => Empty.Add(confs);
 
-    private static IEnumerable<ScopedConfBuilder> ToScopedConfBuilders(IEnumerable<IConfBuilder> otherConfs, ImmutableList<string> scope)
+    internal static IEnumerable<ScopedConfBuilder> ToScopedConfBuilders(IEnumerable<IConfBuilder> otherConfs, ImmutableList<string> scope)
       => otherConfs.Select(builder => new ScopedConfBuilder(scope, builder));
   }
 }

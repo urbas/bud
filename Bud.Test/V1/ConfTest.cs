@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 using Bud.Configuration;
 using Moq;
 using NUnit.Framework;
-using static Bud.Conf;
-using static Bud.Keys;
+using static Bud.V1.Conf;
 
-namespace Bud {
+namespace Bud.V1 {
   public class ConfTest {
     private static readonly Key<int> A = nameof(A);
     private static readonly Key<int> B = nameof(B);
@@ -168,7 +167,7 @@ namespace Bud {
     [Test]
     public void Nested_configurations_can_access_configurations_by_absolute_path() {
       var confA = A.SetValue(42);
-      var confB = Group("foo").Set(B, conf => 1 + conf.Get(Root / A));
+      var confB = Group("foo").Set(B, conf => 1 + conf.Get(Keys.Root / A));
       Assert.AreEqual(43, Group(confA, confB).Get("foo" / B));
     }
 
@@ -202,7 +201,7 @@ namespace Bud {
 
     [Test]
     public void Root_config_can_be_accessed_from_current_scope()
-      => Assert.AreEqual(42, (Root / A).SetValue(42).Get(A));
+      => Assert.AreEqual(42, (Keys.Root / A).SetValue(42).Get(A));
 
     [Test]
     public void Relative_reference_in_a_nested_modified_conf() {

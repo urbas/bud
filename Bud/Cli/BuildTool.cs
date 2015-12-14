@@ -4,22 +4,22 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
-using Bud.Configuration.ApiV1;
 using Bud.Cs;
 using Bud.IO;
+using Bud.V1;
 using Microsoft.CodeAnalysis;
 using static System.IO.Directory;
 using static System.IO.Path;
-using static Bud.Builds;
+using static Bud.V1.Api;
 using Assembly = System.Reflection.Assembly;
 
 namespace Bud.Cli {
   public class BuildTool {
     public static void Main(string[] args) {
-      var compilationOutput = CSharp.CSharpProject(Combine(GetCurrentDirectory()), "BuildConf")
-                                    .Add(CSharp.AssemblyReferences, BudDependencies)
-                                    .Set(SourceIncludes, configs => ImmutableList.Create(Builds.FilesObservatory[configs].ObserveFiles(Combine(ProjectDir[configs], "Build.cs"))))
-                                    .Get(CSharp.Compile)
+      var compilationOutput = CsLibrary(Combine(GetCurrentDirectory()), "BuildConf")
+                                    .Add(AssemblyReferences, BudDependencies)
+                                    .Set(SourceIncludes, configs => ImmutableList.Create(Api.FilesObservatory[configs].ObserveFiles(Combine(ProjectDir[configs], "Build.cs"))))
+                                    .Get(Compile)
                                     .Take(1)
                                     .Wait();
       if (compilationOutput.Success) {

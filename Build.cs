@@ -1,23 +1,19 @@
-﻿using Bud;
-using Bud.Configuration.ApiV1;
-using Bud.Cs;
-using static Bud.Builds;
-using static Bud.CSharp;
+﻿using Bud.V1;
+using static Bud.V1.Api;
 
 public class BudBuild : IBuild {
   public Conf Init()
-    => Conf.Group(CSharpProject("Bud")
-                    .Add(PackageDependencies, BudDependencies),
-                  CSharpProject("Bud.Test")
-                    .Add(Dependencies, "../Bud")
-                    .Add(PackageDependencies, BudTestDependencies));
+    => Projects(CsLibrary("Bud")
+                  .Add(PackageDependencies, BudDependencies),
+                CsLibrary("Bud.Test")
+                  .Add(Dependencies, "../Bud")
+                  .Add(PackageDependencies, BudTestDependencies));
 
   private static Package[] BudDependencies { get; } = {
     new Package("Microsoft.CodeAnalysis.Analyzers", "1.1.0-beta1-20150812-01", "net46"),
     new Package("Microsoft.CodeAnalysis.Common", "1.1.0-beta1-20150812-01", "net46"),
     new Package("Microsoft.CodeAnalysis.CSharp", "1.1.0-beta1-20150812-01", "net46"),
     new Package("Microsoft.Web.Xdt", "2.1.0", "net46"),
-    new Package("NuGet.Core", "2.8.6", "net46"),
     new Package("Rx-Core", "2.2.5", "net46"),
     new Package("Rx-Interfaces", "2.2.5", "net46"),
     new Package("Rx-Linq", "2.2.5", "net46"),

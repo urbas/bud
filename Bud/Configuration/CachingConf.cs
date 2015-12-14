@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Immutable;
+using Bud.V1;
 using Microsoft.CodeAnalysis;
 
 namespace Bud.Configuration {

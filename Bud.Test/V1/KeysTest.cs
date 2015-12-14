@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Bud {
+namespace Bud.V1 {
   public class KeysTest {
     private readonly ImmutableArray<string> abcScope = ImmutableArray.Create("a", "b", "c");
 
