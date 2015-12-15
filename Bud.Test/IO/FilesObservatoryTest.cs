@@ -34,7 +34,9 @@ namespace Bud.IO {
     [Test]
     public void Throws_for_non_existing_folders() {
       using (var tempDir = new TemporaryDirectory()) {
-        Assert.Throws<DirectoryNotFoundException>(() => { noFileChanges.ObserveDir(Path.Combine(tempDir.Path, "B"), "*.txt", true).Resources.ToList(); });
+        Assert.Throws<DirectoryNotFoundException>(() => {
+          noFileChanges.ObserveDir(Path.Combine(tempDir.Path, "B"), "*.txt", true).Resources.ToList();
+        });
       }
     }
 
