@@ -17,14 +17,18 @@ namespace Bud.Cs {
     public ICompiler UnderlyingCompiler { get; }
     public Stopwatch Stopwatch { get; } = new Stopwatch();
 
-    public TimedEmittingCompiler(IImmutableList<ResourceDescription> embeddedResources, ICompiler underlyingCompiler, string outputAssemblyPath) {
+    public TimedEmittingCompiler(IImmutableList<ResourceDescription> embeddedResources,
+                                 ICompiler underlyingCompiler,
+                                 string outputAssemblyPath) {
       OutputAssemblyPath = outputAssemblyPath;
       EmbeddedResources = embeddedResources;
       UnderlyingCompiler = underlyingCompiler;
     }
 
     public static Func<InOut, CompileOutput> Create(IConf conf)
-      => new TimedEmittingCompiler(Api.EmbeddedResources[conf], new RoslynCSharpCompiler(AssemblyName[conf], CSharpCompilationOptions[conf]), Path.Combine(TargetDir[conf], AssemblyName[conf])).Compile;
+      => new TimedEmittingCompiler(Api.EmbeddedResources[conf],
+                                   CreateUnderlyingCompiler(conf),
+                                   GetOutputAssemblyPath(conf)).Compile;
 
     public CompileOutput Compile(InOut inOutInput) {
       if (!inOutInput.IsOkay) {
@@ -52,17 +56,21 @@ namespace Bud.Cs {
                            Files.GetFileTimestamp(OutputAssemblyPath),
                            MetadataReference.CreateFromFile(OutputAssemblyPath));
 
-    private bool IsOutputUpToDate(IEnumerable<Timestamped<string>> sources, IEnumerable<Timestamped<string>> assemblies) {
+    private bool IsOutputUpToDate(IEnumerable<Timestamped<string>> sources,
+                                  IEnumerable<Timestamped<string>> assemblies) {
       var timestampedFile = Files.ToTimestampedFile(OutputAssemblyPath);
       return timestampedFile.IsUpToDateWith(sources) &&
              timestampedFile.IsUpToDateWith(assemblies);
     }
 
-    private static CompileOutput EmitDll(Compilation compilation, Stopwatch stopwatch, IEnumerable<ResourceDescription> manifestResources, string outputAssemblyPath) {
+    private static CompileOutput EmitDll(Compilation compilation,
+                                         Stopwatch stopwatch,
+                                         IEnumerable<ResourceDescription> embeddedResources,
+                                         string outputAssemblyPath) {
       Directory.CreateDirectory(Path.GetDirectoryName(outputAssemblyPath));
       EmitResult emitResult;
       using (var assemblyOutputFile = File.Create(outputAssemblyPath)) {
-        emitResult = compilation.Emit(assemblyOutputFile, manifestResources: manifestResources);
+        emitResult = compilation.Emit(assemblyOutputFile, manifestResources: embeddedResources);
         stopwatch.Stop();
       }
       if (!emitResult.Success) {
@@ -75,5 +83,11 @@ namespace Bud.Cs {
                                Files.FileTimestampNow(),
                                compilation.ToMetadataReference());
     }
+
+    private static RoslynCSharpCompiler CreateUnderlyingCompiler(IConf conf)
+      => new RoslynCSharpCompiler(AssemblyName[conf], CSharpCompilationOptions[conf]);
+
+    private static string GetOutputAssemblyPath(IConf conf)
+      => Path.Combine(TargetDir[conf], AssemblyName[conf]);
   }
 }
