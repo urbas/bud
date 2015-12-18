@@ -107,7 +107,7 @@
     <Compile Include="IO\Diff.cs" />
     <Compile Include="IO\FileFinder.cs" />
     <Compile Include="IO\Files.cs" />
-    <Compile Include="IO\FilesObservatory.cs" />
+    <Compile Include="IO\FileObservatories.cs" />
     <Compile Include="IO\IDiff.cs" />
     <Compile Include="IO\IInOut.cs" />
     <Compile Include="IO\InOut.cs" />

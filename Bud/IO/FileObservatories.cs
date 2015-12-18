@@ -6,7 +6,7 @@ using System.Reactive.Linq;
 using static Bud.IO.Watched;
 
 namespace Bud.IO {
-  public static class FilesObservatory {
+  public static class FileObservatories {
     public static Watched<string> ObserveDir(this IFilesObservatory filesObservatory,
                                              string sourceDir,
                                              string fileFilter,
