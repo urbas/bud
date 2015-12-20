@@ -13,6 +13,7 @@ using Bud.Reactive;
 using Bud.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using NuGet.Packaging;
 
 namespace Bud.V1 {
   /// <summary>
@@ -33,7 +34,22 @@ namespace Bud.V1 {
   ///   </para>
   /// </summary>
   public static class Api {
-    #region Core Build Project Keys
+    #region Project Grouping
+
+    public static Conf Project(string scope, params IConfBuilder[] confs)
+      => Conf.Group(scope, confs);
+
+    public static Conf Projects(params IConfBuilder[] confs)
+      => Conf.Group((IEnumerable<IConfBuilder>)confs);
+
+    public static Conf Projects(IEnumerable<IConfBuilder> confs)
+      => Conf.Group(confs);
+
+    #endregion
+
+    #region Individial Features
+
+    public const string TargetDirName = "target";
 
     /// <summary>
     ///   By default, input consists of <see cref="ProcessedSources" /> and
@@ -50,6 +66,11 @@ namespace Bud.V1 {
     ///   By default, output simply pipes the build through.
     /// </summary>
     public static readonly Key<IObservable<InOut>> Output = nameof(Output);
+
+    /// <summary>
+    ///   By default, deletes the entire <see cref="TargetDir" />
+    /// </summary>
+    public static readonly Key<Unit> Clean = nameof(Clean);
 
     /// <summary>
     ///   The build's identifier. This identifier is used in <see cref="Dependencies" />.
@@ -69,6 +90,18 @@ namespace Bud.V1 {
     /// </summary>
     public static readonly Key<string> TargetDir = nameof(TargetDir);
 
+    private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler =
+      new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
+
+    public static Conf BuildSupport = Conf
+      .Empty
+      .Init(ProjectDir, _ => Directory.GetCurrentDirectory())
+      .Init(TargetDir, c => Path.Combine(ProjectDir[c], TargetDirName))
+      .InitValue(Input, Observable.Empty<InOut>())
+      .Init(Build, c => Observable.Return(InOut.Empty))
+      .Init(Output, c => Build[c])
+      .Init(Clean, DefaultClean);
+
     /// <summary>
     ///   A list of keys (paths) to other builds. For example, say we defined two projects
     ///   <c>A</c> and <c>B</c>. To make <c>B</c> depend on <c>A</c>, one would add the
@@ -76,10 +109,25 @@ namespace Bud.V1 {
     /// </summary>
     public static readonly Key<IImmutableSet<string>> Dependencies = nameof(Dependencies);
 
+    public static readonly Conf DependenciesSupport =
+      Dependencies.InitValue(ImmutableHashSet<string>.Empty);
+
     /// <summary>
-    ///   By default, deletes the entire <see cref="TargetDir" />
+    ///   By default the entire build pipeline (input, sources, build, and output) are
+    ///   scheduled on the same scheduler and the same thread (i.e.: the build pipeline
+    ///   is single threaded). The build pipeline is, however, asynchronous. For example,
+    ///   compilers can run each in their own
+    ///   thread and produce output whenever they finish. The output is
+    ///   collected in the build pipeline's thread.
     /// </summary>
-    public static readonly Key<Unit> Clean = nameof(Clean);
+    /// <remarks>
+    ///   You should never need to override this outside of testing. In all honesty, this
+    ///   key is mostly meant for testing.
+    /// </remarks>
+    public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
+
+    public static readonly Conf BuildSchedulingSupport =
+      BuildPipelineScheduler.Init(_ => DefauBuildPipelineScheduler.Value);
 
     /// <summary>
     ///   By default, the build has no sources. Add them through
@@ -104,6 +152,29 @@ namespace Bud.V1 {
     public static readonly Key<IImmutableList<Func<string, bool>>> SourceExcludeFilters = nameof(SourceExcludeFilters);
 
     /// <summary>
+    ///   How long to wait after a file change has been noticed before triggering
+    ///   a build (i.e.: producing an observation). For example, <see cref="ProcessedSources" />
+    ///   are guarded with this calming period.
+    /// </summary>
+    public static readonly Key<TimeSpan> WatchedFilesCalmingPeriod = nameof(WatchedFilesCalmingPeriod);
+
+    /// <summary>
+    ///   This observatory is used when watching source file changes (see <see cref="Sources" />).
+    /// </summary>
+    /// <remarks>
+    ///   You should never need to override this outside of testing. In all honesty, this
+    ///   key is mostly meant for testing.
+    /// </remarks>
+    public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
+
+    public static readonly Conf SourcesSupport = BuildSchedulingSupport
+      .InitValue(SourceIncludes, ImmutableList<Watched<string>>.Empty)
+      .InitValue(SourceExcludeFilters, ImmutableList<Func<string, bool>>.Empty)
+      .InitValue(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
+      .Init(FilesObservatory, _ => new LocalFilesObservatory())
+      .Init(Sources, DefaultSources);
+
+    /// <summary>
     ///   A stream of <see cref="Sources" /> after they have been processed
     ///   by <see cref="SourceProcessors" />.
     /// </summary>
@@ -115,83 +186,12 @@ namespace Bud.V1 {
     /// </summary>
     public static readonly Key<IImmutableList<IInputProcessor>> SourceProcessors = nameof(SourceProcessors);
 
-    /// <summary>
-    ///   How long to wait after a file change has been noticed before triggering
-    ///   a build (i.e.: producing an observation). For example, <see cref="ProcessedSources" />
-    ///   are guarded with this calming period.
-    /// </summary>
-    public static readonly Key<TimeSpan> WatchedFilesCalmingPeriod = nameof(WatchedFilesCalmingPeriod);
-
-    /// <summary>
-    ///   By default the entire build pipeline (input, sources, build, and output) are
-    ///   scheduled on the same scheduler and the same thread (i.e.: the build pipeline
-    ///   is single threaded). The build pipeline is, however, asynchronous. For example,
-    ///   compilers can run each in their own
-    ///   thread and produce output whenever they finish. The output is
-    ///   collected in the build pipeline's thread.
-    /// </summary>
-    /// <remarks>
-    ///   You should never need to override this outside of testing. In all honesty, this
-    ///   key is mostly meant for testing.
-    /// </remarks>
-    public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
-
-    /// <summary>
-    ///   This observatory is used when watching source file changes (see <see cref="Sources" />).
-    /// </summary>
-    /// <remarks>
-    ///   You should never need to override this outside of testing. In all honesty, this
-    ///   key is mostly meant for testing.
-    /// </remarks>
-    public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
-
-    #endregion
-
-    #region CSharp Project Keys
-
-    public static readonly Key<IObservable<CompileOutput>> Compile = nameof(Compile);
-    public static readonly Key<Func<InOut, CompileOutput>> Compiler = nameof(Compiler);
-    public static readonly Key<IImmutableList<string>> AssemblyReferences = nameof(AssemblyReferences);
-    public static readonly Key<string> AssemblyName = nameof(AssemblyName);
-    public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
-    public static readonly Key<ImmutableList<ResourceDescription>> EmbeddedResources = nameof(EmbeddedResources);
-    public static readonly Key<IImmutableSet<Package>> PackageDependencies = nameof(PackageDependencies);
-    public static readonly Key<IImmutableSet<Package>> TransitivePackageDependencies = nameof(TransitivePackageDependencies);
-
-    #endregion
-
-    #region Individial Features
-
-    public const string TargetDirName = "target";
-
-    private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler =
-      new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
-
-    public static Conf BuildSupport = Conf
-      .Empty
-      .Init(ProjectDir, _ => Directory.GetCurrentDirectory())
-      .Init(TargetDir, c => Path.Combine(ProjectDir[c], TargetDirName))
-      .InitValue(Input, Observable.Empty<InOut>())
-      .Init(Build, c => Input[c])
-      .Init(Output, c => Build[c])
-      .Init(Clean, DefaultClean);
-
-    public static readonly Conf DependenciesSupport =
-      Dependencies.InitValue(ImmutableHashSet<string>.Empty);
-
-    public static readonly Conf BuildSchedulingSupport =
-      BuildPipelineScheduler.Init(_ => DefauBuildPipelineScheduler.Value);
-
-    public static readonly Conf SourcesSupport = BuildSchedulingSupport
-      .InitValue(SourceIncludes, ImmutableList<Watched<string>>.Empty)
-      .InitValue(SourceExcludeFilters, ImmutableList<Func<string, bool>>.Empty)
-      .InitValue(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
-      .Init(FilesObservatory, _ => new LocalFilesObservatory())
-      .Init(Sources, DefaultSources);
-
     public static readonly Conf SourceProcessorsSupport = SourcesSupport
       .InitValue(SourceProcessors, ImmutableList<IInputProcessor>.Empty)
       .Init(ProcessedSources, DefaultProcessSources);
+
+    public static readonly Key<IImmutableSet<Package>> PackageDependencies = nameof(PackageDependencies);
+    public static readonly Key<IImmutableSet<Package>> TransitivePackageDependencies = nameof(TransitivePackageDependencies);
 
     public static readonly Conf PackageDependenceSupport = DependenciesSupport
       .InitValue(PackageDependencies, ImmutableHashSet<Package>.Empty)
@@ -202,14 +202,8 @@ namespace Bud.V1 {
                             .ObserveOn(BuildPipelineScheduler[c])
                             .Calmed(c);
 
-    private static Func<string, bool> SourceExcludeFilter(IConf c) {
-      Func<string, bool> result = _ => true;
-      foreach (var filter in SourceExcludeFilters[c]) {
-        var oldResult = result;
-        result = source => oldResult(source) && filter(source);
-      }
-      return result;
-    }
+    private static Func<string, bool> SourceExcludeFilter(IConf c)
+      => source => SourceExcludeFilters[c].All(func => func(source));
 
     private static IObservable<InOut> DefaultProcessSources(IConf project)
       => SourceProcessors[project]
@@ -316,6 +310,13 @@ namespace Bud.V1 {
 
     #region CSharp Projects
 
+    public static readonly Key<IObservable<CompileOutput>> Compile = nameof(Compile);
+    public static readonly Key<Func<InOut, CompileOutput>> Compiler = nameof(Compiler);
+    public static readonly Key<IImmutableList<string>> AssemblyReferences = nameof(AssemblyReferences);
+    public static readonly Key<string> AssemblyName = nameof(AssemblyName);
+    public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
+    public static readonly Key<ImmutableList<ResourceDescription>> EmbeddedResources = nameof(EmbeddedResources);
+
     public static Conf CsLibrary(string projectId)
       => CsLibrary(projectId, projectId);
 
@@ -363,16 +364,27 @@ namespace Bud.V1 {
 
     #endregion
 
-    #region Project Grouping
+    #region Package Reference Projects
 
-    public static Conf Project(string scope, params IConfBuilder[] confs)
-      => Conf.Group(scope, confs);
+    /// <summary>
+    /// The path to the <c>packages.config</c> file. By default, it is placed directly
+    /// under the <see cref="ProjectDir"/>.
+    /// </summary>
+    public static Key<string> PackagesConfigPath = nameof(PackagesConfigPath);
 
-    public static Conf Projects(params IConfBuilder[] confs)
-      => Conf.Group((IEnumerable<IConfBuilder>) confs);
+    /// <summary>
+    /// A list of NuGet package references. These references will be resolved, downloaded, and returned
+    /// as <see cref="Assembly"/> entries in the <see cref="Output"/>.
+    /// </summary>
+    public static Key<IImmutableList<PackageReference>> PackageReferences = nameof(PackageReferences);
 
-    public static Conf Projects(IEnumerable<IConfBuilder> confs)
-      => Conf.Group(confs);
+    public static Conf PackageReferencesProject(string dir, string projectId)
+      => BuildProject(dir, projectId)
+      .Add(SourceIncludes, c => FilesObservatory[c].ObserveFiles(PackagesConfigPath[c]))
+      .Init(PackagesConfigPath, c => Path.Combine(ProjectDir[c], "packages.config"))
+      .Init(PackageReferences, c => new PackagesConfigReader(File.OpenRead(PackagesConfigPath[c]))
+                                 .GetPackages()
+                                 .ToImmutableList());
 
     #endregion
   }

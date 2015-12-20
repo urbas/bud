@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using static System.IO.Directory;
 using static System.IO.Path;
 
@@ -36,6 +37,15 @@ namespace Bud.IO {
       File.WriteAllText(file, content);
       return file;
     }
+
+    public string CreateFileFromResource(string resourceName, string firstPathComponent, params string[] pathComponents) {
+      using (var packagesConfigStream = Assembly.GetCallingAssembly().GetManifestResourceStream(resourceName)) {
+        return CreateFile(packagesConfigStream, firstPathComponent, pathComponents);
+      }
+    }
+
+    public string CreateFile(Stream content, string firstPathComponent, params string[] pathComponents)
+      => CreateFile(new StreamReader(content).ReadToEnd(), firstPathComponent, pathComponents);
 
     private static string CreateDirectoryInTempDir() {
       string baseDir = GetTempPath();
