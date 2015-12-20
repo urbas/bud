@@ -110,7 +110,6 @@
     <Compile Include="V1\IConf.cs" />
     <Compile Include="V1\Key.cs" />
     <Compile Include="V1\Keys.cs" />
-    <Compile Include="V1\Package.cs" />
     <Compile Include="Cli\BuildTool.cs" />
     <Compile Include="Collections\EnumerableUtils.cs" />
     <Compile Include="Configuration\RawConf.cs" />

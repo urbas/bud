@@ -23,11 +23,11 @@ namespace Bud.IO {
     ///   A filter that returns <c>true</c> iff the given file is not
     ///   in any of the given directories.
     /// </returns>
-    public static Func<string, bool> NotInAnyDirFilter(IEnumerable<string> dirs) {
+    public static Func<string, bool> InAnyDirFilter(IEnumerable<string> dirs) {
       var unixDirPaths = dirs.Select(ToSlashedPath).ToList();
       return file => {
         var slashedPath = ToSlashedPath(file);
-        return !unixDirPaths.Any(dir => IsSlashedPathInDir(slashedPath, dir));
+        return unixDirPaths.Any(dir => IsSlashedPathInDir(slashedPath, dir));
       };
     }
 

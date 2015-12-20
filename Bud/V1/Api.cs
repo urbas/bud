@@ -10,7 +10,6 @@ using Bud.Configuration;
 using Bud.Cs;
 using Bud.IO;
 using Bud.Reactive;
-using Bud.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using NuGet.Packaging;
@@ -40,14 +39,14 @@ namespace Bud.V1 {
       => Conf.Group(scope, confs);
 
     public static Conf Projects(params IConfBuilder[] confs)
-      => Conf.Group((IEnumerable<IConfBuilder>)confs);
+      => Conf.Group((IEnumerable<IConfBuilder>) confs);
 
     public static Conf Projects(IEnumerable<IConfBuilder> confs)
       => Conf.Group(confs);
 
     #endregion
 
-    #region Individial Features
+    #region Base Build Support
 
     public const string TargetDirName = "target";
 
@@ -102,6 +101,10 @@ namespace Bud.V1 {
       .Init(Output, c => Build[c])
       .Init(Clean, DefaultClean);
 
+    #endregion
+
+    #region Dependencies Support
+
     /// <summary>
     ///   A list of keys (paths) to other builds. For example, say we defined two projects
     ///   <c>A</c> and <c>B</c>. To make <c>B</c> depend on <c>A</c>, one would add the
@@ -111,6 +114,10 @@ namespace Bud.V1 {
 
     public static readonly Conf DependenciesSupport =
       Dependencies.InitValue(ImmutableHashSet<string>.Empty);
+
+    #endregion
+
+    #region Build Pipeline Scheduling Support
 
     /// <summary>
     ///   By default the entire build pipeline (input, sources, build, and output) are
@@ -128,6 +135,10 @@ namespace Bud.V1 {
 
     public static readonly Conf BuildSchedulingSupport =
       BuildPipelineScheduler.Init(_ => DefauBuildPipelineScheduler.Value);
+
+    #endregion
+
+    #region Sources Support
 
     /// <summary>
     ///   By default, the build has no sources. Add them through
@@ -175,6 +186,32 @@ namespace Bud.V1 {
       .Init(Sources, DefaultSources);
 
     /// <summary>
+    ///   Adds an individual source file to the project.
+    /// </summary>
+    public static Conf AddSourceFile(this Conf c, string absolutePath)
+      => c.Add(SourceIncludes,
+               conf => FilesObservatory[conf].ObserveFiles(absolutePath));
+
+    /// <summary>
+    ///   Adds an individual source file to the project.
+    /// </summary>
+    public static Conf AddSourceFile(this Conf c, Func<IConf, string> absolutePath)
+      => c.Add(SourceIncludes,
+               conf => FilesObservatory[conf].ObserveFiles(absolutePath(conf)));
+
+    private static IObservable<IEnumerable<string>> DefaultSources(IConf c)
+      => ObservableResources.ObserveResources(SourceIncludes[c], SourceFilter(c))
+                            .ObserveOn(BuildPipelineScheduler[c])
+                            .Calmed(c);
+
+    private static Func<string, bool> SourceFilter(IConf c)
+      => sourceFile => !SourceExcludeFilters[c].Any(filter => filter(sourceFile));
+
+    #endregion
+
+    #region Source Processing Support
+
+    /// <summary>
     ///   A stream of <see cref="Sources" /> after they have been processed
     ///   by <see cref="SourceProcessors" />.
     /// </summary>
@@ -190,21 +227,6 @@ namespace Bud.V1 {
       .InitValue(SourceProcessors, ImmutableList<IInputProcessor>.Empty)
       .Init(ProcessedSources, DefaultProcessSources);
 
-    public static readonly Key<IImmutableSet<Package>> PackageDependencies = nameof(PackageDependencies);
-    public static readonly Key<IImmutableSet<Package>> TransitivePackageDependencies = nameof(TransitivePackageDependencies);
-
-    public static readonly Conf PackageDependenceSupport = DependenciesSupport
-      .InitValue(PackageDependencies, ImmutableHashSet<Package>.Empty)
-      .Init(TransitivePackageDependencies, CollectTransitivePackageDependencies);
-
-    private static IObservable<IEnumerable<string>> DefaultSources(IConf c)
-      => ObservableResources.ObserveResources(SourceIncludes[c], SourceExcludeFilter(c))
-                            .ObserveOn(BuildPipelineScheduler[c])
-                            .Calmed(c);
-
-    private static Func<string, bool> SourceExcludeFilter(IConf c)
-      => source => SourceExcludeFilters[c].All(func => func(source));
-
     private static IObservable<InOut> DefaultProcessSources(IConf project)
       => SourceProcessors[project]
         .Aggregate(ObservedSources(project),
@@ -212,13 +234,6 @@ namespace Bud.V1 {
 
     private static IObservable<InOut> ObservedSources(IConf c)
       => Sources[c].Select(sources => new InOut(sources.Select(InOutFile.ToInOutFile)));
-
-    private static IImmutableSet<Package> CollectTransitivePackageDependencies(IConf c)
-      => Dependencies[c].Select(dependency => c.TryGet(dependency / TransitivePackageDependencies)
-                                               .GetOrElse(ImmutableHashSet<Package>.Empty))
-                        .Concat(new[] {PackageDependencies[c]})
-                        .SelectMany(set => set)
-                        .ToImmutableHashSet();
 
     #endregion
 
@@ -229,8 +244,8 @@ namespace Bud.V1 {
     public static Conf BuildProject(string projectDir, string projectId)
       => Project(projectId)
         .Add(BuildSupport)
+        .Add(DependenciesSupport)
         .Add(SourceProcessorsSupport)
-        .Add(PackageDependenceSupport)
         .SetValue(ProjectDir, projectDir)
         .InitValue(ProjectId, projectId)
         .Set(Input, DefaultInput)
@@ -287,14 +302,14 @@ namespace Bud.V1 {
       => c.Modify(SourceExcludeFilters, (conf, filters) => {
         var projectDir = ProjectDir[conf];
         var dirs = subDirs(conf).Select(s => Path.IsPathRooted(s) ? s : Path.Combine(projectDir, s));
-        return filters.Add(PathUtils.NotInAnyDirFilter(dirs));
+        return filters.Add(PathUtils.InAnyDirFilter(dirs));
       });
 
     private static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
       => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c], BuildPipelineScheduler[c]);
 
     private static IObservable<InOut> DefaultInput(IConf c)
-      => Dependencies[c].Select(dependency => (dependency / Output)[c])
+      => Dependencies[c].Select(dependency => (dependency/Output)[c])
                         .Concat(new[] {ProcessedSources[c]})
                         .CombineLatest(InOut.Merge);
 
@@ -328,7 +343,7 @@ namespace Bud.V1 {
         .Init(Compile, DefaultCSharpCompilation)
         .Set(Build, c => Compile[c].Select(CompileOutput.ToInOut))
         .Init(AssemblyName, c => ProjectId[c] + CSharpCompilationOptions[c].OutputKind.ToExtension())
-        .Init(AssemblyReferences, c => ImmutableList.Create(typeof(object).Assembly.Location))
+        .Init(AssemblyReferences, c => ImmutableList.Create(typeof (object).Assembly.Location))
         .Init(Compiler, TimedEmittingCompiler.Create)
         .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, warningLevel: 1))
         .InitValue(EmbeddedResources, ImmutableList<ResourceDescription>.Empty);
@@ -367,24 +382,24 @@ namespace Bud.V1 {
     #region Package Reference Projects
 
     /// <summary>
-    /// The path to the <c>packages.config</c> file. By default, it is placed directly
-    /// under the <see cref="ProjectDir"/>.
+    ///   The path to the <c>packages.config</c> file. By default, it is placed directly
+    ///   under the <see cref="ProjectDir" />.
     /// </summary>
     public static Key<string> PackagesConfigPath = nameof(PackagesConfigPath);
 
     /// <summary>
-    /// A list of NuGet package references. These references will be resolved, downloaded, and returned
-    /// as <see cref="Assembly"/> entries in the <see cref="Output"/>.
+    ///   A list of NuGet package references. These references will be resolved, downloaded, and returned
+    ///   as <see cref="Assembly" /> entries in the <see cref="Output" />.
     /// </summary>
     public static Key<IImmutableList<PackageReference>> PackageReferences = nameof(PackageReferences);
 
     public static Conf PackageReferencesProject(string dir, string projectId)
       => BuildProject(dir, projectId)
-      .Add(SourceIncludes, c => FilesObservatory[c].ObserveFiles(PackagesConfigPath[c]))
-      .Init(PackagesConfigPath, c => Path.Combine(ProjectDir[c], "packages.config"))
-      .Init(PackageReferences, c => new PackagesConfigReader(File.OpenRead(PackagesConfigPath[c]))
-                                 .GetPackages()
-                                 .ToImmutableList());
+        .AddSourceFile(c => PackagesConfigPath[c])
+        .Init(PackagesConfigPath, c => Path.Combine(ProjectDir[c], "packages.config"))
+        .Init(PackageReferences, c => new PackagesConfigReader(File.OpenRead(PackagesConfigPath[c]))
+                                   .GetPackages()
+                                   .ToImmutableList());
 
     #endregion
   }

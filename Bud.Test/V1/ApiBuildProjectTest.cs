@@ -31,8 +31,8 @@ namespace Bud.V1 {
     }
 
     [Test]
-    public void Sources_should_be_initially_empty()
-      => Assert.IsEmpty(Sources[BuildProject("bar", "Foo")].Take(1).Wait());
+    public void Dependencies_should_be_initially_empty()
+      => Assert.IsEmpty(Dependencies[BuildProject("bar", "Foo")]);
 
     [Test]
     public void Sources_should_contain_files_from_added_directories() {
@@ -56,10 +56,6 @@ namespace Bud.V1 {
         Assert.IsEmpty(files);
       }
     }
-
-    [Test]
-    public void Dependencies_should_be_initially_empty()
-      => Assert.IsEmpty(Dependencies[BuildProject("bar", "Foo")]);
 
     [Test]
     public void Input_should_initially_observe_a_single_empty_inout()

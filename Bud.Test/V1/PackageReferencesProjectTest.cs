@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Linq;
 using Bud.IO;
-using Bud.V1;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
@@ -10,7 +8,7 @@ using NuGet.Versioning;
 using NUnit.Framework;
 using static Bud.V1.Api;
 
-namespace Bud.NuGet {
+namespace Bud.V1 {
   public class PackageReferencesProjectTest {
     [Test]
     public void Output_is_empty_when_packages_config_is_missing()
@@ -42,16 +40,7 @@ namespace Bud.NuGet {
       => PackageReferencesProject(path, "Foo.References");
 
     private static string AddPackagesConfigFile(TemporaryDirectory tmpDir)
-      => tmpDir.CreateFileFromResource("Bud.NuGet.SinglePackageTest.packages.config", "packages.config");
-  }
-
-  public class PackageReferenceComparer : IEqualityComparer<PackageReference> {
-    public bool Equals(PackageReference x, PackageReference y)
-      => x.PackageIdentity.Equals(y.PackageIdentity) &&
-         x.TargetFramework.Equals(y.TargetFramework);
-
-    public int GetHashCode(PackageReference obj)
-      => obj.PackageIdentity.GetHashCode()*37 +
-         obj.TargetFramework.GetHashCode();
+      => tmpDir.CreateFileFromResource("Bud.NuGet.SinglePackageTest.packages.config",
+                                       "packages.config");
   }
 }

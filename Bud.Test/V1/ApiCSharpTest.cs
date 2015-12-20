@@ -92,25 +92,6 @@ namespace Bud.V1 {
                                   ProjectWithDependencies("B", "../A"))
                            .Get("B" / Input).ToEnumerable());
 
-    [Test]
-    public void Default_csharp_projects_have_no_package_dependencies()
-      => Assert.IsEmpty(CsLibrary("A").Get(PackageDependencies));
-
-    [Test]
-    public void Projects_inherit_package_dependencies_from_their_project_dependencies()
-      => Assert.AreEqual(new[] {new Package("Foo.Bar", "1.2.3", "net45")},
-                         Projects(CsLibrary("A")
-                                    .Add(PackageDependencies, new Package("Foo.Bar", "1.2.3", "net45")),
-                                  CsLibrary("B")
-                                    .Add(Dependencies, "../A"))
-                           .Get("B" / TransitivePackageDependencies));
-
-    [Test]
-    public void No_packages_are_inheritted_from_projects_without_package_dependence_support()
-      => Assert.IsEmpty(Projects(BuildProject("aDir", "A"),
-                                 CsLibrary("B").Add(Dependencies, "../A"))
-                          .Get("B" / TransitivePackageDependencies));
-
     private static Conf ProjectAOutputsFooDll(long initialTimestamp)
       => EmptyCSharpProject("A")
         .SetValue(Compiler, input => EmptyCompileOutput(initialTimestamp++));
