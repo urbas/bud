@@ -45,6 +45,30 @@
       <HintPath>..\packages\Microsoft.Web.Xdt.2.1.0\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NuGet.Frameworks">
+      <HintPath>..\packages\NuGet.Frameworks.3.3.0\lib\net45\NuGet.Frameworks.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NuGet.Logging">
+      <HintPath>..\packages\NuGet.Logging.3.3.0\lib\net45\NuGet.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NuGet.Packaging">
+      <HintPath>..\packages\NuGet.Packaging.3.3.0\lib\net45\NuGet.Packaging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NuGet.Packaging.Core">
+      <HintPath>..\packages\NuGet.Packaging.Core.3.3.0\lib\net45\NuGet.Packaging.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NuGet.Packaging.Core.Types">
+      <HintPath>..\packages\NuGet.Packaging.Core.Types.3.3.0\lib\net45\NuGet.Packaging.Core.Types.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NuGet.Versioning">
+      <HintPath>..\packages\NuGet.Versioning.3.3.0\lib\net45\NuGet.Versioning.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.1.38.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Collections.Immutable.1.1.38-beta-23225\lib\dotnet\System.Collections.Immutable.dll</HintPath>
@@ -86,7 +110,6 @@
     <Compile Include="V1\IConf.cs" />
     <Compile Include="V1\Key.cs" />
     <Compile Include="V1\Keys.cs" />
-    <Compile Include="V1\Package.cs" />
     <Compile Include="Cli\BuildTool.cs" />
     <Compile Include="Collections\EnumerableUtils.cs" />
     <Compile Include="Configuration\RawConf.cs" />
@@ -109,9 +132,6 @@
     <Compile Include="IO\Files.cs" />
     <Compile Include="IO\FileObservatories.cs" />
     <Compile Include="IO\IDiff.cs" />
-    <Compile Include="IO\IInOut.cs" />
-    <Compile Include="IO\InOut.cs" />
-    <Compile Include="IO\InOutFile.cs" />
     <Compile Include="IO\ITimestamped.cs" />
     <Compile Include="IO\IInputProcessor.cs" />
     <Compile Include="IO\LocalFilesObservatory.cs" />

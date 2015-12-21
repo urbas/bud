@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
@@ -11,12 +11,11 @@ using Moq;
 using NUnit.Framework;
 using static System.IO.Path;
 using static System.Linq.Enumerable;
-using static Bud.IO.InOutFile;
 using static Bud.IO.Watched;
 using static Bud.V1.Api;
 
 namespace Bud.V1 {
-  public class ApiCoreBuildsTest {
+  public class ApiBuildProjectTest {
     [Test]
     public void Set_the_projectDir()
       => Assert.AreEqual("bar", ProjectDir[BuildProject("bar", "Foo")]);
@@ -26,19 +25,17 @@ namespace Bud.V1 {
       => Assert.AreEqual("Foo", ProjectId[BuildProject("bar", "Foo")]);
 
     [Test]
-    public void Sources_should_be_initially_empty()
-      => Assert.IsEmpty(Sources[BuildProject("bar", "Foo")].Take(1).Wait());
+    public void Target_directory_is_within_the_project_directory() {
+      var project = BuildProject("fooDir", "foo");
+      Assert.AreEqual(Combine(ProjectDir[project], "target"), TargetDir[project]);
+    }
 
     [Test]
     public void Dependencies_should_be_initially_empty()
       => Assert.IsEmpty(Dependencies[BuildProject("bar", "Foo")]);
 
     [Test]
-    public void Input_should_initially_observe_a_single_empty_inout()
-      => Assert.AreEqual(new[] {InOut.Empty}, Input[BuildProject("bar", "Foo")].ToList().Wait());
-
-    [Test]
-    public void Multiple_source_directories() {
+    public void Sources_should_contain_files_from_added_directories() {
       using (var tempDir = new TemporaryDirectory()) {
         var fileA = tempDir.CreateEmptyFile("A", "A.cs");
         var fileB = tempDir.CreateEmptyFile("B", "B.cs");
@@ -48,12 +45,6 @@ namespace Bud.V1 {
         Assert.That(Sources[twoDirsProject].Take(1).Wait(),
                     Is.EquivalentTo(new[] {fileA, fileB}));
       }
-    }
-
-    [Test]
-    public void Target_directory_is_within_the_project_directory() {
-      var project = BuildProject("fooDir", "foo");
-      Assert.AreEqual(Combine(ProjectDir[project], "target"), TargetDir[project]);
     }
 
     [Test]
@@ -67,10 +58,53 @@ namespace Bud.V1 {
     }
 
     [Test]
+    public void Input_should_initially_observe_a_single_empty_inout()
+      => Assert.AreEqual(new[] {Empty<object>()},
+                         Input[BuildProject("bar", "Foo")].ToList().Wait());
+
+    [Test]
+    public void Input_contains_the_added_file() {
+      var buildProject = BuildProject("foo", "Foo")
+        .Add(SourceIncludes, c => FilesObservatory[c].ObserveFiles("foo/bar"));
+      Assert.AreEqual(new [] {"foo/bar"},
+                      Input[buildProject].Take(1).Wait());
+    }
+
+    [Test]
+    public void Default_input_contains_the_output_from_dependencies() {
+      var projects = Projects(BuildProject("aDir", "A")
+                                .SetValue(Output, Observable.Return(new [] {"a"})),
+                              BuildProject("bDir", "B")
+                                .Add(SourceIncludes, Watch("b"))
+                                .Add(Dependencies, "../A"));
+      Assert.AreEqual(new [] { "a", "b" },
+                      projects.Get("B"/Input).Wait());
+    }
+
+    [Test]
+    public void Input_reobserved_when_dependencies_change() {
+      var testScheduler = new TestScheduler();
+      var projects = Projects(BuildProject("aDir", "A")
+                                .SetValue(BuildPipelineScheduler, testScheduler)
+                                .SetValue(Output, Observable.Return(new [] { "foo"}).Delay(TimeSpan.FromSeconds(1), testScheduler)
+                                                            .Concat(Observable.Return(new[] { "bar" }).Delay(TimeSpan.FromSeconds(1), testScheduler))),
+                              BuildProject("bDir", "B")
+                                .SetValue(BuildPipelineScheduler, testScheduler)
+                                .Add(Dependencies, "../A"));
+      var bInput = projects.Get("B"/Input).GetEnumerator();
+      testScheduler.AdvanceBy(TimeSpan.FromSeconds(5).Ticks);
+      Assert.IsTrue(bInput.MoveNext());
+      Assert.AreEqual(new [] { "foo" }, bInput.Current);
+      Assert.IsTrue(bInput.MoveNext());
+      Assert.AreEqual(new[] { "bar" }, bInput.Current);
+      Assert.IsFalse(bInput.MoveNext());
+    }
+
+    [Test]
     public void Source_processor_changes_source_input() {
       var fileProcessor = new Mock<IInputProcessor>(MockBehavior.Strict);
-      var expectedOutputFiles = new InOut(ToInOutFile("foo"));
-      fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<InOut>>()))
+      var expectedOutputFiles = new [] {"foo"};
+      fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<IEnumerable<object>>>()))
                    .Returns(Observable.Return(expectedOutputFiles));
       var actualOutputFiles = BuildProject("FooDir", "Foo")
         .Add(SourceProcessors, fileProcessor.Object)
@@ -100,44 +134,15 @@ namespace Bud.V1 {
     }
 
     [Test]
-    public void Default_build_forwards_the_output_from_dependencies() {
+    public void Default_input_contains_processed_sources() {
       var projects = Projects(BuildProject("aDir", "A")
-                             .Add(SourceIncludes, Watch(new[] {"a"})),
-                           BuildProject("bDir", "B")
-                             .Add(SourceIncludes, Watch(new[] {"b"}))
-                             .Add(Dependencies, "../A"));
-      Assert.AreEqual(new InOut(ToInOutFile("a"), ToInOutFile("b")),
-                      projects.Get("B" / Output).Wait());
-    }
-
-    [Test]
-    public void Input_reobserved_when_dependencies_change() {
-      var testScheduler = new TestScheduler();
-      var projects = Projects(BuildProject("aDir", "A")
-                             .SetValue(BuildPipelineScheduler, testScheduler)
-                             .Add(SourceIncludes, Watch(Empty<string>(), Observable.Return("foo").Delay(TimeSpan.FromSeconds(1), testScheduler)
-                                                                                   .Concat(Observable.Return("bar").Delay(TimeSpan.FromSeconds(1), testScheduler)))),
-                           BuildProject("bDir", "B")
-                             .SetValue(BuildPipelineScheduler, testScheduler)
-                             .Add(Dependencies, "../A"));
-      var output = projects.Get("B" / Output).GetEnumerator();
-      testScheduler.AdvanceBy(TimeSpan.FromSeconds(5).Ticks);
-      Assert.IsTrue(output.MoveNext());
-      Assert.IsTrue(output.MoveNext());
-      Assert.IsTrue(output.MoveNext());
-    }
-
-    [Test]
-    public void Default_build_processes_own_sources_before_output() {
-      var projects = Projects(BuildProject("aDir", "A")
-                             .Add(SourceIncludes, Watch(new[] {"a"}))
-                             .Add(SourceProcessors, new FooAppenderInputProcessor()),
-                           BuildProject("bDir", "B")
-                             .Add(SourceIncludes, Watch(new[] {"b"}))
-                             .Add(SourceProcessors, new FooAppenderInputProcessor())
-                             .Add(Dependencies, "../A"));
-      Assert.AreEqual(new InOut(ToInOutFile("afoo"), ToInOutFile("bfoo")),
-                      projects.Get("B" / Output).Wait());
+                                .SetValue(Output, Observable.Return(new [] {"a"})),
+                              BuildProject("bDir", "B")
+                                .Add(SourceIncludes, Watch("b"))
+                                .Add(SourceProcessors, new FooAppenderInputProcessor())
+                                .Add(Dependencies, "../A"));
+      Assert.AreEqual(new [] { "a", "bfoo" },
+                      projects.Get("B"/Input).Wait());
     }
 
     [Test]
@@ -159,14 +164,14 @@ namespace Bud.V1 {
     }
 
     private class FooAppenderInputProcessor : IInputProcessor {
-      public IObservable<InOut> Process(IObservable<InOut> sources)
-        => sources.Select(io => new InOut(io.Elements.OfType<InOutFile>().Select(file => ToInOutFile(file.Path + "foo"))));
+      public IObservable<IEnumerable<object>> Process(IObservable<IEnumerable<object>> sources)
+        => sources.Select(io => io.OfType<string>().Select(file => file + "foo"));
     }
 
     public class ThreadIdRecordingInputProcessor : IInputProcessor {
       public int InvocationThreadId { get; private set; }
 
-      public IObservable<InOut> Process(IObservable<InOut> sources) {
+      public IObservable<IEnumerable<object>> Process(IObservable<IEnumerable<object>> sources) {
         InvocationThreadId = Thread.CurrentThread.ManagedThreadId;
         return sources;
       }
