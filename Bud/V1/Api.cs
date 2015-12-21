@@ -13,6 +13,7 @@ using Bud.Reactive;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using NuGet.Packaging;
+using static System.Linq.Enumerable;
 
 namespace Bud.V1 {
   /// <summary>
@@ -66,40 +67,11 @@ namespace Bud.V1 {
     /// </summary>
     public static readonly Key<IObservable<IEnumerable<object>>> Output = nameof(Output);
 
-    /// <summary>
-    ///   By default, deletes the entire <see cref="TargetDir" />
-    /// </summary>
-    public static readonly Key<Unit> Clean = nameof(Clean);
-
-    /// <summary>
-    ///   The build's identifier. This identifier is used in <see cref="Dependencies" />.
-    /// </summary>
-    public static readonly Key<string> ProjectId = nameof(ProjectId);
-
-    /// <summary>
-    ///   The build's directory. Ideally, all the sources of this build
-    ///   should be located within this directory.
-    /// </summary>
-    public static readonly Key<string> ProjectDir = nameof(ProjectDir);
-
-    /// <summary>
-    ///   The directory where all outputs and generated files are placed.
-    ///   This directory is by default deleted through the <see cref="Clean" />
-    ///   command.
-    /// </summary>
-    public static readonly Key<string> TargetDir = nameof(TargetDir);
-
-    private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler =
-      new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
-
     public static Conf BuildSupport = Conf
       .Empty
-      .Init(ProjectDir, _ => Directory.GetCurrentDirectory())
-      .Init(TargetDir, c => Path.Combine(ProjectDir[c], TargetDirName))
       .InitValue(Input, Observable.Empty<IEnumerable<object>>())
-      .Init(Build, c => Observable.Return(Enumerable.Empty<object>()))
-      .Init(Output, c => Build[c])
-      .Init(Clean, DefaultClean);
+      .InitValue(Build, Observable.Return(Empty<object>()))
+      .Init(Output, c => Build[c]);
 
     #endregion
 
@@ -132,6 +104,9 @@ namespace Bud.V1 {
     ///   key is mostly meant for testing.
     /// </remarks>
     public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
+
+    private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler =
+      new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
 
     public static readonly Conf BuildSchedulingSupport =
       BuildPipelineScheduler.Init(_ => DefauBuildPipelineScheduler.Value);
@@ -236,6 +211,29 @@ namespace Bud.V1 {
 
     #region Build Project
 
+    /// <summary>
+    ///   The build's identifier. This identifier is used in <see cref="Dependencies" />.
+    /// </summary>
+    public static readonly Key<string> ProjectId = nameof(ProjectId);
+
+    /// <summary>
+    ///   The build's directory. Ideally, all the sources of this build
+    ///   should be located within this directory.
+    /// </summary>
+    public static readonly Key<string> ProjectDir = nameof(ProjectDir);
+
+    /// <summary>
+    ///   The directory where all outputs and generated files are placed.
+    ///   This directory is by default deleted through the <see cref="Clean" />
+    ///   command.
+    /// </summary>
+    public static readonly Key<string> TargetDir = nameof(TargetDir);
+
+    /// <summary>
+    ///   By default, deletes the entire <see cref="TargetDir" />
+    /// </summary>
+    public static readonly Key<Unit> Clean = nameof(Clean);
+
     /// <param name="projectDir">see <see cref="ProjectDir" /></param>
     /// <param name="projectId">see <see cref="ProjectId" /></param>
     public static Conf BuildProject(string projectDir, string projectId)
@@ -243,10 +241,12 @@ namespace Bud.V1 {
         .Add(BuildSupport)
         .Add(DependenciesSupport)
         .Add(SourceProcessorsSupport)
-        .SetValue(ProjectDir, projectDir)
+        .InitValue(ProjectDir, projectDir)
+        .Init(TargetDir, c => Path.Combine(ProjectDir[c], TargetDirName))
         .InitValue(ProjectId, projectId)
-        .Set(Input, DefaultInput)
-        .ExcludeSourceDir(c => TargetDir[c]);
+        .Merge(Input, ObserveProcessedSources)
+        .ExcludeSourceDir(c => TargetDir[c])
+        .Init(Clean, DefaultClean);
 
     /// <summary>
     ///   Adds files found in <paramref name="subDir" /> to <see cref="Sources" />.
@@ -305,10 +305,10 @@ namespace Bud.V1 {
     private static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
       => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c], BuildPipelineScheduler[c]);
 
-    private static IObservable<IEnumerable<object>> DefaultInput(IConf c)
+    private static IObservable<IEnumerable<object>> ObserveProcessedSources(IConf c)
       => Dependencies[c].Select(dependency => (dependency/Output)[c])
                         .Concat(new[] {ProcessedSources[c]})
-                        .CombineLatest(inOuts => inOuts.Aggregate(Enumerable.Empty<object>(), Enumerable.Concat));
+                        .CombineLatest(inOuts => inOuts.Aggregate(Empty<object>(), Enumerable.Concat));
 
     private static Unit DefaultClean(IConf c) {
       var targetDir = TargetDir[c];
