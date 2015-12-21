@@ -54,17 +54,17 @@ namespace Bud.V1 {
     ///   By default, input consists of <see cref="ProcessedSources" /> and
     ///   outputs of <see cref="Dependencies" />.
     /// </summary>
-    public static readonly Key<IObservable<InOut>> Input = nameof(Input);
+    public static readonly Key<IObservable<IEnumerable<object>>> Input = nameof(Input);
 
     /// <summary>
     ///   By default, build simply pipes the input through.
     /// </summary>
-    public static readonly Key<IObservable<InOut>> Build = nameof(Build);
+    public static readonly Key<IObservable<IEnumerable<object>>> Build = nameof(Build);
 
     /// <summary>
     ///   By default, output simply pipes the build through.
     /// </summary>
-    public static readonly Key<IObservable<InOut>> Output = nameof(Output);
+    public static readonly Key<IObservable<IEnumerable<object>>> Output = nameof(Output);
 
     /// <summary>
     ///   By default, deletes the entire <see cref="TargetDir" />
@@ -96,8 +96,8 @@ namespace Bud.V1 {
       .Empty
       .Init(ProjectDir, _ => Directory.GetCurrentDirectory())
       .Init(TargetDir, c => Path.Combine(ProjectDir[c], TargetDirName))
-      .InitValue(Input, Observable.Empty<InOut>())
-      .Init(Build, c => Observable.Return(InOut.Empty))
+      .InitValue(Input, Observable.Empty<IEnumerable<object>>())
+      .Init(Build, c => Observable.Return(Enumerable.Empty<object>()))
       .Init(Output, c => Build[c])
       .Init(Clean, DefaultClean);
 
@@ -215,7 +215,7 @@ namespace Bud.V1 {
     ///   A stream of <see cref="Sources" /> after they have been processed
     ///   by <see cref="SourceProcessors" />.
     /// </summary>
-    public static readonly Key<IObservable<InOut>> ProcessedSources = nameof(ProcessedSources);
+    public static readonly Key<IObservable<IEnumerable<object>>> ProcessedSources = nameof(ProcessedSources);
 
     /// <summary>
     ///   <see cref="Sources" /> are passed through source processors in order.
@@ -227,13 +227,10 @@ namespace Bud.V1 {
       .InitValue(SourceProcessors, ImmutableList<IInputProcessor>.Empty)
       .Init(ProcessedSources, DefaultProcessSources);
 
-    private static IObservable<InOut> DefaultProcessSources(IConf project)
+    private static IObservable<IEnumerable<object>> DefaultProcessSources(IConf project)
       => SourceProcessors[project]
-        .Aggregate(ObservedSources(project),
+        .Aggregate((IObservable<IEnumerable<object>>) Sources[project],
                    (sources, processor) => processor.Process(sources));
-
-    private static IObservable<InOut> ObservedSources(IConf c)
-      => Sources[c].Select(sources => new InOut(sources));
 
     #endregion
 
@@ -308,10 +305,10 @@ namespace Bud.V1 {
     private static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
       => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c], BuildPipelineScheduler[c]);
 
-    private static IObservable<InOut> DefaultInput(IConf c)
+    private static IObservable<IEnumerable<object>> DefaultInput(IConf c)
       => Dependencies[c].Select(dependency => (dependency/Output)[c])
                         .Concat(new[] {ProcessedSources[c]})
-                        .CombineLatest(InOut.Merge);
+                        .CombineLatest(inOuts => inOuts.Aggregate(Enumerable.Empty<object>(), Enumerable.Concat));
 
     private static Unit DefaultClean(IConf c) {
       var targetDir = TargetDir[c];
@@ -326,7 +323,7 @@ namespace Bud.V1 {
     #region CSharp Projects
 
     public static readonly Key<IObservable<CompileOutput>> Compile = nameof(Compile);
-    public static readonly Key<Func<InOut, CompileOutput>> Compiler = nameof(Compiler);
+    public static readonly Key<Func<IEnumerable<object>, CompileOutput>> Compiler = nameof(Compiler);
     public static readonly Key<IImmutableList<string>> AssemblyReferences = nameof(AssemblyReferences);
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
@@ -341,7 +338,7 @@ namespace Bud.V1 {
         .ExcludeSourceDirs("obj", "bin", TargetDirName)
         .Modify(Input, AddAssemblyReferencesToInput)
         .Init(Compile, DefaultCSharpCompilation)
-        .Set(Build, c => Compile[c].Select(InOut.ToInOut))
+        .Set(Build, c => Compile[c].Select(output => new [] {output}))
         .Init(AssemblyName, c => ProjectId[c] + CSharpCompilationOptions[c].OutputKind.ToExtension())
         .Init(AssemblyReferences, c => ImmutableList.Create(typeof (object).Assembly.Location))
         .Init(Compiler, TimedEmittingCompiler.Create)
@@ -355,9 +352,9 @@ namespace Bud.V1 {
                        return embeddedResources.Add(ToResourceDescriptor(resourceFile, nameInAssembly));
                      });
 
-    private static IObservable<InOut> AddAssemblyReferencesToInput(IConf c, IObservable<InOut> input)
+    private static IObservable<IEnumerable<object>> AddAssemblyReferencesToInput(IConf c, IObservable<IEnumerable<object>> input)
       => input.CombineLatest(Observable.Return(AssemblyReferences[c]),
-                             (inOut, references) => inOut.Add(references.Select(Assembly.ToAssembly)));
+                             (inOut, references) => inOut.Concat(references.Select(Assembly.ToAssembly)));
 
     private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
       => Input[conf].Select(Compiler[conf])

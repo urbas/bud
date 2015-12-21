@@ -25,12 +25,12 @@ namespace Bud.Cs {
       UnderlyingCompiler = underlyingCompiler;
     }
 
-    public static Func<InOut, CompileOutput> Create(IConf conf)
+    public static Func<IEnumerable<object>, CompileOutput> Create(IConf conf)
       => new TimedEmittingCompiler(Api.EmbeddedResources[conf],
                                    CreateUnderlyingCompiler(conf),
                                    GetOutputAssemblyPath(conf)).Compile;
 
-    public CompileOutput Compile(InOut inOutInput) {
+    public CompileOutput Compile(IEnumerable<object> inOutInput) {
       List<Timestamped<string>> sources;
       List<Timestamped<string>> assemblies;
       List<CompileOutput> dependencies;

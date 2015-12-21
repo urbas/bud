@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -54,22 +55,22 @@ namespace Bud.V1 {
     [Test]
     public void CompilationInput_includes_Sources_and_AssemblyReferences() {
       var projectA = CsLibrary("foo", "A")
-        .SetValue(SourceIncludes, ImmutableList.Create(Watched.Watch(new[] {"A.cs"})))
+        .SetValue(SourceIncludes, ImmutableList.Create(Watched.Watch("A.cs")))
         .SetValue(AssemblyReferences, ImmutableList.Create("Foo.Bar.dll"));
       var compilationInputs = Input[projectA].ToEnumerable().ToList();
-      Assert.AreEqual(new[] {new InOut("A.cs", Assembly.ToAssembly("Foo.Bar.dll"))},
+      Assert.AreEqual(new[] {new object[] { "A.cs", Assembly.ToAssembly("Foo.Bar.dll") } },
                       compilationInputs);
     }
 
     [Test]
     public void CompilationInput_is_passed_to_the_compiler() {
-      var inOut = new InOut("A.cs", Assembly.ToAssembly("Foo.Bar.dll"));
-      var cSharpCompiler = new Mock<Func<InOut, CompileOutput>>(MockBehavior.Strict);
-      cSharpCompiler.Setup(self => self(It.Is<InOut>(input => inOut.Equals(input))))
+      var input = new object[] {"A.cs", Assembly.ToAssembly("Foo.Bar.dll")};
+      var cSharpCompiler = new Mock<Func<IEnumerable<object>, CompileOutput>>(MockBehavior.Strict);
+      cSharpCompiler.Setup(self => self(It.Is<IEnumerable<object>>(argument => input.SequenceEqual(argument))))
                     .Returns(EmptyCompileOutput());
       var projectA = CsLibrary("foo", "A")
         .SetValue(Compiler, cSharpCompiler.Object)
-        .SetValue(Input, Observable.Return(inOut));
+        .SetValue(Input, Observable.Return(input));
       Compile[projectA].Wait();
       cSharpCompiler.VerifyAll();
     }
@@ -82,12 +83,12 @@ namespace Bud.V1 {
         .Get(Output).GetEnumerator();
       testScheduler.AdvanceBy(TimeSpan.FromSeconds(5).Ticks);
       while (compilation.MoveNext()) {}
-      compiler.Verify(self => self(It.IsAny<InOut>()), Times.Exactly(3));
+      compiler.Verify(self => self(It.IsAny<IEnumerable<object>>()), Times.Exactly(3));
     }
 
     [Test]
     public void Compiler_uses_dependencies()
-      => Assert.AreEqual(new[] {new InOut(EmptyCompileOutput(42L)) },
+      => Assert.AreEqual(new[] {new [] { EmptyCompileOutput(42L) } },
                          Projects(ProjectAOutputsFooDll(42L),
                                   ProjectWithDependencies("B", "../A"))
                            .Get("B" / Input).ToEnumerable());
@@ -109,9 +110,9 @@ namespace Bud.V1 {
     private static CompileOutput EmptyCompileOutput(long timestamp = 0L)
       => new CompileOutput(Enumerable.Empty<Diagnostic>(), TimeSpan.FromMilliseconds(123), "Foo.dll", true, timestamp, null);
 
-    private static Mock<Func<InOut, CompileOutput>> NoOpCompiler() {
-      var compiler = new Mock<Func<InOut, CompileOutput>>();
-      compiler.Setup(self => self(It.IsAny<InOut>())).Returns(EmptyCompileOutput());
+    private static Mock<Func<IEnumerable<object>, CompileOutput>> NoOpCompiler() {
+      var compiler = new Mock<Func<IEnumerable<object>, CompileOutput>>();
+      compiler.Setup(self => self(It.IsAny<IEnumerable<object>>())).Returns(EmptyCompileOutput());
       return compiler;
     }
 
@@ -121,7 +122,7 @@ namespace Bud.V1 {
       return Watched.Watch(Enumerable.Empty<string>(), fileUpdates);
     }
 
-    private static Conf ProjectAWithUpdatingSources(IScheduler testScheduler, Func<InOut, CompileOutput> compiler)
+    private static Conf ProjectAWithUpdatingSources(IScheduler testScheduler, Func<IEnumerable<object>, CompileOutput> compiler)
       => CsLibrary("a", "A")
         .SetValue(BuildPipelineScheduler, testScheduler)
         .SetValue(SourceIncludes, ImmutableList.Create(EmptyFilesWithDelayedUpdates(testScheduler)))

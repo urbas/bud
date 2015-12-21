@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
 using Bud.IO;
 using NuGet.Frameworks;
@@ -12,7 +13,7 @@ namespace Bud.V1 {
   public class PackageReferencesProjectTest {
     [Test]
     public void Output_is_empty_when_packages_config_is_missing()
-      => Assert.AreEqual(InOut.Empty,
+      => Assert.AreEqual(Enumerable.Empty<object>(),
                          Output[TestProject("foo")].Take(1).Wait());
 
     [Test]
@@ -22,7 +23,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Input_contains_the_packages_config_file()
-      => Assert.AreEqual(new InOut(Path.Combine("foo", "packages.config")),
+      => Assert.AreEqual(new [] { Path.Combine("foo", "packages.config") },
                          Input[TestProject("foo")].Take(1).Wait());
 
     [Test]

@@ -132,7 +132,6 @@
     <Compile Include="IO\Files.cs" />
     <Compile Include="IO\FileObservatories.cs" />
     <Compile Include="IO\IDiff.cs" />
-    <Compile Include="IO\InOut.cs" />
     <Compile Include="IO\ITimestamped.cs" />
     <Compile Include="IO\IInputProcessor.cs" />
     <Compile Include="IO\LocalFilesObservatory.cs" />

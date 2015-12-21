@@ -20,7 +20,7 @@ namespace Bud.Cs {
     [Test]
     public void Compile_returns_and_unsucessfull_compile_output_when_given_input_that_is_not_okay() {
       var compiler = new TimedEmittingCompiler(ImmutableList<ResourceDescription>.Empty, underlyingCompiler.Object, Path.Combine("foo", "Foo.dll"));
-      var compilerInput = new InOut(UnsuccessfulCompileOutput());
+      var compilerInput = new [] {UnsuccessfulCompileOutput()};
       Assert.IsFalse(compiler.Compile(compilerInput).Success);
     }
 
@@ -28,7 +28,7 @@ namespace Bud.Cs {
     public void Underlying_compiler_invoked_with_dependencies() {
       using (var tmpDir = new TemporaryDirectory()) {
         var compiler = new TimedEmittingCompiler(ImmutableList<ResourceDescription>.Empty, underlyingCompiler.Object, Path.Combine(tmpDir.Path, "Foo.dll"));
-        var compilerInput = new InOut(FooDllCompileOutput());
+        var compilerInput = new [] {FooDllCompileOutput()};
         var inputAssemblies = new[] {Timestamped.Create("Foo.dll", 0L)};
         underlyingCompiler.Setup(self => self.Compile(It.IsAny<IEnumerable<Timestamped<string>>>(),
                                                       inputAssemblies))
@@ -44,7 +44,7 @@ namespace Bud.Cs {
         var source = tmpDir.CreateEmptyFile("A.cs");
         tmpDir.CreateEmptyFile("A.dll");
         var compiler = new TimedEmittingCompiler(ImmutableList<ResourceDescription>.Empty, underlyingCompiler.Object, Path.Combine(tmpDir.Path, "A.dll"));
-        compiler.Compile(new InOut(source));
+        compiler.Compile(new []{ source });
         underlyingCompiler.Verify(self => self.Compile(It.IsAny<IEnumerable<Timestamped<string>>>(), It.IsAny<IEnumerable<Timestamped<string>>>()), Times.Never);
       }
     }
@@ -56,7 +56,7 @@ namespace Bud.Cs {
         var assemblyReference = tmpDir.CreateEmptyFile("Foo.dll");
         underlyingCompiler.Setup(self => self.Compile(It.Is(EqualToTimestampedFiles(source)), It.Is(EqualToTimestampedFiles(assemblyReference)))).Returns(CSharpCompilation.Create("A.dll"));
         var compiler = new TimedEmittingCompiler(ImmutableList<ResourceDescription>.Empty, underlyingCompiler.Object, Path.Combine(tmpDir.Path, "A.dll"));
-        compiler.Compile(new InOut(source, Assembly.ToAssembly(assemblyReference)));
+        compiler.Compile(new object[] {source, Assembly.ToAssembly(assemblyReference)});
         underlyingCompiler.VerifyAll();
       }
     }
