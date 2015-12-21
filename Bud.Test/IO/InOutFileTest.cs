@@ -8,19 +8,16 @@ namespace Bud.IO {
     public void Path_is_stored() => Assert.AreEqual("a", filaAOkay.Path);
 
     [Test]
-    public void IsOkay_is_stored() => Assert.IsTrue(filaAOkay.IsOkay);
-
-    [Test]
     public void Files_equal()
-      => Assert.AreEqual(filaAOkay, InOutFile.ToInOutFile("a", true));
+      => Assert.AreEqual(filaAOkay, InOutFile.ToInOutFile("a"));
 
     [Test]
-    public void Files_do_not_equal_when_one_is_not_okay()
-      => Assert.AreNotEqual(filaAOkay, InOutFile.ToInOutFile("a", false));
+    public void Different_files_do_not_equal()
+      => Assert.AreNotEqual(filaAOkay, InOutFile.ToInOutFile("b"));
 
     [Test]
     public void Hash_code_equals_when_files_equal()
       => Assert.AreEqual(filaAOkay.GetHashCode(),
-                         InOutFile.ToInOutFile("a", true).GetHashCode());
+                         InOutFile.ToInOutFile("a").GetHashCode());
   }
 }

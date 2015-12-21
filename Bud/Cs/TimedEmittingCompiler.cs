@@ -31,13 +31,14 @@ namespace Bud.Cs {
                                    GetOutputAssemblyPath(conf)).Compile;
 
     public CompileOutput Compile(InOut inOutInput) {
-      if (!inOutInput.IsOkay) {
-        return CreateOutputFromAssembly(false);
-      }
-
       List<Timestamped<string>> sources;
       List<Timestamped<string>> assemblies;
-      CompileInput.ExtractInput(inOutInput, out sources, out assemblies);
+      List<CompileOutput> dependencies;
+      CompileInput.ExtractInput(inOutInput, out sources, out assemblies, out dependencies);
+
+      if (!dependencies.All(dependency => dependency.Success)) {
+        return CreateOutputFromAssembly(false);
+      }
 
       if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(sources, assemblies)) {
         return CreateOutputFromAssembly(true);
@@ -45,6 +46,11 @@ namespace Bud.Cs {
 
       Stopwatch.Restart();
       var cSharpCompilation = UnderlyingCompiler.Compile(sources, assemblies);
+
+      if (cSharpCompilation == null) {
+        throw new Exception("Unexpected compiler error.");
+      }
+
       return EmitDll(cSharpCompilation, Stopwatch, EmbeddedResources, OutputAssemblyPath);
     }
 

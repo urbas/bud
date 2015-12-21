@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
-using static Bud.Cs.Assembly;
 
 namespace Bud.Cs {
-  public class CompileOutput {
+  public class CompileOutput : IInOut {
     public MetadataReference Reference { get; }
     public long Timestamp { get; }
     public IEnumerable<Diagnostic> Diagnostics { get; }
@@ -47,7 +46,5 @@ namespace Bud.Cs {
 
     public override string ToString()
       => $"CompileOutput(AssemblyPath: {AssemblyPath}, Timestamp: {Timestamp})";
-
-    public static InOut ToInOut(CompileOutput compileOutput) => new InOut(ToAssembly(compileOutput.AssemblyPath, compileOutput.Success));
   }
 }

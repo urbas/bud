@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -17,8 +18,6 @@ namespace Bud.IO {
 
     public IImmutableList<IInOut> Elements { get; }
 
-    public bool IsOkay => Elements.All(file => file.IsOkay);
-
     public InOut Add(IEnumerable<IInOut> ioElements)
       => new InOut(Elements.AddRange(ioElements));
 
@@ -30,8 +29,6 @@ namespace Bud.IO {
         return builder;
       }).ToImmutable());
 
-    protected bool Equals(InOut other) => Elements.SequenceEqual(other.Elements);
-
     public override bool Equals(object obj) {
       if (ReferenceEquals(null, obj)) {
         return false;
@@ -42,12 +39,11 @@ namespace Bud.IO {
       return obj.GetType() == GetType() && Equals((InOut) obj);
     }
 
+    protected bool Equals(InOut other) => Elements.SequenceEqual(other.Elements);
     public override int GetHashCode() => EnumerableUtils.ElementwiseHashCode(Elements);
-
     public static bool operator ==(InOut left, InOut right) => Equals(left, right);
-
     public static bool operator !=(InOut left, InOut right) => !Equals(left, right);
-
-    public override string ToString() => $"InOut({string.Join(", ", Elements)})";
+    public override string ToString() => $"InOut({String.Join(", ", Elements)})";
+    public static InOut ToInOut(IInOut output) => new InOut(output);
   }
 }

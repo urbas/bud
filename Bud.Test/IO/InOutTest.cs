@@ -5,7 +5,6 @@ namespace Bud.IO {
   public class InOutTest {
     private readonly IInOut fileAOkay = InOutFile.ToInOutFile("a");
     private readonly IInOut fileBOkay = InOutFile.ToInOutFile("b");
-    private readonly IInOut fileANotOkay = InOutFile.ToInOutFile("a", false);
     private InOut inOutSingleOkayFileA;
     private InOut inOutSingleOkayFileB;
 
@@ -17,17 +16,6 @@ namespace Bud.IO {
 
     [Test]
     public void Empty_contains_no_files() => Assert.IsEmpty(InOut.Empty.Elements);
-
-    [Test]
-    public void Empty_is_okay() => Assert.IsTrue(InOut.Empty.IsOkay);
-
-    [Test]
-    public void Is_not_okay_when_some_files_are_not_okay()
-      => Assert.IsFalse(new InOut(ImmutableList.Create(fileANotOkay)).IsOkay);
-
-    [Test]
-    public void Is_not_okay_when_all_files_are_okay()
-      => Assert.IsTrue(inOutSingleOkayFileA.IsOkay);
 
     [Test]
     public void Merging_empty_is_empty()

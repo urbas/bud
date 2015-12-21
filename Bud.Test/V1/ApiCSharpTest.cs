@@ -87,7 +87,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Compiler_uses_dependencies()
-      => Assert.AreEqual(new[] {new InOut(Assembly.ToAssembly("Foo.dll", true))},
+      => Assert.AreEqual(new[] {new InOut(EmptyCompileOutput(42L)) },
                          Projects(ProjectAOutputsFooDll(42L),
                                   ProjectWithDependencies("B", "../A"))
                            .Get("B" / Input).ToEnumerable());
