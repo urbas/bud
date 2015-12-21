@@ -125,7 +125,6 @@
     <Compile Include="Cs\TimedEmittingCompilerTest.cs" />
     <Compile Include="IO\DiffTest.cs" />
     <Compile Include="IO\FilesTest.cs" />
-    <Compile Include="IO\InOutFileTest.cs" />
     <Compile Include="IO\InOutTest.cs" />
     <Compile Include="IO\LocalFilesObservatoryTest.cs" />
     <Compile Include="IO\FilesObservatoryTest.cs" />

@@ -44,7 +44,7 @@ namespace Bud.Cs {
         var source = tmpDir.CreateEmptyFile("A.cs");
         tmpDir.CreateEmptyFile("A.dll");
         var compiler = new TimedEmittingCompiler(ImmutableList<ResourceDescription>.Empty, underlyingCompiler.Object, Path.Combine(tmpDir.Path, "A.dll"));
-        compiler.Compile(new InOut(InOutFile.ToInOutFile(source)));
+        compiler.Compile(new InOut(source));
         underlyingCompiler.Verify(self => self.Compile(It.IsAny<IEnumerable<Timestamped<string>>>(), It.IsAny<IEnumerable<Timestamped<string>>>()), Times.Never);
       }
     }
@@ -56,7 +56,7 @@ namespace Bud.Cs {
         var assemblyReference = tmpDir.CreateEmptyFile("Foo.dll");
         underlyingCompiler.Setup(self => self.Compile(It.Is(EqualToTimestampedFiles(source)), It.Is(EqualToTimestampedFiles(assemblyReference)))).Returns(CSharpCompilation.Create("A.dll"));
         var compiler = new TimedEmittingCompiler(ImmutableList<ResourceDescription>.Empty, underlyingCompiler.Object, Path.Combine(tmpDir.Path, "A.dll"));
-        compiler.Compile(new InOut(InOutFile.ToInOutFile(source), Assembly.ToAssembly(assemblyReference)));
+        compiler.Compile(new InOut(source, Assembly.ToAssembly(assemblyReference)));
         underlyingCompiler.VerifyAll();
       }
     }

@@ -57,13 +57,13 @@ namespace Bud.V1 {
         .SetValue(SourceIncludes, ImmutableList.Create(Watched.Watch(new[] {"A.cs"})))
         .SetValue(AssemblyReferences, ImmutableList.Create("Foo.Bar.dll"));
       var compilationInputs = Input[projectA].ToEnumerable().ToList();
-      Assert.AreEqual(new[] {new InOut(InOutFile.ToInOutFile("A.cs"), Assembly.ToAssembly("Foo.Bar.dll"))},
+      Assert.AreEqual(new[] {new InOut("A.cs", Assembly.ToAssembly("Foo.Bar.dll"))},
                       compilationInputs);
     }
 
     [Test]
     public void CompilationInput_is_passed_to_the_compiler() {
-      var inOut = new InOut(InOutFile.ToInOutFile("A.cs"), Assembly.ToAssembly("Foo.Bar.dll"));
+      var inOut = new InOut("A.cs", Assembly.ToAssembly("Foo.Bar.dll"));
       var cSharpCompiler = new Mock<Func<InOut, CompileOutput>>(MockBehavior.Strict);
       cSharpCompiler.Setup(self => self(It.Is<InOut>(input => inOut.Equals(input))))
                     .Returns(EmptyCompileOutput());

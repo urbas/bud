@@ -22,7 +22,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Input_contains_the_packages_config_file()
-      => Assert.AreEqual(new InOut(InOutFile.ToInOutFile(Path.Combine("foo", "packages.config"))),
+      => Assert.AreEqual(new InOut(Path.Combine("foo", "packages.config")),
                          Input[TestProject("foo")].Take(1).Wait());
 
     [Test]

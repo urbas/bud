@@ -10,7 +10,6 @@ using Moq;
 using NUnit.Framework;
 using static System.IO.Path;
 using static System.Linq.Enumerable;
-using static Bud.IO.InOutFile;
 using static Bud.IO.Watched;
 using static Bud.V1.Api;
 
@@ -66,18 +65,18 @@ namespace Bud.V1 {
     public void Input_contains_the_added_file() {
       var buildProject = BuildProject("foo", "Foo")
         .Add(SourceIncludes, c => FilesObservatory[c].ObserveFiles("foo/bar"));
-      Assert.AreEqual(new InOut(ToInOutFile("foo/bar")),
+      Assert.AreEqual(new InOut("foo/bar"),
                       Input[buildProject].Take(1).Wait());
     }
 
     [Test]
     public void Default_input_contains_the_output_from_dependencies() {
       var projects = Projects(BuildProject("aDir", "A")
-                                .SetValue(Output, Observable.Return(new InOut(ToInOutFile("a")))),
+                                .SetValue(Output, Observable.Return(new InOut("a"))),
                               BuildProject("bDir", "B")
                                 .Add(SourceIncludes, Watch("b"))
                                 .Add(Dependencies, "../A"));
-      Assert.AreEqual(new InOut(ToInOutFile("a"), ToInOutFile("b")),
+      Assert.AreEqual(new InOut("a", "b"),
                       projects.Get("B"/Input).Wait());
     }
 
@@ -86,24 +85,24 @@ namespace Bud.V1 {
       var testScheduler = new TestScheduler();
       var projects = Projects(BuildProject("aDir", "A")
                                 .SetValue(BuildPipelineScheduler, testScheduler)
-                                .SetValue(Output, Observable.Return(new InOut(ToInOutFile("foo"))).Delay(TimeSpan.FromSeconds(1), testScheduler)
-                                                            .Concat(Observable.Return(new InOut(ToInOutFile("bar"))).Delay(TimeSpan.FromSeconds(1), testScheduler))),
+                                .SetValue(Output, Observable.Return(new InOut("foo")).Delay(TimeSpan.FromSeconds(1), testScheduler)
+                                                            .Concat(Observable.Return(new InOut("bar")).Delay(TimeSpan.FromSeconds(1), testScheduler))),
                               BuildProject("bDir", "B")
                                 .SetValue(BuildPipelineScheduler, testScheduler)
                                 .Add(Dependencies, "../A"));
       var bInput = projects.Get("B"/Input).GetEnumerator();
       testScheduler.AdvanceBy(TimeSpan.FromSeconds(5).Ticks);
       Assert.IsTrue(bInput.MoveNext());
-      Assert.AreEqual(new InOut(ToInOutFile("foo")), bInput.Current);
+      Assert.AreEqual(new InOut("foo"), bInput.Current);
       Assert.IsTrue(bInput.MoveNext());
-      Assert.AreEqual(new InOut(ToInOutFile("bar")), bInput.Current);
+      Assert.AreEqual(new InOut("bar"), bInput.Current);
       Assert.IsFalse(bInput.MoveNext());
     }
 
     [Test]
     public void Source_processor_changes_source_input() {
       var fileProcessor = new Mock<IInputProcessor>(MockBehavior.Strict);
-      var expectedOutputFiles = new InOut(ToInOutFile("foo"));
+      var expectedOutputFiles = new InOut("foo");
       fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<InOut>>()))
                    .Returns(Observable.Return(expectedOutputFiles));
       var actualOutputFiles = BuildProject("FooDir", "Foo")
@@ -136,12 +135,12 @@ namespace Bud.V1 {
     [Test]
     public void Default_input_contains_processed_sources() {
       var projects = Projects(BuildProject("aDir", "A")
-                                .SetValue(Output, Observable.Return(new InOut(ToInOutFile("a")))),
+                                .SetValue(Output, Observable.Return(new InOut("a"))),
                               BuildProject("bDir", "B")
                                 .Add(SourceIncludes, Watch("b"))
                                 .Add(SourceProcessors, new FooAppenderInputProcessor())
                                 .Add(Dependencies, "../A"));
-      Assert.AreEqual(new InOut(ToInOutFile("a"), ToInOutFile("bfoo")),
+      Assert.AreEqual(new InOut("a", "bfoo"),
                       projects.Get("B"/Input).Wait());
     }
 
@@ -165,7 +164,7 @@ namespace Bud.V1 {
 
     private class FooAppenderInputProcessor : IInputProcessor {
       public IObservable<InOut> Process(IObservable<InOut> sources)
-        => sources.Select(io => new InOut(io.Elements.OfType<InOutFile>().Select(file => ToInOutFile(file.Path + "foo"))));
+        => sources.Select(io => new InOut(io.Elements.OfType<string>().Select(file => file + "foo")));
     }
 
     public class ThreadIdRecordingInputProcessor : IInputProcessor {

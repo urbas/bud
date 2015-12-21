@@ -233,7 +233,7 @@ namespace Bud.V1 {
                    (sources, processor) => processor.Process(sources));
 
     private static IObservable<InOut> ObservedSources(IConf c)
-      => Sources[c].Select(sources => new InOut(sources.Select(InOutFile.ToInOutFile)));
+      => Sources[c].Select(sources => new InOut(sources));
 
     #endregion
 

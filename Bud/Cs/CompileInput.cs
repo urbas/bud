@@ -18,9 +18,9 @@ namespace Bud.Cs {
           assemblies.Add(Files.ToTimestampedFile(assembly.Path));
           continue;
         }
-        var file = element as InOutFile;
+        var file = element as string;
         if (file != null) {
-          sources.Add(Files.ToTimestampedFile(file.Path));
+          sources.Add(Files.ToTimestampedFile(file));
           continue;
         }
         var dependency = element as CompileOutput;

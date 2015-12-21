@@ -7,7 +7,6 @@ using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 using static Bud.Cs.Assembly;
 using static Bud.Cs.CompileInput;
-using static Bud.IO.InOutFile;
 
 namespace Bud.Cs {
   public class CompileInputTest {
@@ -37,7 +36,7 @@ namespace Bud.Cs {
     public void FromInOut_collects_sources() {
       using (var tempDir = new TemporaryDirectory()) {
         var fileA = tempDir.CreateEmptyFile("A.cs");
-        ExtractInput(new InOut(ToInOutFile(fileA)), out sources, out assemblies, out dependencies);
+        ExtractInput(new InOut(fileA), out sources, out assemblies, out dependencies);
         Assert.AreEqual(new[] {Files.ToTimestampedFile(fileA)},
                         sources);
       }

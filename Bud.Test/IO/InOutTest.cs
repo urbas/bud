@@ -3,15 +3,15 @@ using NUnit.Framework;
 
 namespace Bud.IO {
   public class InOutTest {
-    private readonly object fileAOkay = InOutFile.ToInOutFile("a");
-    private readonly object fileBOkay = InOutFile.ToInOutFile("b");
+    private readonly string fileA = "a";
+    private readonly string fileB = "b";
     private InOut inOutSingleOkayFileA;
     private InOut inOutSingleOkayFileB;
 
     [SetUp]
     public void SetUp() {
-      inOutSingleOkayFileA = new InOut(ImmutableList.Create(fileAOkay));
-      inOutSingleOkayFileB = new InOut(ImmutableList.Create(fileBOkay));
+      inOutSingleOkayFileA = new InOut(ImmutableList.Create(fileA));
+      inOutSingleOkayFileB = new InOut(ImmutableList.Create(fileB));
     }
 
     [Test]
@@ -23,7 +23,7 @@ namespace Bud.IO {
 
     [Test]
     public void Merging_non_empty()
-      => Assert.AreEqual(new InOut(ImmutableList.Create(fileAOkay, fileBOkay)),
+      => Assert.AreEqual(new InOut(ImmutableList.Create(fileA, fileB)),
                          InOut.Merge(inOutSingleOkayFileA, inOutSingleOkayFileB));
 
     [Test]
@@ -44,11 +44,11 @@ namespace Bud.IO {
     [Test]
     public void Equals_when_files_are_the_same()
       => Assert.AreEqual(inOutSingleOkayFileA,
-                         new InOut(ImmutableList.Create(fileAOkay)));
+                         new InOut(ImmutableList.Create(fileA)));
 
     [Test]
     public void Hash_code_equals_when_instances_equal()
       => Assert.AreEqual(inOutSingleOkayFileA.GetHashCode(),
-                         new InOut(ImmutableList.Create(fileAOkay)).GetHashCode());
+                         new InOut(ImmutableList.Create(fileA)).GetHashCode());
   }
 }
