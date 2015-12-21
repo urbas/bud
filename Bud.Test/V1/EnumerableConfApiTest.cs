@@ -1,11 +1,14 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Reactive.Linq;
 using NUnit.Framework;
 
 namespace Bud.V1 {
   public class EnumerableConfApiTest {
     private readonly Key<int> numberKey = nameof(numberKey);
     private readonly Key<IEnumerable<int>> enumerableKey = nameof(enumerableKey);
+    private readonly Key<IObservable<IEnumerable<int>>> observedEnumerableKey = nameof(observedEnumerableKey);
     private readonly Key<IImmutableList<int>> immutableListKey = nameof(immutableListKey);
     private readonly Key<IImmutableSet<int>> immutableSetKey = nameof(immutableSetKey);
 
@@ -23,6 +26,13 @@ namespace Bud.V1 {
                              .InitValue(enumerableKey, new[] {1})
                              .Add(enumerableKey, c => numberKey[c] + 1)
                              .Get(enumerableKey));
+
+    [Test]
+    public void Merge_adds_values_to_observed_enumerables()
+      => Assert.AreEqual(new[] { 1, 2 },
+                         Conf.Empty.InitValue(observedEnumerableKey, Observable.Return(new[] { 1 }))
+                             .Merge(observedEnumerableKey, Observable.Return(2))
+                             .Get(observedEnumerableKey).Wait());
 
     [Test]
     public void Add_adds_values_to_immutable_lists()

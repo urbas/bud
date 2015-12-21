@@ -338,7 +338,7 @@ namespace Bud.V1 {
         .ExcludeSourceDirs("obj", "bin", TargetDirName)
         .Modify(Input, AddAssemblyReferencesToInput)
         .Init(Compile, DefaultCSharpCompilation)
-        .Set(Build, c => Compile[c].Select(output => new [] {output}))
+        .Merge(Build, c => Compile[c])
         .Init(AssemblyName, c => ProjectId[c] + CSharpCompilationOptions[c].OutputKind.ToExtension())
         .Init(AssemblyReferences, c => ImmutableList.Create(typeof (object).Assembly.Location))
         .Init(Compiler, TimedEmittingCompiler.Create)
