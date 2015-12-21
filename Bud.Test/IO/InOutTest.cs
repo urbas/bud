@@ -3,8 +3,8 @@ using NUnit.Framework;
 
 namespace Bud.IO {
   public class InOutTest {
-    private readonly IInOut fileAOkay = InOutFile.ToInOutFile("a");
-    private readonly IInOut fileBOkay = InOutFile.ToInOutFile("b");
+    private readonly object fileAOkay = InOutFile.ToInOutFile("a");
+    private readonly object fileBOkay = InOutFile.ToInOutFile("b");
     private InOut inOutSingleOkayFileA;
     private InOut inOutSingleOkayFileB;
 
@@ -29,17 +29,17 @@ namespace Bud.IO {
     [Test]
     public void Empties_equal()
       => Assert.AreEqual(InOut.Empty,
-                         new InOut(ImmutableList<IInOut>.Empty));
+                         new InOut(ImmutableList<object>.Empty));
 
     [Test]
     public void Empties_are_not_same()
       => Assert.AreNotSame(InOut.Empty,
-                           new InOut(ImmutableList<IInOut>.Empty));
+                           new InOut(ImmutableList<object>.Empty));
 
     [Test]
     public void Hash_code_equals_when_empty()
       => Assert.AreEqual(InOut.Empty.GetHashCode(),
-                         new InOut(ImmutableList<IInOut>.Empty).GetHashCode());
+                         new InOut(ImmutableList<object>.Empty).GetHashCode());
 
     [Test]
     public void Equals_when_files_are_the_same()

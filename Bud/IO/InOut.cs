@@ -5,26 +5,26 @@ using System.Linq;
 using Bud.Collections;
 
 namespace Bud.IO {
-  public class InOut : IInOut {
-    public static readonly InOut Empty = new InOut(ImmutableList<IInOut>.Empty);
+  public class InOut {
+    public static readonly InOut Empty = new InOut(ImmutableList<object>.Empty);
 
-    public InOut(params IInOut[] elements) : this(elements.ToImmutableList()) {}
+    public InOut(params object[] elements) : this(elements.ToImmutableList()) {}
 
-    public InOut(IEnumerable<IInOut> elements) : this(elements.ToImmutableList()) {}
+    public InOut(IEnumerable<object> elements) : this(elements.ToImmutableList()) {}
 
-    public InOut(IImmutableList<IInOut> elements) {
+    public InOut(IImmutableList<object> elements) {
       Elements = elements;
     }
 
-    public IImmutableList<IInOut> Elements { get; }
+    public IImmutableList<object> Elements { get; }
 
-    public InOut Add(IEnumerable<IInOut> ioElements)
+    public InOut Add(IEnumerable<object> ioElements)
       => new InOut(Elements.AddRange(ioElements));
 
     public static InOut Merge(params InOut[] inOuts) => Merge((IEnumerable<InOut>) inOuts);
 
     public static InOut Merge(IEnumerable<InOut> inOuts)
-      => new InOut(inOuts.Aggregate(ImmutableList.CreateBuilder<IInOut>(), (builder, inOut) => {
+      => new InOut(inOuts.Aggregate(ImmutableList.CreateBuilder<object>(), (builder, inOut) => {
         builder.AddRange(inOut.Elements);
         return builder;
       }).ToImmutable());
@@ -44,6 +44,6 @@ namespace Bud.IO {
     public static bool operator ==(InOut left, InOut right) => Equals(left, right);
     public static bool operator !=(InOut left, InOut right) => !Equals(left, right);
     public override string ToString() => $"InOut({String.Join(", ", Elements)})";
-    public static InOut ToInOut(IInOut output) => new InOut(output);
+    public static InOut ToInOut(object io) => new InOut(io);
   }
 }

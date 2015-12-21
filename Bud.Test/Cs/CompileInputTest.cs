@@ -72,6 +72,6 @@ namespace Bud.Cs {
     private static CompileOutput FooCompileOutput()
       => new CompileOutput(Enumerable.Empty<Diagnostic>(), TimeSpan.Zero, "Foo.dll", true, 0L, null);
 
-    private class TestInOut : IInOut {}
+    private class TestInOut {}
   }
 }

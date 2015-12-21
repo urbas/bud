@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Bud.IO;
 using Microsoft.CodeAnalysis;
 
 namespace Bud.Cs {
-  public class CompileOutput : IInOut {
+  public class CompileOutput {
     public MetadataReference Reference { get; }
     public long Timestamp { get; }
     public IEnumerable<Diagnostic> Diagnostics { get; }

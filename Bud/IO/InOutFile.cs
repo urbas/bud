@@ -1,5 +1,5 @@
 namespace Bud.IO {
-  public class InOutFile : IInOut {
+  public class InOutFile {
     public string Path { get; }
 
     public InOutFile(string path) {
