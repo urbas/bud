@@ -3,6 +3,6 @@ using System.Collections.Generic;
 
 namespace Bud.IO {
   public interface IInputProcessor {
-    IObservable<IEnumerable<object>> Process(IObservable<IEnumerable<object>> sources);
+    IObservable<IEnumerable<string>> Process(IObservable<IEnumerable<string>> sources);
   }
 }

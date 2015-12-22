@@ -120,7 +120,7 @@
     <Compile Include="Configuration\RawConfTest.cs" />
     <Compile Include="Configuration\ScopedConfTest.cs" />
     <Compile Include="Configuration\ScopedDictionaryBuilderTest.cs" />
-    <Compile Include="Cs\CompileInputTest.cs" />
+    <Compile Include="Cs\CompileInputTestUtils.cs" />
     <Compile Include="Cs\RoslynCSharpCompilerTest.cs" />
     <Compile Include="Cs\TimedEmittingCompilerTest.cs" />
     <Compile Include="IO\DiffTest.cs" />
@@ -130,6 +130,7 @@
     <Compile Include="IO\PathUtilsTest.cs" />
     <Compile Include="IO\TimestampedTest.cs" />
     <Compile Include="IO\WatchedTest.cs" />
+    <Compile Include="V1\ApiDependenciesSupportTest.cs" />
     <Compile Include="V1\ApiSourcesSupportTest.cs" />
     <Compile Include="V1\PackageReferenceComparer.cs" />
     <Compile Include="V1\PackageReferencesProjectTest.cs" />

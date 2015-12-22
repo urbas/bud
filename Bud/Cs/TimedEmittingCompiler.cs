@@ -25,20 +25,18 @@ namespace Bud.Cs {
       UnderlyingCompiler = underlyingCompiler;
     }
 
-    public static Func<IEnumerable<object>, CompileOutput> Create(IConf conf)
+    public static Func<CompileInput, CompileOutput> Create(IConf conf)
       => new TimedEmittingCompiler(Api.EmbeddedResources[conf],
                                    CreateUnderlyingCompiler(conf),
                                    GetOutputAssemblyPath(conf)).Compile;
 
-    public CompileOutput Compile(IEnumerable<object> inOutInput) {
-      List<Timestamped<string>> sources;
-      List<Timestamped<string>> assemblies;
-      List<CompileOutput> dependencies;
-      CompileInput.ExtractInput(inOutInput, out sources, out assemblies, out dependencies);
-
-      if (!dependencies.All(dependency => dependency.Success)) {
+    public CompileOutput Compile(CompileInput input) {
+      if (!input.Dependencies.All(dependency => dependency.Success)) {
         return CreateOutputFromAssembly(false);
       }
+
+      List<Timestamped<string>> sources = input.Sources.Cast<string>().Select(Files.ToTimestampedFile).ToList();
+      List<Timestamped<string>> assemblies = input.AssemblyReferences.Concat(input.Dependencies.Select(output => output.AssemblyPath)).Select(Files.ToTimestampedFile).ToList();
 
       if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(sources, assemblies)) {
         return CreateOutputFromAssembly(true);

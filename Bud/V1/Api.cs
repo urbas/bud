@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -52,26 +51,25 @@ namespace Bud.V1 {
     public const string TargetDirName = "target";
 
     /// <summary>
-    ///   Input is a stream of collections. Each collection is a set of arbitrary data.
-    ///   An example of input are source files. Whenever source files change, a new
-    ///   observation is made in this input stream.
+    ///   Input is an observable stream of collections of files. Whenever input
+    ///   files change, a new observation is made in this input stream.
     /// </summary>
-    public static readonly Key<IObservable<IEnumerable<object>>> Input = nameof(Input);
+    public static readonly Key<IObservable<IEnumerable<string>>> Input = nameof(Input);
 
     /// <summary>
     ///   By default, build produces a single empty output.
     /// </summary>
-    public static readonly Key<IObservable<IEnumerable<object>>> Build = nameof(Build);
+    public static readonly Key<IObservable<IEnumerable<string>>> Build = nameof(Build);
 
     /// <summary>
     ///   By default, output forwards the result of the build without modifications.
     /// </summary>
-    public static readonly Key<IObservable<IEnumerable<object>>> Output = nameof(Output);
+    public static readonly Key<IObservable<IEnumerable<string>>> Output = nameof(Output);
 
     public static Conf BuildSupport = Conf
       .Empty
-      .InitValue(Input, Observable.Empty<IEnumerable<object>>())
-      .InitValue(Build, Observable.Return(Empty<object>()))
+      .InitValue(Input, Observable.Return(Empty<string>()))
+      .InitValue(Build, Observable.Return(Empty<string>()))
       .Init(Output, c => Build[c]);
 
     #endregion
@@ -85,8 +83,20 @@ namespace Bud.V1 {
     /// </summary>
     public static readonly Key<IImmutableSet<string>> Dependencies = nameof(Dependencies);
 
-    public static readonly Conf DependenciesSupport =
-      Dependencies.InitValue(ImmutableHashSet<string>.Empty);
+    /// <summary>
+    ///   This observable stream contains output from all dependencies.
+    /// </summary>
+    public static readonly Key<IObservable<IEnumerable<string>>> DependenciesInput = nameof(DependenciesInput);
+
+    public static readonly Conf DependenciesSupport = Conf
+      .Empty
+      .InitValue(Dependencies, ImmutableHashSet<string>.Empty)
+      .Init(DependenciesInput,
+            c => Dependencies[c].Select(dependency => c.TryGet(dependency/Output))
+                                .Where(dependencyOutput => dependencyOutput.HasValue)
+                                .Select(dependencyOutput => dependencyOutput.Value)
+                                .Aggregate(Observable.Return(Empty<string>()),
+                                           (mergedInputs, dependencyOutput) => mergedInputs.CombineLatest(dependencyOutput, (enumerable, enumerable1) => enumerable.Concat(enumerable1))));
 
     #endregion
 
@@ -190,7 +200,7 @@ namespace Bud.V1 {
     ///   A stream of <see cref="Sources" /> after they have been processed
     ///   by <see cref="SourceProcessors" />.
     /// </summary>
-    public static readonly Key<IObservable<IEnumerable<object>>> ProcessedSources = nameof(ProcessedSources);
+    public static readonly Key<IObservable<IEnumerable<string>>> ProcessedSources = nameof(ProcessedSources);
 
     /// <summary>
     ///   <see cref="Sources" /> are passed through source processors in order.
@@ -202,10 +212,9 @@ namespace Bud.V1 {
       .InitValue(SourceProcessors, ImmutableList<IInputProcessor>.Empty)
       .Init(ProcessedSources, DefaultProcessSources);
 
-    private static IObservable<IEnumerable<object>> DefaultProcessSources(IConf project)
-      => SourceProcessors[project]
-        .Aggregate((IObservable<IEnumerable<object>>) Sources[project],
-                   (sources, processor) => processor.Process(sources));
+    private static IObservable<IEnumerable<string>> DefaultProcessSources(IConf project)
+      => SourceProcessors[project].Aggregate(Sources[project],
+                                             (sources, processor) => processor.Process(sources));
 
     #endregion
 
@@ -244,7 +253,7 @@ namespace Bud.V1 {
         .InitValue(ProjectDir, projectDir)
         .Init(TargetDir, c => Path.Combine(ProjectDir[c], TargetDirName))
         .InitValue(ProjectId, projectId)
-        .Merge(Input, ObserveProcessedSources)
+        .Merge(Input, c => ProcessedSources[c])
         .ExcludeSourceDir(c => TargetDir[c])
         .Init(Clean, DefaultClean);
 
@@ -303,11 +312,6 @@ namespace Bud.V1 {
     private static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
       => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c], BuildPipelineScheduler[c]);
 
-    private static IObservable<IEnumerable<object>> ObserveProcessedSources(IConf c)
-      => Dependencies[c].Select(dependency => (dependency/Output)[c])
-                        .Concat(new[] {ProcessedSources[c]})
-                        .CombineLatest(inOuts => inOuts.Aggregate(Empty<object>(), Enumerable.Concat));
-
     private static Unit DefaultClean(IConf c) {
       var targetDir = TargetDir[c];
       if (Directory.Exists(targetDir)) {
@@ -321,7 +325,7 @@ namespace Bud.V1 {
     #region CSharp Projects
 
     public static readonly Key<IObservable<CompileOutput>> Compile = nameof(Compile);
-    public static readonly Key<Func<IEnumerable<object>, CompileOutput>> Compiler = nameof(Compiler);
+    public static readonly Key<Func<CompileInput, CompileOutput>> Compiler = nameof(Compiler);
     public static readonly Key<IImmutableList<string>> AssemblyReferences = nameof(AssemblyReferences);
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
@@ -334,11 +338,10 @@ namespace Bud.V1 {
       => BuildProject(projectDir, projectId)
         .AddSources(fileFilter: "*.cs")
         .ExcludeSourceDirs("obj", "bin", TargetDirName)
-        .Modify(Input, AddAssemblyReferencesToInput)
         .Init(Compile, DefaultCSharpCompilation)
-        .Merge(Build, c => Compile[c])
+        .Merge(Build, c => Compile[c].Select(output => output.AssemblyPath))
         .Init(AssemblyName, c => ProjectId[c] + CSharpCompilationOptions[c].OutputKind.ToExtension())
-        .Init(AssemblyReferences, c => ImmutableList.Create(typeof (object).Assembly.Location))
+        .InitValue(AssemblyReferences, ImmutableList<string>.Empty)
         .Init(Compiler, TimedEmittingCompiler.Create)
         .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, warningLevel: 1))
         .InitValue(EmbeddedResources, ImmutableList<ResourceDescription>.Empty);
@@ -349,12 +352,13 @@ namespace Bud.V1 {
         return ToResourceDescriptor(resourceFile, nameInAssembly);
       });
 
-    private static IObservable<IEnumerable<object>> AddAssemblyReferencesToInput(IConf c, IObservable<IEnumerable<object>> input)
-      => input.CombineLatest(Observable.Return(AssemblyReferences[c]),
-                             (inOut, references) => inOut.Concat(references.Select(Assembly.ToAssembly)));
-
     private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
-      => Input[conf].Select(Compiler[conf])
+      => Input[conf].CombineLatest(ObserveDependencies(conf), (sources, dependencies) => new CompileInput(
+                                                                sources,
+                                                                dependencies,
+                                                                AssemblyReferences[conf]
+                                                                ))
+                    .Select(Compiler[conf])
                     .Do(PrintCompilationResult);
 
     private static void PrintCompilationResult(CompileOutput output) {
@@ -371,6 +375,14 @@ namespace Bud.V1 {
     private static ResourceDescription ToResourceDescriptor(string resourceFile, string nameInAssembly)
       => new ResourceDescription(nameInAssembly, () => File.OpenRead(resourceFile), true);
 
+    private static IObservable<IEnumerable<CompileOutput>> ObserveDependencies(IConf c)
+      => Dependencies[c].Select(dependency => c.TryGet(dependency/Compile))
+                        .Where(output => output.HasValue)
+                        .Select(output => output.Value)
+                        .Aggregate(Observable.Return(Empty<CompileOutput>()),
+                                   (mergedOutputs, dependencyOutput) => mergedOutputs.CombineLatest(dependencyOutput,
+                                                                                                    (outputs, output) => outputs.Concat(new[] {output})));
+
     #endregion
 
     #region Package Reference Projects
@@ -382,8 +394,8 @@ namespace Bud.V1 {
     public static Key<string> PackagesConfigPath = nameof(PackagesConfigPath);
 
     /// <summary>
-    ///   A list of NuGet package references. These references will be resolved, downloaded, and returned
-    ///   as <see cref="Assembly" /> entries in the <see cref="Output" />.
+    ///   A list of NuGet package references. These references will be resolved, downloaded, and listed
+    ///   as entries in the <see cref="Output" /> key.
     /// </summary>
     public static Key<IImmutableList<PackageReference>> PackageReferences = nameof(PackageReferences);
 
