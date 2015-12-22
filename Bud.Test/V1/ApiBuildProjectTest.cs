@@ -6,7 +6,6 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Bud.IO;
-using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
 using static System.IO.Path;
@@ -59,52 +58,22 @@ namespace Bud.V1 {
 
     [Test]
     public void Input_should_initially_observe_a_single_empty_inout()
-      => Assert.AreEqual(new[] {Empty<object>()},
+      => Assert.AreEqual(new[] {Empty<string>()},
                          Input[BuildProject("bar", "Foo")].ToList().Wait());
 
     [Test]
     public void Input_contains_the_added_file() {
       var buildProject = BuildProject("foo", "Foo")
         .Add(SourceIncludes, c => FilesObservatory[c].ObserveFiles("foo/bar"));
-      Assert.AreEqual(new [] {"foo/bar"},
+      Assert.AreEqual(new[] {"foo/bar"},
                       Input[buildProject].Take(1).Wait());
-    }
-
-    [Test]
-    public void Default_input_contains_the_output_from_dependencies() {
-      var projects = Projects(BuildProject("aDir", "A")
-                                .SetValue(Output, Observable.Return(new [] {"a"})),
-                              BuildProject("bDir", "B")
-                                .Add(SourceIncludes, Watch("b"))
-                                .Add(Dependencies, "../A"));
-      Assert.AreEqual(new [] { "a", "b" },
-                      projects.Get("B"/Input).Wait());
-    }
-
-    [Test]
-    public void Input_reobserved_when_dependencies_change() {
-      var testScheduler = new TestScheduler();
-      var projects = Projects(BuildProject("aDir", "A")
-                                .SetValue(BuildPipelineScheduler, testScheduler)
-                                .SetValue(Output, Observable.Return(new [] { "foo"}).Delay(TimeSpan.FromSeconds(1), testScheduler)
-                                                            .Concat(Observable.Return(new[] { "bar" }).Delay(TimeSpan.FromSeconds(1), testScheduler))),
-                              BuildProject("bDir", "B")
-                                .SetValue(BuildPipelineScheduler, testScheduler)
-                                .Add(Dependencies, "../A"));
-      var bInput = projects.Get("B"/Input).GetEnumerator();
-      testScheduler.AdvanceBy(TimeSpan.FromSeconds(5).Ticks);
-      Assert.IsTrue(bInput.MoveNext());
-      Assert.AreEqual(new [] { "foo" }, bInput.Current);
-      Assert.IsTrue(bInput.MoveNext());
-      Assert.AreEqual(new[] { "bar" }, bInput.Current);
-      Assert.IsFalse(bInput.MoveNext());
     }
 
     [Test]
     public void Source_processor_changes_source_input() {
       var fileProcessor = new Mock<IInputProcessor>(MockBehavior.Strict);
-      var expectedOutputFiles = new [] {"foo"};
-      fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<IEnumerable<object>>>()))
+      var expectedOutputFiles = new[] {"foo"};
+      fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<IEnumerable<string>>>()))
                    .Returns(Observable.Return(expectedOutputFiles));
       var actualOutputFiles = BuildProject("FooDir", "Foo")
         .Add(SourceProcessors, fileProcessor.Object)
@@ -135,14 +104,11 @@ namespace Bud.V1 {
 
     [Test]
     public void Default_input_contains_processed_sources() {
-      var projects = Projects(BuildProject("aDir", "A")
-                                .SetValue(Output, Observable.Return(new [] {"a"})),
-                              BuildProject("bDir", "B")
-                                .Add(SourceIncludes, Watch("b"))
-                                .Add(SourceProcessors, new FooAppenderInputProcessor())
-                                .Add(Dependencies, "../A"));
-      Assert.AreEqual(new [] { "a", "bfoo" },
-                      projects.Get("B"/Input).Wait());
+      var projects = BuildProject("bDir", "B")
+        .Add(SourceIncludes, Watch("b"))
+        .Add(SourceProcessors, new FooAppenderInputProcessor());
+      Assert.AreEqual(new[] {"bfoo"},
+                      projects.Get(Input).Wait());
     }
 
     [Test]
@@ -164,14 +130,14 @@ namespace Bud.V1 {
     }
 
     private class FooAppenderInputProcessor : IInputProcessor {
-      public IObservable<IEnumerable<object>> Process(IObservable<IEnumerable<object>> sources)
-        => sources.Select(io => io.OfType<string>().Select(file => file + "foo"));
+      public IObservable<IEnumerable<string>> Process(IObservable<IEnumerable<string>> sources)
+        => sources.Select(io => io.Select(file => file + "foo"));
     }
 
     public class ThreadIdRecordingInputProcessor : IInputProcessor {
       public int InvocationThreadId { get; private set; }
 
-      public IObservable<IEnumerable<object>> Process(IObservable<IEnumerable<object>> sources) {
+      public IObservable<IEnumerable<string>> Process(IObservable<IEnumerable<string>> sources) {
         InvocationThreadId = Thread.CurrentThread.ManagedThreadId;
         return sources;
       }
