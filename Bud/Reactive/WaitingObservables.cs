@@ -4,7 +4,8 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Microsoft.CodeAnalysis;
+using Bud.Optional;
+using static Bud.Optional.Optionals;
 
 namespace Bud.Reactive {
   public static class WaitingObservables {
@@ -17,9 +18,8 @@ namespace Bud.Reactive {
                                                   IScheduler scheduler) {
       var shared = observable.Publish().RefCount();
       return shared.Window(CalmingWindows(shared, calmingPeriod, scheduler))
-                   .SelectMany(o => o.Aggregate(new Optional<T>(), (element, nextElement) => new Optional<T>(nextElement)))
-                   .Where(optional => optional.HasValue)
-                   .Select(optional => optional.Value);
+                   .SelectMany(o => o.Aggregate(None<T>(), (element, nextElement) => Some(nextElement)))
+                   .Gather();
     }
 
     public static IObservable<T> CalmAfterFirst<T>(this IObservable<T> observableToThrottle,

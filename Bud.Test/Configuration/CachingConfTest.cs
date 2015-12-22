@@ -3,6 +3,7 @@ using Bud.V1;
 using Microsoft.CodeAnalysis;
 using Moq;
 using NUnit.Framework;
+using static Bud.Optional.Optionals;
 
 namespace Bud.Configuration {
   public class CachingConfTest {
@@ -16,8 +17,8 @@ namespace Bud.Configuration {
       intFunc.Setup(self => self("foo")).Returns(42);
       objectFunc = new Mock<Func<Key<object>, Optional<object>>>();
       objectFunc.Setup(self => self("bar")).Returns<Key<object>>(k => new object());
-      objectFunc.Setup(self => self("undefined")).Returns(new Optional<object>());
-      objectFunc.Setup(self => self("defined")).Returns(new Optional<object>("42"));
+      objectFunc.Setup(self => self("undefined")).Returns(None<object>());
+      objectFunc.Setup(self => self("defined")).Returns(Some<object>("42"));
       cachingConf = new CachingConf();
     }
 

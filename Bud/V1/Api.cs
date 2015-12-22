@@ -8,6 +8,7 @@ using System.Reactive.Linq;
 using Bud.Configuration;
 using Bud.Cs;
 using Bud.IO;
+using Bud.Optional;
 using Bud.Reactive;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -92,9 +93,7 @@ namespace Bud.V1 {
       .Empty
       .InitValue(Dependencies, ImmutableHashSet<string>.Empty)
       .Init(DependenciesInput,
-            c => Dependencies[c].Select(dependency => c.TryGet(dependency/Output))
-                                .Where(dependencyOutput => dependencyOutput.HasValue)
-                                .Select(dependencyOutput => dependencyOutput.Value)
+            c => Dependencies[c].Gather(dependency => c.TryGet(dependency/Output))
                                 .Aggregate(Observable.Return(Empty<string>()),
                                            (mergedInputs, dependencyOutput) => mergedInputs.CombineLatest(dependencyOutput, (enumerable, enumerable1) => enumerable.Concat(enumerable1))));
 
@@ -376,9 +375,7 @@ namespace Bud.V1 {
       => new ResourceDescription(nameInAssembly, () => File.OpenRead(resourceFile), true);
 
     private static IObservable<IEnumerable<CompileOutput>> ObserveDependencies(IConf c)
-      => Dependencies[c].Select(dependency => c.TryGet(dependency/Compile))
-                        .Where(output => output.HasValue)
-                        .Select(output => output.Value)
+      => Dependencies[c].Gather(dependency => c.TryGet(dependency/Compile))
                         .Aggregate(Observable.Return(Empty<CompileOutput>()),
                                    (mergedOutputs, dependencyOutput) => mergedOutputs.CombineLatest(dependencyOutput,
                                                                                                     (outputs, output) => outputs.Concat(new[] {output})));

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Bud.V1;
 using Microsoft.CodeAnalysis;
+using static Bud.Optional.Optionals;
 
 namespace Bud.Configuration {
   public class RawConf : IConf {
@@ -18,9 +19,9 @@ namespace Bud.Configuration {
     private Optional<T> RawTryGet<T>(Key<T> key) {
       IConfDefinition confDefinition;
       if (ConfDefinitions.TryGetValue(key, out confDefinition)) {
-        return new Optional<T>((T) confDefinition.Value(this));
+        return Some((T) confDefinition.Value(this));
       }
-      return new Optional<T>();
+      return None<T>();
     }
   }
 }
