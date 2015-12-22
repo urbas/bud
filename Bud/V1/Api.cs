@@ -263,21 +263,19 @@ namespace Bud.V1 {
     /// </param>
     /// <returns>the modified project</returns>
     public static Conf AddSources(this Conf c, string subDir = null, string fileFilter = "*", bool includeSubdirs = true)
-      => c.Modify(SourceIncludes, (conf, sources) => {
+      => c.Add(SourceIncludes, conf => {
         var sourceDir = subDir == null ? ProjectDir[conf] : Path.Combine(ProjectDir[conf], subDir);
-        var newSources = FilesObservatory[conf].ObserveDir(sourceDir, fileFilter, includeSubdirs);
-        return sources.Add(newSources);
+        return FilesObservatory[conf].ObserveDir(sourceDir, fileFilter, includeSubdirs);
       });
 
     /// <summary>
     ///   Adds individual source files to the project.
     /// </summary>
     public static Conf AddSourceFiles(this Conf c, params string[] relativeFilePaths)
-      => c.Modify(SourceIncludes, (conf, existingSources) => {
+      => c.Add(SourceIncludes, conf => {
         var projectDir = ProjectDir[conf];
         var absolutePaths = relativeFilePaths.Select(relativeFilePath => Path.Combine(projectDir, relativeFilePath));
-        var newSources = FilesObservatory[conf].ObserveFiles(absolutePaths);
-        return existingSources.Add(newSources);
+        return FilesObservatory[conf].ObserveFiles(absolutePaths);
       });
 
     /// <summary>
@@ -296,10 +294,10 @@ namespace Bud.V1 {
     ///   Removes the given list of subdirectories from sources.
     /// </summary>
     public static Conf ExcludeSourceDirs(this Conf c, Func<IConf, IEnumerable<string>> subDirs)
-      => c.Modify(SourceExcludeFilters, (conf, filters) => {
+      => c.Add(SourceExcludeFilters, conf => {
         var projectDir = ProjectDir[conf];
         var dirs = subDirs(conf).Select(s => Path.IsPathRooted(s) ? s : Path.Combine(projectDir, s));
-        return filters.Add(PathUtils.InAnyDirFilter(dirs));
+        return PathUtils.InAnyDirFilter(dirs);
       });
 
     private static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
@@ -327,7 +325,7 @@ namespace Bud.V1 {
     public static readonly Key<IImmutableList<string>> AssemblyReferences = nameof(AssemblyReferences);
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
     public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
-    public static readonly Key<ImmutableList<ResourceDescription>> EmbeddedResources = nameof(EmbeddedResources);
+    public static readonly Key<IImmutableList<ResourceDescription>> EmbeddedResources = nameof(EmbeddedResources);
 
     public static Conf CsLibrary(string projectId)
       => CsLibrary(projectId, projectId);
@@ -346,11 +344,10 @@ namespace Bud.V1 {
         .InitValue(EmbeddedResources, ImmutableList<ResourceDescription>.Empty);
 
     public static Conf EmbedResource(this Conf conf, string path, string nameInAssembly)
-      => conf.Modify(EmbeddedResources,
-                     (c, embeddedResources) => {
-                       var resourceFile = Path.IsPathRooted(path) ? path : Path.Combine(ProjectDir[c], path);
-                       return embeddedResources.Add(ToResourceDescriptor(resourceFile, nameInAssembly));
-                     });
+      => conf.Add(EmbeddedResources, c => {
+        var resourceFile = Path.IsPathRooted(path) ? path : Path.Combine(ProjectDir[c], path);
+        return ToResourceDescriptor(resourceFile, nameInAssembly);
+      });
 
     private static IObservable<IEnumerable<object>> AddAssemblyReferencesToInput(IConf c, IObservable<IEnumerable<object>> input)
       => input.CombineLatest(Observable.Return(AssemblyReferences[c]),
