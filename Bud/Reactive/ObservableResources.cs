@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Reactive.Linq;
+using Bud.Collections;
 using Bud.IO;
 
 namespace Bud.Reactive {
@@ -25,5 +27,18 @@ namespace Bud.Reactive {
 
     public static IObservable<IEnumerable<T>> ObserveResources<T>(IEnumerable<Watched<T>> watchedResources)
       => ObserveResources(watchedResources, _ => true);
+
+    public static IObservable<IEnumerable<T>> Combined<T>(this IEnumerable<IObservable<IEnumerable<T>>> watchedResources)
+      => SingleEmptyResource<T>()
+        .Concat(watchedResources)
+        .CombineLatest(ImmutableLists.FlattenToImmutableList);
+
+    private static IEnumerable<IObservable<IEnumerable<T>>> SingleEmptyResource<T>()
+      => EmptyResources<T>.SingleEmptyResourceImpl;
+
+    private static class EmptyResources<T> {
+      public static readonly IEnumerable<IObservable<IEnumerable<T>>> SingleEmptyResourceImpl =
+        ImmutableList.Create(Observable.Return(Enumerable.Empty<T>()));
+    }
   }
 }

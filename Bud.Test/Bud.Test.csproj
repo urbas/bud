@@ -116,6 +116,7 @@
   <ItemGroup>
     <Compile Include="BudBuild.cs" />
     <Compile Include="Collections\EnumerableUtilsTest.cs" />
+    <Compile Include="Collections\ImmutableListsTest.cs" />
     <Compile Include="Configuration\CachingConfTest.cs" />
     <Compile Include="Configuration\RawConfTest.cs" />
     <Compile Include="Configuration\ScopedConfTest.cs" />

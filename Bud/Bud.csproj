@@ -103,6 +103,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collections\ImmutableLists.cs" />
     <Compile Include="Optional\OptionalExtensions.cs" />
     <Compile Include="Optional\Optionals.cs" />
     <Compile Include="V1\Api.cs" />
