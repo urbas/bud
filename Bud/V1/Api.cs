@@ -52,18 +52,19 @@ namespace Bud.V1 {
     public const string TargetDirName = "target";
 
     /// <summary>
-    ///   By default, input consists of <see cref="ProcessedSources" /> and
-    ///   outputs of <see cref="Dependencies" />.
+    ///   Input is a stream of collections. Each collection is a set of arbitrary data.
+    ///   An example of input are source files. Whenever source files change, a new
+    ///   observation is made in this input stream.
     /// </summary>
     public static readonly Key<IObservable<IEnumerable<object>>> Input = nameof(Input);
 
     /// <summary>
-    ///   By default, build simply pipes the input through.
+    ///   By default, build produces a single empty output.
     /// </summary>
     public static readonly Key<IObservable<IEnumerable<object>>> Build = nameof(Build);
 
     /// <summary>
-    ///   By default, output simply pipes the build through.
+    ///   By default, output forwards the result of the build without modifications.
     /// </summary>
     public static readonly Key<IObservable<IEnumerable<object>>> Output = nameof(Output);
 
@@ -94,10 +95,9 @@ namespace Bud.V1 {
     /// <summary>
     ///   By default the entire build pipeline (input, sources, build, and output) are
     ///   scheduled on the same scheduler and the same thread (i.e.: the build pipeline
-    ///   is single threaded). The build pipeline is, however, asynchronous. For example,
-    ///   compilers can run each in their own
-    ///   thread and produce output whenever they finish. The output is
-    ///   collected in the build pipeline's thread.
+    ///   is single threaded). The build pipeline is also asynchronous. For example,
+    ///   compilers can run each in their own thread and produce output when they finish.
+    ///   The output is collected in the build pipeline's thread.
     /// </summary>
     /// <remarks>
     ///   You should never need to override this outside of testing. In all honesty, this
