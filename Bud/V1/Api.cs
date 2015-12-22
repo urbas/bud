@@ -355,11 +355,12 @@ namespace Bud.V1 {
       });
 
     private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
-      => Input[conf].CombineLatest(ObserveDependencies(conf), (sources, dependencies) => new CompileInput(
-                                                                sources,
-                                                                dependencies,
-                                                                AssemblyReferences[conf]
-                                                                ))
+      => Input[conf].CombineLatest(ObserveDependencies(conf),
+                                   (sources, dependencies) => new CompileInput(
+                                     sources,
+                                     dependencies,
+                                     AssemblyReferences[conf]
+                                     ))
                     .Select(Compiler[conf])
                     .Do(PrintCompilationResult);
 

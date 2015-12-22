@@ -35,8 +35,10 @@ namespace Bud.Cs {
         return CreateOutputFromAssembly(false);
       }
 
-      List<Timestamped<string>> sources = input.Sources.Cast<string>().Select(Files.ToTimestampedFile).ToList();
-      List<Timestamped<string>> assemblies = input.AssemblyReferences.Concat(input.Dependencies.Select(output => output.AssemblyPath)).Select(Files.ToTimestampedFile).ToList();
+      var sources = input.Sources.Select(Files.ToTimestampedFile).ToList();
+      var assemblies = input.AssemblyReferences
+        .Concat(input.Dependencies.Select(output => output.AssemblyPath))
+        .Select(Files.ToTimestampedFile).ToList();
 
       if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(sources, assemblies)) {
         return CreateOutputFromAssembly(true);

@@ -8,23 +8,35 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Bud.Cs {
   public class RoslynCSharpCompiler : ICompiler {
-    private Diff<Timestamped<string>> sources = Diff.Empty<Timestamped<string>>();
-    private ImmutableDictionary<Timestamped<string>, SyntaxTree> syntaxTreesCache = ImmutableDictionary<Timestamped<string>, SyntaxTree>.Empty;
-    private Diff<Timestamped<string>> references = Diff.Empty<Timestamped<string>>();
-    private ImmutableDictionary<Timestamped<string>, MetadataReference> referencesCache = ImmutableDictionary<Timestamped<string>, MetadataReference>.Empty;
+    private Diff<Timestamped<string>> sources
+      = Diff.Empty<Timestamped<string>>();
+
+    private ImmutableDictionary<Timestamped<string>, SyntaxTree> syntaxTreesCache
+      = ImmutableDictionary<Timestamped<string>, SyntaxTree>.Empty;
+
+    private Diff<Timestamped<string>> references
+      = Diff.Empty<Timestamped<string>>();
+
+    private ImmutableDictionary<Timestamped<string>, MetadataReference> referencesCache
+      = ImmutableDictionary<Timestamped<string>, MetadataReference>.Empty;
+
     private CSharpCompilation cSharpCompilation;
 
     public RoslynCSharpCompiler(string assemblyName, CSharpCompilationOptions compilationOptions) {
-      cSharpCompilation = CSharpCompilation.Create(assemblyName,
-                                                   Enumerable.Empty<SyntaxTree>(),
-                                                   Enumerable.Empty<MetadataReference>(),
-                                                   compilationOptions);
+      cSharpCompilation = CSharpCompilation
+        .Create(assemblyName,
+                Enumerable.Empty<SyntaxTree>(),
+                Enumerable.Empty<MetadataReference>(),
+                compilationOptions);
     }
 
-    public CSharpCompilation Compile(IEnumerable<string> sources, IEnumerable<string> assemblyReferences)
-      => Compile(Files.ToTimestampedFiles(sources), Files.ToTimestampedFiles(assemblyReferences));
+    public CSharpCompilation Compile(IEnumerable<string> sources,
+                                     IEnumerable<string> assemblyReferences)
+      => Compile(Files.ToTimestampedFiles(sources),
+                 Files.ToTimestampedFiles(assemblyReferences));
 
-    public CSharpCompilation Compile(IEnumerable<Timestamped<string>> inputSources, IEnumerable<Timestamped<string>> inputAssemblies) {
+    public CSharpCompilation Compile(IEnumerable<Timestamped<string>> inputSources,
+                                     IEnumerable<Timestamped<string>> inputAssemblies) {
       UpdateSources(inputSources);
       UpdateReferences(inputAssemblies);
       return cSharpCompilation;
