@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Reactive.Linq;
 using Bud.Collections;
 using Bud.IO;
+using Bud.Optional;
+using static System.Reactive.Linq.Observable;
 
 namespace Bud.Reactive {
   public static class ObservableResources {
     public static IObservable<IEnumerable<T>> ObserveResources<T>(IEnumerable<T> resources,
                                                                   IObservable<T> observationTrigger)
-      => Observable.Return(resources)
-                   .Concat(observationTrigger.Select(_ => resources));
+      => Return(resources)
+        .Concat(observationTrigger.Select(_ => resources));
 
     public static IObservable<IEnumerable<T>> ObserveResources<T>(IEnumerable<T> resources,
                                                                   IObservable<T> observationTrigger,
@@ -33,12 +34,17 @@ namespace Bud.Reactive {
         .Concat(watchedResources)
         .CombineLatest(ImmutableLists.FlattenToImmutableList);
 
+    public static IObservable<IEnumerable<T>> PileUp<T>(this IEnumerable<IObservable<T>> watchedResources)
+      => ImmutableList.Create(Return(Optionals.None<T>()))
+        .Concat(watchedResources.Select(observable => observable.Select(Optionals.Some)))
+        .CombineLatest(OptionalExtensions.Gather);
+
     private static IEnumerable<IObservable<IEnumerable<T>>> SingleEmptyResource<T>()
       => EmptyResources<T>.SingleEmptyResourceImpl;
 
     private static class EmptyResources<T> {
       public static readonly IEnumerable<IObservable<IEnumerable<T>>> SingleEmptyResourceImpl =
-        ImmutableList.Create(Observable.Return(Enumerable.Empty<T>()));
+        ImmutableList.Create(Return(Enumerable.Empty<T>()));
     }
   }
 }

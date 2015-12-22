@@ -92,10 +92,12 @@ namespace Bud.V1 {
     public static readonly Conf DependenciesSupport = Conf
       .Empty
       .InitValue(Dependencies, ImmutableHashSet<string>.Empty)
-      .Init(DependenciesInput,
-            c => Dependencies[c].Gather(dependency => c.TryGet(dependency/Output))
-                                .Aggregate(Observable.Return(Empty<string>()),
-                                           (mergedInputs, dependencyOutput) => mergedInputs.CombineLatest(dependencyOutput, (enumerable, enumerable1) => enumerable.Concat(enumerable1))));
+      .Init(DependenciesInput, GatherOutputsFromDependencies);
+
+    private static IObservable<IEnumerable<string>> GatherOutputsFromDependencies(IConf c)
+      => Dependencies[c]
+        .Gather(dependency => c.TryGet(dependency/Output))
+        .Combined();
 
     #endregion
 
@@ -212,8 +214,9 @@ namespace Bud.V1 {
       .Init(ProcessedSources, DefaultProcessSources);
 
     private static IObservable<IEnumerable<string>> DefaultProcessSources(IConf project)
-      => SourceProcessors[project].Aggregate(Sources[project],
-                                             (sources, processor) => processor.Process(sources));
+      => SourceProcessors[project]
+        .Aggregate(Sources[project],
+                   (sources, processor) => processor.Process(sources));
 
     #endregion
 
@@ -376,9 +379,7 @@ namespace Bud.V1 {
 
     private static IObservable<IEnumerable<CompileOutput>> ObserveDependencies(IConf c)
       => Dependencies[c].Gather(dependency => c.TryGet(dependency/Compile))
-                        .Aggregate(Observable.Return(Empty<CompileOutput>()),
-                                   (mergedOutputs, dependencyOutput) => mergedOutputs.CombineLatest(dependencyOutput,
-                                                                                                    (outputs, output) => outputs.Concat(new[] {output})));
+                        .PileUp();
 
     #endregion
 

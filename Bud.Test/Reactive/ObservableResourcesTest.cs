@@ -113,5 +113,24 @@ namespace Bud.Reactive {
       scheduler.AdvanceBy(1);
       IsFalse(actual.MoveNext());
     }
+
+    [Test]
+    public void PileUp_produces_an_empty_observation()
+      => AreEqual(new[] {Enumerable.Empty<int>()},
+                  Enumerable.Empty<IObservable<int>>().PileUp().ToList().Wait());
+
+    [Test]
+    public void PileUp_produces_concatenated_observations() {
+      var scheduler = new TestScheduler();
+      var actual = new[] {Return(1).Concat(Return(2).Delay(TimeSpan.FromTicks(10), scheduler)), Return(42)}
+        .PileUp().GetEnumerator();
+      IsTrue(actual.MoveNext());
+      AreEqual(new[] {1, 42}, actual.Current);
+      scheduler.AdvanceBy(10);
+      IsTrue(actual.MoveNext());
+      AreEqual(new[] {2, 42}, actual.Current);
+      scheduler.AdvanceBy(1);
+      IsFalse(actual.MoveNext());
+    }
   }
 }
