@@ -10,7 +10,9 @@ namespace Bud.V1 {
     private readonly Key<IEnumerable<int>> enumerableKey = nameof(enumerableKey);
     private readonly Key<IObservable<IEnumerable<int>>> observedEnumerableKey = nameof(observedEnumerableKey);
     private readonly Key<IImmutableList<int>> immutableListKey = nameof(immutableListKey);
+    private readonly Key<IObservable<IImmutableList<int>>> observedIImmutableListKey = nameof(observedIImmutableListKey);
     private readonly Key<IImmutableSet<int>> immutableSetKey = nameof(immutableSetKey);
+    private readonly Key<IObservable<IImmutableSet<int>>> observedImmutableSetKey = nameof(observedImmutableSetKey);
 
     [Test]
     public void Add_adds_values_to_enumerables()
@@ -50,6 +52,13 @@ namespace Bud.V1 {
                              .Get(immutableListKey));
 
     [Test]
+    public void Merge_adds_values_to_observed_immutable_lists()
+      => Assert.AreEqual(new[] { 1, 2 },
+                         Conf.Empty.InitValue(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
+                             .Merge(observedIImmutableListKey, Observable.Return(2))
+                             .Get(observedIImmutableListKey).Wait());
+
+    [Test]
     public void Add_adds_values_to_immutable_sets()
       => Assert.AreEqual(new[] {1, 2},
                          Conf.Empty.InitValue(immutableSetKey, ImmutableHashSet.Create(1))
@@ -63,5 +72,12 @@ namespace Bud.V1 {
                              .InitValue(immutableSetKey, ImmutableHashSet.Create(1))
                              .Add(immutableSetKey, c => numberKey[c] + 1)
                              .Get(immutableSetKey));
+
+    [Test]
+    public void Merge_adds_values_to_observed_immutable_sets()
+      => Assert.AreEqual(new[] { 1, 2 },
+                         Conf.Empty.InitValue(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
+                             .Merge(observedImmutableSetKey, Observable.Return(2))
+                             .Get(observedImmutableSetKey).Wait());
   }
 }
