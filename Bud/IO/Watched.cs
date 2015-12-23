@@ -6,7 +6,8 @@ using System.Reactive.Linq;
 namespace Bud.IO {
   public class Watched<T> {
     public static Watched<T> Empty { get; }
-      = new Watched<T>(Enumerable.Empty<T>(), Observable.Empty<T>());
+      = new Watched<T>(Enumerable.Empty<T>(),
+                       Observable.Empty<T>());
 
     /// <param name="resources">
     ///   an enumeration of watched resources.
@@ -28,7 +29,8 @@ namespace Bud.IO {
   }
 
   public static class Watched {
-    public static Watched<T> Watch<T>(IEnumerable<T> resources, IObservable<T> watcher)
+    public static Watched<T> Watch<T>(IEnumerable<T> resources,
+                                      IObservable<T> watcher)
       => new Watched<T>(resources, watcher);
 
     public static Watched<T> Watch<T>(IEnumerable<T> resources)

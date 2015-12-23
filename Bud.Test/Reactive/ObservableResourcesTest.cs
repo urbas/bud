@@ -6,6 +6,7 @@ using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
 using static System.Reactive.Linq.Observable;
+using static Bud.IO.Watched;
 using static NUnit.Framework.Assert;
 
 namespace Bud.Reactive {
@@ -61,8 +62,8 @@ namespace Bud.Reactive {
 
     [Test]
     public void Observing_two_watched_resources_merges_their_elements() {
-      var watchedResources1 = new Watched<int>(new[] {42}, Empty<int>());
-      var watchedResources2 = new Watched<int>(new[] {9001}, Empty<int>());
+      var watchedResources1 = Watch(new[] {42}, Empty<int>());
+      var watchedResources2 = Watch(new[] {9001}, Empty<int>());
       var observable = ObservableResources.ObserveResources(new[] {watchedResources1, watchedResources2});
       AreEqual(new[] {new[] {42, 9001}},
                observable.ToList().Wait());
@@ -70,8 +71,8 @@ namespace Bud.Reactive {
 
     [Test]
     public void Observing_two_watched_resources_merges_observation_triggers() {
-      var watchedResources1 = new Watched<int>(Enumerable.Empty<int>(), Return(1));
-      var watchedResources2 = new Watched<int>(Enumerable.Empty<int>(), Return(2));
+      var watchedResources1 = Watch(Enumerable.Empty<int>(), Return(1));
+      var watchedResources2 = Watch(Enumerable.Empty<int>(), Return(2));
       var observations = ObservableResources.ObserveResources(new[] {watchedResources1, watchedResources2}).ToList().Wait();
       AreEqual(3, observations.Count);
       That(observations, Is.All.EqualTo(Enumerable.Empty<int>()));
@@ -79,8 +80,8 @@ namespace Bud.Reactive {
 
     [Test]
     public void Observing_two_watched_resources_filters_their_elements() {
-      var watchedResources1 = new Watched<int>(new[] {42}, Empty<int>());
-      var watchedResources2 = new Watched<int>(new[] {9001}, Empty<int>());
+      var watchedResources1 = Watch(new[] {42}, Empty<int>());
+      var watchedResources2 = Watch(new[] {9001}, Empty<int>());
       var observable = ObservableResources.ObserveResources(new[] {watchedResources1, watchedResources2}, i => 42 == i);
       AreEqual(new[] {new[] {42}},
                observable.ToList().Wait());
@@ -88,8 +89,8 @@ namespace Bud.Reactive {
 
     [Test]
     public void Observing_two_watched_resources_filters_their_elements_and_observation_triggers() {
-      var watchedResources1 = new Watched<int>(new[] {42}, Return(42));
-      var watchedResources2 = new Watched<int>(new[] {9001}, Return(9001));
+      var watchedResources1 = Watch(new[] {42}, Return(42));
+      var watchedResources2 = Watch(new[] {9001}, Return(9001));
       var observable = ObservableResources.ObserveResources(new[] {watchedResources1, watchedResources2}, i => 42 == i);
       AreEqual(new[] {new[] {42}, new[] {42}},
                observable.ToList().Wait());
