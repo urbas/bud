@@ -10,6 +10,7 @@ using Moq;
 using NUnit.Framework;
 using static System.IO.Path;
 using static System.Linq.Enumerable;
+using static Bud.IO.FileObservatories;
 using static Bud.IO.Watched;
 using static Bud.V1.Api;
 
@@ -88,10 +89,10 @@ namespace Bud.V1 {
       int inputThreadId = 0;
       var fileProcessor = new ThreadIdRecordingInputProcessor();
       BuildProject("fooDir", "A")
-        .Add(SourceIncludes, Watch(Empty<string>(), Observable.Create<string>(observer => {
+        .Add(SourceIncludes, WatchFiles(Empty<string>(), Observable.Create<IEnumerable<string>>(observer => {
           Task.Run(() => {
             inputThreadId = Thread.CurrentThread.ManagedThreadId;
-            observer.OnNext("foo");
+            observer.OnNext(Empty<string>());
             observer.OnCompleted();
           });
           return new CompositeDisposable();
@@ -105,7 +106,7 @@ namespace Bud.V1 {
     [Test]
     public void Default_input_contains_processed_sources() {
       var projects = BuildProject("bDir", "B")
-        .Add(SourceIncludes, Watch("b"))
+        .Add(SourceIncludes, UnchangingFiles("b"))
         .Add(SourceProcessors, new FooAppenderInputProcessor());
       Assert.AreEqual(new[] {"bfoo"},
                       projects.Get(Input).Wait());

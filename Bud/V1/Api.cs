@@ -138,7 +138,7 @@ namespace Bud.V1 {
     ///     and then passed on to <see cref="Sources" />.
     ///   </para>
     /// </summary>
-    public static readonly Key<IImmutableList<Watched<string>>> SourceIncludes = nameof(SourceIncludes);
+    public static readonly Key<IImmutableList<Watched<IEnumerable<string>>>> SourceIncludes = nameof(SourceIncludes);
 
     /// <summary>
     ///   These filters are applied on the <see cref="Sources" /> stream
@@ -163,7 +163,7 @@ namespace Bud.V1 {
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
 
     public static readonly Conf SourcesSupport = BuildSchedulingSupport
-      .InitValue(SourceIncludes, ImmutableList<Watched<string>>.Empty)
+      .InitValue(SourceIncludes, ImmutableList<Watched<IEnumerable<string>>>.Empty)
       .InitValue(SourceExcludeFilters, ImmutableList<Func<string, bool>>.Empty)
       .InitValue(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
       .Init(FilesObservatory, _ => new LocalFilesObservatory())
@@ -188,8 +188,10 @@ namespace Bud.V1 {
                             .ObserveOn(BuildPipelineScheduler[c])
                             .Calmed(c);
 
-    private static Func<string, bool> SourceFilter(IConf c)
-      => sourceFile => !SourceExcludeFilters[c].Any(filter => filter(sourceFile));
+    private static Func<string, bool> SourceFilter(IConf c) {
+      var excludeFilters = SourceExcludeFilters[c];
+      return sourceFile => !excludeFilters.Any(filter => filter(sourceFile));
+    }
 
     #endregion
 

@@ -9,7 +9,7 @@ using Bud.V1;
 using Microsoft.CodeAnalysis;
 using static System.IO.Directory;
 using static System.IO.Path;
-using static Bud.IO.Watched;
+using static Bud.IO.FileObservatories;
 using static Bud.V1.Api;
 using Assembly = System.Reflection.Assembly;
 
@@ -18,7 +18,7 @@ namespace Bud.Cli {
     public static void Main(string[] args) {
       var compilationOutput = CsLibrary(Combine(GetCurrentDirectory()), "BuildConf")
         .Add(AssemblyReferences, BudDependencies)
-        .Set(SourceIncludes, configs => ImmutableList.Create(Watch(Combine(ProjectDir[configs], "Build.cs"))))
+        .Set(SourceIncludes, configs => ImmutableList.Create(UnchangingFiles(Combine(ProjectDir[configs], "Build.cs"))))
         .Get(Compile)
         .Take(1)
         .Wait();

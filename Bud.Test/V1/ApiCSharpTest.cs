@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -109,7 +110,7 @@ namespace Bud.V1 {
 
     private static Conf EmptyCSharpProject(string projectId)
       => CsLibrary(projectId, projectId)
-        .SetValue(SourceIncludes, ImmutableList.Create(Watched<string>.Empty))
+        .SetValue(SourceIncludes, ImmutableList<Watched<IEnumerable<string>>>.Empty)
         .SetValue(AssemblyReferences, ImmutableList<string>.Empty);
 
     private static CompileOutput EmptyCompileOutput(long timestamp = 0L)
@@ -121,16 +122,16 @@ namespace Bud.V1 {
       return compiler;
     }
 
-    private static Watched<string> EmptyFilesWithDelayedUpdates(IScheduler testScheduler) {
-      var fileUpdates = Observable.Return("foo").Delay(TimeSpan.FromSeconds(1), testScheduler)
-                                  .Concat(Observable.Return("bar").Delay(TimeSpan.FromSeconds(1), testScheduler));
-      return Watched.Watch(Enumerable.Empty<string>(), fileUpdates);
+    private static Watched<IEnumerable<string>> FileADelayedUpdates(IScheduler testScheduler) {
+      var fileUpdates = Observable.Return(new [] {"A.cs"}).Delay(TimeSpan.FromSeconds(1), testScheduler)
+                                  .Concat(Observable.Return(new[] { "A.cs" }).Delay(TimeSpan.FromSeconds(1), testScheduler));
+      return Watched.Watch<IEnumerable<string>>(new [] {"A.cs"}, fileUpdates);
     }
 
     private static Conf ProjectAWithUpdatingSources(IScheduler testScheduler, Func<CompileInput, CompileOutput> compiler)
       => CsLibrary("a", "A")
         .SetValue(BuildPipelineScheduler, testScheduler)
-        .SetValue(SourceIncludes, ImmutableList.Create(EmptyFilesWithDelayedUpdates(testScheduler)))
+        .SetValue(SourceIncludes, ImmutableList.Create(FileADelayedUpdates(testScheduler)))
         .SetValue(AssemblyReferences, ImmutableList<string>.Empty)
         .SetValue(Compiler, compiler);
   }
