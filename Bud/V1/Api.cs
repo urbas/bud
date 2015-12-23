@@ -47,9 +47,7 @@ namespace Bud.V1 {
 
     #endregion
 
-    #region Base Build Support
-
-    public const string TargetDirName = "target";
+    #region Build Support
 
     /// <summary>
     ///   Input is an observable stream of collections of files. Whenever input
@@ -220,7 +218,9 @@ namespace Bud.V1 {
 
     #endregion
 
-    #region Build Project
+    #region Bare Project
+
+    public const string TargetDirName = "target";
 
     /// <summary>
     ///   The build's identifier. This identifier is used in <see cref="Dependencies" />.
@@ -247,17 +247,34 @@ namespace Bud.V1 {
 
     /// <param name="projectDir">see <see cref="ProjectDir" /></param>
     /// <param name="projectId">see <see cref="ProjectId" /></param>
-    public static Conf BuildProject(string projectDir, string projectId)
+    public static Conf BareProject(string projectDir, string projectId)
       => Project(projectId)
-        .Add(BuildSupport)
-        .Add(DependenciesSupport)
-        .Add(SourceProcessorsSupport)
         .InitValue(ProjectDir, projectDir)
         .Init(TargetDir, c => Path.Combine(ProjectDir[c], TargetDirName))
         .InitValue(ProjectId, projectId)
-        .Merge(Input, c => ProcessedSources[c])
-        .ExcludeSourceDir(c => TargetDir[c])
         .Init(Clean, DefaultClean);
+
+    private static Unit DefaultClean(IConf c) {
+      var targetDir = TargetDir[c];
+      if (Directory.Exists(targetDir)) {
+        Directory.Delete(targetDir, true);
+      }
+      return Unit.Default;
+    }
+
+    #endregion
+
+    #region Build Project
+
+    /// <param name="projectDir">see <see cref="ProjectDir" /></param>
+    /// <param name="projectId">see <see cref="ProjectId" /></param>
+    public static Conf BuildProject(string projectDir, string projectId)
+      => BareProject(projectDir, projectId)
+        .Add(BuildSupport)
+        .Add(DependenciesSupport)
+        .Add(SourceProcessorsSupport)
+        .Merge(Input, c => ProcessedSources[c])
+        .ExcludeSourceDir(c => TargetDir[c]);
 
     /// <summary>
     ///   Adds files found in <paramref name="subDir" /> to <see cref="Sources" />.
@@ -313,14 +330,6 @@ namespace Bud.V1 {
 
     private static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
       => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c], BuildPipelineScheduler[c]);
-
-    private static Unit DefaultClean(IConf c) {
-      var targetDir = TargetDir[c];
-      if (Directory.Exists(targetDir)) {
-        Directory.Delete(targetDir, true);
-      }
-      return Unit.Default;
-    }
 
     #endregion
 
@@ -390,21 +399,16 @@ namespace Bud.V1 {
     ///   The path to the <c>packages.config</c> file. By default, it is placed directly
     ///   under the <see cref="ProjectDir" />.
     /// </summary>
-    public static Key<string> PackagesConfigPath = nameof(PackagesConfigPath);
+    public static Key<string> PackagesConfigFile = nameof(PackagesConfigFile);
 
     /// <summary>
-    ///   A list of NuGet package references. These references will be resolved, downloaded, and listed
-    ///   as entries in the <see cref="Output" /> key.
+    ///   A list of NuGet package references. By default, this list is read from the <see cref="PackagesConfigFile" />.
     /// </summary>
-    public static Key<IImmutableList<PackageReference>> PackageReferences = nameof(PackageReferences);
+    public static Key<IObservable<IImmutableList<PackageReference>>> PackageReferences = nameof(PackageReferences);
 
     public static Conf PackageReferencesProject(string dir, string projectId)
-      => BuildProject(dir, projectId)
-        .AddSourceFile(c => PackagesConfigPath[c])
-        .Init(PackagesConfigPath, c => Path.Combine(ProjectDir[c], "packages.config"))
-        .Init(PackageReferences, c => new PackagesConfigReader(File.OpenRead(PackagesConfigPath[c]))
-                                   .GetPackages()
-                                   .ToImmutableList());
+      => BareProject(dir, projectId)
+        .Init(PackagesConfigFile, c => Path.Combine(ProjectDir[c], "packages.config"));
 
     #endregion
   }
