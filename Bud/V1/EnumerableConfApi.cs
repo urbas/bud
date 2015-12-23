@@ -17,13 +17,16 @@ namespace Bud.V1 {
     public static Conf Add<T>(this Conf conf, Key<IEnumerable<T>> key, Func<IConf, T> value)
       => conf.Modify(key, (c, oldList) => oldList.Concat(new[] {value(c)}));
 
-    public static Conf Merge<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, IObservable<T> value)
-      => conf.Merge(key, _ => value);
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, T value)
+      => conf.Add(key, _ => Observable.Return(value));
 
-    public static Conf Merge<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, Func<IConf, IObservable<T>> value)
-      => conf.Merge(key, c => value(c).Select(e => new[] {e}));
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, IObservable<T> value)
+      => conf.Add(key, _ => value);
 
-    public static Conf Merge<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, Func<IConf, IObservable<IEnumerable<T>>> values)
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, Func<IConf, IObservable<T>> value)
+      => conf.Add(key, c => value(c).Select(e => new[] {e}));
+
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, Func<IConf, IObservable<IEnumerable<T>>> values)
       => conf.Modify(key, (c, observable) => observable.CombineLatest(values(c), Enumerable.Concat));
 
     #endregion
@@ -39,13 +42,16 @@ namespace Bud.V1 {
     public static Conf Add<T>(this Conf conf, Key<IImmutableList<T>> key, Func<IConf, T> value)
       => conf.Modify(key, (c, oldList) => oldList.Add(value(c)));
 
-    public static Conf Merge<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, IObservable<T> value)
-      => conf.Merge(key, _ => value);
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, T value)
+      => conf.Add(key, _ => Observable.Return(value));
 
-    public static Conf Merge<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, Func<IConf, IObservable<T>> value)
-      => conf.Merge(key, c => value(c).Select(ImmutableList.Create));
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, IObservable<T> value)
+      => conf.Add(key, _ => value);
 
-    public static Conf Merge<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, Func<IConf, IObservable<IEnumerable<T>>> values)
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, Func<IConf, IObservable<T>> value)
+      => conf.Add(key, c => value(c).Select(ImmutableList.Create));
+
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, Func<IConf, IObservable<IEnumerable<T>>> values)
       => conf.Modify(key, (c, observable) => observable
                             .CombineLatest(values(c),
                                            (list, listToAppend) => list.AddRange(listToAppend)));
@@ -63,13 +69,16 @@ namespace Bud.V1 {
     public static Conf Add<T>(this Conf conf, Key<IImmutableSet<T>> key, Func<IConf, T> value)
       => conf.Modify(key, (c, oldList) => oldList.Add(value(c)));
 
-    public static Conf Merge<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, IObservable<T> value)
-      => conf.Merge(key, _ => value);
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, T value)
+      => conf.Add(key, _ => Observable.Return(value));
 
-    public static Conf Merge<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, Func<IConf, IObservable<T>> value)
-      => conf.Merge(key, c => value(c).Select(v => new [] {v}));
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, IObservable<T> value)
+      => conf.Add(key, _ => value);
 
-    public static Conf Merge<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, Func<IConf, IObservable<IEnumerable<T>>> values)
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, Func<IConf, IObservable<T>> value)
+      => conf.Add(key, c => value(c).Select(v => new [] {v}));
+
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, Func<IConf, IObservable<IEnumerable<T>>> values)
       => conf.Modify(key, (c, observable) => observable
                             .CombineLatest(values(c),
                                            (list, listToAppend) => list.Union(listToAppend)));

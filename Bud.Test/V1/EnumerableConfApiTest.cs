@@ -30,10 +30,10 @@ namespace Bud.V1 {
                              .Get(enumerableKey));
 
     [Test]
-    public void Merge_adds_values_to_observed_enumerables()
+    public void Add_adds_values_to_observed_enumerables()
       => Assert.AreEqual(new[] { 1, 2 },
                          Conf.Empty.InitValue(observedEnumerableKey, Observable.Return(new[] { 1 }))
-                             .Merge(observedEnumerableKey, Observable.Return(2))
+                             .Add(observedEnumerableKey, 2)
                              .Get(observedEnumerableKey).Wait());
 
     [Test]
@@ -52,10 +52,10 @@ namespace Bud.V1 {
                              .Get(immutableListKey));
 
     [Test]
-    public void Merge_adds_values_to_observed_immutable_lists()
+    public void Add_adds_values_to_observed_immutable_lists()
       => Assert.AreEqual(new[] { 1, 2 },
                          Conf.Empty.InitValue(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
-                             .Merge(observedIImmutableListKey, Observable.Return(2))
+                             .Add(observedIImmutableListKey, 2)
                              .Get(observedIImmutableListKey).Wait());
 
     [Test]
@@ -74,10 +74,10 @@ namespace Bud.V1 {
                              .Get(immutableSetKey));
 
     [Test]
-    public void Merge_adds_values_to_observed_immutable_sets()
+    public void Add_adds_values_to_observed_immutable_sets()
       => Assert.AreEqual(new[] { 1, 2 },
                          Conf.Empty.InitValue(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
-                             .Merge(observedImmutableSetKey, Observable.Return(2))
+                             .Add(observedImmutableSetKey, 2)
                              .Get(observedImmutableSetKey).Wait());
   }
 }

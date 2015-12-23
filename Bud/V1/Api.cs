@@ -273,7 +273,7 @@ namespace Bud.V1 {
         .Add(BuildSupport)
         .Add(DependenciesSupport)
         .Add(SourceProcessorsSupport)
-        .Merge(Input, c => ProcessedSources[c])
+        .Add(Input, c => ProcessedSources[c])
         .ExcludeSourceDir(c => TargetDir[c]);
 
     /// <summary>
@@ -350,7 +350,7 @@ namespace Bud.V1 {
         .AddSources(fileFilter: "*.cs")
         .ExcludeSourceDirs("obj", "bin", TargetDirName)
         .Init(Compile, DefaultCSharpCompilation)
-        .Merge(Build, c => Compile[c].Select(output => output.AssemblyPath))
+        .Add(Build, c => Compile[c].Select(output => output.AssemblyPath))
         .Init(AssemblyName, c => ProjectId[c] + CSharpCompilationOptions[c].OutputKind.ToExtension())
         .InitValue(AssemblyReferences, ImmutableList<string>.Empty)
         .Init(Compiler, TimedEmittingCompiler.Create)

@@ -59,7 +59,7 @@ namespace Bud.V1 {
                     .Returns(EmptyCompileOutput());
       var projectA = CsLibrary("foo", "A")
         .SetValue(Compiler, cSharpCompiler.Object)
-        .Merge(Input, Observable.Return("A.cs"));
+        .Add(Input, "A.cs");
       Compile[projectA].Take(1).Wait();
       cSharpCompiler.VerifyAll();
     }
