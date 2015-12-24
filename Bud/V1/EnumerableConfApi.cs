@@ -8,6 +8,9 @@ namespace Bud.V1 {
   public static class EnumerableConfApi {
     #region IEnumerable
 
+    public static Conf Clear<T>(this Conf conf, Key<IEnumerable<T>> key)
+      => conf.SetValue(key, Enumerable.Empty<T>());
+
     public static Conf Add<T>(this Conf conf, Key<IEnumerable<T>> key, params T[] values)
       => Add(conf, key, (IEnumerable<T>) values);
 
@@ -32,6 +35,9 @@ namespace Bud.V1 {
     #endregion
 
     #region IImmutableList
+
+    public static Conf Clear<T>(this Conf conf, Key<IImmutableList<T>> key)
+      => conf.SetValue(key, ImmutableList<T>.Empty);
 
     public static Conf Add<T>(this Conf conf, Key<IImmutableList<T>> key, params T[] values)
       => Add(conf, key, (IEnumerable<T>) values);
@@ -59,6 +65,9 @@ namespace Bud.V1 {
     #endregion
 
     #region IImmutableSet
+
+    public static Conf Clear<T>(this Conf conf, Key<IImmutableSet<T>> key)
+      => conf.SetValue(key, ImmutableHashSet<T>.Empty);
 
     public static Conf Add<T>(this Conf conf, Key<IImmutableSet<T>> key, params T[] values)
       => Add(conf, key, (IEnumerable<T>) values);
