@@ -11,7 +11,7 @@ using NUnit.Framework;
 using static System.IO.Path;
 using static System.Linq.Enumerable;
 using static Bud.IO.FileObservatories;
-using static Bud.IO.Watched;
+using static Bud.IO.Watcher;
 using static Bud.V1.Api;
 
 namespace Bud.V1 {
@@ -65,7 +65,7 @@ namespace Bud.V1 {
     [Test]
     public void Input_contains_the_added_file() {
       var buildProject = BuildProject("foo", "Foo")
-        .Add(SourceIncludes, c => FilesObservatory[c].ObserveFiles("foo/bar"));
+        .Add(SourceIncludes, c => FilesObservatory[c].WatchFiles("foo/bar"));
       Assert.AreEqual(new[] {"foo/bar"},
                       Input[buildProject].Take(1).Wait());
     }
@@ -106,7 +106,7 @@ namespace Bud.V1 {
     [Test]
     public void Default_input_contains_processed_sources() {
       var projects = BuildProject("bDir", "B")
-        .Add(SourceIncludes, UnchangingFiles("b"))
+        .Add(SourceIncludes, WatchMany("b"))
         .Add(SourceProcessors, new FooAppenderInputProcessor());
       Assert.AreEqual(new[] {"bfoo"},
                       projects.Get(Input).Wait());

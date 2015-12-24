@@ -108,6 +108,7 @@
     <Compile Include="Optional\Optionals.cs" />
     <Compile Include="V1\Api.cs" />
     <Compile Include="V1\Conf.cs" />
+    <Compile Include="V1\ConfExtensions.cs" />
     <Compile Include="V1\EnumerableConfApi.cs" />
     <Compile Include="V1\IBuild.cs" />
     <Compile Include="V1\IConf.cs" />
@@ -141,7 +142,7 @@
     <Compile Include="IO\EmptyFilesObservatory.cs" />
     <Compile Include="IO\PathUtils.cs" />
     <Compile Include="IO\Timestamped.cs" />
-    <Compile Include="IO\Watched.cs" />
+    <Compile Include="IO\Watcher.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="IO\TemporaryDirectory.cs" />
     <Compile Include="Configuration\InitConf.cs" />

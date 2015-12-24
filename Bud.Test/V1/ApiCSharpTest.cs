@@ -110,7 +110,7 @@ namespace Bud.V1 {
 
     private static Conf EmptyCSharpProject(string projectId)
       => CsLibrary(projectId, projectId)
-        .SetValue(SourceIncludes, ImmutableList<Watched<IEnumerable<string>>>.Empty)
+        .SetValue(SourceIncludes, ImmutableList<Watcher<IEnumerable<string>>>.Empty)
         .SetValue(AssemblyReferences, ImmutableList<string>.Empty);
 
     private static CompileOutput EmptyCompileOutput(long timestamp = 0L)
@@ -122,10 +122,10 @@ namespace Bud.V1 {
       return compiler;
     }
 
-    private static Watched<IEnumerable<string>> FileADelayedUpdates(IScheduler testScheduler) {
+    private static Watcher<IEnumerable<string>> FileADelayedUpdates(IScheduler testScheduler) {
       var fileUpdates = Observable.Return(new [] {"A.cs"}).Delay(TimeSpan.FromSeconds(1), testScheduler)
                                   .Concat(Observable.Return(new[] { "A.cs" }).Delay(TimeSpan.FromSeconds(1), testScheduler));
-      return Watched.Watch<IEnumerable<string>>(new [] {"A.cs"}, fileUpdates);
+      return Watcher.Watch<IEnumerable<string>>(new [] {"A.cs"}, fileUpdates);
     }
 
     private static Conf ProjectAWithUpdatingSources(IScheduler testScheduler, Func<CompileInput, CompileOutput> compiler)

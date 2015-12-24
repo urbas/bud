@@ -10,32 +10,37 @@ using Microsoft.CodeAnalysis;
 using static System.IO.Directory;
 using static System.IO.Path;
 using static Bud.IO.FileObservatories;
+using static Bud.IO.Watcher;
 using static Bud.V1.Api;
 using Assembly = System.Reflection.Assembly;
 
 namespace Bud.Cli {
   public class BuildTool {
     public static void Main(string[] args) {
-      var compilationOutput = CsLibrary(Combine(GetCurrentDirectory()), "BuildConf")
-        .Add(AssemblyReferences, BudDependencies)
-        .Set(SourceIncludes, configs => ImmutableList.Create(UnchangingFiles(Combine(ProjectDir[configs], "Build.cs"))))
-        .Get(Compile)
-        .Take(1)
-        .Wait();
-      if (compilationOutput.Success) {
-        var buildDefinition = LoadBuildConf(compilationOutput);
+      var compileOutput = CompileBuildConfiguration();
+      if (compileOutput.Success) {
+        var buildDefinition = LoadBuildConfiguration(compileOutput.AssemblyPath);
         foreach (var command in args) {
           buildDefinition.Get<IObservable<object>>(command)
                          .ObserveOn(new EventLoopScheduler())
                          .Wait();
         }
       } else {
-        PrintCompilationErrors(compilationOutput);
+        PrintCompilationErrors(compileOutput);
       }
     }
 
-    private static IConf LoadBuildConf(CompileOutput compilationOutput) {
-      var assembly = Assembly.LoadFile(compilationOutput.AssemblyPath);
+    private static CompileOutput CompileBuildConfiguration()
+      => CreateBuildConfiguration().TakeOne(Compile);
+
+    private static Conf CreateBuildConfiguration()
+      => CsLibrary(Combine(GetCurrentDirectory()), "BuildConf")
+      .Add(AssemblyReferences, BudDependencies)
+      .Clear(SourceIncludes)
+      .Add(SourceIncludes, configs => WatchMany(Combine(ProjectDir[configs], "Build.cs")));
+
+    private static IConf LoadBuildConfiguration(string assemblyPath) {
+      var assembly = Assembly.LoadFile(assemblyPath);
       var buildDefinitionType = assembly.GetExportedTypes().First(typeof(IBuild).IsAssignableFrom);
       var buildDefinition = (IBuild) buildDefinitionType.GetConstructor(Type.EmptyTypes).Invoke(new object[] {});
       return buildDefinition.Init().ToCompiled();

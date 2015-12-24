@@ -138,7 +138,7 @@ namespace Bud.V1 {
     ///     and then passed on to <see cref="Sources" />.
     ///   </para>
     /// </summary>
-    public static readonly Key<IImmutableList<Watched<IEnumerable<string>>>> SourceIncludes = nameof(SourceIncludes);
+    public static readonly Key<IImmutableList<Watcher<IEnumerable<string>>>> SourceIncludes = nameof(SourceIncludes);
 
     /// <summary>
     ///   These filters are applied on the <see cref="Sources" /> stream
@@ -163,7 +163,7 @@ namespace Bud.V1 {
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
 
     public static readonly Conf SourcesSupport = BuildSchedulingSupport
-      .InitValue(SourceIncludes, ImmutableList<Watched<IEnumerable<string>>>.Empty)
+      .InitValue(SourceIncludes, ImmutableList<Watcher<IEnumerable<string>>>.Empty)
       .InitValue(SourceExcludeFilters, ImmutableList<Func<string, bool>>.Empty)
       .InitValue(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
       .Init(FilesObservatory, _ => new LocalFilesObservatory())
@@ -174,17 +174,17 @@ namespace Bud.V1 {
     /// </summary>
     public static Conf AddSourceFile(this Conf c, string absolutePath)
       => c.Add(SourceIncludes,
-               conf => FilesObservatory[conf].ObserveFiles(absolutePath));
+               conf => FilesObservatory[conf].WatchFiles(absolutePath));
 
     /// <summary>
     ///   Adds an individual source file to the project.
     /// </summary>
     public static Conf AddSourceFile(this Conf c, Func<IConf, string> absolutePath)
       => c.Add(SourceIncludes,
-               conf => FilesObservatory[conf].ObserveFiles(absolutePath(conf)));
+               conf => FilesObservatory[conf].WatchFiles(absolutePath(conf)));
 
     private static IObservable<IEnumerable<string>> DefaultSources(IConf c)
-      => ObservableResources.ObserveResources(SourceIncludes[c], SourceFilter(c))
+      => Watcher.ObserveResources(SourceIncludes[c], SourceFilter(c))
                             .ObserveOn(BuildPipelineScheduler[c])
                             .Calmed(c);
 
@@ -295,7 +295,7 @@ namespace Bud.V1 {
     public static Conf AddSources(this Conf c, string subDir = null, string fileFilter = "*", bool includeSubdirs = true)
       => c.Add(SourceIncludes, conf => {
         var sourceDir = subDir == null ? ProjectDir[conf] : Path.Combine(ProjectDir[conf], subDir);
-        return FilesObservatory[conf].ObserveDir(sourceDir, fileFilter, includeSubdirs);
+        return FilesObservatory[conf].WatchDir(sourceDir, fileFilter, includeSubdirs);
       });
 
     /// <summary>
@@ -305,7 +305,7 @@ namespace Bud.V1 {
       => c.Add(SourceIncludes, conf => {
         var projectDir = ProjectDir[conf];
         var absolutePaths = relativeFilePaths.Select(relativeFilePath => Path.Combine(projectDir, relativeFilePath));
-        return FilesObservatory[conf].ObserveFiles(absolutePaths);
+        return FilesObservatory[conf].WatchFiles(absolutePaths);
       });
 
     /// <summary>
@@ -391,7 +391,7 @@ namespace Bud.V1 {
 
     private static IObservable<IEnumerable<CompileOutput>> ObserveDependencies(IConf c)
       => Dependencies[c].Gather(dependency => c.TryGet(dependency/Compile))
-                        .PileUp();
+                        .Combined();
 
     #endregion
 

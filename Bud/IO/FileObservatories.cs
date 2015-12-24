@@ -3,24 +3,26 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using static Bud.IO.Watched;
+using static Bud.IO.Watcher;
 
 namespace Bud.IO {
   public static class FileObservatories {
-    public static Watched<IEnumerable<string>> ObserveDir(this IFilesObservatory filesObservatory,
-                                                          string sourceDir,
-                                                          string fileFilter,
-                                                          bool includeSubdirs)
+    public static Watcher<IEnumerable<string>> WatchDir(this IFilesObservatory filesObservatory,
+                                                        string sourceDir,
+                                                        string fileFilter,
+                                                        bool includeSubdirs)
       => Watch(FindFiles(sourceDir, fileFilter, includeSubdirs),
                filesObservatory.CreateObserver(sourceDir, fileFilter, includeSubdirs));
 
-    public static Watched<IEnumerable<string>> ObserveFiles(this IFilesObservatory filesObservatory,
-                                                            IEnumerable<string> absolutePaths)
-      => WatchFiles(absolutePaths, WatchersForFiles(filesObservatory, absolutePaths));
+    public static Watcher<IEnumerable<string>> WatchFiles(this IFilesObservatory filesObservatory,
+                                                          IEnumerable<string> absolutePaths)
+      => WatchFiles(absolutePaths,
+                    WatchersForFiles(filesObservatory, absolutePaths));
 
-    public static Watched<IEnumerable<string>> ObserveFiles(this IFilesObservatory filesobservatory,
-                                                            params string[] absolutePaths)
-      => ObserveFiles(filesobservatory, absolutePaths as IEnumerable<string>);
+    public static Watcher<IEnumerable<string>> WatchFiles(this IFilesObservatory filesobservatory,
+                                                          params string[] absolutePaths)
+      => WatchFiles(filesobservatory,
+                    absolutePaths as IEnumerable<string>);
 
     private static IEnumerable<string> FindFiles(string sourceDir,
                                                  string fileFilter,
@@ -43,12 +45,8 @@ namespace Bud.IO {
                                          Path.GetFileName(file),
                                          false);
 
-    public static Watched<IEnumerable<string>> UnchangingFiles(params string[] files)
-      => new Watched<IEnumerable<string>>(files,
-                       Observable.Empty<IEnumerable<string>>());
-
-    public static Watched<IEnumerable<string>> WatchFiles(IEnumerable<string> files,
-      IObservable<IEnumerable<string>> changes)
-      => new Watched<IEnumerable<string>>(files, changes);
+    public static Watcher<IEnumerable<string>> WatchFiles(IEnumerable<string> files,
+                                                          IObservable<IEnumerable<string>> changes)
+      => new Watcher<IEnumerable<string>>(files, changes);
   }
 }

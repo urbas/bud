@@ -6,18 +6,20 @@ using System.Reactive.Linq;
 
 namespace Bud.IO {
   public class LocalFilesObservatory : IFilesObservatory {
-    public IObservable<IEnumerable<string>> CreateObserver(string sourceDir, string fileFilter, bool includeSubfolders)
-      => ObserveFileSystem(sourceDir, fileFilter, includeSubfolders)
-      .Select(changedFile => new [] {changedFile});
+    public IObservable<IEnumerable<string>> CreateObserver(string dir,
+                                                           string fileFilter,
+                                                           bool includeSubfolders)
+      => ObserveFileSystem(dir, fileFilter, includeSubfolders)
+        .Select(changedFile => new[] {changedFile});
 
-    public static IObservable<string> ObserveFileSystem(string watcherDir,
+    public static IObservable<string> ObserveFileSystem(string dir,
                                                         string fileFilter,
                                                         bool includeSubdirectories,
                                                         Action subscribedCallback = null,
                                                         Action disposedCallback = null)
       => Observable.Create<string>(observer => {
         var compositeDisposable = new CompositeDisposable {
-          new FileSystemObserver(watcherDir, fileFilter, includeSubdirectories, observer),
+          new FileSystemObserver(dir, fileFilter, includeSubdirectories, observer),
           new CallbackDisposable(disposedCallback)
         };
         subscribedCallback?.Invoke();
