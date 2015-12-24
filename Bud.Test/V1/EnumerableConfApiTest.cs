@@ -15,6 +15,17 @@ namespace Bud.V1 {
     private readonly Key<IObservable<IEnumerable<int>>> observedEnumerableKey = nameof(observedEnumerableKey);
 
     [Test]
+    public void InitEmpty_initializes_enumerables_to_empty()
+      => IsEmpty(Conf.Empty.InitEmpty(enumerableKey).Get(enumerableKey));
+
+    [Test]
+    public void InitEmpty_does_not_changed_initialized_enumerables()
+      => AreEqual(new[] { 1 },
+                  Conf.Empty.InitValue(enumerableKey, new[] { 1 })
+                      .InitEmpty(enumerableKey)
+                      .Get(enumerableKey));
+
+    [Test]
     public void Clear_resets_enumerables()
       => IsEmpty(Conf.Empty.InitValue(enumerableKey, new[] {1})
                      .Clear(enumerableKey)
@@ -48,6 +59,17 @@ namespace Bud.V1 {
 
     private readonly Key<IImmutableList<int>> immutableListKey = nameof(immutableListKey);
     private readonly Key<IObservable<IImmutableList<int>>> observedIImmutableListKey = nameof(observedIImmutableListKey);
+
+    [Test]
+    public void InitEmpty_initializes_immutable_lists_to_empty()
+      => IsEmpty(Conf.Empty.InitEmpty(immutableListKey).Get(immutableListKey));
+
+    [Test]
+    public void InitEmpty_does_not_changed_initialized_immutable_lists()
+      => AreEqual(new[] { 1 },
+                  Conf.Empty.InitValue(immutableListKey, ImmutableList.Create(1))
+                      .InitEmpty(immutableListKey)
+                      .Get(immutableListKey));
 
     [Test]
     public void Clear_resets_immutable_lists()
@@ -85,10 +107,21 @@ namespace Bud.V1 {
     private readonly Key<IObservable<IImmutableSet<int>>> observedImmutableSetKey = nameof(observedImmutableSetKey);
 
     [Test]
+    public void InitEmpty_initializes_immutable_sets_to_empty()
+      => IsEmpty(Conf.Empty.InitEmpty(immutableSetKey).Get(immutableSetKey));
+
+    [Test]
+    public void InitEmpty_does_not_changed_initialized_immutable_sets()
+      => AreEqual(new[] { 1 },
+                  Conf.Empty.InitValue(immutableSetKey, ImmutableHashSet.Create(1))
+                      .InitEmpty(immutableSetKey)
+                      .Get(immutableSetKey));
+
+    [Test]
     public void Clear_resets_immutable_sets()
-      => IsEmpty(Conf.Empty.InitValue(immutableListKey, ImmutableList.Create(1))
-                     .Clear(immutableListKey)
-                     .Get(immutableListKey));
+      => IsEmpty(Conf.Empty.InitValue(immutableSetKey, ImmutableHashSet.Create(1))
+                     .Clear(immutableSetKey)
+                     .Get(immutableSetKey));
 
     [Test]
     public void Add_adds_values_to_immutable_sets()
