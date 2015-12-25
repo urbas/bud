@@ -3,7 +3,7 @@ namespace Bud.Optional {
     public T Value { get; }
     public bool HasValue { get; }
 
-    public Optional(T value) : this() {
+    public Optional(T value) {
       Value = value;
       HasValue = true;
     }
