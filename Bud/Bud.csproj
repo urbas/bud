@@ -105,6 +105,7 @@
   <ItemGroup>
     <Compile Include="Collections\ImmutableLists.cs" />
     <Compile Include="IO\FileWatcher.cs" />
+    <Compile Include="Optional\Optional.cs" />
     <Compile Include="Optional\OptionalExtensions.cs" />
     <Compile Include="Optional\Optionals.cs" />
     <Compile Include="V1\Api.cs" />
@@ -132,7 +133,6 @@
     <Compile Include="Configuration\IConfDefinition.cs" />
     <Compile Include="Configuration\IConfBuilder.cs" />
     <Compile Include="IO\Diff.cs" />
-    <Compile Include="IO\FileEnumerator.cs" />
     <Compile Include="IO\FileUtils.cs" />
     <Compile Include="IO\FileObservatories.cs" />
     <Compile Include="IO\IDiff.cs" />
@@ -140,7 +140,7 @@
     <Compile Include="IO\IInputProcessor.cs" />
     <Compile Include="IO\LocalFilesObservatory.cs" />
     <Compile Include="IO\IFilesObservatory.cs" />
-    <Compile Include="IO\EmptyFilesObservatory.cs" />
+    <Compile Include="IO\NoOpFilesObservatory.cs" />
     <Compile Include="IO\PathUtils.cs" />
     <Compile Include="IO\Timestamped.cs" />
     <Compile Include="IO\FileWatchers.cs" />

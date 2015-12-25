@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
-using Microsoft.CodeAnalysis;
 
 namespace Bud.Optional {
   public static class OptionalExtensions {

@@ -1,4 +1,4 @@
-using Microsoft.CodeAnalysis;
+using Bud.Optional;
 
 namespace Bud.V1 {
   public interface IConf {

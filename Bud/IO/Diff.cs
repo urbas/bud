@@ -88,6 +88,14 @@ namespace Bud.IO {
       return new Diff<T>(added, removed, changed, all);
     }
 
+    public static ImmutableDictionary<TKey, TValue> UpdateCache<TKey, TValue>(ImmutableDictionary<TKey, TValue> cache,
+                                                                              IDiff<TKey> diff,
+                                                                              Func<TKey, TValue> valueFactory) {
+      cache = cache.AddRange(diff.Added.Select(key => new KeyValuePair<TKey, TValue>(key, valueFactory(key))));
+      cache = cache.RemoveRange(diff.Removed);
+      return cache.SetItems(diff.Changed.Select(key => new KeyValuePair<TKey, TValue>(key, valueFactory(key))));
+    }
+
     private static bool HasElementChanged<T>(IImmutableSet<T> previousDiff, T el) where T : ITimestamped {
       T oldEl;
       return previousDiff.TryGetValue(el, out oldEl) && el.Timestamp > oldEl.Timestamp;
@@ -95,14 +103,6 @@ namespace Bud.IO {
 
     private static class EmptyDiff<T> {
       public static readonly Diff<T> Instance = new Diff<T>(ImmutableHashSet<T>.Empty, ImmutableHashSet<T>.Empty, ImmutableHashSet<T>.Empty, ImmutableHashSet<T>.Empty);
-    }
-
-    public static ImmutableDictionary<TKey, TValue> UpdateCache<TKey, TValue>(ImmutableDictionary<TKey, TValue> cache,
-                                                                              IDiff<TKey> diff,
-                                                                              Func<TKey, TValue> valueFactory) {
-      cache = cache.AddRange(diff.Added.Select(key => new KeyValuePair<TKey, TValue>(key, valueFactory(key))));
-      cache = cache.RemoveRange(diff.Removed);
-      return cache.SetItems(diff.Changed.Select(key => new KeyValuePair<TKey, TValue>(key, valueFactory(key))));
     }
   }
 }

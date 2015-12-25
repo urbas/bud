@@ -29,16 +29,16 @@ namespace Bud.IO {
       => Assert.IsTrue(PathUtils.IsPathInDir("a/", "a"));
 
     [Test]
+    public void IsPathInDir_returns_true_if_dir_ends_with_dir_separator()
+      => Assert.IsTrue(PathUtils.IsPathInDir("a", "a/"));
+
+    [Test]
     public void IsPathInDir_returns_true_if_path_is_a_subpath_of_dir()
       => Assert.IsTrue(PathUtils.IsPathInDir("a/b", "a"));
 
     [Test]
     public void IsPathInDir_returns_false_if_path_is_a_substring_of_dir_but_not_a_subpath()
       => Assert.IsFalse(PathUtils.IsPathInDir("ab", "a"));
-
-    [Test]
-    public void IsPathInDir_returns_true_if_dir_ends_with_dir_separator()
-      => Assert.IsTrue(PathUtils.IsPathInDir("a", "a/"));
 
     [Test]
     public void IsPathInDir_returns_false_for_diverging_paths()
@@ -54,5 +54,4 @@ namespace Bud.IO {
       Assert.IsTrue(PathUtils.IsPathInDir("a/b/c/", $"a{DirectorySeparatorChar}b"));
     }
   }
-
 }

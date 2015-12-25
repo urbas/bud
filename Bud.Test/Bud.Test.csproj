@@ -127,7 +127,7 @@
     <Compile Include="IO\DiffTest.cs" />
     <Compile Include="IO\FileUtilsTest.cs" />
     <Compile Include="IO\LocalFilesObservatoryTest.cs" />
-    <Compile Include="IO\FilesObservatoryTest.cs" />
+    <Compile Include="IO\FileObservatoriesTest.cs" />
     <Compile Include="IO\PathUtilsTest.cs" />
     <Compile Include="IO\TimestampedTest.cs" />
     <Compile Include="IO\FileWatchersTest.cs" />

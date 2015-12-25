@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 using Bud.V1;
-using Microsoft.CodeAnalysis;
+using Bud.Optional;
 
 namespace Bud.Configuration {
   public class ScopedConf : IConf {

@@ -1,5 +1,3 @@
-using Microsoft.CodeAnalysis;
-
 namespace Bud.Optional {
   public static class Optionals {
     public static Optional<T> None<T>() => NoneOptional<T>.Instance;

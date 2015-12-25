@@ -1,8 +1,8 @@
 using System.Reactive.Linq;
 using Bud.Optional;
 using NUnit.Framework;
-using static Bud.Optional.Optionals;
 using static NUnit.Framework.Assert;
+using static Bud.Optional.Optionals;
 
 namespace Bud.Util {
   public class OptionalExtensionsTest {

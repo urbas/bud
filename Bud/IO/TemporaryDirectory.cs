@@ -28,24 +28,29 @@ namespace Bud.IO {
 
     public override string ToString() => Path;
 
-    public string CreateEmptyFile(string firstPathComponent, params string[] pathComponents)
-      => CreateFile(string.Empty, firstPathComponent, pathComponents);
+    public string CreateEmptyFile(params string[] targetPath)
+      => CreateFile(string.Empty, targetPath);
 
-    public string CreateFile(string content, string firstPathComponent, params string[] pathComponents) {
-      var file = Combine(new[] {Path, firstPathComponent}.Concat(pathComponents).ToArray());
+    public string CreateFile(string content, params string[] targetPath) {
+      string file;
+      if (targetPath.Length == 0) {
+        file = Combine(Path, GetFileName(content));
+      } else {
+        file = Combine(new[] {Path}.Concat(targetPath).ToArray());
+      }
       CreateDirectory(GetDirectoryName(file));
       File.WriteAllText(file, content);
       return file;
     }
 
-    public string CreateFileFromResource(string resourceName, string firstPathComponent, params string[] pathComponents) {
+    public string CreateFileFromResource(string resourceName, params string[] targetPath) {
       using (var packagesConfigStream = Assembly.GetCallingAssembly().GetManifestResourceStream(resourceName)) {
-        return CreateFile(packagesConfigStream, firstPathComponent, pathComponents);
+        return CreateFile(packagesConfigStream, targetPath);
       }
     }
 
-    public string CreateFile(Stream content, string firstPathComponent, params string[] pathComponents)
-      => CreateFile(new StreamReader(content).ReadToEnd(), firstPathComponent, pathComponents);
+    public string CreateFile(Stream content, params string[] targetPath)
+      => CreateFile(new StreamReader(content).ReadToEnd(), targetPath);
 
     private static string CreateDirectoryInTempDir() {
       string baseDir = GetTempPath();

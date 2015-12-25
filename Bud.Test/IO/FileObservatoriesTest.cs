@@ -3,8 +3,8 @@ using System.Linq;
 using NUnit.Framework;
 
 namespace Bud.IO {
-  public class FilesObservatoryTest {
-    private readonly EmptyFilesObservatory noFileChanges = new EmptyFilesObservatory();
+  public class FileObservatoriesTest {
+    private readonly NoOpFilesObservatory noFileChanges = new NoOpFilesObservatory();
 
     [Test]
     public void List_files_in_the_folder() {

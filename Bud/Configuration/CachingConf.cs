@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Immutable;
+using Bud.Optional;
 using Bud.V1;
-using Microsoft.CodeAnalysis;
 using static Bud.Optional.Optionals;
 
 namespace Bud.Configuration {

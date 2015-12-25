@@ -46,7 +46,7 @@ namespace Bud.Cs {
     private void UpdateReferences(IEnumerable<Timestamped<string>> newAssemblies) {
       references = references.DiffByTimestamp(newAssemblies);
       var oldReferencesCache = referencesCache;
-      referencesCache = Diff.UpdateCache(referencesCache, references, path => MetadataReference.CreateFromFile(path.Value));
+      referencesCache = Diff.UpdateCache(referencesCache, references, LoadAssemblyFromFile);
       cSharpCompilation = cSharpCompilation.AddReferences(references.Added.Select(r => referencesCache[r]))
                                            .RemoveReferences(references.Removed.Select(r => oldReferencesCache[r]))
                                            .RemoveReferences(references.Changed.Select(r => oldReferencesCache[r]))
@@ -56,11 +56,17 @@ namespace Bud.Cs {
     private void UpdateSources(IEnumerable<Timestamped<string>> newSources) {
       sources = sources.DiffByTimestamp(newSources);
       var oldSyntaxTreesCache = syntaxTreesCache;
-      syntaxTreesCache = Diff.UpdateCache(syntaxTreesCache, sources, s => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s.Value), path: s.Value));
+      syntaxTreesCache = Diff.UpdateCache(syntaxTreesCache, sources, ParseSyntaxTree);
       cSharpCompilation = cSharpCompilation.AddSyntaxTrees(sources.Added.Select(s => syntaxTreesCache[s]))
                                            .RemoveSyntaxTrees(sources.Removed.Select(s => oldSyntaxTreesCache[s]))
                                            .RemoveSyntaxTrees(sources.Changed.Select(s => oldSyntaxTreesCache[s]))
                                            .AddSyntaxTrees(sources.Changed.Select(s => syntaxTreesCache[s]));
     }
+
+    private static SyntaxTree ParseSyntaxTree(Timestamped<string> s)
+      => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s.Value), path: s.Value);
+
+    private static MetadataReference LoadAssemblyFromFile(Timestamped<string> path)
+      => MetadataReference.CreateFromFile(path.Value);
   }
 }

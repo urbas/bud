@@ -20,7 +20,7 @@ namespace Bud.IO {
     }
 
     /// <returns>
-    ///   A filter that returns <c>true</c> iff the given file is not
+    ///   A filter that returns <c>true</c> iff the given file is
     ///   in any of the given directories.
     /// </returns>
     public static Func<string, bool> InAnyDirFilter(IEnumerable<string> dirs) {

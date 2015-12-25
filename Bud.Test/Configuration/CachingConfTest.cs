@@ -1,8 +1,8 @@
 using System;
 using Bud.V1;
-using Microsoft.CodeAnalysis;
 using Moq;
 using NUnit.Framework;
+using Bud.Optional;
 using static Bud.Optional.Optionals;
 
 namespace Bud.Configuration {
