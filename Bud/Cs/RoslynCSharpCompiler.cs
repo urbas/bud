@@ -5,6 +5,7 @@ using System.Linq;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using static Bud.IO.FileUtils;
 
 namespace Bud.Cs {
   public class RoslynCSharpCompiler : ICompiler {
@@ -32,8 +33,8 @@ namespace Bud.Cs {
 
     public CSharpCompilation Compile(IEnumerable<string> sources,
                                      IEnumerable<string> assemblyReferences)
-      => Compile(Files.ToTimestampedFiles(sources),
-                 Files.ToTimestampedFiles(assemblyReferences));
+      => Compile(ToTimestampedFiles(sources),
+                 ToTimestampedFiles(assemblyReferences));
 
     public CSharpCompilation Compile(IEnumerable<Timestamped<string>> inputSources,
                                      IEnumerable<Timestamped<string>> inputAssemblies) {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 namespace Bud.IO {
-  public class Files {
+  public class FileUtils {
     public static Timestamped<string> ToTimestampedFile(string path)
       => new Timestamped<string>(path, GetFileTimestamp(path));
 

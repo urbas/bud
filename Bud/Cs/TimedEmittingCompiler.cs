@@ -8,6 +8,7 @@ using Bud.IO;
 using Bud.V1;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Emit;
+using static Bud.IO.FileUtils;
 using static Bud.V1.Api;
 
 namespace Bud.Cs {
@@ -35,10 +36,10 @@ namespace Bud.Cs {
         return CreateOutputFromAssembly(false);
       }
 
-      var sources = input.Sources.Select(Files.ToTimestampedFile).ToList();
+      var sources = input.Sources.Select(ToTimestampedFile).ToList();
       var assemblies = input.AssemblyReferences
         .Concat(input.Dependencies.Select(output => output.AssemblyPath))
-        .Select(Files.ToTimestampedFile).ToList();
+        .Select(ToTimestampedFile).ToList();
 
       if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(sources, assemblies)) {
         return CreateOutputFromAssembly(true);
@@ -59,12 +60,12 @@ namespace Bud.Cs {
                            Stopwatch.Elapsed,
                            OutputAssemblyPath,
                            isSuccess,
-                           Files.GetFileTimestamp(OutputAssemblyPath),
+                           GetFileTimestamp(OutputAssemblyPath),
                            MetadataReference.CreateFromFile(OutputAssemblyPath));
 
     private bool IsOutputUpToDate(IEnumerable<Timestamped<string>> sources,
                                   IEnumerable<Timestamped<string>> assemblies) {
-      var timestampedFile = Files.ToTimestampedFile(OutputAssemblyPath);
+      var timestampedFile = ToTimestampedFile(OutputAssemblyPath);
       return timestampedFile.IsUpToDateWith(sources) &&
              timestampedFile.IsUpToDateWith(assemblies);
     }
@@ -86,7 +87,7 @@ namespace Bud.Cs {
                                stopwatch.Elapsed,
                                outputAssemblyPath,
                                emitResult.Success,
-                               Files.FileTimestampNow(),
+                               FileTimestampNow(),
                                compilation.ToMetadataReference());
     }
 

@@ -130,7 +130,8 @@
     <Compile Include="IO\FilesObservatoryTest.cs" />
     <Compile Include="IO\PathUtilsTest.cs" />
     <Compile Include="IO\TimestampedTest.cs" />
-    <Compile Include="IO\WatchedTest.cs" />
+    <Compile Include="IO\FileWatchersTest.cs" />
+    <Compile Include="IO\FileWatcherTest.cs" />
     <Compile Include="V1\ApiDependenciesSupportTest.cs" />
     <Compile Include="V1\ApiSourcesSupportTest.cs" />
     <Compile Include="V1\PackageReferenceComparer.cs" />

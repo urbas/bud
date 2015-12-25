@@ -3,24 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using static Bud.IO.Watcher;
 
 namespace Bud.IO {
   public static class FileObservatories {
-    public static Watcher<IEnumerable<string>> WatchDir(this IFilesObservatory filesObservatory,
-                                                        string sourceDir,
-                                                        string fileFilter,
-                                                        bool includeSubdirs)
-      => Watch(FindFiles(sourceDir, fileFilter, includeSubdirs),
-               filesObservatory.CreateObserver(sourceDir, fileFilter, includeSubdirs));
+    public static FileWatcher WatchDir(this IFilesObservatory filesObservatory,
+                                        string sourceDir,
+                                        string fileFilter,
+                                        bool includeSubdirs)
+      => new FileWatcher(FindFiles(sourceDir, fileFilter, includeSubdirs),
+                         filesObservatory.CreateObserver(sourceDir, fileFilter, includeSubdirs));
 
-    public static Watcher<IEnumerable<string>> WatchFiles(this IFilesObservatory filesObservatory,
-                                                          IEnumerable<string> absolutePaths)
-      => WatchFiles(absolutePaths,
-                    WatchersForFiles(filesObservatory, absolutePaths));
+    public static FileWatcher WatchFiles(this IFilesObservatory filesObservatory,
+                                          IEnumerable<string> absolutePaths)
+      => new FileWatcher(absolutePaths,
+                         FilesChangesObserver(filesObservatory, absolutePaths));
 
-    public static Watcher<IEnumerable<string>> WatchFiles(this IFilesObservatory filesobservatory,
-                                                          params string[] absolutePaths)
+    public static FileWatcher WatchFiles(this IFilesObservatory filesobservatory,
+                                          params string[] absolutePaths)
       => WatchFiles(filesobservatory,
                     absolutePaths as IEnumerable<string>);
 
@@ -34,19 +33,15 @@ namespace Bud.IO {
     private static SearchOption ToSearchOption(bool includeSubdirs)
       => includeSubdirs ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly;
 
-    private static IObservable<IEnumerable<string>> WatchersForFiles(IFilesObservatory filesObservatory,
-                                                                     IEnumerable<string> absolutePaths)
+    private static IObservable<string> FilesChangesObserver(IFilesObservatory filesObservatory,
+                                                            IEnumerable<string> absolutePaths)
       => absolutePaths.Select(file => SingleFileWatcher(filesObservatory, file))
                       .Merge();
 
-    private static IObservable<IEnumerable<string>> SingleFileWatcher(IFilesObservatory filesObservatory,
-                                                                      string file)
+    private static IObservable<string> SingleFileWatcher(IFilesObservatory filesObservatory,
+                                                         string file)
       => filesObservatory.CreateObserver(Path.GetDirectoryName(file),
                                          Path.GetFileName(file),
                                          false);
-
-    public static Watcher<IEnumerable<string>> WatchFiles(IEnumerable<string> files,
-                                                          IObservable<IEnumerable<string>> changes)
-      => new Watcher<IEnumerable<string>>(files, changes);
   }
 }

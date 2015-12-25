@@ -11,6 +11,7 @@ using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
 using static Bud.Cs.CompileInputTestUtils;
+using static Bud.IO.FileWatchers;
 using static Bud.V1.Api;
 
 namespace Bud.V1 {
@@ -110,8 +111,8 @@ namespace Bud.V1 {
 
     private static Conf EmptyCSharpProject(string projectId)
       => CsLibrary(projectId, projectId)
-        .SetValue(SourceIncludes, ImmutableList<Watcher<IEnumerable<string>>>.Empty)
-        .SetValue(AssemblyReferences, ImmutableList<string>.Empty);
+        .Clear(SourceIncludes)
+        .Clear(AssemblyReferences);
 
     private static CompileOutput EmptyCompileOutput(long timestamp = 0L)
       => new CompileOutput(Enumerable.Empty<Diagnostic>(), TimeSpan.FromMilliseconds(123), "Foo.dll", true, timestamp, null);
@@ -122,10 +123,11 @@ namespace Bud.V1 {
       return compiler;
     }
 
-    private static Watcher<IEnumerable<string>> FileADelayedUpdates(IScheduler testScheduler) {
-      var fileUpdates = Observable.Return(new [] {"A.cs"}).Delay(TimeSpan.FromSeconds(1), testScheduler)
-                                  .Concat(Observable.Return(new[] { "A.cs" }).Delay(TimeSpan.FromSeconds(1), testScheduler));
-      return Watcher.Watch<IEnumerable<string>>(new [] {"A.cs"}, fileUpdates);
+    private static FileWatcher FileADelayedUpdates(IScheduler testScheduler) {
+      var changes = Observable.Return("A.cs").Delay(TimeSpan.FromSeconds(1), testScheduler)
+                                  .Concat(Observable.Return("A.cs").Delay(TimeSpan.FromSeconds(1), testScheduler));
+      IEnumerable<string> files = new [] {"A.cs"};
+      return new FileWatcher(files, changes);
     }
 
     private static Conf ProjectAWithUpdatingSources(IScheduler testScheduler, Func<CompileInput, CompileOutput> compiler)

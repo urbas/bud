@@ -1,16 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 
 namespace Bud.IO {
   public class LocalFilesObservatory : IFilesObservatory {
-    public IObservable<IEnumerable<string>> CreateObserver(string dir,
-                                                           string fileFilter,
-                                                           bool includeSubfolders)
-      => ObserveFileSystem(dir, fileFilter, includeSubfolders)
-        .Select(changedFile => new[] {changedFile});
+    public IObservable<string> CreateObserver(string dir,
+                                              string fileFilter,
+                                              bool includeSubfolders)
+      => ObserveFileSystem(dir, fileFilter, includeSubfolders);
 
     public static IObservable<string> ObserveFileSystem(string dir,
                                                         string fileFilter,

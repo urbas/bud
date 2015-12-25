@@ -5,7 +5,7 @@ using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
 using static System.Reactive.Linq.Observable;
-using static Bud.IO.Watcher;
+using static Bud.IO.FileWatchers;
 using static Bud.Reactive.ObservableResources;
 using static NUnit.Framework.Assert;
 

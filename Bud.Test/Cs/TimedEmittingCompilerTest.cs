@@ -10,6 +10,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Moq;
 using NUnit.Framework;
 using static Bud.Cs.CompileInputTestUtils;
+using static Bud.IO.FileUtils;
 
 namespace Bud.Cs {
   public class TimedEmittingCompilerTest {
@@ -63,7 +64,7 @@ namespace Bud.Cs {
     }
 
     private Expression<Func<IEnumerable<Timestamped<string>>, bool>> EqualToTimestampedFiles(string expectedFile)
-      => actualFiles => actualFiles.SequenceEqual(new[] {Files.ToTimestampedFile(expectedFile)});
+      => actualFiles => actualFiles.SequenceEqual(new[] {ToTimestampedFile(expectedFile)});
 
     private static CompileOutput UnsuccessfulCompileOutput()
       => new CompileOutput(Enumerable.Empty<Diagnostic>(), TimeSpan.Zero, "Foo.dll", false, 0L, null);

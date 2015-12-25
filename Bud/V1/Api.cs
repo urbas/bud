@@ -89,7 +89,7 @@ namespace Bud.V1 {
 
     public static readonly Conf DependenciesSupport = Conf
       .Empty
-      .InitValue(Dependencies, ImmutableHashSet<string>.Empty)
+      .InitEmpty(Dependencies)
       .Init(DependenciesInput, GatherOutputsFromDependencies);
 
     private static IObservable<IEnumerable<string>> GatherOutputsFromDependencies(IConf c)
@@ -138,7 +138,7 @@ namespace Bud.V1 {
     ///     and then passed on to <see cref="Sources" />.
     ///   </para>
     /// </summary>
-    public static readonly Key<IImmutableList<Watcher<IEnumerable<string>>>> SourceIncludes = nameof(SourceIncludes);
+    public static readonly Key<IImmutableList<FileWatcher>> SourceIncludes = nameof(SourceIncludes);
 
     /// <summary>
     ///   These filters are applied on the <see cref="Sources" /> stream
@@ -163,8 +163,8 @@ namespace Bud.V1 {
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
 
     public static readonly Conf SourcesSupport = BuildSchedulingSupport
-      .InitValue(SourceIncludes, ImmutableList<Watcher<IEnumerable<string>>>.Empty)
-      .InitValue(SourceExcludeFilters, ImmutableList<Func<string, bool>>.Empty)
+      .InitEmpty(SourceIncludes)
+      .InitEmpty(SourceExcludeFilters)
       .InitValue(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
       .Init(FilesObservatory, _ => new LocalFilesObservatory())
       .Init(Sources, DefaultSources);
@@ -184,9 +184,9 @@ namespace Bud.V1 {
                conf => FilesObservatory[conf].WatchFiles(absolutePath(conf)));
 
     private static IObservable<IEnumerable<string>> DefaultSources(IConf c)
-      => Watcher.ObserveResources(SourceIncludes[c], SourceFilter(c))
-                            .ObserveOn(BuildPipelineScheduler[c])
-                            .Calmed(c);
+      => SourceIncludes[c].ToObservable(SourceFilter(c))
+                          .ObserveOn(BuildPipelineScheduler[c])
+                          .Calmed(c);
 
     private static Func<string, bool> SourceFilter(IConf c) {
       var excludeFilters = SourceExcludeFilters[c];
@@ -210,7 +210,7 @@ namespace Bud.V1 {
     public static readonly Key<IImmutableList<IInputProcessor>> SourceProcessors = nameof(SourceProcessors);
 
     public static readonly Conf SourceProcessorsSupport = SourcesSupport
-      .InitValue(SourceProcessors, ImmutableList<IInputProcessor>.Empty)
+      .InitEmpty(SourceProcessors)
       .Init(ProcessedSources, DefaultProcessSources);
 
     private static IObservable<IEnumerable<string>> DefaultProcessSources(IConf project)
@@ -354,10 +354,10 @@ namespace Bud.V1 {
         .Init(Compile, DefaultCSharpCompilation)
         .Add(Build, c => Compile[c].Select(output => output.AssemblyPath))
         .Init(AssemblyName, c => ProjectId[c] + CSharpCompilationOptions[c].OutputKind.ToExtension())
-        .InitValue(AssemblyReferences, ImmutableList<string>.Empty)
+        .InitEmpty(AssemblyReferences)
+        .InitEmpty(EmbeddedResources)
         .Init(Compiler, TimedEmittingCompiler.Create)
-        .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, warningLevel: 1))
-        .InitValue(EmbeddedResources, ImmutableList<ResourceDescription>.Empty);
+        .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, warningLevel: 1));
 
     public static Conf EmbedResource(this Conf conf, string path, string nameInAssembly)
       => conf.Add(EmbeddedResources, c => {
