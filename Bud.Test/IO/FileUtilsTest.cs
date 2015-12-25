@@ -2,7 +2,7 @@ using NUnit.Framework;
 using static Bud.IO.FileUtils;
 
 namespace Bud.IO {
-  public class FilesTest {
+  public class FileUtilsTest {
     [Test]
     public void ToTimestampedFile_returns_a_timestamped_file_with_the_right_path_and_timestamp() {
       using (var tmpDir = new TemporaryDirectory()) {

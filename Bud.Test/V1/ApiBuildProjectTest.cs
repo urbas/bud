@@ -10,8 +10,6 @@ using Moq;
 using NUnit.Framework;
 using static System.IO.Path;
 using static System.Linq.Enumerable;
-using static Bud.IO.FileObservatories;
-using static Bud.IO.FileWatchers;
 using static Bud.V1.Api;
 
 namespace Bud.V1 {

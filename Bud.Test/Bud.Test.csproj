@@ -125,7 +125,7 @@
     <Compile Include="Cs\RoslynCSharpCompilerTest.cs" />
     <Compile Include="Cs\TimedEmittingCompilerTest.cs" />
     <Compile Include="IO\DiffTest.cs" />
-    <Compile Include="IO\FilesTest.cs" />
+    <Compile Include="IO\FileUtilsTest.cs" />
     <Compile Include="IO\LocalFilesObservatoryTest.cs" />
     <Compile Include="IO\FilesObservatoryTest.cs" />
     <Compile Include="IO\PathUtilsTest.cs" />
