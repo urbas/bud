@@ -12,7 +12,6 @@ namespace Bud.V1 {
     #region IEnumerable
 
     private readonly Key<IEnumerable<int>> enumerableKey = nameof(enumerableKey);
-    private readonly Key<IObservable<IEnumerable<int>>> observedEnumerableKey = nameof(observedEnumerableKey);
 
     [Test]
     public void InitEmpty_initializes_enumerables_to_empty()
@@ -20,8 +19,8 @@ namespace Bud.V1 {
 
     [Test]
     public void InitEmpty_does_not_changed_initialized_enumerables()
-      => AreEqual(new[] { 1 },
-                  Conf.Empty.InitValue(enumerableKey, new[] { 1 })
+      => AreEqual(new[] {1},
+                  Conf.Empty.InitValue(enumerableKey, new[] {1})
                       .InitEmpty(enumerableKey)
                       .Get(enumerableKey));
 
@@ -46,6 +45,33 @@ namespace Bud.V1 {
                       .Add(enumerableKey, c => numberKey[c] + 1)
                       .Get(enumerableKey));
 
+    #endregion
+
+    #region IObservable<IEnumerable<T>>
+
+    private readonly Key<IObservable<IEnumerable<int>>> observedEnumerableKey = nameof(observedEnumerableKey);
+
+    [Test]
+    public void InitEmpty_initializes_observed_enumerables_to_empty()
+      => That(Conf.Empty.InitEmpty(observedEnumerableKey).Get(observedEnumerableKey).ToEnumerable(),
+              Has.Exactly(1).Empty);
+
+    [Test]
+    public void InitEmpty_does_not_changed_initialized_observed_enumerables()
+      => That(Conf.Empty.InitValue(observedEnumerableKey, Observable.Return(new[] {1}))
+                  .InitEmpty(observedEnumerableKey)
+                  .Get(observedEnumerableKey)
+                  .ToEnumerable(),
+              Has.Exactly(1).EqualTo(new[] {1}));
+
+    [Test]
+    public void Clear_resets_ovbserved_enumerables()
+      => That(Conf.Empty.InitValue(observedEnumerableKey, Observable.Return(new[] {1}))
+                  .Clear(observedEnumerableKey)
+                  .Get(observedEnumerableKey)
+                  .ToEnumerable(),
+              Has.Exactly(1).Empty);
+
     [Test]
     public void Add_adds_values_to_observed_enumerables()
       => AreEqual(new[] {1, 2},
@@ -58,7 +84,6 @@ namespace Bud.V1 {
     #region IImmutableList
 
     private readonly Key<IImmutableList<int>> immutableListKey = nameof(immutableListKey);
-    private readonly Key<IObservable<IImmutableList<int>>> observedIImmutableListKey = nameof(observedIImmutableListKey);
 
     [Test]
     public void InitEmpty_initializes_immutable_lists_to_empty()
@@ -66,7 +91,7 @@ namespace Bud.V1 {
 
     [Test]
     public void InitEmpty_does_not_changed_initialized_immutable_lists()
-      => AreEqual(new[] { 1 },
+      => AreEqual(new[] {1},
                   Conf.Empty.InitValue(immutableListKey, ImmutableList.Create(1))
                       .InitEmpty(immutableListKey)
                       .Get(immutableListKey));
@@ -92,9 +117,36 @@ namespace Bud.V1 {
                       .Add(immutableListKey, c => numberKey[c] + 1)
                       .Get(immutableListKey));
 
+    #endregion
+
+    #region IObservable<IImmutableList<T>>
+
+    private readonly Key<IObservable<IImmutableList<int>>> observedIImmutableListKey = nameof(observedIImmutableListKey);
+
+    [Test]
+    public void InitEmpty_initializes_observed_immutable_lists_to_empty()
+      => That(Conf.Empty.InitEmpty(observedIImmutableListKey).Get(observedIImmutableListKey).ToEnumerable(),
+              Has.Exactly(1).Empty);
+
+    [Test]
+    public void InitEmpty_does_not_changed_initialized_observed_immutable_lists()
+      => That(Conf.Empty.InitValue(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
+                  .InitEmpty(observedIImmutableListKey)
+                  .Get(observedIImmutableListKey)
+                  .ToEnumerable(),
+              Has.Exactly(1).EqualTo(new[] { 1 }));
+
+    [Test]
+    public void Clear_resets_ovbserved_immutable_lists()
+      => That(Conf.Empty.InitValue(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
+                  .Clear(observedIImmutableListKey)
+                  .Get(observedIImmutableListKey)
+                  .ToEnumerable(),
+              Has.Exactly(1).Empty);
+
     [Test]
     public void Add_adds_values_to_observed_immutable_lists()
-      => AreEqual(new[] {1, 2},
+      => AreEqual(new[] { 1, 2 },
                   Conf.Empty.InitValue(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
                       .Add(observedIImmutableListKey, 2)
                       .Get(observedIImmutableListKey).Wait());
@@ -104,7 +156,6 @@ namespace Bud.V1 {
     #region IImmutableSet
 
     private readonly Key<IImmutableSet<int>> immutableSetKey = nameof(immutableSetKey);
-    private readonly Key<IObservable<IImmutableSet<int>>> observedImmutableSetKey = nameof(observedImmutableSetKey);
 
     [Test]
     public void InitEmpty_initializes_immutable_sets_to_empty()
@@ -112,7 +163,7 @@ namespace Bud.V1 {
 
     [Test]
     public void InitEmpty_does_not_changed_initialized_immutable_sets()
-      => AreEqual(new[] { 1 },
+      => AreEqual(new[] {1},
                   Conf.Empty.InitValue(immutableSetKey, ImmutableHashSet.Create(1))
                       .InitEmpty(immutableSetKey)
                       .Get(immutableSetKey));
@@ -138,9 +189,36 @@ namespace Bud.V1 {
                       .Add(immutableSetKey, c => numberKey[c] + 1)
                       .Get(immutableSetKey));
 
+    #endregion
+
+    #region IObservable<IImmutableList<T>>
+
+    private readonly Key<IObservable<IImmutableSet<int>>> observedImmutableSetKey = nameof(observedImmutableSetKey);
+
+    [Test]
+    public void InitEmpty_initializes_observed_immutable_sets_to_empty()
+      => That(Conf.Empty.InitEmpty(observedImmutableSetKey).Get(observedImmutableSetKey).ToEnumerable(),
+              Has.Exactly(1).Empty);
+
+    [Test]
+    public void InitEmpty_does_not_changed_initialized_observed_immutable_sets()
+      => That(Conf.Empty.InitValue(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
+                  .InitEmpty(observedImmutableSetKey)
+                  .Get(observedImmutableSetKey)
+                  .ToEnumerable(),
+              Has.Exactly(1).EqualTo(new[] { 1 }));
+
+    [Test]
+    public void Clear_resets_ovbserved_immutable_sets()
+      => That(Conf.Empty.InitValue(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
+                  .Clear(observedImmutableSetKey)
+                  .Get(observedImmutableSetKey)
+                  .ToEnumerable(),
+              Has.Exactly(1).Empty);
+
     [Test]
     public void Add_adds_values_to_observed_immutable_sets()
-      => AreEqual(new[] {1, 2},
+      => AreEqual(new[] { 1, 2 },
                   Conf.Empty.InitValue(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
                       .Add(observedImmutableSetKey, 2)
                       .Get(observedImmutableSetKey).Wait());
