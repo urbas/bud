@@ -34,7 +34,7 @@ namespace Bud.IO {
     public string CreateFile(string content, params string[] targetPath) {
       string file;
       if (targetPath.Length == 0) {
-        file = Combine(Path, GetFileName(content));
+        file = Combine(Path, Guid.NewGuid().ToString());
       } else {
         file = Combine(new[] {Path}.Concat(targetPath).ToArray());
       }
