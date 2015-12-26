@@ -1,15 +1,12 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Reactive.Linq;
 using Bud.IO;
 using Bud.NuGet;
 using Moq;
-using NuGet.Frameworks;
-using NuGet.Packaging;
-using NuGet.Packaging.Core;
-using NuGet.Versioning;
 using NUnit.Framework;
+using static System.IO.File;
+using static System.IO.Path;
 using static Bud.V1.Api;
 using static NUnit.Framework.Assert;
 
@@ -18,7 +15,7 @@ namespace Bud.V1 {
     [Test]
     public void Packages_config_file_is_at_the_root_by_default()
       => That(PackagesConfigFile[TestProject()],
-              Is.EqualTo(Path.Combine("a", "packages.config")));
+              Is.EqualTo(Combine("a", "packages.config")));
 
     [Test]
     public void Assemblies_is_initially_empty()
@@ -28,15 +25,15 @@ namespace Bud.V1 {
     [Test]
     public void Assemblies_are_resolved_from_the_packages_config_file() {
       using (var tmpDir = new TemporaryDirectory()) {
-        CreatePackagesConfigFile(tmpDir);
+        var packageConfigFile = CreatePackagesConfigFile(tmpDir);
         var expectedAssemblies = ImmutableList.Create("Foo.dll");
-        var assemblyResolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
-        assemblyResolver.Setup(self => self.ResolveAssemblies(It.Is((IEnumerable<PackageReference> p) => EqualToSomePackageReferences(p))))
-                        .Returns(expectedAssemblies);
+        var assemblyResolver = MockAssemblyResolver(packageConfigFile, expectedAssemblies);
         var project = TestProject(tmpDir.Path)
           .SetValue(AssemblyResolver, assemblyResolver.Object);
-        That(Assemblies[project].Take(1).ToEnumerable(),
-             Has.Exactly(1).EqualTo(expectedAssemblies));
+
+        var actualAssemblies = Assemblies[project].Take(1).ToEnumerable();
+
+        That(actualAssemblies, Has.Exactly(1).EqualTo(expectedAssemblies));
         assemblyResolver.VerifyAll();
       }
     }
@@ -44,16 +41,16 @@ namespace Bud.V1 {
     [Test]
     public void Assemblies_are_stored_in_the_target_folder() {
       using (var tmpDir = new TemporaryDirectory()) {
-        CreatePackagesConfigFile(tmpDir);
+        var packageConfigFile = CreatePackagesConfigFile(tmpDir);
         var resolvedAssemblies = ImmutableList.Create("Foo.dll", "Bar.dll");
-        var assemblyResolver = new Mock<IAssemblyResolver>();
-        assemblyResolver.Setup(self => self.ResolveAssemblies(It.IsAny<IEnumerable<PackageReference>>()))
-                        .Returns(resolvedAssemblies);
+        var assemblyResolver = MockAssemblyResolver(packageConfigFile, resolvedAssemblies);
         var project = TestProject(tmpDir.Path)
           .SetValue(AssemblyResolver, assemblyResolver.Object)
           .ToCompiled();
-        ("A" / Assemblies)[project].Take(1).Wait();
-        That(File.ReadAllLines(Path.Combine(("A" / TargetDir)[project], "resolved_assemblies")),
+
+        ("A"/Assemblies)[project].Take(1).Wait();
+
+        That(ReadResolvedAssembliesCache(project),
              Is.EqualTo(resolvedAssemblies));
       }
     }
@@ -66,10 +63,12 @@ namespace Bud.V1 {
         var project = TestProject(tmpDir.Path)
           .SetValue(AssemblyResolver, assemblyResolver.Object)
           .ToCompiled();
-        tmpDir.CreateFile("Moo.dll\nZoo.dll", ("A" / TargetDir)[project], "resolved_assemblies");
-        ("A" / Assemblies)[project].Take(1).Wait();
-        That(File.ReadAllLines(Path.Combine(("A" / TargetDir)[project], "resolved_assemblies")),
-             Is.EqualTo(new [] {"Moo.dll", "Zoo.dll"}));
+        tmpDir.CreateFile("Moo.dll\nZoo.dll", ("A"/TargetDir)[project], "resolved_assemblies");
+
+        ("A"/Assemblies)[project].Take(1).Wait();
+
+        That(ReadResolvedAssembliesCache(project),
+             Is.EqualTo(new[] {"Moo.dll", "Zoo.dll"}));
       }
     }
 
@@ -81,12 +80,15 @@ namespace Bud.V1 {
     private static Conf TestProject(string baseDir = "a")
       => PackageReferencesProject(baseDir, "A");
 
-    private static PackageReference[] SomePackageReferences()
-      => new[] {new PackageReference(new PackageIdentity("Urbas.Example.Foo", NuGetVersion.Parse("1.0.1")), NuGetFramework.Parse("net46"))};
+    private static Mock<IAssemblyResolver> MockAssemblyResolver(string packageConfigFile,
+                                                                IEnumerable<string> assemblies) {
+      var assemblyResolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
+      assemblyResolver.Setup(self => self.ResolveAssemblies(new[] {packageConfigFile}))
+                      .Returns(assemblies);
+      return assemblyResolver;
+    }
 
-    private static bool EqualToSomePackageReferences(IEnumerable<PackageReference> p)
-      => Is.EquivalentTo(SomePackageReferences())
-           .Using(new PackageReferenceComparer())
-           .Matches(p);
+    private static string[] ReadResolvedAssembliesCache(IConf project)
+      => ReadAllLines(Combine(("A"/TargetDir)[project], "resolved_assemblies"));
   }
 }

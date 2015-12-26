@@ -428,18 +428,12 @@ namespace Bud.V1 {
           return File.ReadAllLines(resolvedAssembliesFile)
                      .ToImmutableList();
         }
-        var packageReferences = sources.Where(File.Exists)
-                                       .SelectMany(PackageReferencesFromFile);
-        var assemblies = AssemblyResolver[c].ResolveAssemblies(packageReferences)
+        var assemblies = AssemblyResolver[c].ResolveAssemblies(sources)
                                             .ToImmutableList();
         Directory.CreateDirectory(TargetDir[c]);
         File.WriteAllLines(resolvedAssembliesFile, assemblies);
         return assemblies;
       });
-
-    private static IEnumerable<PackageReference> PackageReferencesFromFile(string source)
-      => new PackagesConfigReader(File.OpenRead(source))
-        .GetPackages();
 
     #endregion
   }
