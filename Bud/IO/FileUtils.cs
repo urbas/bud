@@ -15,5 +15,10 @@ namespace Bud.IO {
 
     public static IEnumerable<Timestamped<string>> ToTimestampedFiles(IEnumerable<string> sources)
       => sources.Select(ToTimestampedFile);
+
+    public static bool IsNewerThan(string file, IEnumerable<string> referenceFiles) {
+      var fileTimestamp = GetFileTimestamp(file);
+      return referenceFiles.All(referenceFile => GetFileTimestamp(referenceFile) < fileTimestamp);
+    }
   }
 }

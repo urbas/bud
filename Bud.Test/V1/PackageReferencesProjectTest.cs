@@ -1,6 +1,10 @@
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Reactive.Linq;
 using Bud.IO;
+using Bud.NuGet;
+using Moq;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
@@ -14,21 +18,58 @@ namespace Bud.V1 {
     [Test]
     public void Packages_config_file_is_at_the_root_by_default()
       => That(PackagesConfigFile[TestProject()],
-              Is.EqualTo(Path.Combine("foo", "packages.config")));
+              Is.EqualTo(Path.Combine("a", "packages.config")));
 
     [Test]
-    public void PackageReferences_is_initially_empty()
-      => That(PackageReferences[TestProject()].Take(1).ToEnumerable(),
+    public void Assemblies_is_initially_empty()
+      => That(Assemblies[TestProject()].Take(1).ToEnumerable(),
               Has.Exactly(1).Empty);
 
     [Test]
-    public void PackageReferences_lists_contents_of_the_packages_config_file() {
+    public void Assemblies_are_resolved_from_the_packages_config_file() {
       using (var tmpDir = new TemporaryDirectory()) {
         CreatePackagesConfigFile(tmpDir);
-        That(PackageReferences[TestProject(tmpDir.Path)].Take(1).ToEnumerable(),
-             Has.Exactly(1)
-                .EqualTo(new[] {new PackageReference(new PackageIdentity("Urbas.Example.Foo", NuGetVersion.Parse("1.0.1")), NuGetFramework.Parse("net46"))})
-                .Using(new PackageReferenceComparer()));
+        var expectedAssemblies = ImmutableList.Create("Foo.dll");
+        var assemblyResolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
+        assemblyResolver.Setup(self => self.ResolveAssemblies(It.Is((IEnumerable<PackageReference> p) => EqualToSomePackageReferences(p))))
+                        .Returns(expectedAssemblies);
+        var project = TestProject(tmpDir.Path)
+          .SetValue(AssemblyResolver, assemblyResolver.Object);
+        That(Assemblies[project].Take(1).ToEnumerable(),
+             Has.Exactly(1).EqualTo(expectedAssemblies));
+        assemblyResolver.VerifyAll();
+      }
+    }
+
+    [Test]
+    public void Assemblies_are_stored_in_the_target_folder() {
+      using (var tmpDir = new TemporaryDirectory()) {
+        CreatePackagesConfigFile(tmpDir);
+        var resolvedAssemblies = ImmutableList.Create("Foo.dll", "Bar.dll");
+        var assemblyResolver = new Mock<IAssemblyResolver>();
+        assemblyResolver.Setup(self => self.ResolveAssemblies(It.IsAny<IEnumerable<PackageReference>>()))
+                        .Returns(resolvedAssemblies);
+        var project = TestProject(tmpDir.Path)
+          .SetValue(AssemblyResolver, assemblyResolver.Object)
+          .ToCompiled();
+        ("A" / Assemblies)[project].Take(1).Wait();
+        That(File.ReadAllLines(Path.Combine(("A" / TargetDir)[project], "resolved_assemblies")),
+             Is.EqualTo(resolvedAssemblies));
+      }
+    }
+
+    [Test]
+    public void Assemblies_are_loaded_from_cache() {
+      using (var tmpDir = new TemporaryDirectory()) {
+        CreatePackagesConfigFile(tmpDir);
+        var assemblyResolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
+        var project = TestProject(tmpDir.Path)
+          .SetValue(AssemblyResolver, assemblyResolver.Object)
+          .ToCompiled();
+        tmpDir.CreateFile("Moo.dll\nZoo.dll", ("A" / TargetDir)[project], "resolved_assemblies");
+        ("A" / Assemblies)[project].Take(1).Wait();
+        That(File.ReadAllLines(Path.Combine(("A" / TargetDir)[project], "resolved_assemblies")),
+             Is.EqualTo(new [] {"Moo.dll", "Zoo.dll"}));
       }
     }
 
@@ -37,7 +78,15 @@ namespace Bud.V1 {
                                        tmpDir.Path,
                                        "packages.config");
 
-    private static Conf TestProject(string baseDir = "foo")
-      => PackageReferencesProject(baseDir, "Foo.References");
+    private static Conf TestProject(string baseDir = "a")
+      => PackageReferencesProject(baseDir, "A");
+
+    private static PackageReference[] SomePackageReferences()
+      => new[] {new PackageReference(new PackageIdentity("Urbas.Example.Foo", NuGetVersion.Parse("1.0.1")), NuGetFramework.Parse("net46"))};
+
+    private static bool EqualToSomePackageReferences(IEnumerable<PackageReference> p)
+      => Is.EquivalentTo(SomePackageReferences())
+           .Using(new PackageReferenceComparer())
+           .Matches(p);
   }
 }

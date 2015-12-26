@@ -2,19 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Bud.Configuration;
 using Bud.Cs;
 using Bud.IO;
+using Bud.NuGet;
 using Bud.Optional;
 using Bud.Reactive;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using NuGet.Packaging;
 using static System.IO.Path;
-using static System.Linq.Enumerable;
 
 namespace Bud.V1 {
   /// <summary>
@@ -129,7 +130,7 @@ namespace Bud.V1 {
     ///   By default, the build has no sources. Add them through
     ///   <see cref="AddSources" /> or <see cref="AddSourceFiles" />.
     /// </summary>
-    public static readonly Key<IObservable<IEnumerable<string>>> Sources = nameof(Sources);
+    public static readonly Key<IObservable<IImmutableList<string>>> Sources = nameof(Sources);
 
     /// <summary>
     ///   A descriptor of where to fetch source files from and how to
@@ -184,10 +185,10 @@ namespace Bud.V1 {
       => c.Add(SourceIncludes,
                conf => FilesObservatory[conf].WatchFiles(absolutePath(conf)));
 
-    private static IObservable<IEnumerable<string>> DefaultSources(IConf c)
-      => SourceIncludes[c].ToObservable(SourceFilter(c))
-                          .ObserveOn(BuildPipelineScheduler[c])
-                          .Calmed(c);
+    private static IObservable<IImmutableList<string>> DefaultSources(IConf c)
+      => SourceIncludes[c].ToObservable(SourceFilter(c)).ObserveOn(BuildPipelineScheduler[c])
+                          .Calmed(c)
+                          .Select(ImmutableList.ToImmutableList);
 
     private static Func<string, bool> SourceFilter(IConf c) {
       var excludeFilters = SourceExcludeFilters[c];
@@ -202,7 +203,7 @@ namespace Bud.V1 {
     ///   A stream of <see cref="Sources" /> after they have been processed
     ///   by <see cref="SourceProcessors" />.
     /// </summary>
-    public static readonly Key<IObservable<IEnumerable<string>>> ProcessedSources = nameof(ProcessedSources);
+    public static readonly Key<IObservable<IImmutableList<string>>> ProcessedSources = nameof(ProcessedSources);
 
     /// <summary>
     ///   <see cref="Sources" /> are passed through source processors in order.
@@ -214,10 +215,11 @@ namespace Bud.V1 {
       .InitEmpty(SourceProcessors)
       .Init(ProcessedSources, DefaultProcessSources);
 
-    private static IObservable<IEnumerable<string>> DefaultProcessSources(IConf project)
+    private static IObservable<IImmutableList<string>> DefaultProcessSources(IConf project)
       => SourceProcessors[project]
-        .Aggregate(Sources[project],
-                   (sources, processor) => processor.Process(sources));
+        .Aggregate(Sources[project] as IObservable<IEnumerable<string>>,
+                   (sources, processor) => processor.Process(sources))
+        .Select(ImmutableList.ToImmutableList);
 
     #endregion
 
@@ -373,9 +375,7 @@ namespace Bud.V1 {
                                      sources,
                                      dependencies,
                                      AssemblyReferences[conf]
-                                     ))
-                    .Select(Compiler[conf])
-                    .Do(PrintCompilationResult);
+                                     )).Select(Compiler[conf]).Do(PrintCompilationResult);
 
     private static void PrintCompilationResult(CompileOutput output) {
       if (output.Success) {
@@ -406,21 +406,36 @@ namespace Bud.V1 {
     public static Key<string> PackagesConfigFile = nameof(PackagesConfigFile);
 
     /// <summary>
-    ///   A list of NuGet package references. By default, this list is read from the <see cref="PackagesConfigFile" />.
+    ///   A list of paths to assemblies. These paths are resolved from NuGet
+    ///   package references.
     /// </summary>
-    public static Key<IObservable<IImmutableList<PackageReference>>> PackageReferences = nameof(PackageReferences);
+    public static Key<IObservable<IImmutableList<string>>> Assemblies = nameof(Assemblies);
+
+    public static Key<IAssemblyResolver> AssemblyResolver = nameof(AssemblyResolver);
 
     public static Conf PackageReferencesProject(string dir, string projectId)
       => BareProject(dir, projectId)
         .Add(SourcesSupport)
         .AddSourceFile(c => PackagesConfigFile[c])
+        .InitValue(AssemblyResolver, new NuGetAssemblyResolver())
         .Init(PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
-        .Init(PackageReferences, c => Sources[c].Select(PackageReferencesFromFiles));
+        .Init(Assemblies, ResolveAssemblies);
 
-    private static ImmutableList<PackageReference> PackageReferencesFromFiles(IEnumerable<string> sources)
-      => sources.Where(File.Exists)
-                .SelectMany(PackageReferencesFromFile)
-                .ToImmutableList();
+    private static IObservable<IImmutableList<string>> ResolveAssemblies(IConf c)
+      => Sources[c].Select(sources => {
+        var resolvedAssembliesFile = Combine(TargetDir[c], "resolved_assemblies");
+        if (File.Exists(resolvedAssembliesFile) && FileUtils.IsNewerThan(resolvedAssembliesFile, sources)) {
+          return File.ReadAllLines(resolvedAssembliesFile)
+                     .ToImmutableList();
+        }
+        var packageReferences = sources.Where(File.Exists)
+                                       .SelectMany(PackageReferencesFromFile);
+        var assemblies = AssemblyResolver[c].ResolveAssemblies(packageReferences)
+                                            .ToImmutableList();
+        Directory.CreateDirectory(TargetDir[c]);
+        File.WriteAllLines(resolvedAssembliesFile, assemblies);
+        return assemblies;
+      });
 
     private static IEnumerable<PackageReference> PackageReferencesFromFile(string source)
       => new PackagesConfigReader(File.OpenRead(source))
