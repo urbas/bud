@@ -13,6 +13,7 @@ using Bud.Reactive;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using NuGet.Packaging;
+using static System.IO.Path;
 using static System.Linq.Enumerable;
 
 namespace Bud.V1 {
@@ -67,8 +68,8 @@ namespace Bud.V1 {
 
     public static Conf BuildSupport = Conf
       .Empty
-      .InitValue(Input, Observable.Return(Empty<string>()))
-      .InitValue(Build, Observable.Return(Empty<string>()))
+      .InitEmpty(Input)
+      .InitEmpty(Build)
       .Init(Output, c => Build[c]);
 
     #endregion
@@ -166,7 +167,7 @@ namespace Bud.V1 {
       .InitEmpty(SourceIncludes)
       .InitEmpty(SourceExcludeFilters)
       .InitValue(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
-      .Init(FilesObservatory, _ => new LocalFilesObservatory())
+      .InitValue(FilesObservatory, new LocalFilesObservatory())
       .Init(Sources, DefaultSources);
 
     /// <summary>
@@ -251,8 +252,9 @@ namespace Bud.V1 {
     /// <param name="projectId">see <see cref="ProjectId" /></param>
     public static Conf BareProject(string projectDir, string projectId)
       => Project(projectId)
+        .Add(BuildSchedulingSupport)
         .InitValue(ProjectDir, projectDir)
-        .Init(TargetDir, c => Path.Combine(ProjectDir[c], TargetDirName))
+        .Init(TargetDir, c => Combine(ProjectDir[c], TargetDirName))
         .InitValue(ProjectId, projectId)
         .Init(Clean, DefaultClean);
 
@@ -294,7 +296,7 @@ namespace Bud.V1 {
     /// <returns>the modified project</returns>
     public static Conf AddSources(this Conf c, string subDir = null, string fileFilter = "*", bool includeSubdirs = true)
       => c.Add(SourceIncludes, conf => {
-        var sourceDir = subDir == null ? ProjectDir[conf] : Path.Combine(ProjectDir[conf], subDir);
+        var sourceDir = subDir == null ? ProjectDir[conf] : Combine(ProjectDir[conf], subDir);
         return FilesObservatory[conf].WatchDir(sourceDir, fileFilter, includeSubdirs);
       });
 
@@ -304,7 +306,7 @@ namespace Bud.V1 {
     public static Conf AddSourceFiles(this Conf c, params string[] relativeFilePaths)
       => c.Add(SourceIncludes, conf => {
         var projectDir = ProjectDir[conf];
-        var absolutePaths = relativeFilePaths.Select(relativeFilePath => Path.Combine(projectDir, relativeFilePath));
+        var absolutePaths = relativeFilePaths.Select(relativeFilePath => Combine(projectDir, relativeFilePath));
         return FilesObservatory[conf].WatchFiles(absolutePaths);
       });
 
@@ -326,7 +328,7 @@ namespace Bud.V1 {
     public static Conf ExcludeSourceDirs(this Conf c, Func<IConf, IEnumerable<string>> subDirs)
       => c.Add(SourceExcludeFilters, conf => {
         var projectDir = ProjectDir[conf];
-        var dirs = subDirs(conf).Select(s => Path.IsPathRooted(s) ? s : Path.Combine(projectDir, s));
+        var dirs = subDirs(conf).Select(s => IsPathRooted(s) ? s : Combine(projectDir, s));
         return PathUtils.InAnyDirFilter(dirs);
       });
 
@@ -361,7 +363,7 @@ namespace Bud.V1 {
 
     public static Conf EmbedResource(this Conf conf, string path, string nameInAssembly)
       => conf.Add(EmbeddedResources, c => {
-        var resourceFile = Path.IsPathRooted(path) ? path : Path.Combine(ProjectDir[c], path);
+        var resourceFile = IsPathRooted(path) ? path : Combine(ProjectDir[c], path);
         return ToResourceDescriptor(resourceFile, nameInAssembly);
       });
 
@@ -377,7 +379,7 @@ namespace Bud.V1 {
 
     private static void PrintCompilationResult(CompileOutput output) {
       if (output.Success) {
-        Console.WriteLine($"Compiled '{Path.GetFileNameWithoutExtension(output.AssemblyPath)}' in {output.CompilationTime.Milliseconds}ms.");
+        Console.WriteLine($"Compiled '{GetFileNameWithoutExtension(output.AssemblyPath)}' in {output.CompilationTime.Milliseconds}ms.");
       } else {
         Console.WriteLine($"Failed to compile '{output.AssemblyPath}'.");
         foreach (var diagnostic in output.Diagnostics) {
@@ -410,7 +412,19 @@ namespace Bud.V1 {
 
     public static Conf PackageReferencesProject(string dir, string projectId)
       => BareProject(dir, projectId)
-        .Init(PackagesConfigFile, c => Path.Combine(ProjectDir[c], "packages.config"));
+        .Add(SourcesSupport)
+        .AddSourceFile(c => PackagesConfigFile[c])
+        .Init(PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
+        .Init(PackageReferences, c => Sources[c].Select(PackageReferencesFromFiles));
+
+    private static ImmutableList<PackageReference> PackageReferencesFromFiles(IEnumerable<string> sources)
+      => sources.Where(File.Exists)
+                .SelectMany(PackageReferencesFromFile)
+                .ToImmutableList();
+
+    private static IEnumerable<PackageReference> PackageReferencesFromFile(string source)
+      => new PackagesConfigReader(File.OpenRead(source))
+        .GetPackages();
 
     #endregion
   }
