@@ -25,7 +25,7 @@ namespace Bud.V1 {
     [Test]
     public void Assemblies_are_resolved_from_the_packages_config_file() {
       using (var tmpDir = new TemporaryDirectory()) {
-        var packageConfigFile = CreatePackagesConfigFile(tmpDir);
+        var packageConfigFile = PackageConfigTestUtils.CreatePackagesConfigFile(tmpDir);
         var expectedAssemblies = ImmutableList.Create("Foo.dll");
         var assemblyResolver = MockAssemblyResolver(packageConfigFile, expectedAssemblies);
         var project = TestProject(tmpDir.Path)
@@ -41,7 +41,7 @@ namespace Bud.V1 {
     [Test]
     public void Assemblies_are_stored_in_the_target_folder() {
       using (var tmpDir = new TemporaryDirectory()) {
-        var packageConfigFile = CreatePackagesConfigFile(tmpDir);
+        var packageConfigFile = PackageConfigTestUtils.CreatePackagesConfigFile(tmpDir);
         var resolvedAssemblies = ImmutableList.Create("Foo.dll", "Bar.dll");
         var assemblyResolver = MockAssemblyResolver(packageConfigFile, resolvedAssemblies);
         var project = TestProject(tmpDir.Path)
@@ -51,14 +51,14 @@ namespace Bud.V1 {
         ("A"/Assemblies)[project].Take(1).Wait();
 
         That(ReadResolvedAssembliesCache(project),
-             Is.EqualTo(resolvedAssemblies));
+             Is.EquivalentTo(resolvedAssemblies));
       }
     }
 
     [Test]
     public void Assemblies_are_loaded_from_cache() {
       using (var tmpDir = new TemporaryDirectory()) {
-        CreatePackagesConfigFile(tmpDir);
+        PackageConfigTestUtils.CreatePackagesConfigFile(tmpDir);
         var assemblyResolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
         var project = TestProject(tmpDir.Path)
           .SetValue(AssemblyResolver, assemblyResolver.Object)
@@ -68,14 +68,9 @@ namespace Bud.V1 {
         ("A"/Assemblies)[project].Take(1).Wait();
 
         That(ReadResolvedAssembliesCache(project),
-             Is.EqualTo(new[] {"Moo.dll", "Zoo.dll"}));
+             Is.EquivalentTo(new[] {"Moo.dll", "Zoo.dll"}));
       }
     }
-
-    private static string CreatePackagesConfigFile(TemporaryDirectory tmpDir)
-      => tmpDir.CreateFileFromResource("Bud.NuGet.SinglePackageTest.packages.config",
-                                       tmpDir.Path,
-                                       "packages.config");
 
     private static Conf TestProject(string baseDir = "a")
       => PackageReferencesProject(baseDir, "A");
@@ -83,8 +78,9 @@ namespace Bud.V1 {
     private static Mock<IAssemblyResolver> MockAssemblyResolver(string packageConfigFile,
                                                                 IEnumerable<string> assemblies) {
       var assemblyResolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
-      assemblyResolver.Setup(self => self.ResolveAssemblies(new[] {packageConfigFile}))
-                      .Returns(assemblies);
+      assemblyResolver.Setup(self => self.ResolveAssemblies(new[] {packageConfigFile},
+                                                            It.IsAny<string>()))
+                      .Returns(new ResolvedAssemblies(ImmutableHashSet<string>.Empty, assemblies.ToImmutableHashSet()));
       return assemblyResolver;
     }
 

@@ -33,16 +33,17 @@ namespace Bud.Cs {
 
     public CompileOutput Compile(CompileInput input) {
       if (!input.Dependencies.All(dependency => dependency.Success)) {
-        return CreateOutputFromAssembly(false);
+        return CreateOutputFromAssembly(false,
+                                        File.Exists(OutputAssemblyPath) ? MetadataReference.CreateFromFile(OutputAssemblyPath) : null);
       }
 
       var sources = input.Sources.Select(ToTimestampedFile).ToList();
       var assemblies = input.AssemblyReferences
-        .Concat(input.Dependencies.Select(output => output.AssemblyPath))
-        .Select(ToTimestampedFile).ToList();
+                            .Concat(input.Dependencies.Select(output => output.AssemblyPath))
+                            .Select(ToTimestampedFile).ToList();
 
       if (File.Exists(OutputAssemblyPath) && IsOutputUpToDate(sources, assemblies)) {
-        return CreateOutputFromAssembly(true);
+        return CreateOutputFromAssembly(true, MetadataReference.CreateFromFile(OutputAssemblyPath));
       }
 
       Stopwatch.Restart();
@@ -55,13 +56,13 @@ namespace Bud.Cs {
       return EmitDll(cSharpCompilation, Stopwatch, EmbeddedResources, OutputAssemblyPath);
     }
 
-    private CompileOutput CreateOutputFromAssembly(bool isSuccess)
+    private CompileOutput CreateOutputFromAssembly(bool isSuccess, PortableExecutableReference outputAssembly)
       => new CompileOutput(Enumerable.Empty<Diagnostic>(),
                            Stopwatch.Elapsed,
                            OutputAssemblyPath,
                            isSuccess,
                            GetFileTimestamp(OutputAssemblyPath),
-                           MetadataReference.CreateFromFile(OutputAssemblyPath));
+                           outputAssembly);
 
     private bool IsOutputUpToDate(IEnumerable<Timestamped<string>> sources,
                                   IEnumerable<Timestamped<string>> assemblies) {

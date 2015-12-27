@@ -14,7 +14,6 @@ using Bud.Optional;
 using Bud.Reactive;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using NuGet.Packaging;
 using static System.IO.Path;
 
 namespace Bud.V1 {
@@ -409,7 +408,7 @@ namespace Bud.V1 {
     ///   A list of paths to assemblies. These paths are resolved from NuGet
     ///   package references.
     /// </summary>
-    public static Key<IObservable<IImmutableList<string>>> Assemblies = nameof(Assemblies);
+    public static Key<IObservable<IImmutableSet<string>>> Assemblies = nameof(Assemblies);
 
     public static Key<IAssemblyResolver> AssemblyResolver = nameof(AssemblyResolver);
 
@@ -421,18 +420,18 @@ namespace Bud.V1 {
         .Init(PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
         .Init(Assemblies, ResolveAssemblies);
 
-    private static IObservable<IImmutableList<string>> ResolveAssemblies(IConf c)
+    private static IObservable<IImmutableSet<string>> ResolveAssemblies(IConf c)
       => Sources[c].Select(sources => {
         var resolvedAssembliesFile = Combine(TargetDir[c], "resolved_assemblies");
         if (File.Exists(resolvedAssembliesFile) && FileUtils.IsNewerThan(resolvedAssembliesFile, sources)) {
           return File.ReadAllLines(resolvedAssembliesFile)
-                     .ToImmutableList();
+                     .ToImmutableHashSet();
         }
-        var assemblies = AssemblyResolver[c].ResolveAssemblies(sources)
-                                            .ToImmutableList();
+        var resolvedAssemblies = AssemblyResolver[c].ResolveAssemblies(sources,
+                                                               Combine(ProjectDir[c], "packages"));
         Directory.CreateDirectory(TargetDir[c]);
-        File.WriteAllLines(resolvedAssembliesFile, assemblies);
-        return assemblies;
+        File.WriteAllLines(resolvedAssembliesFile, resolvedAssemblies.Assemblies);
+        return resolvedAssemblies.Assemblies;
       });
 
     #endregion

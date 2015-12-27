@@ -12,7 +12,7 @@ using static Bud.IO.LocalFilesObservatory;
 namespace Bud.IO {
   public class LocalFilesObservatoryTest {
     [Test]
-    public async void Adding_a_file_should_result_in_a_push_notification() {
+    public async Task Adding_a_file_should_result_in_a_push_notification() {
       using (var tempDir = new TemporaryDirectory()) {
         var disposingBarrier = new CountdownEvent(1);
         var observedChanges = ObserveSingleFileChangeAsync(tempDir, disposingBarrier);
@@ -23,7 +23,7 @@ namespace Bud.IO {
     }
 
     [Test]
-    public async void Changing_a_file_should_result_in_a_push_notification() {
+    public async Task Changing_a_file_should_result_in_a_push_notification() {
       using (var tempDir = new TemporaryDirectory()) {
         var fileA = tempDir.CreateEmptyFile("A", "A.txt");
         var disposingBarrier = new CountdownEvent(1);
@@ -35,7 +35,7 @@ namespace Bud.IO {
     }
 
     [Test]
-    public async void Removing_a_file_should_result_in_a_push_notification() {
+    public async Task Removing_a_file_should_result_in_a_push_notification() {
       using (var tempDir = new TemporaryDirectory()) {
         var fileA = tempDir.CreateEmptyFile("A", "A.txt");
         var disposingBarrier = new CountdownEvent(1);
@@ -47,7 +47,7 @@ namespace Bud.IO {
     }
 
     [Test]
-    public async void Moving_a_file_should_result_in_two_push_notifications() {
+    public async Task Moving_a_file_should_result_in_two_push_notifications() {
       using (var tempDir = new TemporaryDirectory()) {
         var fileA = tempDir.CreateEmptyFile("A", "A.txt");
         var fileB = Path.Combine(tempDir.Path, "B.txt");
@@ -62,7 +62,7 @@ namespace Bud.IO {
     }
 
     [Test]
-    public async void Renaming_a_file_should_result_in_two_push_notifications() {
+    public async Task Renaming_a_file_should_result_in_two_push_notifications() {
       using (var tempDir = new TemporaryDirectory()) {
         var fileA = tempDir.CreateEmptyFile("A.txt");
         var fileB = Path.Combine(tempDir.Path, "B.txt");
@@ -77,7 +77,7 @@ namespace Bud.IO {
     }
 
     [Test]
-    public async void Changing_multiple_files_must_produce_multiple_observations() {
+    public async Task Changing_multiple_files_must_produce_multiple_observations() {
       using (var tempDir = new TemporaryDirectory()) {
         var fileA = tempDir.CreateEmptyFile("A.txt");
         var fileB = tempDir.CreateEmptyFile("B", "B.txt");
@@ -95,7 +95,7 @@ namespace Bud.IO {
 
     [Test]
     [Timeout(2000)]
-    public async void Merging_observers_should_produce_observations_when_only_one_produces_them() {
+    public async Task Merging_observers_should_produce_observations_when_only_one_produces_them() {
       using (var tempDir = new TemporaryDirectory()) {
         tempDir.CreateEmptyFile("A", "A.txt");
         var fileB = tempDir.CreateEmptyFile("B", "B.txt");

@@ -112,7 +112,7 @@ namespace Bud.V1 {
     }
 
     [Test]
-    public async void Multithreaded_access_to_configs_should_not_result_in_duplicate_invocations() {
+    public async Task Multithreaded_access_to_configs_should_not_result_in_duplicate_invocations() {
       var intConfig = new Mock<Func<IConf, int>>();
       var conf = A.Set(intConfig.Object)
                   .Set(BAsync, AddFooTwiceConcurrently);
