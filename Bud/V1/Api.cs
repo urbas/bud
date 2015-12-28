@@ -14,7 +14,9 @@ using Bud.Optional;
 using Bud.Reactive;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using static System.IO.File;
 using static System.IO.Path;
+using static Bud.IO.FileUtils;
 
 namespace Bud.V1 {
   /// <summary>
@@ -388,7 +390,7 @@ namespace Bud.V1 {
     }
 
     private static ResourceDescription ToResourceDescriptor(string resourceFile, string nameInAssembly)
-      => new ResourceDescription(nameInAssembly, () => File.OpenRead(resourceFile), true);
+      => new ResourceDescription(nameInAssembly, () => OpenRead(resourceFile), true);
 
     private static IObservable<IEnumerable<CompileOutput>> ObserveDependencies(IConf c)
       => Dependencies[c].Gather(dependency => c.TryGet(dependency/Compile))
@@ -423,14 +425,16 @@ namespace Bud.V1 {
     private static IObservable<IImmutableSet<string>> ResolveAssemblies(IConf c)
       => Sources[c].Select(sources => {
         var resolvedAssembliesFile = Combine(TargetDir[c], "resolved_assemblies");
-        if (File.Exists(resolvedAssembliesFile) && FileUtils.IsNewerThan(resolvedAssembliesFile, sources)) {
-          return File.ReadAllLines(resolvedAssembliesFile)
+        if (Exists(resolvedAssembliesFile) &&
+            IsNewerThan(resolvedAssembliesFile, sources)) {
+          return ReadAllLines(resolvedAssembliesFile)
                      .ToImmutableHashSet();
         }
-        var resolvedAssemblies = AssemblyResolver[c].ResolveAssemblies(sources,
-                                                               Combine(ProjectDir[c], "packages"));
+        var resolvedAssemblies = AssemblyResolver[c]
+          .ResolveAssemblies(sources,
+                             Combine(ProjectDir[c], "packages"));
         Directory.CreateDirectory(TargetDir[c]);
-        File.WriteAllLines(resolvedAssembliesFile, resolvedAssemblies.Assemblies);
+        WriteAllLines(resolvedAssembliesFile, resolvedAssemblies.Assemblies);
         return resolvedAssemblies.Assemblies;
       });
 

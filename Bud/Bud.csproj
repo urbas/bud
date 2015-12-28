@@ -112,6 +112,7 @@
     <Compile Include="IO\FileWatcher.cs" />
     <Compile Include="NuGet\IAssemblyResolver.cs" />
     <Compile Include="NuGet\NuGetAssemblyResolver.cs" />
+    <Compile Include="NuGet\ResolvedAssemblies.cs" />
     <Compile Include="Optional\Optional.cs" />
     <Compile Include="Optional\OptionalExtensions.cs" />
     <Compile Include="Optional\Optionals.cs" />

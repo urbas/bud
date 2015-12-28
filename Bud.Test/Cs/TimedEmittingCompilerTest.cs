@@ -34,7 +34,7 @@ namespace Bud.Cs {
         var inputAssemblies = new[] {Timestamped.Create("Foo.dll", 0L)};
         underlyingCompiler.Setup(self => self.Compile(It.IsAny<IEnumerable<Timestamped<string>>>(),
                                                       inputAssemblies))
-                                                      .Returns((CSharpCompilation) null);
+                          .Returns((CSharpCompilation) null);
         Assert.That(() => compiler.Compile(compilerInput), Throws.TypeOf<Exception>());
         underlyingCompiler.VerifyAll();
       }
@@ -69,7 +69,7 @@ namespace Bud.Cs {
     private static CompileOutput UnsuccessfulCompileOutput()
       => new CompileOutput(Enumerable.Empty<Diagnostic>(), TimeSpan.Zero, "Foo.dll", false, 0L, null);
 
-        private static CompileOutput FooDllCompileOutput()
-          => new CompileOutput(Enumerable.Empty<Diagnostic>(), TimeSpan.Zero, "Foo.dll", true, 0L, null);
+    private static CompileOutput FooDllCompileOutput()
+      => new CompileOutput(Enumerable.Empty<Diagnostic>(), TimeSpan.Zero, "Foo.dll", true, 0L, null);
   }
 }
