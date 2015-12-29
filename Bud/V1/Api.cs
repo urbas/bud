@@ -412,13 +412,13 @@ namespace Bud.V1 {
     /// </summary>
     public static Key<IObservable<IImmutableSet<string>>> Assemblies = nameof(Assemblies);
 
-    public static Key<IAssemblyResolver> AssemblyResolver = nameof(AssemblyResolver);
+    public static Key<IPackageResolver> AssemblyResolver = nameof(AssemblyResolver);
 
     public static Conf PackageReferencesProject(string dir, string projectId)
       => BareProject(dir, projectId)
         .Add(SourcesSupport)
         .AddSourceFile(c => PackagesConfigFile[c])
-        .InitValue(AssemblyResolver, new NuGetAssemblyResolver())
+        .InitValue(AssemblyResolver, new NuGetPackageResolver())
         .Init(PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
         .Init(Assemblies, ResolveAssemblies);
 
@@ -428,14 +428,15 @@ namespace Bud.V1 {
         if (Exists(resolvedAssembliesFile) &&
             IsNewerThan(resolvedAssembliesFile, sources)) {
           return ReadAllLines(resolvedAssembliesFile)
-                     .ToImmutableHashSet();
+            .ToImmutableHashSet();
         }
         var resolvedAssemblies = AssemblyResolver[c]
-          .ResolveAssemblies(sources,
-                             Combine(ProjectDir[c], "packages"));
+          .Resolve(sources,
+                             Combine(ProjectDir[c], "packages"))
+          .ToImmutableHashSet();
         Directory.CreateDirectory(TargetDir[c]);
-        WriteAllLines(resolvedAssembliesFile, resolvedAssemblies.Assemblies);
-        return resolvedAssemblies.Assemblies;
+        WriteAllLines(resolvedAssembliesFile, resolvedAssemblies);
+        return resolvedAssemblies;
       });
 
     #endregion

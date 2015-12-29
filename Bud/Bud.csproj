@@ -110,8 +110,8 @@
   <ItemGroup>
     <Compile Include="Collections\ImmutableLists.cs" />
     <Compile Include="IO\FileWatcher.cs" />
-    <Compile Include="NuGet\IAssemblyResolver.cs" />
-    <Compile Include="NuGet\NuGetAssemblyResolver.cs" />
+    <Compile Include="NuGet\IPackageResolver.cs" />
+    <Compile Include="NuGet\NuGetPackageResolver.cs" />
     <Compile Include="NuGet\ResolvedAssemblies.cs" />
     <Compile Include="Optional\Optional.cs" />
     <Compile Include="Optional\OptionalExtensions.cs" />

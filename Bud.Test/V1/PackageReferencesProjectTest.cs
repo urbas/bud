@@ -27,14 +27,14 @@ namespace Bud.V1 {
       using (var tmpDir = new TemporaryDirectory()) {
         var packageConfigFile = PackageConfigTestUtils.CreatePackagesConfigFile(tmpDir);
         var expectedAssemblies = ImmutableList.Create("Foo.dll");
-        var assemblyResolver = MockAssemblyResolver(packageConfigFile, expectedAssemblies);
+        var resolver = MockPackageResolver(packageConfigFile, expectedAssemblies);
         var project = TestProject(tmpDir.Path)
-          .SetValue(AssemblyResolver, assemblyResolver.Object);
+          .SetValue(AssemblyResolver, resolver.Object);
 
         var actualAssemblies = Assemblies[project].Take(1).ToEnumerable();
 
         That(actualAssemblies, Has.Exactly(1).EqualTo(expectedAssemblies));
-        assemblyResolver.VerifyAll();
+        resolver.VerifyAll();
       }
     }
 
@@ -43,9 +43,9 @@ namespace Bud.V1 {
       using (var tmpDir = new TemporaryDirectory()) {
         var packageConfigFile = PackageConfigTestUtils.CreatePackagesConfigFile(tmpDir);
         var resolvedAssemblies = ImmutableList.Create("Foo.dll", "Bar.dll");
-        var assemblyResolver = MockAssemblyResolver(packageConfigFile, resolvedAssemblies);
+        var resolver = MockPackageResolver(packageConfigFile, resolvedAssemblies);
         var project = TestProject(tmpDir.Path)
-          .SetValue(AssemblyResolver, assemblyResolver.Object)
+          .SetValue(AssemblyResolver, resolver.Object)
           .ToCompiled();
 
         ("A"/Assemblies)[project].Take(1).Wait();
@@ -59,9 +59,9 @@ namespace Bud.V1 {
     public void Assemblies_are_loaded_from_cache() {
       using (var tmpDir = new TemporaryDirectory()) {
         PackageConfigTestUtils.CreatePackagesConfigFile(tmpDir);
-        var assemblyResolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
+        var resolver = new Mock<IPackageResolver>(MockBehavior.Strict);
         var project = TestProject(tmpDir.Path)
-          .SetValue(AssemblyResolver, assemblyResolver.Object)
+          .SetValue(AssemblyResolver, resolver.Object)
           .ToCompiled();
         tmpDir.CreateFile("Moo.dll\nZoo.dll", ("A"/TargetDir)[project], "resolved_assemblies");
 
@@ -75,13 +75,13 @@ namespace Bud.V1 {
     private static Conf TestProject(string baseDir = "a")
       => PackageReferencesProject(baseDir, "A");
 
-    private static Mock<IAssemblyResolver> MockAssemblyResolver(string packageConfigFile,
-                                                                IEnumerable<string> assemblies) {
-      var assemblyResolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
-      assemblyResolver.Setup(self => self.ResolveAssemblies(new[] {packageConfigFile},
-                                                            It.IsAny<string>()))
-                      .Returns(new ResolvedAssemblies(ImmutableHashSet<string>.Empty, assemblies.ToImmutableHashSet()));
-      return assemblyResolver;
+    private static Mock<IPackageResolver> MockPackageResolver(string packageConfigFile,
+                                                              IEnumerable<string> assemblies) {
+      var resolver = new Mock<IPackageResolver>(MockBehavior.Strict);
+      resolver.Setup(self => self.Resolve(new[] {packageConfigFile},
+                                          It.IsAny<string>()))
+              .Returns(assemblies.ToImmutableHashSet());
+      return resolver;
     }
 
     private static string[] ReadResolvedAssembliesCache(IConf project)

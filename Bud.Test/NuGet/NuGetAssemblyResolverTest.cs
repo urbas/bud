@@ -3,14 +3,14 @@ using Bud.IO;
 using NUnit.Framework;
 
 namespace Bud.NuGet {
-  public class NuGetAssemblyResolverTest {
+  public class NuGetPackageResolverTest {
     [Test]
-    [Ignore("Takes too long")]
+//    [Ignore("Takes too long")]
     public void ResolveAssemblies_installs_missing_packages() {
       using (var tmpDir = new TemporaryDirectory()) {
         var packagesConfigFile = PackageConfigTestUtils.CreatePackagesConfigFile(tmpDir, "Bud.packages.config");
-        var assemblyResolver = new NuGetAssemblyResolver();
-        var assemblies = assemblyResolver.ResolveAssemblies(new[] {packagesConfigFile}, tmpDir.Path);
+        var assemblyResolver = new NuGetPackageResolver();
+        var assemblies = assemblyResolver.Resolve(new[] {packagesConfigFile}, tmpDir.Path);
         Console.WriteLine($"{string.Join("\n", assemblies)}");
       }
     }

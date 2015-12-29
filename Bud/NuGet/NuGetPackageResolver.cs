@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -10,23 +9,23 @@ using NuGet.Repositories;
 using NuGet.Versioning;
 
 namespace Bud.NuGet {
-  public class NuGetAssemblyResolver : IAssemblyResolver {
-    public ResolvedAssemblies ResolveAssemblies(IEnumerable<string> packagesConfigFiles,
-                                                string outputDirectory) {
-      var packagesDir = Path.Combine(outputDirectory, "packages");
+  public class NuGetPackageResolver : IPackageResolver {
+    public IEnumerable<string> Resolve(IEnumerable<string> packagesConfigFiles,
+                                       string cacheDir) {
+      var packagesDir = Path.Combine(cacheDir, "packages");
       foreach (var packagesConfigFile in packagesConfigFiles) {
         ExecuteNuGet($"restore {packagesConfigFile} -PackagesDirectory {packagesDir}");
       }
-      var packagesV3Dir = Path.Combine(outputDirectory, "packages-v3");
+      var packagesV3Dir = Path.Combine(cacheDir, "packages-index");
       ExecuteNuGet($"init {packagesDir} {packagesV3Dir}");
       var packageReferences = packagesConfigFiles.SelectMany(PackageReferencesFromFile);
       var packageRepository = new NuGetv3LocalRepository(packagesV3Dir, true);
       var assemblies = new List<string>();
-      var frameworkReferences = new List<string>();
       foreach (var packageReference in packageReferences) {
         var packageInfo = FindBestMatch(packageRepository, packageReference);
         var nuspec = new NuspecReader(XDocument.Load(packageInfo.ManifestPath));
-        frameworkReferences.AddRange(FindFrameworkAssemblies(nuspec, packageReference));
+        var frameworkAssemblies = FindFrameworkAssemblies(nuspec, packageReference);
+        assemblies.AddRange(frameworkAssemblies);
 
         using (var fileStream = File.OpenRead(packageInfo.ZipPath)) {
           var nupkg = new PackageReader(fileStream, false);
@@ -34,14 +33,14 @@ namespace Bud.NuGet {
           assemblies.AddRange(packageAssemblies);
         }
       }
-      return new ResolvedAssemblies(frameworkReferences.ToImmutableHashSet(),
-                                    assemblies.ToImmutableHashSet());
+      return assemblies;
     }
 
     private static IEnumerable<string> FindAssemblies(PackageReader nupkg,
                                                       PackageReference packageReference,
                                                       string packagesDir, NuspecReader nuspec) {
       var referenceItems = nupkg.GetReferenceItems()
+                                .Where(group => group.Items.Any())
                                 .GetNearest(packageReference.TargetFramework)?
                                 .Items ?? Enumerable.Empty<string>();
       return referenceItems.Select(path => PathInPackage(packagesDir, nuspec, path));
