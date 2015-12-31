@@ -64,9 +64,9 @@ namespace Bud.Cs {
     }
 
     private static SyntaxTree ParseSyntaxTree(Timestamped<string> s)
-      => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s.Value), path: s.Value);
+      => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s), path: s);
 
     private static MetadataReference LoadAssemblyFromFile(Timestamped<string> path)
-      => MetadataReference.CreateFromFile(path.Value);
+      => MetadataReference.CreateFromFile(path);
   }
 }

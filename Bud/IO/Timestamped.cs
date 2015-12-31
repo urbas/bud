@@ -38,6 +38,9 @@ namespace Bud.IO {
 
     public override string ToString()
       => $"Timestamped(Value: {Value}, Timestamp: {Timestamp})";
+
+    public static implicit operator T(Timestamped<T> timestamped)
+      => timestamped.Value;
   }
 
   public static class Timestamped {
