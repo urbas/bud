@@ -115,9 +115,7 @@
     <Compile Include="NuGet\IPackageResolver.cs" />
     <Compile Include="NuGet\NuGetPackageResolver.cs" />
     <Compile Include="NuGet\ResolvedAssemblies.cs" />
-    <Compile Include="Optional\Optional.cs" />
-    <Compile Include="Optional\OptionalExtensions.cs" />
-    <Compile Include="Optional\Optionals.cs" />
+    <Compile Include="Util\Optional.cs" />
     <Compile Include="V1\Api.cs" />
     <Compile Include="V1\Conf.cs" />
     <Compile Include="V1\ConfExtensions.cs" />
@@ -174,6 +172,7 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

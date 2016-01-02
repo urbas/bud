@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Bud.V1;
-using Bud.Optional;
-using static Bud.Optional.Optionals;
+using Bud.Util;
+using static Bud.Util.Optional;
 
 namespace Bud.Configuration {
   public class RawConf : IConf {

@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Bud.Optional;
+using Bud.Util;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using NuGet.Repositories;
 using NuGet.Versioning;
-using static Bud.Optional.Optionals;
+using static Bud.Util.Optional;
 
 namespace Bud.NuGet {
   public class NuGetPackageResolver : IPackageResolver {

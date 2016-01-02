@@ -2,8 +2,8 @@ using System;
 using Bud.V1;
 using Moq;
 using NUnit.Framework;
-using Bud.Optional;
-using static Bud.Optional.Optionals;
+using Bud.Util;
+using static Bud.Util.Optional;
 
 namespace Bud.Configuration {
   public class CachingConfTest {

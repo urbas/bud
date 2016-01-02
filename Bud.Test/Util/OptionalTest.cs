@@ -1,11 +1,26 @@
 using System.Reactive.Linq;
-using Bud.Optional;
 using NUnit.Framework;
+using static Bud.Util.Optional;
 using static NUnit.Framework.Assert;
-using static Bud.Optional.Optionals;
 
 namespace Bud.Util {
-  public class OptionalExtensionsTest {
+  public class OptionalTest {
+    [Test]
+    public void Equals_returns_false_when_comparing_none_with_some()
+      => IsFalse(Some(42).Equals(None<int>()));
+
+    [Test]
+    public void Equals_returns_true_when_value_equals()
+      => IsTrue(Some(42).Equals(Some(42)));
+
+    [Test]
+    public void Equals_returns_false_when_values_differ()
+      => IsFalse(Some(42).Equals(Some(9001)));
+
+    [Test]
+    public void Hash_code_equals_for_equal_values()
+      => AreEqual(Some(42), Some(42));
+
     [Test]
     public void GetOrElse_returns_the_contained_value()
       => AreEqual(42, Some(42).GetOrElse(9001));

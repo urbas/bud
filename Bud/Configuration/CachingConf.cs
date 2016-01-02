@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Immutable;
-using Bud.Optional;
+using Bud.Util;
 using Bud.V1;
-using static Bud.Optional.Optionals;
+using static Bud.Util.Optional;
 
 namespace Bud.Configuration {
   public class CachingConf {
