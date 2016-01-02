@@ -2,6 +2,8 @@
 
 - Bud should use packages from NuGet's `packages.config` files.
 
+  - http://stackoverflow.com/questions/375860/getting-the-net-framework-directory-path
+
 - Use less than 10ms to start a simple build.
 
 - I want to test my projects.
