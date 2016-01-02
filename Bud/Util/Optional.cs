@@ -13,6 +13,12 @@ namespace Bud.Util {
       HasValue = true;
     }
 
+    public T GetOrElse(T defaultValue)
+      => HasValue ? Value : defaultValue;
+
+    public T GetOrElse(Func<T> defaultValue)
+      => HasValue ? Value : defaultValue();
+
     public bool Equals(Optional<T> other)
       => HasValue == other.HasValue
          && EqualityComparer<T>.Default.Equals(Value, other.Value);
@@ -41,12 +47,6 @@ namespace Bud.Util {
     private static class NoneOptional<T> {
       public static readonly Optional<T> Instance = new Optional<T>();
     }
-
-    public static T GetOrElse<T>(this Optional<T> optional, T defaultValue)
-      => optional.HasValue ? optional.Value : defaultValue;
-
-    public static T GetOrElse<T>(this Optional<T> optional, Func<T> defaultValue)
-      => optional.HasValue ? optional.Value : defaultValue();
 
     public static IEnumerable<T> Gather<T>(this IEnumerable<Optional<T>> enumerable)
       => enumerable.Where(optional => optional.HasValue)
