@@ -22,6 +22,14 @@ namespace Bud.Util {
       => AreEqual(Some(42), Some(42));
 
     [Test]
+    public void ToString_returns_none()
+      => AreEqual("None", None<int>().ToString());
+
+    [Test]
+    public void ToString_returns_some_with_value()
+      => AreEqual("Some(42)", Some(42).ToString());
+
+    [Test]
     public void GetOrElse_returns_the_contained_value()
       => AreEqual(42, Some(42).GetOrElse(9001));
 

@@ -28,6 +28,8 @@ namespace Bud.Util {
       }
     }
 
+    public override string ToString() => HasValue ? $"Some({Value})" : "None";
+
     public static implicit operator Optional<T>(T value)
       => new Optional<T>(value);
   }
