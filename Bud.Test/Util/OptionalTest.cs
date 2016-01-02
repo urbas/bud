@@ -1,4 +1,6 @@
+using System;
 using System.Reactive.Linq;
+using Moq;
 using NUnit.Framework;
 using static Bud.Util.Optional;
 using static NUnit.Framework.Assert;
@@ -36,6 +38,19 @@ namespace Bud.Util {
     [Test]
     public void GetOrElse_returns_the_default_value()
       => AreEqual(9001, None<int>().GetOrElse(9001));
+
+    [Test]
+    public void Lazy_GetOrElse_returns_the_contained_value()
+      => AreEqual(42, Some(42).GetOrElse(() => 9001));
+
+    [Test]
+    public void Lazy_GetOrElse_returns_the_default_value()
+      => AreEqual(9001, None<int>().GetOrElse(() => 9001));
+
+    [Test]
+    public void Lazy_GetOrElse_does_not_invoke_the_callback()
+      => DoesNotThrow(
+        () => Some(42).GetOrElse(new Mock<Func<int>>(MockBehavior.Strict).Object));
 
     [Test]
     public void Gather_returns_values()

@@ -45,6 +45,9 @@ namespace Bud.Util {
     public static T GetOrElse<T>(this Optional<T> optional, T defaultValue)
       => optional.HasValue ? optional.Value : defaultValue;
 
+    public static T GetOrElse<T>(this Optional<T> optional, Func<T> defaultValue)
+      => optional.HasValue ? optional.Value : defaultValue();
+
     public static IEnumerable<T> Gather<T>(this IEnumerable<Optional<T>> enumerable)
       => enumerable.Where(optional => optional.HasValue)
                    .Select(optional => optional.Value);
