@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -9,6 +10,7 @@ using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using NuGet.Repositories;
 using NuGet.Versioning;
+using static Bud.NuGet.FrameworkAssemblyReferencesAggregator;
 using static Bud.NuGet.WindowsFrameworkAssemblyResolver;
 using static Bud.Util.Optional;
 
@@ -25,7 +27,7 @@ namespace Bud.NuGet {
       ExecuteNuGet($"init {packagesDir} {packagesV3Dir}");
       var packageReferences = packagesConfigFiles.SelectMany(PackageReferencesFromFile);
       var packageRepository = new NuGetv3LocalRepository(packagesV3Dir, true);
-      var frameworkAssemblies = new List<FrameworkAssemblyReference>();
+      var frameworkAssemblies = new List<Tuple<string, Version>>();
       var assemblies = new List<string>();
       foreach (var packageReference in packageReferences) {
         var packageInfo = FindBestMatch(packageRepository, packageReference);
@@ -46,18 +48,20 @@ namespace Bud.NuGet {
           }
         }
       }
-      assemblies.AddRange(frameworkAssemblies.Gather(FindFrameworkAssembly));
+      assemblies.AddRange(AggregateReferences(frameworkAssemblies)
+        .Gather(FindFrameworkAssembly))
+      ;
       return assemblies;
     }
 
-    private static Optional<FrameworkAssemblyReference> ToFrameworkAssemblyReference(PackageReaderBase nupkg,
-                                                                                     NuGetFramework targetFramework) {
+    private static Optional<Tuple<string, Version>> ToFrameworkAssemblyReference(PackageReaderBase nupkg,
+                                                                                 NuGetFramework targetFramework) {
       var frameworkSpecificGroup = nupkg.GetReferenceItems().GetNearest(targetFramework);
       if (frameworkSpecificGroup == null) {
-        return None<FrameworkAssemblyReference>();
+        return None<Tuple<string, Version>>();
       }
-      return new FrameworkAssemblyReference(nupkg.GetIdentity().Id,
-                                            frameworkSpecificGroup.TargetFramework);
+      return Tuple.Create(nupkg.GetIdentity().Id,
+                          frameworkSpecificGroup.TargetFramework.Version);
     }
 
     private static ICollection<string> FindAssemblies(PackageReaderBase nupkg,
@@ -76,14 +80,16 @@ namespace Bud.NuGet {
                                         string path)
       => Path.Combine(packagesDir, $"{nuspec.GetId()}.{nuspec.GetVersion()}", path);
 
-    private static IEnumerable<FrameworkAssemblyReference>
+    private static IEnumerable<Tuple<string, Version>>
       FindFrameworkAssemblyReferences(NuspecReader nuspec,
                                       PackageReference packageReference) {
       var group = nuspec.GetFrameworkReferenceGroups()
                         .GetNearest(packageReference.TargetFramework);
       return group?.Items
-                   .Select(assemblyName => new FrameworkAssemblyReference(assemblyName, group.TargetFramework))
-             ?? Enumerable.Empty<FrameworkAssemblyReference>();
+                   .Select(assemblyName =>
+                           Tuple.Create(assemblyName,
+                                        group.TargetFramework.Version))
+             ?? Enumerable.Empty<Tuple<string, Version>>();
     }
 
     private static LocalPackageInfo FindBestMatch(NuGetv3LocalRepository packageRepository,
@@ -107,7 +113,7 @@ namespace Bud.NuGet {
            new PackagesConfigReader(File.OpenRead(s)).GetPackages() :
            Enumerable.Empty<PackageReference>();
 
-    private static Optional<string> FindFrameworkAssembly(FrameworkAssemblyReference reference)
-      => ResolveFrameworkAssembly(reference.AssemblyName, reference.Framework.Version);
+    private static Optional<string> FindFrameworkAssembly(KeyValuePair<string, Version> reference)
+      => ResolveFrameworkAssembly(reference.Key, reference.Value);
   }
 }

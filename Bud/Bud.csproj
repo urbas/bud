@@ -111,6 +111,7 @@
     <Compile Include="Collections\ImmutableLists.cs" />
     <Compile Include="IO\FileWatcher.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReference.cs" />
+    <Compile Include="NuGet\FrameworkAssemblyReferencesAggregator.cs" />
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolver.cs" />
     <Compile Include="NuGet\IPackageResolver.cs" />
     <Compile Include="NuGet\NuGetPackageResolver.cs" />

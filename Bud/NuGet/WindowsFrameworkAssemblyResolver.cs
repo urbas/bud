@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Bud.Util;
@@ -105,7 +106,7 @@ namespace Bud.NuGet {
       public static Optional<string> FindAssembly(string assemblyName,
                                                   Version version) {
         foreach (var versionFolders in VersionToFoldersMap) {
-          if (version >= versionFolders.Key) {
+          if (versionFolders.Key >= version) {
             foreach (var folder in versionFolders.Value) {
               var assemblyPath = Combine(folder, $"{assemblyName}.dll");
               if (Exists(assemblyPath)) {
@@ -128,7 +129,8 @@ namespace Bud.NuGet {
           .GetSubKeyNames()
           .Where(key => key.StartsWith("v")).ToImmutableSortedDictionary(
             versionKey => Version.Parse(versionKey.Substring(1)),
-            versionKey => CollectAssemblyFolders(netFrameworkRegKey, versionKey));
+            versionKey => CollectAssemblyFolders(netFrameworkRegKey, versionKey),
+            new VersionComparerReverse());
         return versions;
       }
 
@@ -146,6 +148,10 @@ namespace Bud.NuGet {
                                                  .GetValue(null) as string)
           .Where(folder => !string.IsNullOrEmpty(folder))
           .ToImmutableHashSet();
+      }
+
+      private class VersionComparerReverse : IComparer<Version> {
+        public int Compare(Version x, Version y) => y.CompareTo(x);
       }
     }
   }
