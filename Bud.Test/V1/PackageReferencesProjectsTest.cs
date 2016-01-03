@@ -11,7 +11,7 @@ using static Bud.V1.Api;
 using static NUnit.Framework.Assert;
 
 namespace Bud.V1 {
-  public class ApiPackageReferencesProjectTest {
+  public class PackageReferencesProjectsTest {
     [Test]
     public void Packages_config_file_is_at_the_root_by_default()
       => That(PackagesConfigFile[TestProject()],

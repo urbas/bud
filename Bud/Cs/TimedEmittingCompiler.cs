@@ -93,7 +93,7 @@ namespace Bud.Cs {
     }
 
     private static RoslynCSharpCompiler CreateUnderlyingCompiler(IConf conf)
-      => new RoslynCSharpCompiler(AssemblyName[conf], CSharpCompilationOptions[conf]);
+      => new RoslynCSharpCompiler(AssemblyName[conf], CsCompilationOptions[conf]);
 
     private static string GetOutputAssemblyPath(IConf conf)
       => Path.Combine(TargetDir[conf], AssemblyName[conf]);

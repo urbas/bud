@@ -17,6 +17,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.File;
 using static System.IO.Path;
 using static Bud.IO.FileUtils;
+using static Bud.V1.CsProjects;
+using static Bud.V1.PackageReferencesProjects;
 
 namespace Bud.V1 {
   /// <summary>
@@ -346,59 +348,17 @@ namespace Bud.V1 {
     public static readonly Key<Func<CompileInput, CompileOutput>> Compiler = nameof(Compiler);
     public static readonly Key<IImmutableList<string>> AssemblyReferences = nameof(AssemblyReferences);
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
-    public static readonly Key<CSharpCompilationOptions> CSharpCompilationOptions = nameof(CSharpCompilationOptions);
+    public static readonly Key<CSharpCompilationOptions> CsCompilationOptions = nameof(CsCompilationOptions);
     public static readonly Key<IImmutableList<ResourceDescription>> EmbeddedResources = nameof(EmbeddedResources);
 
     public static Conf CsLibrary(string projectId)
       => CsLibrary(projectId, projectId);
 
     public static Conf CsLibrary(string projectDir, string projectId)
-      => BuildProject(projectDir, projectId)
-        .AddSources(fileFilter: "*.cs")
-        .ExcludeSourceDirs("obj", "bin", TargetDirName)
-        .Init(Compile, DefaultCSharpCompilation)
-        .Add(Build, c => Compile[c].Select(output => output.AssemblyPath))
-        .Init(AssemblyName, c => ProjectId[c] + CSharpCompilationOptions[c].OutputKind.ToExtension())
-        .InitEmpty(AssemblyReferences)
-        .InitEmpty(EmbeddedResources)
-        .Init(Compiler, TimedEmittingCompiler.Create)
-        .InitValue(CSharpCompilationOptions,
-                   new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary,
-                                                warningLevel: 1));
+      => CreateCsLibrary(projectDir, projectId);
 
     public static Conf EmbedResource(this Conf conf, string path, string nameInAssembly)
-      => conf.Add(EmbeddedResources, c => {
-        var resourceFile = IsPathRooted(path) ? path : Combine(ProjectDir[c], path);
-        return ToResourceDescriptor(resourceFile, nameInAssembly);
-      });
-
-    private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
-      => Input[conf]
-        .CombineLatest(ObserveDependencies(conf),
-                       (sources, dependencies) => new CompileInput(
-                                                    sources,
-                                                    dependencies,
-                                                    AssemblyReferences[conf]
-                                                    ))
-        .Select(Compiler[conf]).Do(PrintCompilationResult);
-
-    private static void PrintCompilationResult(CompileOutput output) {
-      if (output.Success) {
-        Console.WriteLine($"Compiled '{GetFileNameWithoutExtension(output.AssemblyPath)}' in {output.CompilationTime.Milliseconds}ms.");
-      } else {
-        Console.WriteLine($"Failed to compile '{output.AssemblyPath}'.");
-        foreach (var diagnostic in output.Diagnostics) {
-          Console.WriteLine(diagnostic);
-        }
-      }
-    }
-
-    private static ResourceDescription ToResourceDescriptor(string resourceFile, string nameInAssembly)
-      => new ResourceDescription(nameInAssembly, () => OpenRead(resourceFile), true);
-
-    private static IObservable<IEnumerable<CompileOutput>> ObserveDependencies(IConf c)
-      => Dependencies[c].Gather(dependency => c.TryGet(dependency/Compile))
-                        .Combined();
+      => EmbedResourceImpl(conf, path, nameInAssembly);
 
     #endregion
 
@@ -419,29 +379,7 @@ namespace Bud.V1 {
     public static Key<IPackageResolver> AssemblyResolver = nameof(AssemblyResolver);
 
     public static Conf PackageReferencesProject(string dir, string projectId)
-      => BareProject(dir, projectId)
-        .Add(SourcesSupport)
-        .AddSourceFile(c => PackagesConfigFile[c])
-        .InitValue(AssemblyResolver, new NuGetPackageResolver())
-        .Init(PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
-        .Init(Assemblies, ResolveAssemblies);
-
-    private static IObservable<IImmutableSet<string>> ResolveAssemblies(IConf c)
-      => Sources[c].Select(sources => {
-        var resolvedAssembliesFile = Combine(TargetDir[c], "resolved_assemblies");
-        if (Exists(resolvedAssembliesFile) &&
-            IsNewerThan(resolvedAssembliesFile, sources)) {
-          return ReadAllLines(resolvedAssembliesFile)
-            .ToImmutableHashSet();
-        }
-        var resolvedAssemblies = AssemblyResolver[c]
-          .Resolve(sources,
-                   Combine(ProjectDir[c], "packages"))
-          .ToImmutableHashSet();
-        Directory.CreateDirectory(TargetDir[c]);
-        WriteAllLines(resolvedAssembliesFile, resolvedAssemblies);
-        return resolvedAssemblies;
-      });
+      => CreatePackageReferencesProject(dir, projectId);
 
     #endregion
   }

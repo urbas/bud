@@ -143,7 +143,7 @@
     <Compile Include="V1\ApiSourcesSupportTest.cs" />
     <Compile Include="V1\PackageConfigTestUtils.cs" />
     <Compile Include="V1\PackageReferenceComparer.cs" />
-    <Compile Include="V1\ApiPackageReferencesProjectTest.cs" />
+    <Compile Include="V1\PackageReferencesProjectsTest.cs" />
     <EmbeddedResource Include="NuGet\SinglePackageTest\packages.config" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reactive\ObservableResourcesTest.cs" />
