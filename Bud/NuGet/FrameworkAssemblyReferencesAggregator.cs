@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 
 namespace Bud.NuGet {
-  public class FrameworkAssemblyReferencesAggregator
-  {
-    public static IDictionary<string, Version> AggregateReferences(IEnumerable<Tuple<string, Version>> frameworkAssemblyReferences) {
+  public class FrameworkAssemblyReferencesAggregator {
+    public static IDictionary<string, Version> AggregateReferences(
+      IEnumerable<Tuple<string, Version>> frameworkAssemblyReferences) {
       var aggregatedReferences = new Dictionary<string, Version>();
       foreach (var assemblyToVersion in frameworkAssemblyReferences) {
         Version existingVersion;

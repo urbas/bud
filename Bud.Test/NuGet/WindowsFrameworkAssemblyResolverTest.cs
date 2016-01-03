@@ -88,7 +88,7 @@ namespace Bud.NuGet {
 
     [Test]
     public void Finds_a_reference_when_assembly_is_in_an_assembly_ex_dir()
-      => IsTrue(ResolveFrameworkAssembly("Microsoft.VisualStudio.QualityTools.UnitTestFramework", Net46)
+      => IsTrue(ResolveFrameworkAssembly("Microsoft.VisualStudio.QualityTools.UnitTestFramework", Net45)
                   .HasValue);
   }
 }

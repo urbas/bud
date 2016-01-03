@@ -38,10 +38,9 @@ namespace Bud.NuGet {
       if (version >= new Version(2, 0) && !assembly.HasValue) {
         assembly = FindNet2Assembly(assemblyName);
       }
-      if (!assembly.HasValue) {
-        return AssemblyFoldersEx.FindAssembly(assemblyName, version);
-      }
-      return assembly;
+      return assembly.HasValue ?
+               assembly :
+               AssemblyFoldersEx.FindAssembly(assemblyName, version);
     }
 
     private static Optional<string> FindNet4PlusAssembly(string assemblyName, Version version) {
