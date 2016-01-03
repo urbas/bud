@@ -362,7 +362,9 @@ namespace Bud.V1 {
         .InitEmpty(AssemblyReferences)
         .InitEmpty(EmbeddedResources)
         .Init(Compiler, TimedEmittingCompiler.Create)
-        .InitValue(CSharpCompilationOptions, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, warningLevel: 1));
+        .InitValue(CSharpCompilationOptions,
+                   new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary,
+                                                warningLevel: 1));
 
     public static Conf EmbedResource(this Conf conf, string path, string nameInAssembly)
       => conf.Add(EmbeddedResources, c => {
@@ -371,12 +373,14 @@ namespace Bud.V1 {
       });
 
     private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
-      => Input[conf].CombineLatest(ObserveDependencies(conf),
-                                   (sources, dependencies) => new CompileInput(
-                                     sources,
-                                     dependencies,
-                                     AssemblyReferences[conf]
-                                     )).Select(Compiler[conf]).Do(PrintCompilationResult);
+      => Input[conf]
+        .CombineLatest(ObserveDependencies(conf),
+                       (sources, dependencies) => new CompileInput(
+                                                    sources,
+                                                    dependencies,
+                                                    AssemblyReferences[conf]
+                                                    ))
+        .Select(Compiler[conf]).Do(PrintCompilationResult);
 
     private static void PrintCompilationResult(CompileOutput output) {
       if (output.Success) {
@@ -432,7 +436,7 @@ namespace Bud.V1 {
         }
         var resolvedAssemblies = AssemblyResolver[c]
           .Resolve(sources,
-                             Combine(ProjectDir[c], "packages"))
+                   Combine(ProjectDir[c], "packages"))
           .ToImmutableHashSet();
         Directory.CreateDirectory(TargetDir[c]);
         WriteAllLines(resolvedAssembliesFile, resolvedAssemblies);

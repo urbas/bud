@@ -14,8 +14,9 @@ using static Bud.Util.Optional;
 
 namespace Bud.NuGet {
   public class NuGetPackageResolver : IPackageResolver {
-    public IEnumerable<string> Resolve(IEnumerable<string> packagesConfigFiles,
-                                       string cacheDir) {
+    public IEnumerable<string>
+      Resolve(IReadOnlyCollection<string> packagesConfigFiles,
+              string cacheDir) {
       var packagesDir = Path.Combine(cacheDir, "packages");
       foreach (var packagesConfigFile in packagesConfigFiles) {
         ExecuteNuGet($"restore {packagesConfigFile} -PackagesDirectory {packagesDir}");
@@ -35,7 +36,7 @@ namespace Bud.NuGet {
         using (var fileStream = File.OpenRead(packageInfo.ZipPath)) {
           var nupkg = new PackageReader(fileStream, false);
           var packageAssemblies = FindAssemblies(nupkg, packageReference, packagesDir, nuspec);
-          if (packageAssemblies.Any()) {
+          if (packageAssemblies.Count > 0) {
             assemblies.AddRange(packageAssemblies);
           } else {
             var reference = ToFrameworkAssemblyReference(nupkg, packageReference.TargetFramework);
@@ -59,14 +60,15 @@ namespace Bud.NuGet {
                                             frameworkSpecificGroup.TargetFramework);
     }
 
-    private static IEnumerable<string> FindAssemblies(PackageReaderBase nupkg,
+    private static ICollection<string> FindAssemblies(PackageReaderBase nupkg,
                                                       PackageReference packageReference,
                                                       string packagesDir,
                                                       INuspecCoreReader nuspec) {
       var referenceItems = nupkg.GetReferenceItems()
                                 .GetNearest(packageReference.TargetFramework)?
                                 .Items ?? Enumerable.Empty<string>();
-      return referenceItems.Select(path => PathInPackage(packagesDir, nuspec, path));
+      return referenceItems.Select(path => PathInPackage(packagesDir, nuspec, path))
+                           .ToList();
     }
 
     private static string PathInPackage(string packagesDir,
@@ -102,10 +104,10 @@ namespace Bud.NuGet {
 
     private static IEnumerable<PackageReference> PackageReferencesFromFile(string s)
       => File.Exists(s) ?
-        new PackagesConfigReader(File.OpenRead(s)).GetPackages() :
-        Enumerable.Empty<PackageReference>();
+           new PackagesConfigReader(File.OpenRead(s)).GetPackages() :
+           Enumerable.Empty<PackageReference>();
 
-    private static Optional<string> FindFrameworkAssembly(FrameworkAssemblyReference reference) 
+    private static Optional<string> FindFrameworkAssembly(FrameworkAssemblyReference reference)
       => ResolveFrameworkAssembly(reference.AssemblyName, reference.Framework.Version);
   }
 }
