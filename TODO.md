@@ -1,16 +1,20 @@
 # TODO List
 
-- Bud should use packages from NuGet's `packages.config` files.
+- [Ongoing] Bud should use packages from NuGet's `packages.config` files.
 
-  - http://stackoverflow.com/questions/375860/getting-the-net-framework-directory-path
+  - [Done] Invoke NuGet to download packages.
+
+  - [Done] Resolve referenced DLLs and references framework assemblies
+
+  - [Ongoing] Make Bud compile itself through its `packages.config` file.
 
 - Use less than 10ms to start a simple build.
 
-- I want to test my projects.
+- I want to publish my projects to NuGet.
 
 - I want to install Bud from Chocolatey.
 
-- I want to publish my projects to NuGet.
+- I want to test my projects.
 
 - I want to generate MSBuild solution and project files for my projects.
 
