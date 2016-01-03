@@ -19,7 +19,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Assemblies_is_initially_empty()
-      => That(Assemblies[TestProject()].Take(1).ToEnumerable(),
+      => That(ResolvedAssemblies[TestProject()].Take(1).ToEnumerable(),
               Has.Exactly(1).Empty);
 
     [Test]
@@ -31,7 +31,7 @@ namespace Bud.V1 {
         var project = TestProject(tmpDir.Path)
           .SetValue(AssemblyResolver, resolver.Object);
 
-        var actualAssemblies = Assemblies[project].Take(1).ToEnumerable();
+        var actualAssemblies = ResolvedAssemblies[project].Take(1).ToEnumerable();
 
         That(actualAssemblies, Has.Exactly(1).EqualTo(expectedAssemblies));
         resolver.VerifyAll();
@@ -48,7 +48,7 @@ namespace Bud.V1 {
           .SetValue(AssemblyResolver, resolver.Object)
           .ToCompiled();
 
-        ("A"/Assemblies)[project].Take(1).Wait();
+        ("A"/ResolvedAssemblies)[project].Take(1).Wait();
 
         That(ReadResolvedAssembliesCache(project),
              Is.EquivalentTo(resolvedAssemblies));
@@ -65,7 +65,7 @@ namespace Bud.V1 {
           .ToCompiled();
         tmpDir.CreateFile("Moo.dll\nZoo.dll", ("A"/TargetDir)[project], "resolved_assemblies");
 
-        ("A"/Assemblies)[project].Take(1).Wait();
+        ("A"/ResolvedAssemblies)[project].Take(1).Wait();
 
         That(ReadResolvedAssembliesCache(project),
              Is.EquivalentTo(new[] {"Moo.dll", "Zoo.dll"}));

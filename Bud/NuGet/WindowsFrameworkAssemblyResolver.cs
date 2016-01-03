@@ -10,15 +10,15 @@ using static Bud.Util.Optional;
 
 namespace Bud.NuGet {
   public class WindowsFrameworkAssemblyResolver {
-    internal static readonly string OldFrameworkPath
+    public static readonly string OldFrameworkPath
       = Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows),
                 "Microsoft.NET", "Framework");
 
-    internal static readonly string Net3PlusFrameworkPath
+    public static readonly string Net3PlusFrameworkPath
       = Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
                 "Reference Assemblies", "Microsoft", "Framework");
 
-    internal static readonly string Net4PlusFrameworkPath
+    public static readonly string Net4PlusFrameworkPath
       = Combine(Net3PlusFrameworkPath, ".NETFramework");
 
     public static Optional<string> ResolveFrameworkAssembly(string assemblyName, Version version) {

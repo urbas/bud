@@ -150,7 +150,7 @@
     <Compile Include="Reactive\WaitingObservablesTest.cs" />
     <Compile Include="Util\OptionalTest.cs" />
     <Compile Include="Util\StringsTest.cs" />
-    <Compile Include="V1\ApiCSharpTest.cs" />
+    <Compile Include="V1\CsProjectsTest.cs" />
     <Compile Include="V1\ApiBuildProjectTest.cs" />
     <Compile Include="V1\ConfTest.cs" />
     <Compile Include="V1\EnumerableConfApiTest.cs" />

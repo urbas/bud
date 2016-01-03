@@ -17,12 +17,7 @@ namespace Bud.Cli {
     public static void Main(string[] args) {
       var compileOutput = CompileBuildConfiguration();
       if (compileOutput.Success) {
-        var buildDefinition = LoadBuildConfiguration(compileOutput.AssemblyPath);
-        foreach (var command in args) {
-          buildDefinition.Get<IObservable<object>>(command)
-                         .ObserveOn(new EventLoopScheduler())
-                         .Wait();
-        }
+        ExecuteCommands(args, compileOutput);
       } else {
         PrintCompilationErrors(compileOutput);
       }
@@ -31,17 +26,14 @@ namespace Bud.Cli {
     private static CompileOutput CompileBuildConfiguration()
       => CreateBuildConfiguration().TakeOne(Compile);
 
-    private static Conf CreateBuildConfiguration()
-      => CsLibrary(Combine(GetCurrentDirectory()), "BuildConf")
-        .Add(AssemblyReferences, BudDependencies)
-        .Clear(SourceIncludes)
-        .AddSourceFile(c => Combine(ProjectDir[c], "Build.cs"));
-
-    private static IConf LoadBuildConfiguration(string assemblyPath) {
-      var assembly = Assembly.LoadFile(assemblyPath);
-      var buildDefinitionType = assembly.GetExportedTypes().First(typeof (IBuild).IsAssignableFrom);
-      var buildDefinition = (IBuild) buildDefinitionType.GetConstructor(Type.EmptyTypes).Invoke(new object[] {});
-      return buildDefinition.Init().ToCompiled();
+    private static void ExecuteCommands(string[] commands,
+                                        CompileOutput compileOutput) {
+      var buildDefinition = LoadBuildConfiguration(compileOutput.AssemblyPath);
+      foreach (var command in commands) {
+        buildDefinition.Get<IObservable<object>>(command)
+                       .ObserveOn(new EventLoopScheduler())
+                       .Wait();
+      }
     }
 
     private static void PrintCompilationErrors(CompileOutput compilationOutput) {
@@ -50,6 +42,23 @@ namespace Bud.Cli {
         Console.WriteLine(diagnostic);
       }
     }
+
+    private static IConf LoadBuildConfiguration(string assemblyPath) {
+      var assembly = Assembly.LoadFile(assemblyPath);
+      var buildDefinitionType = assembly
+        .GetExportedTypes()
+        .First(typeof (IBuild).IsAssignableFrom);
+      var buildDefinition = buildDefinitionType
+        .GetConstructor(Type.EmptyTypes)
+        .Invoke(new object[] {});
+      return ((IBuild) buildDefinition).Init().ToCompiled();
+    }
+
+    private static Conf CreateBuildConfiguration()
+      => CsLibrary(Combine(GetCurrentDirectory()), "BuildConf")
+        .Add(AssemblyReferences, BudDependencies)
+        .Clear(SourceIncludes)
+        .AddSourceFile(c => Combine(ProjectDir[c], "Build.cs"));
 
     private static IEnumerable<string> BudDependencies { get; } = ImmutableList.Create(
       typeof (BuildTool).Assembly.Location,

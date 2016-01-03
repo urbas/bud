@@ -115,7 +115,6 @@
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolver.cs" />
     <Compile Include="NuGet\IPackageResolver.cs" />
     <Compile Include="NuGet\NuGetPackageResolver.cs" />
-    <Compile Include="NuGet\ResolvedAssemblies.cs" />
     <Compile Include="Util\Optional.cs" />
     <Compile Include="V1\Api.cs" />
     <Compile Include="V1\Conf.cs" />

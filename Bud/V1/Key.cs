@@ -9,7 +9,7 @@ namespace Bud.V1 {
     public static implicit operator Key<T>(string id) => new Key<T>(id);
     public static implicit operator string(Key<T> key) => key.Id;
     public T this[IConf conf] => conf.Get(this);
-    internal T this[Conf conf] => conf.Get(this);
+    public T this[Conf conf] => conf.Get(this);
     public static Key<T> operator /(string prefix, Key<T> key) => prefix + "/" + key.Id;
     public static Key<T> operator /(Key prefix, Key<T> key) => prefix.Id + "/" + key.Id;
     public bool IsAbsolute => Keys.IsAbsolute(Id);

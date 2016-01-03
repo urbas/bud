@@ -14,9 +14,7 @@ using Bud.Reactive;
 using Bud.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using static System.IO.File;
 using static System.IO.Path;
-using static Bud.IO.FileUtils;
 using static Bud.V1.CsProjects;
 using static Bud.V1.PackageReferencesProjects;
 
@@ -346,7 +344,7 @@ namespace Bud.V1 {
 
     public static readonly Key<IObservable<CompileOutput>> Compile = nameof(Compile);
     public static readonly Key<Func<CompileInput, CompileOutput>> Compiler = nameof(Compiler);
-    public static readonly Key<IImmutableList<string>> AssemblyReferences = nameof(AssemblyReferences);
+    public static readonly Key<IObservable<IImmutableList<string>>> AssemblyReferences = nameof(AssemblyReferences);
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
     public static readonly Key<CSharpCompilationOptions> CsCompilationOptions = nameof(CsCompilationOptions);
     public static readonly Key<IImmutableList<ResourceDescription>> EmbeddedResources = nameof(EmbeddedResources);
@@ -374,7 +372,7 @@ namespace Bud.V1 {
     ///   A list of paths to assemblies. These paths are resolved from NuGet
     ///   package references.
     /// </summary>
-    public static Key<IObservable<IImmutableSet<string>>> Assemblies = nameof(Assemblies);
+    public static Key<IObservable<IImmutableSet<string>>> ResolvedAssemblies = nameof(ResolvedAssemblies);
 
     public static Key<IPackageResolver> AssemblyResolver = nameof(AssemblyResolver);
 
