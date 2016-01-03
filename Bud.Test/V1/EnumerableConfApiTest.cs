@@ -74,9 +74,23 @@ namespace Bud.V1 {
 
     [Test]
     public void Add_adds_values_to_observed_enumerables()
+      => AreEqual(new[] {1, 2, 3},
+                  Conf.Empty.InitValue(observedEnumerableKey, Observable.Return(new[] {1}))
+                      .Add(observedEnumerableKey, 2, 3)
+                      .Get(observedEnumerableKey).Wait());
+
+    [Test]
+    public void Add_adds_observed_value_to_observed_enumerables()
       => AreEqual(new[] {1, 2},
                   Conf.Empty.InitValue(observedEnumerableKey, Observable.Return(new[] {1}))
-                      .Add(observedEnumerableKey, 2)
+                      .Add(observedEnumerableKey, Observable.Return(2))
+                      .Get(observedEnumerableKey).Wait());
+
+    [Test]
+    public void Add_adds_observed_values_to_observed_enumerables()
+      => AreEqual(new[] {1, 2, 3},
+                  Conf.Empty.InitValue(observedEnumerableKey, Observable.Return(new[] {1}))
+                      .Add(observedEnumerableKey, Observable.Return(new [] {2, 3}))
                       .Get(observedEnumerableKey).Wait());
 
     #endregion
@@ -146,9 +160,23 @@ namespace Bud.V1 {
 
     [Test]
     public void Add_adds_values_to_observed_immutable_lists()
+      => AreEqual(new[] { 1, 2, 3 },
+                  Conf.Empty.InitValue(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
+                      .Add(observedIImmutableListKey, 2, 3)
+                      .Get(observedIImmutableListKey).Wait());
+
+    [Test]
+    public void Add_adds_observed_value_to_observed_immutable_lists()
       => AreEqual(new[] { 1, 2 },
                   Conf.Empty.InitValue(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
-                      .Add(observedIImmutableListKey, 2)
+                      .Add(observedIImmutableListKey, Observable.Return(2))
+                      .Get(observedIImmutableListKey).Wait());
+
+    [Test]
+    public void Add_adds_observed_values_to_observed_immutable_lists()
+      => AreEqual(new[] { 1, 2, 3 },
+                  Conf.Empty.InitValue(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
+                      .Add(observedIImmutableListKey, Observable.Return(new[] { 2, 3 }))
                       .Get(observedIImmutableListKey).Wait());
 
     #endregion
@@ -218,9 +246,23 @@ namespace Bud.V1 {
 
     [Test]
     public void Add_adds_values_to_observed_immutable_sets()
+      => AreEqual(new[] { 1, 2, 3 },
+                  Conf.Empty.InitValue(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
+                      .Add(observedImmutableSetKey, 2, 3)
+                      .Get(observedImmutableSetKey).Wait());
+
+    [Test]
+    public void Add_adds_observed_value_to_observed_immutable_sets()
       => AreEqual(new[] { 1, 2 },
                   Conf.Empty.InitValue(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
-                      .Add(observedImmutableSetKey, 2)
+                      .Add(observedImmutableSetKey, Observable.Return(2))
+                      .Get(observedImmutableSetKey).Wait());
+
+    [Test]
+    public void Add_adds_observed_values_to_observed_immutable_sets()
+      => AreEqual(new[] { 1, 2, 3 },
+                  Conf.Empty.InitValue(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
+                      .Add(observedImmutableSetKey, Observable.Return(new[] { 2, 3 }))
                       .Get(observedImmutableSetKey).Wait());
 
     #endregion

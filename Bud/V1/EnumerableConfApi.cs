@@ -33,10 +33,16 @@ namespace Bud.V1 {
     public static Conf Clear<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key)
       => conf.SetValue(key, Observable.Return(Enumerable.Empty<T>()));
 
-    public static Conf Add<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, T value)
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, params T[] value)
+      => conf.Add(key, (IEnumerable<T>)value);
+
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, IEnumerable<T> value)
       => conf.Add(key, _ => Observable.Return(value));
 
     public static Conf Add<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, IObservable<T> value)
+      => conf.Add(key, _ => value);
+
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, IObservable<IEnumerable<T>> value)
       => conf.Add(key, _ => value);
 
     public static Conf Add<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, Func<IConf, IObservable<T>> value)
@@ -46,7 +52,6 @@ namespace Bud.V1 {
       => conf.Modify(key, (c, observable) => observable.CombineLatest(values(c), Enumerable.Concat));
 
     #endregion
-
 
     #region IImmutableList
 
@@ -78,7 +83,16 @@ namespace Bud.V1 {
     public static Conf Clear<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key)
       => conf.SetValue(key, Observable.Return(ImmutableList<T>.Empty));
 
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, params T[] value)
+      => conf.Add(key, (IEnumerable<T>)value);
+
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, IEnumerable<T> value)
+      => conf.Add(key, _ => Observable.Return(value));
+
     public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, IObservable<T> value)
+      => conf.Add(key, _ => value);
+
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, IObservable<IEnumerable<T>> value)
       => conf.Add(key, _ => value);
 
     public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, Func<IConf, IObservable<T>> value)
@@ -113,7 +127,7 @@ namespace Bud.V1 {
 
     #endregion
 
-    #region IObservable<IImmutableList<T>>
+    #region IObservable<IImmutableSet<T>>
 
     public static Conf InitEmpty<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key)
       => conf.InitValue(key, Observable.Return(ImmutableHashSet<T>.Empty));
@@ -121,7 +135,16 @@ namespace Bud.V1 {
     public static Conf Clear<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key)
       => conf.SetValue(key, Observable.Return(ImmutableHashSet<T>.Empty));
 
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, params T[] value)
+      => conf.Add(key, (IEnumerable<T>)value);
+
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, IEnumerable<T> value)
+      => conf.Add(key, _ => Observable.Return(value));
+
     public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, IObservable<T> value)
+      => conf.Add(key, _ => value);
+
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, IObservable<IEnumerable<T>> value)
       => conf.Add(key, _ => value);
 
     public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, Func<IConf, IObservable<T>> value)
