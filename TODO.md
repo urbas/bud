@@ -1,12 +1,12 @@
 # TODO List
 
-- [Ongoing] Bud should use packages from NuGet's `packages.config` files.
+- [Done] Bud should use packages from NuGet's `packages.config` files.
 
   - [Done] Invoke NuGet to download packages.
 
   - [Done] Resolve referenced DLLs and references framework assemblies
 
-  - [Ongoing] Make Bud compile itself through its `packages.config` file.
+  - [Done] Make Bud compile itself through its `packages.config` file.
 
 - Use less than 10ms to start a simple build.
 
