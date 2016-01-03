@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -10,6 +9,7 @@ using NuGet.Packaging;
 using NuGet.Packaging.Core;
 using NuGet.Repositories;
 using NuGet.Versioning;
+using static Bud.NuGet.WindowsFrameworkAssemblyResolver;
 using static Bud.Util.Optional;
 
 namespace Bud.NuGet {
@@ -45,14 +45,12 @@ namespace Bud.NuGet {
           }
         }
       }
-
-      Console.WriteLine($"Framework assemblies:\n{string.Join("\n", frameworkAssemblies)}");
-      assemblies.AddRange(FrameworkAssemblyResolver.ResolveFrameworkAsseblies(frameworkAssemblies));
-
+      assemblies.AddRange(frameworkAssemblies.Gather(FindFrameworkAssembly));
       return assemblies;
     }
 
-    private static Optional<FrameworkAssemblyReference> ToFrameworkAssemblyReference(PackageReader nupkg, NuGetFramework targetFramework) {
+    private static Optional<FrameworkAssemblyReference> ToFrameworkAssemblyReference(PackageReaderBase nupkg,
+                                                                                     NuGetFramework targetFramework) {
       var frameworkSpecificGroup = nupkg.GetReferenceItems().GetNearest(targetFramework);
       if (frameworkSpecificGroup == null) {
         return None<FrameworkAssemblyReference>();
@@ -64,7 +62,7 @@ namespace Bud.NuGet {
     private static IEnumerable<string> FindAssemblies(PackageReaderBase nupkg,
                                                       PackageReference packageReference,
                                                       string packagesDir,
-                                                      NuspecReader nuspec) {
+                                                      INuspecCoreReader nuspec) {
       var referenceItems = nupkg.GetReferenceItems()
                                 .GetNearest(packageReference.TargetFramework)?
                                 .Items ?? Enumerable.Empty<string>();
@@ -106,5 +104,8 @@ namespace Bud.NuGet {
       => File.Exists(s) ?
         new PackagesConfigReader(File.OpenRead(s)).GetPackages() :
         Enumerable.Empty<PackageReference>();
+
+    private static Optional<string> FindFrameworkAssembly(FrameworkAssemblyReference reference) 
+      => ResolveFrameworkAssembly(reference.AssemblyName, reference.Framework.Version);
   }
 }
