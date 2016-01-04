@@ -11,13 +11,17 @@ using static Bud.V1.Api;
 
 namespace Bud.V1 {
   internal static class PackageReferencesProjects {
+    private static readonly Conf PackageReferencesProjectSettings = Conf
+      .Empty
+      .Add(SourcesSupport)
+      .AddSourceFile(c => PackagesConfigFile[c])
+      .InitValue(AssemblyResolver, new NuGetPackageResolver())
+      .Init(PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
+      .Init(ResolvedAssemblies, ResolveAssemblies);
+
     internal static Conf CreatePackageReferencesProject(string dir, string projectId)
       => BareProject(dir, projectId)
-        .Add(SourcesSupport)
-        .AddSourceFile(c => PackagesConfigFile[c])
-        .InitValue(AssemblyResolver, new NuGetPackageResolver())
-        .Init(PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
-        .Init(ResolvedAssemblies, ResolveAssemblies);
+        .Add(PackageReferencesProjectSettings);
 
     internal static IObservable<IImmutableSet<string>> ResolveAssemblies(IConf c)
       => Sources[c].Select(sources => {

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reactive.Linq;
 using Bud.Cs;
 using Bud.Reactive;
@@ -14,23 +13,27 @@ using static Bud.V1.Api;
 
 namespace Bud.V1 {
   internal static class CsProjects {
+    private static readonly Conf CsProjectSetting = Conf
+      .Empty
+      .AddSources(fileFilter: "*.cs")
+      .Init(Compile, DefaultCSharpCompilation)
+      .Add(Build, c => Compile[c].Select(output => output.AssemblyPath))
+      .Init(AssemblyName, c => ProjectId[c] + CsCompilationOptions[c].OutputKind.ToExtension())
+      .InitEmpty(AssemblyReferences)
+      .InitEmpty(EmbeddedResources)
+      .Init(Compiler, TimedEmittingCompiler.Create)
+      .InitValue(CsCompilationOptions,
+                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary,
+                                              warningLevel: 1))
+      .Add(AssemblyReferences, c => ("NuGetPackageReference"/ResolvedAssemblies)[c])
+      .Set("NuGetPackageReference"/ProjectDir, c => Combine(ProjectDir[c], "packages"))
+      .Set("NuGetPackageReference"/PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
+      .ExcludeSourceDirs(DefaultExcludedSourceDirs);
+
     internal static Conf CreateCsLibrary(string projectDir, string projectId)
       => BuildProject(projectDir, projectId)
-        .AddSources(fileFilter: "*.cs")
-        .Init(Compile, DefaultCSharpCompilation)
-        .Add(Build, c => Compile[c].Select(output => output.AssemblyPath))
-        .Init(AssemblyName, c => ProjectId[c] + CsCompilationOptions[c].OutputKind.ToExtension())
-        .InitEmpty(AssemblyReferences)
-        .InitEmpty(EmbeddedResources)
-        .Init(Compiler, TimedEmittingCompiler.Create)
-        .InitValue(CsCompilationOptions,
-                   new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary,
-                                                warningLevel: 1))
         .Add(PackageReferencesProject(projectDir, "NuGetPackageReference"))
-        .Add(AssemblyReferences, c => ("NuGetPackageReference" / ResolvedAssemblies)[c])
-        .Set("NuGetPackageReference" / ProjectDir, c => Combine(ProjectDir[c], "packages"))
-        .Set("NuGetPackageReference" / PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
-        .ExcludeSourceDirs(c => new[] { "obj", "bin", TargetDir[c], ("NuGetPackageReference" / ProjectDir)[c] });
+        .Add(CsProjectSetting);
 
     internal static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
       => Input[conf]
@@ -61,5 +64,13 @@ namespace Bud.V1 {
         var resourceFile = IsPathRooted(path) ? path : Combine(ProjectDir[c], path);
         return ToResourceDescriptor(resourceFile, nameInAssembly);
       });
+
+    private static IEnumerable<string> DefaultExcludedSourceDirs(IConf c)
+      => new[] {
+        "obj",
+        "bin",
+        TargetDir[c],
+        ("NuGetPackageReference"/ProjectDir)[c]
+      };
   }
 }
