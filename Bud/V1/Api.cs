@@ -15,6 +15,7 @@ using Bud.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Path;
+using static Bud.V1.BuildProjects;
 using static Bud.V1.CsProjects;
 using static Bud.V1.PackageReferencesProjects;
 
@@ -277,11 +278,7 @@ namespace Bud.V1 {
     /// <param name="projectId">see <see cref="ProjectId" /></param>
     public static Conf BuildProject(string projectDir, string projectId)
       => BareProject(projectDir, projectId)
-        .Add(BuildSupport)
-        .Add(DependenciesSupport)
-        .Add(SourceProcessorsSupport)
-        .Add(Input, c => ProcessedSources[c])
-        .ExcludeSourceDir(c => TargetDir[c]);
+      .Add(BuildProjectSettings);
 
     /// <summary>
     ///   Adds files found in <paramref name="subDir" /> to <see cref="Sources" />.
@@ -298,20 +295,13 @@ namespace Bud.V1 {
     /// </param>
     /// <returns>the modified project</returns>
     public static Conf AddSources(this Conf c, string subDir = null, string fileFilter = "*", bool includeSubdirs = true)
-      => c.Add(SourceIncludes, conf => {
-        var sourceDir = subDir == null ? ProjectDir[conf] : Combine(ProjectDir[conf], subDir);
-        return FilesObservatory[conf].WatchDir(sourceDir, fileFilter, includeSubdirs);
-      });
+      => AddSourcesImpl(c, subDir, fileFilter, includeSubdirs);
 
     /// <summary>
     ///   Adds individual source files to the project.
     /// </summary>
     public static Conf AddSourceFiles(this Conf c, params string[] relativeFilePaths)
-      => c.Add(SourceIncludes, conf => {
-        var projectDir = ProjectDir[conf];
-        var absolutePaths = relativeFilePaths.Select(relativeFilePath => Combine(projectDir, relativeFilePath));
-        return FilesObservatory[conf].WatchFiles(absolutePaths);
-      });
+      => AddSourceFilesImpl(c, relativeFilePaths);
 
     /// <summary>
     ///   Removes the given list of subdirectories from sources.
@@ -329,14 +319,7 @@ namespace Bud.V1 {
     ///   Removes the given list of subdirectories from sources.
     /// </summary>
     public static Conf ExcludeSourceDirs(this Conf c, Func<IConf, IEnumerable<string>> subDirs)
-      => c.Add(SourceExcludeFilters, conf => {
-        var projectDir = ProjectDir[conf];
-        var dirs = subDirs(conf).Select(s => IsPathRooted(s) ? s : Combine(projectDir, s));
-        return PathUtils.InAnyDirFilter(dirs);
-      });
-
-    private static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
-      => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c], BuildPipelineScheduler[c]);
+      => ExcludeSourceDirsImpl(c, subDirs);
 
     #endregion
 

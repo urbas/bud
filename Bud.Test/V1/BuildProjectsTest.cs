@@ -13,7 +13,7 @@ using static System.Linq.Enumerable;
 using static Bud.V1.Api;
 
 namespace Bud.V1 {
-  public class ApiBuildProjectTest {
+  public class BuildProjectsTest {
     [Test]
     public void Set_the_projectDir()
       => Assert.AreEqual("bar", ProjectDir[BuildProject("bar", "Foo")]);
