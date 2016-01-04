@@ -11,7 +11,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Sources_should_contain_added_files() {
-      var project = SourcesSupport.AddSourceFile("A")
+      var project = ApiImpl.SourcesSupport.AddSourceFile("A")
                                   .AddSourceFile(_ => "B");
       Assert.That(Sources[project].Take(1).Wait(),
                   Is.EquivalentTo(new[] {"A", "B"}));
@@ -19,7 +19,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Sources_should_be_excluded_by_the_exclusion_filter() {
-      var project = SourcesSupport.AddSourceFile("A")
+      var project = ApiImpl.SourcesSupport.AddSourceFile("A")
                                   .AddSourceFile(_ => "B")
                                   .Add(SourceExcludeFilters, sourceFile => string.Equals("B", sourceFile));
       Assert.That(Sources[project].Take(1).Wait(),

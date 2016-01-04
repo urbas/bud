@@ -10,9 +10,9 @@ namespace Bud.V1 {
   internal static class BuildProjects {
     internal static readonly Conf BuildProjectSettings = Conf
       .Empty
-      .Add(BuildSupport)
-      .Add(DependenciesSupport)
-      .Add(SourceProcessorsSupport)
+      .Add(ApiImpl.BuildSupport)
+      .Add(ApiImpl.DependenciesSupport)
+      .Add(ApiImpl.SourceProcessorsSupport)
       .Add(Input, c => ProcessedSources[c])
       .ExcludeSourceDir(c => TargetDir[c]);
 

@@ -1,20 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
-using System.Linq;
 using System.Reactive;
 using System.Reactive.Concurrency;
-using System.Reactive.Linq;
 using Bud.Configuration;
 using Bud.Cs;
 using Bud.IO;
 using Bud.NuGet;
-using Bud.Reactive;
-using Bud.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using static System.IO.Path;
 using static Bud.V1.BareProjects;
 using static Bud.V1.BuildProjects;
 using static Bud.V1.CsProjects;
@@ -70,12 +64,6 @@ namespace Bud.V1 {
     /// </summary>
     public static readonly Key<IObservable<IEnumerable<string>>> Output = nameof(Output);
 
-    public static Conf BuildSupport = Conf
-      .Empty
-      .InitEmpty(Input)
-      .InitEmpty(Build)
-      .Init(Output, c => Build[c]);
-
     #endregion
 
     #region Dependencies Support
@@ -91,16 +79,6 @@ namespace Bud.V1 {
     ///   This observable stream contains output from all dependencies.
     /// </summary>
     public static readonly Key<IObservable<IEnumerable<string>>> DependenciesInput = nameof(DependenciesInput);
-
-    public static readonly Conf DependenciesSupport = Conf
-      .Empty
-      .InitEmpty(Dependencies)
-      .Init(DependenciesInput, GatherOutputsFromDependencies);
-
-    private static IObservable<IEnumerable<string>> GatherOutputsFromDependencies(IConf c)
-      => Dependencies[c]
-        .Gather(dependency => c.TryGet(dependency/Output))
-        .Combined();
 
     #endregion
 
@@ -118,12 +96,6 @@ namespace Bud.V1 {
     ///   key is mostly meant for testing.
     /// </remarks>
     public static readonly Key<IScheduler> BuildPipelineScheduler = nameof(BuildPipelineScheduler);
-
-    private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler =
-      new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
-
-    public static readonly Conf BuildSchedulingSupport =
-      BuildPipelineScheduler.Init(_ => DefauBuildPipelineScheduler.Value);
 
     #endregion
 
@@ -167,13 +139,6 @@ namespace Bud.V1 {
     /// </remarks>
     public static readonly Key<IFilesObservatory> FilesObservatory = nameof(FilesObservatory);
 
-    public static readonly Conf SourcesSupport = BuildSchedulingSupport
-      .InitEmpty(SourceIncludes)
-      .InitEmpty(SourceExcludeFilters)
-      .InitValue(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
-      .InitValue(FilesObservatory, new LocalFilesObservatory())
-      .Init(Sources, DefaultSources);
-
     /// <summary>
     ///   Adds an individual source file to the project.
     /// </summary>
@@ -187,16 +152,6 @@ namespace Bud.V1 {
     public static Conf AddSourceFile(this Conf c, Func<IConf, string> absolutePath)
       => c.Add(SourceIncludes,
                conf => FilesObservatory[conf].WatchFiles(absolutePath(conf)));
-
-    private static IObservable<IImmutableList<string>> DefaultSources(IConf c)
-      => SourceIncludes[c].ToObservable(SourceFilter(c)).ObserveOn(BuildPipelineScheduler[c])
-                          .Calmed(c)
-                          .Select(ImmutableList.ToImmutableList);
-
-    private static Func<string, bool> SourceFilter(IConf c) {
-      var excludeFilters = SourceExcludeFilters[c];
-      return sourceFile => !excludeFilters.Any(filter => filter(sourceFile));
-    }
 
     #endregion
 
@@ -213,16 +168,6 @@ namespace Bud.V1 {
     ///   Their output is then piped through <c>ProcessedSources</c>.
     /// </summary>
     public static readonly Key<IImmutableList<IInputProcessor>> SourceProcessors = nameof(SourceProcessors);
-
-    public static readonly Conf SourceProcessorsSupport = SourcesSupport
-      .InitEmpty(SourceProcessors)
-      .Init(ProcessedSources, DefaultProcessSources);
-
-    private static IObservable<IImmutableList<string>> DefaultProcessSources(IConf project)
-      => SourceProcessors[project]
-        .Aggregate(Sources[project] as IObservable<IEnumerable<string>>,
-                   (sources, processor) => processor.Process(sources))
-        .Select(ImmutableList.ToImmutableList);
 
     #endregion
 

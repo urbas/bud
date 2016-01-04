@@ -117,6 +117,7 @@
     <Compile Include="NuGet\NuGetPackageResolver.cs" />
     <Compile Include="Util\Optional.cs" />
     <Compile Include="V1\Api.cs" />
+    <Compile Include="V1\ApiImpl.cs" />
     <Compile Include="V1\BareProjects.cs" />
     <Compile Include="V1\BuildProjects.cs" />
     <Compile Include="V1\Conf.cs" />

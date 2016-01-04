@@ -13,7 +13,7 @@ namespace Bud.V1 {
   internal static class PackageReferencesProjects {
     private static readonly Conf PackageReferencesProjectSettings = Conf
       .Empty
-      .Add(SourcesSupport)
+      .Add(ApiImpl.SourcesSupport)
       .AddSourceFile(c => PackagesConfigFile[c])
       .InitValue(AssemblyResolver, new NuGetPackageResolver())
       .Init(PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
