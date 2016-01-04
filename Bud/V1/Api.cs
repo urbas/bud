@@ -15,6 +15,7 @@ using Bud.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Path;
+using static Bud.V1.BareProjects;
 using static Bud.V1.BuildProjects;
 using static Bud.V1.CsProjects;
 using static Bud.V1.PackageReferencesProjects;
@@ -255,20 +256,7 @@ namespace Bud.V1 {
     /// <param name="projectDir">see <see cref="ProjectDir" /></param>
     /// <param name="projectId">see <see cref="ProjectId" /></param>
     public static Conf BareProject(string projectDir, string projectId)
-      => Project(projectId)
-        .Add(BuildSchedulingSupport)
-        .InitValue(ProjectDir, projectDir)
-        .Init(TargetDir, c => Combine(ProjectDir[c], TargetDirName))
-        .InitValue(ProjectId, projectId)
-        .Init(Clean, DefaultClean);
-
-    private static Unit DefaultClean(IConf c) {
-      var targetDir = TargetDir[c];
-      if (Directory.Exists(targetDir)) {
-        Directory.Delete(targetDir, true);
-      }
-      return Unit.Default;
-    }
+      => CreateBareProject(projectDir, projectId);
 
     #endregion
 
@@ -277,8 +265,7 @@ namespace Bud.V1 {
     /// <param name="projectDir">see <see cref="ProjectDir" /></param>
     /// <param name="projectId">see <see cref="ProjectId" /></param>
     public static Conf BuildProject(string projectDir, string projectId)
-      => BareProject(projectDir, projectId)
-      .Add(BuildProjectSettings);
+      => CreateBuildProject(projectDir, projectId);
 
     /// <summary>
     ///   Adds files found in <paramref name="subDir" /> to <see cref="Sources" />.

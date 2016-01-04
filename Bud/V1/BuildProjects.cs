@@ -16,6 +16,10 @@ namespace Bud.V1 {
       .Add(Input, c => ProcessedSources[c])
       .ExcludeSourceDir(c => TargetDir[c]);
 
+    internal static Conf CreateBuildProject(string projectDir, string projectId)
+      => BareProject(projectDir, projectId)
+        .Add(BuildProjectSettings);
+
     internal static Conf AddSourcesImpl(Conf c,
                                         string subDir,
                                         string fileFilter,
