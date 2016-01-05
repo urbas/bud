@@ -109,7 +109,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\ImmutableLists.cs" />
+    <Compile Include="IO\ValueUpdater.cs" />
     <Compile Include="IO\FileWatcher.cs" />
+    <Compile Include="IO\IValueStore.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReference.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReferencesAggregator.cs" />
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolver.cs" />

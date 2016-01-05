@@ -128,6 +128,7 @@
     <Compile Include="Cs\CompileInputTestUtils.cs" />
     <Compile Include="Cs\RoslynCSharpCompilerTest.cs" />
     <Compile Include="Cs\TimedEmittingCompilerTest.cs" />
+    <Compile Include="IO\ValueUpdaterTest.cs" />
     <Compile Include="IO\DiffTest.cs" />
     <Compile Include="IO\FileUtilsTest.cs" />
     <Compile Include="IO\LocalFilesObservatoryTest.cs" />

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Bud.IO;
@@ -9,26 +8,19 @@ using static Bud.IO.FileUtils;
 
 namespace Bud.Cs {
   public class RoslynCSharpCompiler : ICompiler {
-    private Diff<Timestamped<string>> sources
-      = Diff.Empty<Timestamped<string>>();
-
-    private ImmutableDictionary<Timestamped<string>, SyntaxTree> syntaxTreesCache
-      = ImmutableDictionary<Timestamped<string>, SyntaxTree>.Empty;
-
-    private Diff<Timestamped<string>> references
-      = Diff.Empty<Timestamped<string>>();
-
-    private ImmutableDictionary<Timestamped<string>, MetadataReference> referencesCache
-      = ImmutableDictionary<Timestamped<string>, MetadataReference>.Empty;
-
-    private CSharpCompilation cSharpCompilation;
+    private readonly ValueUpdater<Timestamped<string>, SyntaxTree> syntaxTreesUpdater;
+    private readonly ValueUpdater<Timestamped<string>, MetadataReference> referencesUpdater;
+    private IncrementalRoslynCSharpCompiler compiler;
 
     public RoslynCSharpCompiler(string assemblyName, CSharpCompilationOptions compilationOptions) {
-      cSharpCompilation = CSharpCompilation
+      var cSharpCompilation = CSharpCompilation
         .Create(assemblyName,
                 Enumerable.Empty<SyntaxTree>(),
                 Enumerable.Empty<MetadataReference>(),
                 compilationOptions);
+      compiler = new IncrementalRoslynCSharpCompiler(cSharpCompilation);
+      syntaxTreesUpdater = new ValueUpdater<Timestamped<string>, SyntaxTree>(compiler, ParseSyntaxTree);
+      referencesUpdater = new ValueUpdater<Timestamped<string>, MetadataReference>(compiler, LoadAssemblyFromFile);
     }
 
     public CSharpCompilation Compile(IEnumerable<string> sources,
@@ -38,29 +30,9 @@ namespace Bud.Cs {
 
     public CSharpCompilation Compile(IEnumerable<Timestamped<string>> inputSources,
                                      IEnumerable<Timestamped<string>> inputAssemblies) {
-      UpdateSources(inputSources);
-      UpdateReferences(inputAssemblies);
-      return cSharpCompilation;
-    }
-
-    private void UpdateReferences(IEnumerable<Timestamped<string>> newAssemblies) {
-      references = references.DiffByTimestamp(newAssemblies);
-      var oldReferencesCache = referencesCache;
-      referencesCache = Diff.UpdateCache(referencesCache, references, LoadAssemblyFromFile);
-      cSharpCompilation = cSharpCompilation.AddReferences(references.Added.Select(r => referencesCache[r]))
-                                           .RemoveReferences(references.Removed.Select(r => oldReferencesCache[r]))
-                                           .RemoveReferences(references.Changed.Select(r => oldReferencesCache[r]))
-                                           .AddReferences(references.Changed.Select(r => referencesCache[r]));
-    }
-
-    private void UpdateSources(IEnumerable<Timestamped<string>> newSources) {
-      sources = sources.DiffByTimestamp(newSources);
-      var oldSyntaxTreesCache = syntaxTreesCache;
-      syntaxTreesCache = Diff.UpdateCache(syntaxTreesCache, sources, ParseSyntaxTree);
-      cSharpCompilation = cSharpCompilation.AddSyntaxTrees(sources.Added.Select(s => syntaxTreesCache[s]))
-                                           .RemoveSyntaxTrees(sources.Removed.Select(s => oldSyntaxTreesCache[s]))
-                                           .RemoveSyntaxTrees(sources.Changed.Select(s => oldSyntaxTreesCache[s]))
-                                           .AddSyntaxTrees(sources.Changed.Select(s => syntaxTreesCache[s]));
+      syntaxTreesUpdater.UpdateWith(inputSources);
+      referencesUpdater.UpdateWith(inputAssemblies);
+      return compiler.Compilation;
     }
 
     private static SyntaxTree ParseSyntaxTree(Timestamped<string> s)
@@ -68,5 +40,19 @@ namespace Bud.Cs {
 
     private static MetadataReference LoadAssemblyFromFile(Timestamped<string> path)
       => MetadataReference.CreateFromFile(path);
+
+    private class IncrementalRoslynCSharpCompiler
+      : IValueStore<SyntaxTree>, IValueStore<MetadataReference> {
+      public CSharpCompilation Compilation { get; private set; }
+
+      public IncrementalRoslynCSharpCompiler(CSharpCompilation compilation) {
+        Compilation = compilation;
+      }
+
+      public void Add(IEnumerable<SyntaxTree> newValues) => Compilation = Compilation.AddSyntaxTrees(newValues);
+      public void Remove(IEnumerable<SyntaxTree> oldValues) => Compilation = Compilation.RemoveSyntaxTrees(oldValues);
+      public void Add(IEnumerable<MetadataReference> newValues) => Compilation = Compilation.AddReferences(newValues);
+      public void Remove(IEnumerable<MetadataReference> oldValues) => Compilation = Compilation.AddReferences(oldValues);
+    }
   }
 }

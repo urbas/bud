@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
-using Bud.Collections;
+using static Bud.Collections.EnumerableUtils;
 
 namespace Bud.IO {
   public class Diff<T> : IDiff<T> {
@@ -66,10 +66,10 @@ namespace Bud.IO {
 
     private int CalculateHashCode() {
       unchecked {
-        var hashCode = EnumerableUtils.ElementwiseHashCode(Added);
-        hashCode = (hashCode * 397) ^ EnumerableUtils.ElementwiseHashCode(Removed);
-        hashCode = (hashCode * 397) ^ EnumerableUtils.ElementwiseHashCode(Changed);
-        hashCode = (hashCode * 397) ^ EnumerableUtils.ElementwiseHashCode(All);
+        var hashCode = ElementwiseHashCode(Added);
+        hashCode = (hashCode*397) ^ ElementwiseHashCode(Removed);
+        hashCode = (hashCode*397) ^ ElementwiseHashCode(Changed);
+        hashCode = (hashCode*397) ^ ElementwiseHashCode(All);
         return hashCode;
       }
     }
@@ -88,9 +88,9 @@ namespace Bud.IO {
       return new Diff<T>(added, removed, changed, all);
     }
 
-    public static ImmutableDictionary<TKey, TValue> UpdateCache<TKey, TValue>(ImmutableDictionary<TKey, TValue> cache,
-                                                                              IDiff<TKey> diff,
-                                                                              Func<TKey, TValue> valueFactory) {
+    public static IImmutableDictionary<TKey, TValue> UpdateCache<TKey, TValue>(IImmutableDictionary<TKey, TValue> cache,
+                                                                               IDiff<TKey> diff,
+                                                                               Func<TKey, TValue> valueFactory) {
       cache = cache.AddRange(diff.Added.Select(key => new KeyValuePair<TKey, TValue>(key, valueFactory(key))));
       cache = cache.RemoveRange(diff.Removed);
       return cache.SetItems(diff.Changed.Select(key => new KeyValuePair<TKey, TValue>(key, valueFactory(key))));
