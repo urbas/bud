@@ -71,7 +71,7 @@ namespace Bud.V1 {
     /// <summary>
     ///   A list of keys (paths) to other builds. For example, say we defined two projects
     ///   <c>A</c> and <c>B</c>. To make <c>B</c> depend on <c>A</c>, one would add the
-    ///   <c>../A</c> to the <see cref="Dependencies" /> list.
+    ///   <c>../A</c> to the list of <see cref="Dependencies" />.
     /// </summary>
     public static readonly Key<IImmutableSet<string>> Dependencies = nameof(Dependencies);
 
@@ -171,9 +171,22 @@ namespace Bud.V1 {
 
     #endregion
 
+    #region Publishing Support
+
+    /// <summary>
+    ///   Publishes a project to a distribution endpoint. For example,
+    ///   projects like <see cref="CsLibrary(string)"/> are published
+    ///   to a NuGet repository.
+    /// </summary>
+    public static readonly Key<Unit> Publish = nameof(Publish);
+
+    #endregion
+
     #region Bare Project
 
     public const string TargetDirName = "target";
+
+    public const string DefaultVersion = "0.0.1";
 
     /// <summary>
     ///   The build's identifier. This identifier is used in <see cref="Dependencies" />.
@@ -197,6 +210,11 @@ namespace Bud.V1 {
     ///   By default, deletes the entire <see cref="TargetDir" />
     /// </summary>
     public static readonly Key<Unit> Clean = nameof(Clean);
+
+    /// <summary>
+    /// The version of the project. By default, it's <see cref="DefaultVersion"/>.
+    /// </summary>
+    public static Key<string> Version = nameof(Version);
 
     /// <param name="projectDir">see <see cref="ProjectDir" /></param>
     /// <param name="projectId">see <see cref="ProjectId" /></param>
