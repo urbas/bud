@@ -109,6 +109,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collections\ImmutableLists.cs" />
+    <Compile Include="Cs\RoslynDllEmitter.cs" />
     <Compile Include="IO\ValueUpdater.cs" />
     <Compile Include="IO\FileWatcher.cs" />
     <Compile Include="IO\IValueStore.cs" />

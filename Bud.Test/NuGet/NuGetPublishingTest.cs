@@ -9,15 +9,19 @@ namespace Bud.NuGet {
     [Test]
     public void Publishes_the_output_of_a_bare_project() {
       var nuGetPublisher = new Mock<INuGetPublisher>(MockBehavior.Strict);
+      var fileToPackage = "Foo.txt";
       nuGetPublisher.Setup(self => self.Publish("Foo",
                                                 DefaultVersion,
-                                                new[] {"Foo.txt"}));
+                                                new[] {fileToPackage}));
+
       var project = BareProject("fooDir", "Foo")
         .Clear(Output)
-        .Add(Output, "Foo.txt")
+        .Add(Output, fileToPackage)
         .Add(NuGetPublishingSupport)
         .SetValue(NuGetPublisher, nuGetPublisher.Object);
+
       project.Get(Publish);
+
       nuGetPublisher.VerifyAll();
     }
   }

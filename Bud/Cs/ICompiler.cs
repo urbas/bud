@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using Bud.IO;
-using Microsoft.CodeAnalysis.CSharp;
 
 namespace Bud.Cs {
   public interface ICompiler {
-    CSharpCompilation Compile(IEnumerable<Timestamped<string>> inputSources,
-                              IEnumerable<Timestamped<string>> inputAssemblies);
+    CompileOutput Compile(IEnumerable<Timestamped<string>> inputSources,
+                          IEnumerable<Timestamped<string>> inputAssemblies,
+                          string outputAssemblyPath,
+                          Stopwatch stopwatch);
   }
 }

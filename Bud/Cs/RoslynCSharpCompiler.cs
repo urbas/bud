@@ -7,10 +7,10 @@ using Microsoft.CodeAnalysis.CSharp;
 using static Bud.IO.FileUtils;
 
 namespace Bud.Cs {
-  public class RoslynCSharpCompiler : ICompiler {
+  public class RoslynCSharpCompiler {
     private readonly ValueUpdater<Timestamped<string>, SyntaxTree> syntaxTreesUpdater;
     private readonly ValueUpdater<Timestamped<string>, MetadataReference> referencesUpdater;
-    private IncrementalRoslynCSharpCompiler compiler;
+    private readonly IncrementalCompilation compilation;
 
     public RoslynCSharpCompiler(string assemblyName, CSharpCompilationOptions compilationOptions) {
       var cSharpCompilation = CSharpCompilation
@@ -18,9 +18,9 @@ namespace Bud.Cs {
                 Enumerable.Empty<SyntaxTree>(),
                 Enumerable.Empty<MetadataReference>(),
                 compilationOptions);
-      compiler = new IncrementalRoslynCSharpCompiler(cSharpCompilation);
-      syntaxTreesUpdater = new ValueUpdater<Timestamped<string>, SyntaxTree>(compiler, ParseSyntaxTree);
-      referencesUpdater = new ValueUpdater<Timestamped<string>, MetadataReference>(compiler, LoadAssemblyFromFile);
+      compilation = new IncrementalCompilation(cSharpCompilation);
+      syntaxTreesUpdater = new ValueUpdater<Timestamped<string>, SyntaxTree>(compilation, ParseSyntaxTree);
+      referencesUpdater = new ValueUpdater<Timestamped<string>, MetadataReference>(compilation, LoadAssemblyFromFile);
     }
 
     public CSharpCompilation Compile(IEnumerable<string> sources,
@@ -32,7 +32,7 @@ namespace Bud.Cs {
                                      IEnumerable<Timestamped<string>> inputAssemblies) {
       syntaxTreesUpdater.UpdateWith(inputSources);
       referencesUpdater.UpdateWith(inputAssemblies);
-      return compiler.Compilation;
+      return compilation.State;
     }
 
     private static SyntaxTree ParseSyntaxTree(Timestamped<string> s)
@@ -41,18 +41,18 @@ namespace Bud.Cs {
     private static MetadataReference LoadAssemblyFromFile(Timestamped<string> path)
       => MetadataReference.CreateFromFile(path);
 
-    private class IncrementalRoslynCSharpCompiler
+    private class IncrementalCompilation
       : IValueStore<SyntaxTree>, IValueStore<MetadataReference> {
-      public CSharpCompilation Compilation { get; private set; }
+      public CSharpCompilation State { get; private set; }
 
-      public IncrementalRoslynCSharpCompiler(CSharpCompilation compilation) {
-        Compilation = compilation;
+      public IncrementalCompilation(CSharpCompilation state) {
+        State = state;
       }
 
-      public void Add(IEnumerable<SyntaxTree> newValues) => Compilation = Compilation.AddSyntaxTrees(newValues);
-      public void Remove(IEnumerable<SyntaxTree> oldValues) => Compilation = Compilation.RemoveSyntaxTrees(oldValues);
-      public void Add(IEnumerable<MetadataReference> newValues) => Compilation = Compilation.AddReferences(newValues);
-      public void Remove(IEnumerable<MetadataReference> oldValues) => Compilation = Compilation.AddReferences(oldValues);
+      public void Add(IEnumerable<SyntaxTree> newValues) => State = State.AddSyntaxTrees(newValues);
+      public void Remove(IEnumerable<SyntaxTree> oldValues) => State = State.RemoveSyntaxTrees(oldValues);
+      public void Add(IEnumerable<MetadataReference> newValues) => State = State.AddReferences(newValues);
+      public void Remove(IEnumerable<MetadataReference> oldValues) => State = State.AddReferences(oldValues);
     }
   }
 }

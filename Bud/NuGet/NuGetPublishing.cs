@@ -12,7 +12,9 @@ namespace Bud.NuGet {
     public static Key<INuGetPublisher> NuGetPublisher = nameof(NuGetPublisher);
 
     private static Unit DefaultPublish(IConf c) {
-      NuGetPublisher[c].Publish(ProjectId[c], Version[c], Output[c].Take(1).Wait());
+      NuGetPublisher[c].Publish(ProjectId[c],
+                                Version[c],
+                                Output[c].Take(1).Wait());
       return Unit.Default;
     }
   }
