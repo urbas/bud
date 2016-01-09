@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Moq;
 using NUnit.Framework;
 using static System.IO.Path;
+using static System.Linq.Enumerable;
 using static Bud.Cs.CompileInputTestUtils;
 using static Bud.IO.FileUtils;
 using static NUnit.Framework.Assert;
@@ -49,8 +49,7 @@ namespace Bud.Cs {
           .Setup(
             self => self.Compile(It.Is(EqualToTimestampedFiles(sourceFile)),
                                  It.Is(EqualToTimestampedFiles(dependency.AssemblyPath, referencedAssembly)),
-                                 compiler.OutputAssemblyPath,
-                                 It.IsAny<Stopwatch>()))
+                                 compiler.OutputAssemblyPath))
           .Returns((CompileOutput) null);
 
         compiler.Compile(ToCompileInput(sourceFile, dependency, referencedAssembly));
@@ -69,9 +68,9 @@ namespace Bud.Cs {
                           .SetEquals(actualFiles);
 
     private static CompileOutput UnsuccessfulCompileOutput()
-      => new CompileOutput(Enumerable.Empty<Diagnostic>(), TimeSpan.Zero, "Foo.dll", false, 0L, null);
+      => new CompileOutput(Empty<Diagnostic>(), TimeSpan.Zero, "Foo.dll", false, 0L, null);
 
     private static CompileOutput FooDllCompileOutput()
-      => new CompileOutput(Enumerable.Empty<Diagnostic>(), TimeSpan.Zero, "Foo.dll", true, 0L, null);
+      => new CompileOutput(Empty<Diagnostic>(), TimeSpan.Zero, "Foo.dll", true, 0L, null);
   }
 }

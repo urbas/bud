@@ -10,22 +10,23 @@ using static System.IO.Directory;
 using static System.IO.Path;
 
 namespace Bud.Cs {
-  public class RoslynDllEmitter : ICompiler {
-    private readonly RoslynCSharpCompiler compiler;
+  public class RoslynCsCompiler : ICompiler {
+    private readonly RoslynCsCompilation compilation;
     private readonly IEnumerable<ResourceDescription> embeddedResources;
 
-    public RoslynDllEmitter(IEnumerable<ResourceDescription> embeddedResources,
+    public RoslynCsCompiler(IEnumerable<ResourceDescription> embeddedResources,
                             string assemblyName,
                             CSharpCompilationOptions options) {
-      compiler = new RoslynCSharpCompiler(assemblyName, options);
+      compilation = new RoslynCsCompilation(assemblyName, options);
       this.embeddedResources = embeddedResources;
     }
 
     public CompileOutput Compile(IEnumerable<Timestamped<string>> sources,
                                  IEnumerable<Timestamped<string>> assemblies,
-                                 string outputAssemblyPath,
-                                 Stopwatch stopwatch) {
-      var cSharpCompilation = compiler.Compile(sources, assemblies);
+                                 string outputAssemblyPath) {
+      var stopwatch = new Stopwatch();
+      stopwatch.Start();
+      var cSharpCompilation = compilation.Compile(sources, assemblies);
 
       if (cSharpCompilation == null) {
         throw new Exception("Unexpected compiler error.");

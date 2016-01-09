@@ -1,23 +1,20 @@
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using static System.Linq.Enumerable;
 using static Bud.IO.FileUtils;
 
 namespace Bud.Cs {
-  public class RoslynCSharpCompiler {
+  public class RoslynCsCompilation {
     private readonly ValueUpdater<Timestamped<string>, SyntaxTree> syntaxTreesUpdater;
     private readonly ValueUpdater<Timestamped<string>, MetadataReference> referencesUpdater;
     private readonly IncrementalCompilation compilation;
 
-    public RoslynCSharpCompiler(string assemblyName, CSharpCompilationOptions compilationOptions) {
-      var cSharpCompilation = CSharpCompilation
-        .Create(assemblyName,
-                Enumerable.Empty<SyntaxTree>(),
-                Enumerable.Empty<MetadataReference>(),
-                compilationOptions);
+    public RoslynCsCompilation(string assemblyName,
+                               CSharpCompilationOptions options) {
+      var cSharpCompilation = InitCompilation(assemblyName, options);
       compilation = new IncrementalCompilation(cSharpCompilation);
       syntaxTreesUpdater = new ValueUpdater<Timestamped<string>, SyntaxTree>(compilation, ParseSyntaxTree);
       referencesUpdater = new ValueUpdater<Timestamped<string>, MetadataReference>(compilation, LoadAssemblyFromFile);
@@ -34,6 +31,13 @@ namespace Bud.Cs {
       referencesUpdater.UpdateWith(inputAssemblies);
       return compilation.State;
     }
+
+    private static CSharpCompilation InitCompilation(string assemblyName,
+                                                     CSharpCompilationOptions compilationOptions)
+      => CSharpCompilation.Create(assemblyName,
+                                  Empty<SyntaxTree>(),
+                                  Empty<MetadataReference>(),
+                                  compilationOptions);
 
     private static SyntaxTree ParseSyntaxTree(Timestamped<string> s)
       => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(s), path: s);

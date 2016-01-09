@@ -1,36 +1,38 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Bud.IO;
+using Bud.V1;
 using Moq;
 using NUnit.Framework;
+using static System.IO.Directory;
 using static System.IO.Path;
-using static System.Linq.Enumerable;
 using static Bud.V1.Api;
+using static NUnit.Framework.Assert;
 
-namespace Bud.V1 {
+namespace Bud.BaseProjects {
   public class BuildProjectsTest {
     [Test]
     public void Set_the_projectDir()
-      => Assert.AreEqual("bar", ProjectDir[BuildProject("bar", "Foo")]);
+      => AreEqual("bar", ProjectDir[BuildProject("bar", "Foo")]);
 
     [Test]
     public void Set_the_projectId()
-      => Assert.AreEqual("Foo", ProjectId[BuildProject("bar", "Foo")]);
+      => AreEqual("Foo", ProjectId[BuildProject("bar", "Foo")]);
 
     [Test]
     public void Target_directory_is_within_the_project_directory() {
       var project = BuildProject("fooDir", "foo");
-      Assert.AreEqual(Combine(ProjectDir[project], "target"), TargetDir[project]);
+      AreEqual(Combine(ProjectDir[project], "target"), TargetDir[project]);
     }
 
     [Test]
     public void Dependencies_should_be_initially_empty()
-      => Assert.IsEmpty(Dependencies[BuildProject("bar", "Foo")]);
+      => IsEmpty(Dependencies[BuildProject("bar", "Foo")]);
 
     [Test]
     public void Sources_should_contain_files_from_added_directories() {
@@ -40,7 +42,7 @@ namespace Bud.V1 {
         var twoDirsProject = BuildProject(tempDir.Path, "foo")
           .AddSources("A")
           .AddSources("B");
-        Assert.That(Sources[twoDirsProject].Take(1).Wait(),
+        That(Sources[twoDirsProject].Take(1).Wait(),
                     Is.EquivalentTo(new[] {fileA, fileB}));
       }
     }
@@ -51,20 +53,20 @@ namespace Bud.V1 {
         var project = BuildProject(tempDir.Path, "foo").AddSources(fileFilter: "*.cs");
         tempDir.CreateEmptyFile(TargetDir[project], "A.cs");
         var files = Sources[project].Take(1).Wait();
-        Assert.IsEmpty(files);
+        IsEmpty(files);
       }
     }
 
     [Test]
     public void Input_should_initially_observe_a_single_empty_inout()
-      => Assert.AreEqual(new[] {Empty<string>()},
+      => AreEqual(new[] {Enumerable.Empty<string>()},
                          Input[BuildProject("bar", "Foo")].ToList().Wait());
 
     [Test]
     public void Input_contains_the_added_file() {
       var buildProject = BuildProject("foo", "Foo")
         .Add(SourceIncludes, c => FilesObservatory[c].WatchFiles("foo/bar"));
-      Assert.AreEqual(new[] {"foo/bar"},
+      AreEqual(new[] {"foo/bar"},
                       Input[buildProject].Take(1).Wait());
     }
 
@@ -79,7 +81,7 @@ namespace Bud.V1 {
         .Get(ProcessedSources)
         .Wait();
       fileProcessor.VerifyAll();
-      Assert.AreEqual(expectedOutputFiles, actualOutputFiles);
+      AreEqual(expectedOutputFiles, actualOutputFiles);
     }
 
     [Test]
@@ -87,7 +89,7 @@ namespace Bud.V1 {
       int inputThreadId = 0;
       var fileProcessor = new ThreadIdRecordingInputProcessor();
       BuildProject("fooDir", "A")
-        .Add(SourceIncludes, new FileWatcher(Empty<string>(), Observable.Create<string>(observer => {
+        .Add(SourceIncludes, new FileWatcher(Enumerable.Empty<string>(), Observable.Create<string>(observer => {
           Task.Run(() => {
             inputThreadId = Thread.CurrentThread.ManagedThreadId;
             observer.OnNext("A.cs");
@@ -97,8 +99,8 @@ namespace Bud.V1 {
         })))
         .Add(SourceProcessors, fileProcessor)
         .Get(ProcessedSources).Wait();
-      Assert.AreNotEqual(0, fileProcessor.InvocationThreadId);
-      Assert.AreNotEqual(inputThreadId, fileProcessor.InvocationThreadId);
+      AreNotEqual(0, fileProcessor.InvocationThreadId);
+      AreNotEqual(inputThreadId, fileProcessor.InvocationThreadId);
     }
 
     [Test]
@@ -106,7 +108,7 @@ namespace Bud.V1 {
       var projects = BuildProject("bDir", "B")
         .Add(SourceIncludes, new FileWatcher("b"))
         .Add(SourceProcessors, new FooAppenderInputProcessor());
-      Assert.AreEqual(new[] {"bfoo"},
+      AreEqual(new[] {"bfoo"},
                       projects.Get(Input).Wait());
     }
 
@@ -116,7 +118,7 @@ namespace Bud.V1 {
         tmpDir.CreateEmptyFile("target", "foo.txt");
         tmpDir.CreateEmptyFile("target", "dir", "bar.txt");
         BuildProject(Combine(tmpDir.Path), "A").Get(Clean);
-        Assert.IsFalse(Directory.Exists(Combine(tmpDir.Path, "target")));
+        IsFalse(Exists(Combine(tmpDir.Path, "target")));
       }
     }
 
@@ -124,7 +126,7 @@ namespace Bud.V1 {
     public void Clean_does_nothing_when_the_target_folder_does_not_exist() {
       using (var tmpDir = new TemporaryDirectory()) {
         BuildProject(Combine(tmpDir.Path), "A").Get(Clean);
-        Assert.IsFalse(Directory.Exists(Combine(tmpDir.Path, "target")));
+        IsFalse(Exists(Combine(tmpDir.Path, "target")));
       }
     }
 

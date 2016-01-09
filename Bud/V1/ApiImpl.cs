@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using Bud.BaseProjects;
 using Bud.IO;
 using Bud.Reactive;
 using Bud.Util;

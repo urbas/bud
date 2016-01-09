@@ -118,6 +118,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseProjects\BuildProjectsTest.cs" />
     <Compile Include="BudBuild.cs" />
     <Compile Include="Collections\EnumerableUtilsTest.cs" />
     <Compile Include="Collections\ImmutableListsTest.cs" />
@@ -126,7 +127,8 @@
     <Compile Include="Configuration\ScopedConfTest.cs" />
     <Compile Include="Configuration\ScopedDictionaryBuilderTest.cs" />
     <Compile Include="Cs\CompileInputTestUtils.cs" />
-    <Compile Include="Cs\RoslynCSharpCompilerTest.cs" />
+    <Compile Include="Cs\CsProjectsTest.cs" />
+    <Compile Include="Cs\RoslynCsCompilationTest.cs" />
     <Compile Include="Cs\TimedEmittingCompilerTest.cs" />
     <Compile Include="IO\ValueUpdaterTest.cs" />
     <Compile Include="IO\DiffTest.cs" />
@@ -140,19 +142,17 @@
     <Compile Include="NuGet\FrameworkAssemblyReferenceVersionAggregatorTest.cs" />
     <Compile Include="NuGet\NuGetPublishingTest.cs" />
     <Compile Include="NuGet\PackageConfigTestUtils.cs" />
+    <Compile Include="NuGet\PackageReferencesProjectsTest.cs" />
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolverTest.cs" />
     <Compile Include="NuGet\NuGetAssemblyResolverTest.cs" />
     <Compile Include="V1\ApiDependenciesSupportTest.cs" />
     <Compile Include="V1\ApiSourcesSupportTest.cs" />
-    <Compile Include="V1\PackageReferencesProjectsTest.cs" />
     <EmbeddedResource Include="NuGet\SinglePackageTest\packages.config" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reactive\ObservableResourcesTest.cs" />
     <Compile Include="Reactive\WaitingObservablesTest.cs" />
     <Compile Include="Util\OptionalTest.cs" />
     <Compile Include="Util\StringsTest.cs" />
-    <Compile Include="V1\CsProjectsTest.cs" />
-    <Compile Include="V1\BuildProjectsTest.cs" />
     <Compile Include="V1\ConfTest.cs" />
     <Compile Include="V1\EnumerableConfApiTest.cs" />
     <Compile Include="V1\KeysTest.cs" />

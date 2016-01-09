@@ -3,16 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using Bud.IO;
 using Bud.Reactive;
+using Bud.V1;
 using static System.IO.Path;
+using static Bud.IO.PathUtils;
 using static Bud.V1.Api;
+using static Bud.V1.ApiImpl;
 
-namespace Bud.V1 {
+namespace Bud.BaseProjects {
   internal static class BuildProjects {
     internal static readonly Conf BuildProjectSettings = Conf
       .Empty
-      .Add(ApiImpl.BuildSupport)
-      .Add(ApiImpl.DependenciesSupport)
-      .Add(ApiImpl.SourceProcessorsSupport)
+      .Add(BuildSupport)
+      .Add(DependenciesSupport)
+      .Add(SourceProcessorsSupport)
       .Add(Input, c => ProcessedSources[c])
       .ExcludeSourceDir(c => TargetDir[c]);
 
@@ -49,10 +52,11 @@ namespace Bud.V1 {
         var projectDir = ProjectDir[conf];
         var dirs = subDirs(conf)
           .Select(s => IsPathRooted(s) ? s : Combine(projectDir, s));
-        return PathUtils.InAnyDirFilter(dirs);
+        return InAnyDirFilter(dirs);
       });
 
     internal static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
-      => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c], BuildPipelineScheduler[c]);
+      => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c],
+                                   BuildPipelineScheduler[c]);
   }
 }

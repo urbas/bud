@@ -7,7 +7,7 @@ using static System.Linq.Enumerable;
 
 namespace Bud.Cs {
   [Category("IntegrationTest")]
-  public class RoslynCSharpCompilerTest {
+  public class RoslynCsCompilationTest {
     [Test]
     public void Fails_to_compile_when_core_assembly_references_are_missing() {
       using (var tempDir = new TemporaryDirectory()) {
@@ -100,7 +100,7 @@ namespace Bud.Cs {
     }
 
 
-    private static RoslynCSharpCompiler CreateCompiler()
-      => new RoslynCSharpCompiler("A.dll", new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
+    private static RoslynCsCompilation CreateCompiler()
+      => new RoslynCsCompilation("A.dll", new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
   }
 }

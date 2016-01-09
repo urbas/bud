@@ -2,18 +2,19 @@ using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Reactive.Linq;
-using Bud.NuGet;
+using Bud.V1;
 using static System.IO.Directory;
 using static System.IO.File;
 using static System.IO.Path;
 using static Bud.IO.FileUtils;
 using static Bud.V1.Api;
+using static Bud.V1.ApiImpl;
 
-namespace Bud.V1 {
+namespace Bud.NuGet {
   internal static class PackageReferencesProjects {
     private static readonly Conf PackageReferencesProjectSettings = Conf
       .Empty
-      .Add(ApiImpl.SourcesSupport)
+      .Add(SourcesSupport)
       .AddSourceFile(c => PackagesConfigFile[c])
       .InitValue(AssemblyResolver, new NuGetPackageResolver())
       .Init(PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))

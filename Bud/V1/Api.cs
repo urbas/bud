@@ -9,10 +9,10 @@ using Bud.IO;
 using Bud.NuGet;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using static Bud.V1.BareProjects;
-using static Bud.V1.BuildProjects;
-using static Bud.V1.CsProjects;
-using static Bud.V1.PackageReferencesProjects;
+using static Bud.BaseProjects.BareProjects;
+using static Bud.BaseProjects.BuildProjects;
+using static Bud.Cs.CsProjects;
+using static Bud.NuGet.PackageReferencesProjects;
 
 namespace Bud.V1 {
   /// <summary>

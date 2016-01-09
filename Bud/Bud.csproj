@@ -108,8 +108,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseProjects\BareProjects.cs" />
+    <Compile Include="BaseProjects\BuildProjects.cs" />
     <Compile Include="Collections\ImmutableLists.cs" />
-    <Compile Include="Cs\RoslynDllEmitter.cs" />
+    <Compile Include="Cs\CsProjects.cs" />
+    <Compile Include="Cs\RoslynCsCompiler.cs" />
     <Compile Include="IO\ValueUpdater.cs" />
     <Compile Include="IO\FileWatcher.cs" />
     <Compile Include="IO\IValueStore.cs" />
@@ -117,17 +120,15 @@
     <Compile Include="NuGet\FrameworkAssemblyReferencesAggregator.cs" />
     <Compile Include="NuGet\INuGetPublisher.cs" />
     <Compile Include="NuGet\NuGetPublishing.cs" />
+    <Compile Include="NuGet\PackageReferencesProjects.cs" />
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolver.cs" />
     <Compile Include="NuGet\IPackageResolver.cs" />
     <Compile Include="NuGet\NuGetPackageResolver.cs" />
     <Compile Include="Util\Optional.cs" />
     <Compile Include="V1\Api.cs" />
     <Compile Include="V1\ApiImpl.cs" />
-    <Compile Include="V1\BareProjects.cs" />
-    <Compile Include="V1\BuildProjects.cs" />
     <Compile Include="V1\Conf.cs" />
     <Compile Include="V1\ConfExtensions.cs" />
-    <Compile Include="V1\CsProjects.cs" />
     <Compile Include="V1\EnumerableConfApi.cs" />
     <Compile Include="V1\IBuild.cs" />
     <Compile Include="V1\IConf.cs" />
@@ -143,7 +144,7 @@
     <Compile Include="Cs\CompileOutput.cs" />
     <Compile Include="Cs\ICompiler.cs" />
     <Compile Include="Cs\OutputAssemblyKind.cs" />
-    <Compile Include="Cs\RoslynCSharpCompiler.cs" />
+    <Compile Include="Cs\RoslynCsCompilation.cs" />
     <Compile Include="Cs\TimedEmittingCompiler.cs" />
     <Compile Include="Configuration\CachingConf.cs" />
     <Compile Include="Configuration\ConfBuilder.cs" />
@@ -172,7 +173,6 @@
     <Compile Include="Reactive\ObservableResources.cs" />
     <Compile Include="Reactive\WaitingObservables.cs" />
     <Compile Include="Util\Strings.cs" />
-    <Compile Include="V1\PackageReferencesProjects.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

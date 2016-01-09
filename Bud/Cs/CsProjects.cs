@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reactive.Linq;
-using Bud.Cs;
 using Bud.Reactive;
 using Bud.Util;
+using Bud.V1;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static System.Console;
-using static System.IO.File;
 using static System.IO.Path;
 using static Bud.V1.Api;
+using static Microsoft.CodeAnalysis.OutputKind;
 
-namespace Bud.V1 {
+namespace Bud.Cs {
   internal static class CsProjects {
     private static readonly Conf CsProjectSetting = Conf
       .Empty
@@ -23,7 +24,7 @@ namespace Bud.V1 {
       .InitEmpty(EmbeddedResources)
       .Init(Compiler, TimedEmittingCompiler.Create)
       .InitValue(CsCompilationOptions,
-                 new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary,
+                 new CSharpCompilationOptions(DynamicallyLinkedLibrary,
                                               warningLevel: 1))
       .Add(AssemblyReferences, c => ("NuGetPackageReference"/ResolvedAssemblies)[c])
       .Set("NuGetPackageReference"/ProjectDir, c => Combine(ProjectDir[c], "packages"))
@@ -53,10 +54,10 @@ namespace Bud.V1 {
     }
 
     internal static ResourceDescription ToResourceDescriptor(string resourceFile, string nameInAssembly)
-      => new ResourceDescription(nameInAssembly, () => OpenRead(resourceFile), true);
+      => new ResourceDescription(nameInAssembly, () => File.OpenRead(resourceFile), true);
 
     internal static IObservable<IEnumerable<CompileOutput>> ObserveDependencies(IConf c)
-      => Dependencies[c].Gather(dependency => c.TryGet(dependency/Compile))
+      => Dependencies[c].Gather(dependency => c.TryGet<IObservable<CompileOutput>>(dependency/Compile))
                         .Combined();
 
     internal static Conf EmbedResourceImpl(Conf conf, string path, string nameInAssembly)
