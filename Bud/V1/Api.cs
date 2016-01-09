@@ -76,7 +76,8 @@ namespace Bud.V1 {
     public static readonly Key<IImmutableSet<string>> Dependencies = nameof(Dependencies);
 
     /// <summary>
-    ///   This observable stream contains output from all dependencies.
+    ///   This observable stream contains aggregated output from all
+    ///   dependencies.
     /// </summary>
     public static readonly Key<IObservable<IEnumerable<string>>> DependenciesInput = nameof(DependenciesInput);
 
@@ -175,7 +176,7 @@ namespace Bud.V1 {
 
     /// <summary>
     ///   Publishes a project to a distribution endpoint. For example,
-    ///   projects like <see cref="CsLibrary(string)"/> are published
+    ///   projects like <see cref="CsLibrary(string)" /> are published
     ///   to a NuGet repository.
     /// </summary>
     public static readonly Key<Unit> Publish = nameof(Publish);
@@ -212,7 +213,7 @@ namespace Bud.V1 {
     public static readonly Key<Unit> Clean = nameof(Clean);
 
     /// <summary>
-    /// The version of the project. By default, it's <see cref="DefaultVersion"/>.
+    ///   The version of the project. By default, it's <see cref="DefaultVersion" />.
     /// </summary>
     public static Key<string> Version = nameof(Version);
 

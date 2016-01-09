@@ -6,9 +6,9 @@ using Bud.V1;
 using static System.IO.Directory;
 using static System.IO.File;
 using static System.IO.Path;
+using static Bud.BaseProjects.BuildProjects;
 using static Bud.IO.FileUtils;
 using static Bud.V1.Api;
-using static Bud.V1.ApiImpl;
 
 namespace Bud.NuGet {
   internal static class PackageReferencesProjects {
