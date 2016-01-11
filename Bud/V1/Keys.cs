@@ -72,7 +72,7 @@ namespace Bud.V1 {
     ///   the method will return <c>foo/a/b/c</c>.
     /// </remarks>
     public static string InterpretFromScope(string key, ICollection<string> scope) {
-      if (IsAbsolute(key) || !scope.Any()) {
+      if (IsAbsolute(key) || scope.Count == 0) {
         return key;
       }
       var backtracks = CountBacktracks(key);

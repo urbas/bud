@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
-using Bud.V1;
+using System.Collections.Immutable;
 using Bud.Util;
+using Bud.V1;
 using static Bud.Util.Optional;
 
 namespace Bud.Configuration {
@@ -19,7 +21,17 @@ namespace Bud.Configuration {
     private Optional<T> RawTryGet<T>(Key<T> key) {
       IConfDefinition confDefinition;
       if (ConfDefinitions.TryGetValue(key, out confDefinition)) {
-        return Some((T) confDefinition.Value(this));
+        object value;
+        try {
+          value = confDefinition.Value(this);
+        } catch (Exception e) {
+          var cex = e as ConfAccessException;
+          if (cex != null) {
+            throw new ConfAccessException(cex.ReferencePath.Add(key), cex.InnerException);
+          }
+          throw new ConfAccessException(ImmutableList.Create(key.Id), e);
+        }
+        return Some((T) value);
       }
       return None<T>();
     }
