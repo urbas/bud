@@ -20,24 +20,6 @@ using static NUnit.Framework.Assert;
 namespace Bud.BaseProjects {
   public class BuildProjectsTest {
     [Test]
-    public void Set_the_projectDir()
-      => AreEqual("bar", ProjectDir[BuildProject("bar", "Foo")]);
-
-    [Test]
-    public void Set_the_projectId()
-      => AreEqual("Foo", ProjectId[BuildProject("bar", "Foo")]);
-
-    [Test]
-    public void Target_directory_is_within_the_project_directory() {
-      var project = BuildProject("fooDir", "foo");
-      AreEqual(Combine(ProjectDir[project], "target"), TargetDir[project]);
-    }
-
-    [Test]
-    public void Dependencies_should_be_initially_empty()
-      => IsEmpty(Dependencies[BuildProject("bar", "Foo")]);
-
-    [Test]
     public void DependenciesInput_must_be_empty_when_no_dependencies_given() {
       var projects = BuildProject("aDir", "A");
       AreEqual(new[] {Enumerable.Empty<string>()},
@@ -190,6 +172,7 @@ namespace Bud.BaseProjects {
         IsFalse(Exists(Combine(tmpDir.Path, "target")));
       }
     }
+
 
     private static IObservable<string[]> ChangingOutput(IScheduler scheduler)
       => Return(new[] {"foo"}).Delay(TimeSpan.FromSeconds(1), scheduler)

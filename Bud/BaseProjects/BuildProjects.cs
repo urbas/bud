@@ -11,7 +11,6 @@ using Bud.V1;
 using static System.IO.Path;
 using static Bud.IO.PathUtils;
 using static Bud.V1.Api;
-using Observable = System.Reactive.Linq.Observable;
 
 namespace Bud.BaseProjects {
   internal static class BuildProjects {
@@ -20,11 +19,6 @@ namespace Bud.BaseProjects {
             .InitEmpty(Input)
             .InitEmpty(Build)
             .Init(Output, c => Build[c]);
-
-    internal static readonly Conf DependenciesSupport
-      = Conf.Empty
-            .InitEmpty(Dependencies)
-            .Init(DependenciesInput, GatherOutputsFromDependencies);
 
     internal static readonly Conf BuildSchedulingSupport
       = BuildPipelineScheduler
@@ -46,10 +40,10 @@ namespace Bud.BaseProjects {
     internal static readonly Conf BuildProjectSettings = Conf
       .Empty
       .Add(BuildSupport)
-      .Add(DependenciesSupport)
       .Add(SourceProcessorsSupport)
       .Add(Input, c => ProcessedSources[c])
-      .ExcludeSourceDir(c => TargetDir[c]);
+      .ExcludeSourceDir(c => TargetDir[c])
+      .Init(DependenciesInput, GatherOutputsFromDependencies);
 
     internal static Conf CreateBuildProject(string projectDir, string projectId)
       => BareProject(projectDir, projectId)
@@ -101,8 +95,8 @@ namespace Bud.BaseProjects {
 
     internal static IObservable<IImmutableList<string>> DefaultSources(IConf c)
       => Observable.Select(Observable.ObserveOn(SourceIncludes[c]
-                                       .ToObservable(SourceFilter(c)), BuildPipelineScheduler[c])
-                          .Calmed(c), ImmutableList.ToImmutableList);
+                                                  .ToObservable(SourceFilter(c)), BuildPipelineScheduler[c])
+                                     .Calmed(c), ImmutableList.ToImmutableList);
 
     internal static Func<string, bool> SourceFilter(IConf c) {
       var excludeFilters = SourceExcludeFilters[c];

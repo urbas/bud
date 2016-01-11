@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -51,6 +52,12 @@ namespace Bud.IO {
 
     public string CreateFile(Stream content, params string[] targetPath)
       => CreateFile(new StreamReader(content).ReadToEnd(), targetPath);
+
+    public string CreateDir(params string[] subDirPath) {
+      var newDir = Combine(new [] { Path }.Concat(subDirPath).ToArray());
+      CreateDirectory(newDir);
+      return newDir;
+    }
 
     private static string CreateDirectoryInTempDir() {
       string baseDir = GetTempPath();

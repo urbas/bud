@@ -179,7 +179,11 @@ namespace Bud.V1 {
     ///   projects like <see cref="CsLibrary(string)" /> are published
     ///   to a NuGet repository.
     /// </summary>
-    public static readonly Key<Unit> Publish = nameof(Publish);
+    public static readonly Key<IObservable<Unit>> Publish = nameof(Publish);
+
+    public static Key<IPublisher> Publisher = nameof(Publisher);
+
+    public static Key<IObservable<IEnumerable<PackageFile>>> PackageFiles = nameof(PackageFiles);
 
     #endregion
 

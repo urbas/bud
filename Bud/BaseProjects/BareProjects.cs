@@ -1,21 +1,25 @@
-using System.IO;
 using System.Reactive;
 using Bud.V1;
 using static System.IO.Directory;
+using static System.IO.Path;
 using static Bud.BaseProjects.BuildProjects;
 using static Bud.V1.Api;
 
 namespace Bud.BaseProjects {
   internal static class BareProjects {
+    internal static readonly Conf DependenciesSupport
+      = Conf.Empty.InitEmpty(Dependencies);
+
     internal static Conf CreateBareProject(string projectDir,
                                            string projectId,
                                            string version = DefaultVersion)
       => Project(projectId)
+        .Add(DependenciesSupport)
         .Add(BuildSchedulingSupport)
         .InitValue(ProjectId, projectId)
         .InitValue(ProjectDir, projectDir)
         .InitValue(Version, version)
-        .Init(TargetDir, c => Path.Combine(ProjectDir[c], TargetDirName))
+        .Init(TargetDir, c => Combine(ProjectDir[c], TargetDirName))
         .Init(Clean, DefaultClean);
 
     internal static Unit DefaultClean(IConf c) {

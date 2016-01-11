@@ -118,6 +118,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseProjects\BareProjectsTest.cs" />
     <Compile Include="BaseProjects\BuildProjectsTest.cs" />
     <Compile Include="BudBuild.cs" />
     <Compile Include="Collections\EnumerableUtilsTest.cs" />
