@@ -119,7 +119,10 @@
     <Compile Include="IO\IValueStore.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReference.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReferencesAggregator.cs" />
+    <Compile Include="NuGet\IPackager.cs" />
     <Compile Include="NuGet\IPublisher.cs" />
+    <Compile Include="NuGet\NuGetExecutable.cs" />
+    <Compile Include="NuGet\NuGetPackager.cs" />
     <Compile Include="NuGet\NuGetPublishing.cs" />
     <Compile Include="NuGet\PackageDependency.cs" />
     <Compile Include="NuGet\PackageFile.cs" />

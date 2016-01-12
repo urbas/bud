@@ -174,14 +174,36 @@ namespace Bud.V1 {
 
     #region Publishing Support
 
+    public const string PackageOutputDirName = "package";
+
     /// <summary>
     ///   Publishes a project to a distribution endpoint. For example,
     ///   projects like <see cref="CsLibrary(string)" /> are published
     ///   to a NuGet repository.
     /// </summary>
-    public static readonly Key<IObservable<Unit>> Publish = nameof(Publish);
+    /// <remarks>
+    ///   <para>
+    ///     Returns a stream of booleans which indicate whether the publication
+    ///     was successful.
+    ///   </para>
+    /// </remarks>
+    public static readonly Key<IObservable<bool>> Publish = nameof(Publish);
 
     public static Key<IPublisher> Publisher = nameof(Publisher);
+
+    /// <summary>
+    ///   Creates a package and returns the path to the created package.
+    /// </summary>
+    /// <remarks>
+    ///   <para>
+    ///     Returns a stream of paths to the created package.
+    ///   </para>
+    /// </remarks>
+    public static readonly Key<IObservable<string>> Package = nameof(Package);
+
+    public static Key<IPackager> Packager = nameof(Packager);
+
+    public static Key<string> PackageOutputDir = nameof(PackageOutputDir);
 
     public static Key<IObservable<IEnumerable<PackageFile>>> PackageFiles = nameof(PackageFiles);
 

@@ -141,6 +141,7 @@
     <Compile Include="IO\FileWatchersTest.cs" />
     <Compile Include="IO\FileWatcherTest.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReferenceVersionAggregatorTest.cs" />
+    <Compile Include="NuGet\NuGetPackagerTest.cs" />
     <Compile Include="NuGet\NuGetPublishingTest.cs" />
     <Compile Include="NuGet\PackageConfigTestUtils.cs" />
     <Compile Include="NuGet\PackageReferencesProjectsTest.cs" />

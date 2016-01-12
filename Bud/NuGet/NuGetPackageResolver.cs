@@ -21,10 +21,10 @@ namespace Bud.NuGet {
               string cacheDir) {
       var packagesDir = Path.Combine(cacheDir, "packages");
       foreach (var packagesConfigFile in packagesConfigFiles) {
-        ExecuteNuGet($"restore {packagesConfigFile} -PackagesDirectory {packagesDir}");
+        NuGetExecutable.ExecuteNuGet($"restore {packagesConfigFile} -PackagesDirectory {packagesDir}");
       }
       var packagesV3Dir = Path.Combine(cacheDir, "packages-index");
-      ExecuteNuGet($"init {packagesDir} {packagesV3Dir}");
+      NuGetExecutable.ExecuteNuGet($"init {packagesDir} {packagesV3Dir}");
       var packageReferences = packagesConfigFiles.SelectMany(PackageReferencesFromFile);
       var packageRepository = new NuGetv3LocalRepository(packagesV3Dir, true);
       var frameworkAssemblies = new List<Tuple<string, Version>>();
@@ -99,16 +99,6 @@ namespace Bud.NuGet {
       => packageRepository
         .FindPackagesById(packageReference.PackageIdentity.Id)
         .FindBestMatch(new VersionRange(packageReference.PackageIdentity.Version), info => info?.Version);
-
-    private static void ExecuteNuGet(string arguments) {
-      var process = new Process();
-      process.StartInfo = new ProcessStartInfo("nuget", arguments) {
-        CreateNoWindow = true,
-        UseShellExecute = false
-      };
-      process.Start();
-      process.WaitForExit();
-    }
 
     private static IEnumerable<PackageReference>
       PackageReferencesFromFile(string file)

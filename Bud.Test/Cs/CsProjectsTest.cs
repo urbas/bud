@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -11,6 +10,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
+using static System.IO.Path;
 using static Bud.V1.Api;
 using static NUnit.Framework.Assert;
 using Contains = NUnit.Framework.Contains;
@@ -115,12 +115,12 @@ namespace Bud.Cs {
 
     [Test]
     public void Referenced_packages_project_must_reside_in_the_packages_folder()
-      => AreEqual(Path.Combine("Foo", "packages"),
+      => AreEqual(Combine("Foo", "packages"),
                   CsLibrary("Foo").Get("NuGetPackageReference"/ProjectDir));
 
     [Test]
     public void Packages_config_file_must_be_read_from_the_root()
-      => AreEqual(Path.Combine("Foo", "packages.config"),
+      => AreEqual(Combine("Foo", "packages.config"),
                   CsLibrary("Foo").Get("NuGetPackageReference"/PackagesConfigFile));
 
     [Test]
@@ -160,19 +160,21 @@ namespace Bud.Cs {
     }
 
     [Test]
-    public void Publishing_must_list_dependencies_in_the_package() {
-      var publisher = new Mock<IPublisher>(MockBehavior.Strict);
-      publisher.Setup(s => s.Publish("B",
-                                     DefaultVersion,
-                                     new[] {new PackageFile("B.dll", "lib/B.dll"), },
-                                     new[] {new PackageDependency("A", DefaultVersion)}));
+    public void Package_must_contain_the_dll_of_the_CsLibrary_project() {
+      var packager = new Mock<IPackager>(MockBehavior.Strict);
       var projects = Projects(CsLibrary("aDir", "A"),
                               CsLibrary("bDir", "B")
                                 .Clear(Output).Add(Output, "B.dll")
-                                .SetValue(Publisher, publisher.Object)
+                                .SetValue(Packager, packager.Object)
                                 .Add(Dependencies, "../A"));
-      projects.Get("B"/Publish).Take(1).Wait();
-      publisher.VerifyAll();
+      packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
+                                 "B",
+                                 DefaultVersion,
+                                 new[] {new PackageFile("B.dll", "lib/B.dll"),},
+                                 new[] {new PackageDependency("A", DefaultVersion)}))
+              .Returns("B.nupkg");
+      projects.Get("B"/Package).Take(1).Wait();
+      packager.VerifyAll();
     }
 
     private static Conf ProjectAOutputsFooDll(long initialTimestamp)

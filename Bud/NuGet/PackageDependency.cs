@@ -1,16 +1,16 @@
 namespace Bud.NuGet {
   public class PackageDependency {
     public string PackageId { get; }
-    public string Version1 { get; }
+    public string Version { get; }
 
     public PackageDependency(string packageId, string version) {
       PackageId = packageId;
-      Version1 = version;
+      Version = version;
     }
 
     public bool Equals(PackageDependency other)
       => string.Equals(PackageId, other.PackageId)
-      && string.Equals(Version1, other.Version1);
+      && string.Equals(Version, other.Version);
 
     public override bool Equals(object obj) {
       if (ReferenceEquals(null, obj)) {
@@ -24,8 +24,11 @@ namespace Bud.NuGet {
 
     public override int GetHashCode() {
       unchecked {
-        return (PackageId.GetHashCode()*397) ^ Version1.GetHashCode();
+        return (PackageId.GetHashCode()*397) ^ Version.GetHashCode();
       }
     }
+
+    public override string ToString()
+      => $"PackageId: {PackageId}, Version: {Version}";
   }
 }
