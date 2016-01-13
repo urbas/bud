@@ -23,11 +23,11 @@ namespace Bud.NuGet {
     }
 
     private static void CopyPackageFiles(IEnumerable<PackageFile> files, string filesDir) {
+      Delete(filesDir, true);
       foreach (var packageFile in files) {
         var destFileName = Combine(filesDir, packageFile.PathInPackage);
         CreateDirectory(GetDirectoryName(destFileName));
-        Copy(packageFile.FileToPackage,
-             destFileName);
+        Copy(packageFile.FileToPackage, destFileName, true);
       }
     }
 

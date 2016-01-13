@@ -38,7 +38,10 @@ namespace Bud.NuGet {
           {"developmentDependency", "true"}
         }.ToImmutableDictionary();
 
-        var package = Pack(tmpDir, txtFile, dllFile, optionalFields);
+        var package = Pack(tmpDir, optionalFields, new[] {
+          new PackageFile(txtFile, "content/A.txt"),
+          new PackageFile(dllFile, "lib/net40/Foo.Bar.dll"),
+        });
 
         using (var fileStream = OpenRead(package)) {
           var packageReader = new PackageReader(fileStream);
@@ -52,14 +55,34 @@ namespace Bud.NuGet {
       }
     }
 
-    private string Pack(TemporaryDirectory tmpDir, string txtFile, string dllFile, IImmutableDictionary<string, string> optionalFields)
+    [Test]
+    public void Package_does_not_contain_files_from_a_previous_packaging() {
+      using (var tmpDir = new TemporaryDirectory()) {
+        var txtFile = tmpDir.CreateEmptyFile("A.txt");
+        var dllFile = tmpDir.CreateEmptyFile("Foo.Bar.dll");
+        var optionalFields = ImmutableDictionary<string, string>.Empty;
+
+        Pack(tmpDir, optionalFields, new[] {
+          new PackageFile(txtFile, "content/A.txt"),
+          new PackageFile(dllFile, "lib/net40/Foo.Bar.dll"),
+        });
+        var package = Pack(tmpDir, optionalFields, new[] {
+          new PackageFile(txtFile, "content/A.txt"),
+        });
+
+        using (var fileStream = OpenRead(package)) {
+          var packageReader = new PackageReader(fileStream);
+          IsEmpty(packageReader.GetLibItems());
+        }
+        That(package, Does.Exist);
+      }
+    }
+
+    private string Pack(TemporaryDirectory tmpDir, IImmutableDictionary<string, string> optionalFields, PackageFile[] packageFiles)
       => packager.Pack(tmpDir.CreateDir("out"),
                        "Foo.Bar",
                        "1.2.3",
-                       new[] {
-                         new PackageFile(txtFile, "content/A.txt"),
-                         new PackageFile(dllFile, "lib/net40/Foo.Bar.dll"),
-                       },
+                       packageFiles,
                        new[] {
                          new PackageDependency("Moo.Zar", "3.2.1")
                        },
