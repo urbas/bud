@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Immutable;
 using System.Reactive.Linq;
 using Bud.V1;
 using Moq;
@@ -25,7 +27,8 @@ namespace Bud.NuGet {
                                        "Foo",
                                        DefaultVersion,
                                        new[] {new PackageFile(fileToPackage, "content/Foo.txt")},
-                                       new PackageDependency[] {}))
+                                       new PackageDependency[] {},
+                                       new NuGetPackageMetadata(Environment.UserName, "Foo", ImmutableDictionary<string, string>.Empty)))
               .Returns(package);
 
       AreEqual(package, project.Get(Package).Take(1).Wait());

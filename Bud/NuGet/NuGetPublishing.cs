@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Reactive.Linq;
 using Bud.V1;
 using static System.IO.Path;
@@ -10,10 +11,16 @@ namespace Bud.NuGet {
   internal static class NuGetPublishing {
     internal static Conf NuGetPublishingSupport
       = Conf.Empty
+            .Init(PackageMetadata, DefaultPackageMetadata)
             .Init(PackageOutputDir, DefaultPackageOutputDir)
             .Init(Publish, DefaultPublish)
             .Init(Package, DefaultPackage)
             .Init(PackageFiles, DefaultPackageFiles);
+
+    private static NuGetPackageMetadata DefaultPackageMetadata(IConf c)
+      => new NuGetPackageMetadata(Environment.UserName,
+                                  ProjectId[c],
+                                  ImmutableDictionary<string, string>.Empty);
 
     private static string DefaultPackageOutputDir(IConf c)
       => Combine(TargetDir[c], PackageOutputDirName);
@@ -24,7 +31,8 @@ namespace Bud.NuGet {
         ProjectId[c],
         Api.Version[c],
         packageFiles,
-        PackageDependencies(c)));
+        PackageDependencies(c),
+        PackageMetadata[c]));
 
     private static IObservable<IEnumerable<PackageFile>> DefaultPackageFiles(IConf c)
       => Output[c].Select(files => files.Select(ToContentFiles));

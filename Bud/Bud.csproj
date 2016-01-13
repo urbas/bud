@@ -126,6 +126,7 @@
     <Compile Include="NuGet\NuGetPublishing.cs" />
     <Compile Include="NuGet\PackageDependency.cs" />
     <Compile Include="NuGet\PackageFile.cs" />
+    <Compile Include="NuGet\NuGetPackageMetadata.cs" />
     <Compile Include="NuGet\PackageReferencesProjects.cs" />
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolver.cs" />
     <Compile Include="NuGet\IPackageResolver.cs" />

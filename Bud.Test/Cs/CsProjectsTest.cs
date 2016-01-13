@@ -171,7 +171,8 @@ namespace Bud.Cs {
                                  "B",
                                  DefaultVersion,
                                  new[] {new PackageFile("B.dll", "lib/B.dll"),},
-                                 new[] {new PackageDependency("A", DefaultVersion)}))
+                                 new[] {new PackageDependency("A", DefaultVersion)},
+                                 It.IsAny<NuGetPackageMetadata>()))
               .Returns("B.nupkg");
       projects.Get("B"/Package).Take(1).Wait();
       packager.VerifyAll();

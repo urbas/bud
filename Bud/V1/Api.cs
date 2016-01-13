@@ -207,6 +207,8 @@ namespace Bud.V1 {
 
     public static Key<IObservable<IEnumerable<PackageFile>>> PackageFiles = nameof(PackageFiles);
 
+    public static Key<NuGetPackageMetadata> PackageMetadata = nameof(PackageMetadata);
+
     #endregion
 
     #region Bare Project
