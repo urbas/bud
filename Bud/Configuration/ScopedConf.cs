@@ -14,10 +14,10 @@ namespace Bud.Configuration {
       CachingConf = new CachingConf();
     }
 
-    public Optional<T> TryGet<T>(Key<T> key)
+    public Option<T> TryGet<T>(Key<T> key)
       => CachingConf.TryGet(key, RawTryGet);
 
-    private Optional<T> RawTryGet<T>(Key<T> key)
+    private Option<T> RawTryGet<T>(Key<T> key)
       => Conf.TryGet<T>(Keys.InterpretFromScope(key.Id, Scope));
 
     public static IConf MakeScoped(ImmutableList<string> scope, IConf conf)

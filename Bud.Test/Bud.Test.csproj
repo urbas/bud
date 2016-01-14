@@ -142,7 +142,9 @@
     <Compile Include="IO\FileWatcherTest.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReferenceVersionAggregatorTest.cs" />
     <Compile Include="NuGet\NuGetPackagerTest.cs" />
+    <Compile Include="NuGet\NuGetPublisherTest.cs" />
     <Compile Include="NuGet\NuGetPublishingTest.cs" />
+    <Compile Include="NuGet\NuGetPushCliArgsBuilderTest.cs" />
     <Compile Include="NuGet\PackageConfigTestUtils.cs" />
     <Compile Include="NuGet\PackageReferencesProjectsTest.cs" />
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolverTest.cs" />
@@ -160,6 +162,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <EmbeddedResource Include="packages.config" />
+    <EmbeddedResource Include="NuGet\Foo.Bar.1.2.3.nupkg" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bud\Bud.csproj">

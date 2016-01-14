@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -33,13 +32,7 @@ namespace Bud.IO {
       => CreateFile(string.Empty, targetPath);
 
     public string CreateFile(string content, params string[] targetPath) {
-      string file;
-      if (targetPath.Length == 0) {
-        file = Combine(Path, Guid.NewGuid().ToString());
-      } else {
-        file = Combine(new[] {Path}.Concat(targetPath).ToArray());
-      }
-      CreateDirectory(GetDirectoryName(file));
+      var file = CreateFilePathAndDir(targetPath);
       File.WriteAllText(file, content);
       return file;
     }
@@ -50,11 +43,27 @@ namespace Bud.IO {
       }
     }
 
-    public string CreateFile(Stream content, params string[] targetPath)
-      => CreateFile(new StreamReader(content).ReadToEnd(), targetPath);
+    public string CreateFilePath(params string[] targetPath)
+      => targetPath.Length == 0 ?
+           Combine(Path, Guid.NewGuid().ToString()) :
+           Combine(new[] {Path}.Concat(targetPath).ToArray());
+
+    private string CreateFilePathAndDir(string[] targetPath) {
+      var file = CreateFilePath(targetPath);
+      CreateDirectory(GetDirectoryName(file));
+      return file;
+    }
+
+    public string CreateFile(Stream content, params string[] targetPath) {
+      var file = CreateFilePathAndDir(targetPath);
+      using (var fileStream = File.Open(file, FileMode.Create, FileAccess.Write)) {
+        content.CopyTo(fileStream);
+      }
+      return file;
+    }
 
     public string CreateDir(params string[] subDirPath) {
-      var newDir = Combine(new [] { Path }.Concat(subDirPath).ToArray());
+      var newDir = Combine(new[] {Path}.Concat(subDirPath).ToArray());
       CreateDirectory(newDir);
       return newDir;
     }

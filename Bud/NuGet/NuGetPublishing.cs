@@ -5,6 +5,7 @@ using System.Reactive.Linq;
 using Bud.V1;
 using static System.IO.Path;
 using static System.Linq.Enumerable;
+using static Bud.Util.Option;
 using static Bud.V1.Api;
 
 namespace Bud.NuGet {
@@ -37,8 +38,12 @@ namespace Bud.NuGet {
     private static IObservable<IEnumerable<PackageFile>> DefaultPackageFiles(IConf c)
       => Output[c].Select(files => files.Select(ToContentFiles));
 
-    private static IObservable<bool> DefaultPublish(IConf c)
-      => Package[c].Select(package => Publisher[c].Publish(package));
+    private static IObservable<bool> DefaultPublish(IConf c) {
+      return Package[c]
+        .Select(package => Publisher[c].Publish(package,
+                                                PublishUrl[c],
+                                                PublishApiKey[c]));
+    }
 
     private static PackageFile ToContentFiles(string file)
       => new PackageFile(file, $"content/{GetFileName(file)}");

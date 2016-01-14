@@ -12,7 +12,7 @@ using NuGet.Repositories;
 using NuGet.Versioning;
 using static Bud.NuGet.FrameworkAssemblyReferencesAggregator;
 using static Bud.NuGet.WindowsFrameworkAssemblyResolver;
-using static Bud.Util.Optional;
+using static Bud.Util.Option;
 
 namespace Bud.NuGet {
   public class NuGetPackageResolver : IPackageResolver {
@@ -53,7 +53,7 @@ namespace Bud.NuGet {
       return assemblies;
     }
 
-    private static Optional<Tuple<string, Version>>
+    private static Option<Tuple<string, Version>>
       ToFrameworkAssemblyReference(PackageReaderBase nupkg,
                                    NuGetFramework targetFramework) {
       var frameworkSpecificGroup = nupkg.GetReferenceItems().GetNearest(targetFramework);
@@ -106,7 +106,7 @@ namespace Bud.NuGet {
            new PackagesConfigReader(File.OpenRead(file)).GetPackages() :
            Enumerable.Empty<PackageReference>();
 
-    private static Optional<string> FindFrameworkAssembly(KeyValuePair<string, Version> reference)
+    private static Option<string> FindFrameworkAssembly(KeyValuePair<string, Version> reference)
       => ResolveFrameworkAssembly(reference.Key, reference.Value);
   }
 }

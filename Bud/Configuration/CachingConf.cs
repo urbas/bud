@@ -2,16 +2,16 @@ using System;
 using System.Collections.Immutable;
 using Bud.Util;
 using Bud.V1;
-using static Bud.Util.Optional;
+using static Bud.Util.Option;
 
 namespace Bud.Configuration {
   public class CachingConf {
     private ImmutableDictionary<string, object> configValueCache = ImmutableDictionary<string, object>.Empty;
     private readonly object configValueCacheGuard = new object();
 
-    public Optional<T> TryGet<T>(Key<T> key, Func<Key<T>, Optional<T>> fallbackConf) {
+    public Option<T> TryGet<T>(Key<T> key, Func<Key<T>, Option<T>> fallbackConf) {
       lock (configValueCacheGuard) {
-        Optional<T> cachedValue;
+        Option<T> cachedValue;
         if (TryGetFromCache(key, out cachedValue)) {
           return cachedValue;
         }
@@ -21,10 +21,10 @@ namespace Bud.Configuration {
       }
     }
 
-    private bool TryGetFromCache<T>(Key<T> key, out Optional<T> outValue) {
+    private bool TryGetFromCache<T>(Key<T> key, out Option<T> outValue) {
       object configValue;
       if (configValueCache.TryGetValue(key, out configValue)) {
-        outValue = (Optional<T>) configValue;
+        outValue = (Option<T>) configValue;
         return true;
       }
       outValue = None<T>();

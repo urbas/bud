@@ -6,7 +6,7 @@ using Bud.Util;
 using Microsoft.Win32;
 using static System.IO.File;
 using static System.IO.Path;
-using static Bud.Util.Optional;
+using static Bud.Util.Option;
 
 namespace Bud.NuGet {
   public class WindowsFrameworkAssemblyResolver {
@@ -21,7 +21,7 @@ namespace Bud.NuGet {
     public static readonly string Net4PlusFrameworkPath
       = Combine(Net3PlusFrameworkPath, ".NETFramework");
 
-    public static Optional<string> ResolveFrameworkAssembly(string assemblyName, Version version) {
+    public static Option<string> ResolveFrameworkAssembly(string assemblyName, Version version) {
       var assembly = None<string>();
       if (version.Major == 0) {
         version = new Version(int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue);
@@ -43,7 +43,7 @@ namespace Bud.NuGet {
                AssemblyFoldersEx.FindAssembly(assemblyName, version);
     }
 
-    private static Optional<string> FindNet4PlusAssembly(string assemblyName, Version version) {
+    private static Option<string> FindNet4PlusAssembly(string assemblyName, Version version) {
       var rootReferenceAssemblyPath = ToNet4RawAssemblyPath(assemblyName,
                                                             version);
       if (Exists(rootReferenceAssemblyPath)) {
@@ -74,7 +74,7 @@ namespace Bud.NuGet {
            $"v{version.Major}.{version.Minor}" :
            $"v{version.Major}.{version.Minor}.{version.Build}";
 
-    private static Optional<string> FindNet3Assembly(int minorVersion,
+    private static Option<string> FindNet3Assembly(int minorVersion,
                                                      string assemblyName) {
       var assembly = Combine(Net3PlusFrameworkPath,
                              ToNet3Dir(minorVersion),
@@ -91,7 +91,7 @@ namespace Bud.NuGet {
     private static string ToNet3Dir(int minorVersion)
       => $"v3.{minorVersion}";
 
-    private static Optional<string> FindNet2Assembly(string assemblyName) {
+    private static Option<string> FindNet2Assembly(string assemblyName) {
       var assembly = Combine(OldFrameworkPath,
                              "v2.0.50727",
                              $"{assemblyName}.dll");
@@ -102,7 +102,7 @@ namespace Bud.NuGet {
       private static readonly ImmutableSortedDictionary<Version, IImmutableSet<string>>
         VersionToFoldersMap = GetAssemblyFoldersEx();
 
-      public static Optional<string> FindAssembly(string assemblyName,
+      public static Option<string> FindAssembly(string assemblyName,
                                                   Version version) {
         foreach (var versionFolders in VersionToFoldersMap) {
           if (versionFolders.Key >= version) {

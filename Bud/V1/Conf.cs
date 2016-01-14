@@ -82,7 +82,7 @@ namespace Bud.V1 {
     ///   The key for which to get the value. If the path of the key is relative,
     ///   it will be interpreted with the <see cref="Scope" /> as the base path.
     /// </param>
-    public Optional<T> TryGet<T>(Key<T> key)
+    public Option<T> TryGet<T>(Key<T> key)
       => ToCompiled().TryGet<T>(Keys.InterpretFromScope(key, Scope));
 
     public void ApplyIn(ScopedDictionaryBuilder<IConfDefinition> configDefinitions) {

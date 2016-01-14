@@ -4,11 +4,11 @@ using System.Linq;
 using System.Reactive.Linq;
 
 namespace Bud.Util {
-  public struct Optional<T> {
+  public struct Option<T> {
     public T Value { get; }
     public bool HasValue { get; }
 
-    public Optional(T value) {
+    public Option(T value) {
       Value = value;
       HasValue = true;
     }
@@ -19,14 +19,14 @@ namespace Bud.Util {
     public T GetOrElse(Func<T> defaultValue)
       => HasValue ? Value : defaultValue();
 
-    public bool Equals(Optional<T> other)
+    public bool Equals(Option<T> other)
       => HasValue == other.HasValue
          && EqualityComparer<T>.Default.Equals(Value, other.Value);
 
     public override bool Equals(object obj)
       => !ReferenceEquals(null, obj)
-      && obj is Optional<T> 
-      && Equals((Optional<T>) obj);
+      && obj is Option<T> 
+      && Equals((Option<T>) obj);
 
     public override int GetHashCode() {
       unchecked {
@@ -36,32 +36,32 @@ namespace Bud.Util {
 
     public override string ToString() => HasValue ? $"Some({Value})" : "None";
 
-    public static implicit operator Optional<T>(T value)
-      => new Optional<T>(value);
+    public static implicit operator Option<T>(T value)
+      => new Option<T>(value);
   }
 
-  public static class Optional {
-    public static Optional<T> None<T>() => NoneOptional<T>.Instance;
-    public static Optional<T> Some<T>(T value) => new Optional<T>(value);
+  public static class Option {
+    public static Option<T> None<T>() => NoneOptional<T>.Instance;
+    public static Option<T> Some<T>(T value) => new Option<T>(value);
 
     private static class NoneOptional<T> {
-      public static readonly Optional<T> Instance = new Optional<T>();
+      public static readonly Option<T> Instance = new Option<T>();
     }
 
-    public static IEnumerable<T> Gather<T>(this IEnumerable<Optional<T>> enumerable)
+    public static IEnumerable<T> Gather<T>(this IEnumerable<Option<T>> enumerable)
       => enumerable.Where(optional => optional.HasValue)
                    .Select(optional => optional.Value);
 
     public static IEnumerable<TResult> Gather<TSource, TResult>(this IEnumerable<TSource> enumerable,
-                                                                Func<TSource, Optional<TResult>> selector)
+                                                                Func<TSource, Option<TResult>> selector)
       => enumerable.Select(selector).Gather();
 
-    public static IObservable<T> Gather<T>(this IObservable<Optional<T>> enumerable)
+    public static IObservable<T> Gather<T>(this IObservable<Option<T>> enumerable)
       => enumerable.Where(optional => optional.HasValue)
                    .Select(optional => optional.Value);
 
     public static IObservable<TResult> Gather<TSource, TResult>(this IObservable<TSource> enumerable,
-                                                                Func<TSource, Optional<TResult>> selector)
+                                                                Func<TSource, Option<TResult>> selector)
       => enumerable.Select(selector).Gather();
   }
 }

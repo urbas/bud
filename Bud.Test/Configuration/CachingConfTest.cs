@@ -3,19 +3,19 @@ using Bud.V1;
 using Moq;
 using NUnit.Framework;
 using Bud.Util;
-using static Bud.Util.Optional;
+using static Bud.Util.Option;
 
 namespace Bud.Configuration {
   public class CachingConfTest {
-    private Mock<Func<Key<int>, Optional<int>>> intFunc;
-    private Mock<Func<Key<object>, Optional<object>>> objectFunc;
+    private Mock<Func<Key<int>, Option<int>>> intFunc;
+    private Mock<Func<Key<object>, Option<object>>> objectFunc;
     private CachingConf cachingConf;
 
     [SetUp]
     public void SetUp() {
-      intFunc = new Mock<Func<Key<int>, Optional<int>>>();
+      intFunc = new Mock<Func<Key<int>, Option<int>>>();
       intFunc.Setup(self => self("foo")).Returns(42);
-      objectFunc = new Mock<Func<Key<object>, Optional<object>>>();
+      objectFunc = new Mock<Func<Key<object>, Option<object>>>();
       objectFunc.Setup(self => self("bar")).Returns<Key<object>>(k => new object());
       objectFunc.Setup(self => self("undefined")).Returns(None<object>());
       objectFunc.Setup(self => self("defined")).Returns(Some<object>("42"));

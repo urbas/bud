@@ -2,7 +2,7 @@ using System;
 using System.Reactive.Linq;
 using Moq;
 using NUnit.Framework;
-using static Bud.Util.Optional;
+using static Bud.Util.Option;
 using static NUnit.Framework.Assert;
 
 namespace Bud.Util {

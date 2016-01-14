@@ -7,6 +7,7 @@ using Bud.Configuration;
 using Bud.Cs;
 using Bud.IO;
 using Bud.NuGet;
+using Bud.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static Bud.BaseProjects.BareProjects;
@@ -190,6 +191,17 @@ namespace Bud.V1 {
     public static readonly Key<IObservable<bool>> Publish = nameof(Publish);
 
     public static Key<IPublisher> Publisher = nameof(Publisher);
+
+    /// <summary>
+    ///   The repository URL to which to publish the package. The default
+    ///   is NuGet's main repository.
+    /// </summary>
+    public static Key<Option<string>> PublishUrl = nameof(PublishUrl);
+
+    /// <summary>
+    ///   The API key to use when publishing with NuGet.
+    /// </summary>
+    public static Key<Option<string>> PublishApiKey = nameof(PublishApiKey);
 
     /// <summary>
     ///   Creates a package and returns the path to the created package.

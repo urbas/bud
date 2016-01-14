@@ -4,7 +4,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using static Bud.Util.Optional;
+using static Bud.Util.Option;
 
 namespace Bud.Reactive {
   public static class WaitingObservables {

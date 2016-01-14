@@ -2,7 +2,11 @@ using System;
 using System.Diagnostics;
 
 namespace Bud.NuGet {
-  public static class NuGetExecutable {
+  public class NuGetExecutable {
+    public static readonly NuGetExecutable Instance = new NuGetExecutable();
+
+    public virtual bool Run(string args) => ExecuteNuGet(args) == 0;
+
     public static int ExecuteNuGet(string arguments) {
       var process = new Process();
       process.StartInfo = new ProcessStartInfo("nuget", arguments) {

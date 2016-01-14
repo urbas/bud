@@ -34,5 +34,26 @@ namespace Bud.NuGet {
       AreEqual(package, project.Get(Package).Take(1).Wait());
       packager.VerifyAll();
     }
+
+    [Test]
+    public void Invokes_the_publisher_with_the_right_parameters() {
+      var packager = new Mock<IPublisher>(MockBehavior.Strict);
+      const string package = "Foo.nupkg";
+
+      var project = BareProject("fooDir", "Foo")
+        .Add(NuGetPublishingSupport)
+        .SetValue(Publisher, packager.Object)
+        .SetValue(Package, Observable.Return(package))
+        .SetValue(PublishUrl, "publish url")
+        .SetValue(PublishApiKey, "publish api key");
+
+      packager.Setup(self => self.Publish(package,
+                                       "publish url",
+                                       "publish api key"))
+              .Returns(true);
+
+      AreEqual(new [] {true}, project.Get(Publish).ToEnumerable());
+      packager.VerifyAll();
+    }
   }
 }

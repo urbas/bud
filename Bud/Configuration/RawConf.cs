@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using Bud.Util;
 using Bud.V1;
-using static Bud.Util.Optional;
+using static Bud.Util.Option;
 
 namespace Bud.Configuration {
   public class RawConf : IConf {
@@ -15,10 +15,10 @@ namespace Bud.Configuration {
       CachingConf = new CachingConf();
     }
 
-    public Optional<T> TryGet<T>(Key<T> key)
+    public Option<T> TryGet<T>(Key<T> key)
       => CachingConf.TryGet(key.Relativize(), RawTryGet);
 
-    private Optional<T> RawTryGet<T>(Key<T> key) {
+    private Option<T> RawTryGet<T>(Key<T> key) {
       IConfDefinition confDefinition;
       if (ConfDefinitions.TryGetValue(key, out confDefinition)) {
         object value;
