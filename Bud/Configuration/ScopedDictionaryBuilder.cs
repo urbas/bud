@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using Bud.Util;
+using static Bud.Util.Option;
 using static Bud.V1.Keys;
 
 namespace Bud.Configuration {
@@ -15,8 +17,13 @@ namespace Bud.Configuration {
       Scope = scope;
     }
 
-    public bool TryGetValue(string key, out T confDefinition)
-      => dictionary.TryGetValue(ToFullPath(key, Scope), out confDefinition);
+    public Option<T> Get(string key) {
+      T value;
+      if (dictionary.TryGetValue(ToFullPath(key, Scope), out value)) {
+        return Some(value);
+      }
+      return None<T>();
+    }
 
     public ScopedDictionaryBuilder<T> Set(string key, T confDefinition) {
       var fullPath = ToFullPath(key, Scope);
@@ -31,13 +38,5 @@ namespace Bud.Configuration {
 
     public ScopedDictionaryBuilder<T> In(IEnumerable<string> scope)
       => new ScopedDictionaryBuilder<T>(dictionary, Scope.AddRange(scope));
-
-    public ScopedDictionaryBuilder<T> Out()
-      => new ScopedDictionaryBuilder<T>(dictionary, Scope.RemoveAt(Scope.Count - 1));
-
-    public T Get(string key) => dictionary[ToFullPath(key, Scope)];
-
-    public ScopedDictionaryBuilder<T> GoToRoot()
-      => new ScopedDictionaryBuilder<T>(dictionary, ImmutableList<string>.Empty);
   }
 }

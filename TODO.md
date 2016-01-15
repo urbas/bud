@@ -12,6 +12,8 @@
 
 - I want to install Bud from Chocolatey.
 
+- I want to clean my projects without cleaning the resolved packages.
+
 - I want to test my projects.
 
 - I want to generate MSBuild solution and project files for my projects.
