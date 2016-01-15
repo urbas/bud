@@ -252,6 +252,13 @@ namespace Bud.V1 {
     public void TryGet_returns_an_optional_containing_the_value_of_the_key()
       => AreEqual(42, Empty.SetValue(A, 42).TryGet(A).Value);
 
+    [Test]
+    public void Init_does_not_modify_a_defined_key_with_relative_path()
+      => AreEqual(42,
+                  Empty.SetValue(A, 42)
+                       .In("a").InitValue(".."/A, 9001)
+                       .TryGet(Keys.Root/A).Value);
+
     private static async Task<int> AddFooTwiceConcurrently(IConf conf) {
       var first = Task.Run(() => A[conf]);
       var second = Task.Run(() => A[conf]);

@@ -18,62 +18,62 @@ namespace Bud.Configuration {
     [Test]
     public void TryGetting_a_missing_key_must_return_false_and_output_null_value()
       => AreEqual(None<string>(),
-                  builder.Get("A"));
+                  builder.TryGet("A"));
 
     [Test]
     public void TryGetting_a_present_key_must_return_true_and_output_the_value()
       => AreEqual(Some("foo"),
-                  builder.Set("A", "foo").Get("A"));
+                  builder.Set("A", "foo").TryGet("A"));
 
     [Test]
     public void Contains_must_return_false_for_undefined_keys()
-      => IsFalse(builder.Contains("A"));
+      => IsFalse(builder.TryGet("A").HasValue);
 
     [Test]
     public void Contains_must_return_true_for_defined_keys()
-      => IsTrue(builder.Set("A", "foo").Contains("A"));
+      => IsTrue(builder.Set("A", "foo").TryGet("A").HasValue);
 
     [Test]
     public void Absolute_keys_can_be_referenced_by_relative_paths()
       => AreEqual("foo",
-                  builder.Set("/A", "foo").Get("A").Value);
+                  builder.Set("/A", "foo").TryGet("A").Value);
 
     [Test]
     public void Reseting_absolute_keys_with_relative_paths()
       => AreEqual("bar",
-                  builder.Set("/A", "foo").Set("A", "bar").Get("A").Value);
+                  builder.Set("/A", "foo").Set("A", "bar").TryGet("A").Value);
 
     [Test]
     public void Relative_keys_can_be_set_in_nested_scopes() {
       builder.In("B").Set("A", "foo");
       AreEqual("foo",
-               builder.Get("B/A").Value);
+               builder.TryGet("B/A").Value);
     }
 
     [Test]
     public void Absolute_keys_can_be_set_in_nested_scopes() {
       builder.In("B").Set("/A", "foo");
       AreEqual("foo",
-               builder.Get("/A").Value);
+               builder.TryGet("/A").Value);
     }
 
     [Test]
     public void Adding_backtracking_keys_in_nested_scopes_puts_them_into_root() {
       builder.In("B").Set("../A", "foo");
       AreEqual("foo",
-               builder.Get("/A").Value);
+               builder.TryGet("/A").Value);
     }
 
     [Test]
     public void Getting_keys_via_a_relative_path()
       => AreEqual("foo",
-                  builder.In("a").In("b").Set("A", "foo").Get("A").Value);
+                  builder.In("a").In("b").Set("A", "foo").TryGet("A").Value);
 
     [Test]
     public void Adding_backtracking_keys_in_double_nested_scopes_puts_them_in_a_scope_above() {
       builder.In("B").In("C").Set("../A", "foo");
       AreEqual("foo",
-               builder.Get("B/A").Value);
+               builder.TryGet("B/A").Value);
     }
 
     [Test]

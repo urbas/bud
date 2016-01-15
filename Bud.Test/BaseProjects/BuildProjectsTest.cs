@@ -6,6 +6,7 @@ using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
 using Bud.IO;
+using Bud.NuGet;
 using Bud.V1;
 using Microsoft.Reactive.Testing;
 using Moq;
@@ -54,7 +55,6 @@ namespace Bud.BaseProjects {
       AreEqual(new[] {"bar"}, bInput.Current);
       IsFalse(bInput.MoveNext());
     }
-
 
     [Test]
     public void Sources_should_be_initially_empty()

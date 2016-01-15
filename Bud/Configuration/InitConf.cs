@@ -10,7 +10,7 @@ namespace Bud.Configuration {
     }
 
     public override void ApplyIn(ScopedDictionaryBuilder<IConfDefinition> configDefinitions) {
-      if (!configDefinitions.Contains(Key)) {
+      if (!configDefinitions.TryGet(Key).HasValue) {
         SetConf.DefineConfIn(configDefinitions, ValueFactory, Key);
       }
     }

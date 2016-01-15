@@ -17,7 +17,7 @@ namespace Bud.Configuration {
       Scope = scope;
     }
 
-    public Option<T> Get(string key) {
+    public Option<T> TryGet(string key) {
       T value;
       if (dictionary.TryGetValue(ToFullPath(key, Scope), out value)) {
         return Some(value);
@@ -30,8 +30,6 @@ namespace Bud.Configuration {
       dictionary[fullPath] = confDefinition;
       return this;
     }
-
-    public bool Contains(string key) => dictionary.ContainsKey(key);
 
     public ScopedDictionaryBuilder<T> In(string scope)
       => new ScopedDictionaryBuilder<T>(dictionary, Scope.Add(scope));

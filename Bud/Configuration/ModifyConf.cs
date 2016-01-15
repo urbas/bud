@@ -11,7 +11,7 @@ namespace Bud.Configuration {
     }
 
     public override void ApplyIn(ScopedDictionaryBuilder<IConfDefinition> configDefinitions) {
-      var oldConfDefinition = configDefinitions.Get(Key);
+      var oldConfDefinition = configDefinitions.TryGet(Key);
       if (oldConfDefinition.HasValue) {
         var scopedValueFactory = WithScopedValueFactory(oldConfDefinition.Value,
                                                         configDefinitions.Scope);
