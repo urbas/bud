@@ -103,10 +103,10 @@ namespace Bud.V1 {
     [Test]
     public void List_returns_all_keys_named_the_same_on_any_level()
       => AreEqual(new[] { "a", "b/a", "c/b/a" },
-                  Keys.List("**/a", new[] {"a", "b", "b/a", "b/b", "c/b/a", "c/b/b"}).ToArray());
+                  Keys.List("**/a", new[] {"a", "b", "b/a", "b/b", "c/b/a", "c/b/b"}));
 
     [Test]
     public void List_does_not_treat_the_dot_as_a_regex_special_character()
-      => IsEmpty(Keys.List("a.b", new[] {"axb"}).ToArray());
+      => IsEmpty(Keys.List("a.b", new[] {"axb"}));
   }
 }

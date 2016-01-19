@@ -25,9 +25,9 @@ namespace Bud.Configuration {
       return None<T>();
     }
 
-    public ScopedDictionaryBuilder<T> Set(string key, T confDefinition) {
+    public ScopedDictionaryBuilder<T> Set(string key, T value) {
       var fullPath = ToFullPath(key, Scope);
-      dictionary[fullPath] = confDefinition;
+      dictionary[fullPath] = value;
       return this;
     }
 
