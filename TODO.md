@@ -12,7 +12,11 @@
 
 - I want to install Bud from Chocolatey.
 
-- I want to clean my projects without cleaning the resolved packages.
+- [Ongoing] I want to clean my projects without cleaning the resolved packages.
+
+  - [Ongoing] Add support to call `bud */Clean`.
+
+- Alias `bud Command` to `bud **/Command`. Do not alias absolute paths like `bud /Command` or wildcarded paths like `bud */Command` and `bud a/**/b`.
 
 - I want to test my projects.
 
