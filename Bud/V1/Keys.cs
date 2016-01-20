@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Bud.Util;
 
 namespace Bud.V1 {
@@ -19,10 +18,7 @@ namespace Bud.V1 {
     }
 
     public static Key<T> Relativize<T>(this Key<T> configKey)
-      => Relativize(configKey.Id);
-
-    public static string Relativize(string keyPath)
-      => IsAbsolute(keyPath) ? keyPath.Substring(1) : keyPath;
+      => configKey.IsAbsolute ? configKey.Id.Substring(1) : configKey.Id;
 
     public static string PrefixWith(string parentKey, string childKey)
       => string.IsNullOrEmpty(childKey) ?
@@ -86,14 +82,6 @@ namespace Bud.V1 {
       var backtrackedScope = scope.Take(scope.Count - backtracks);
       var keyWithBacktracksRemoved = key.Substring(backtracks * BacktrackPath.Length);
       return ConvertScopeToString(backtrackedScope) + Separator + keyWithBacktracksRemoved;
-    }
-
-    public static IEnumerable<string> List(string keyPath, IEnumerable<string> keys) {
-      var keyPathRegex = Regex.Escape(Relativize(keyPath))
-        .Replace(@"\*\*/", ".{0,}")
-        .Replace(@"\*", "[^/]+?");
-      var matcher = new Regex($"^{keyPathRegex}$");
-      return keys.Where(key => matcher.IsMatch(key));
     }
   }
 }
