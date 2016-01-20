@@ -23,7 +23,7 @@ namespace Bud.NuGet {
         .Add(NuGetPublishingSupport)
         .SetValue(Packager, packager.Object);
 
-      packager.Setup(self => self.Pack(Combine(TargetDir[project], PackageOutputDirName),
+      packager.Setup(self => self.Pack(Combine(BudDir[project], PackageOutputDirName),
                                        "Foo",
                                        DefaultVersion,
                                        new[] {new PackageFile(fileToPackage, "content/Foo.txt")},

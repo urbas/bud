@@ -94,7 +94,7 @@ namespace Bud.BaseProjects {
     public void Sources_should_not_include_files_in_the_target_folder() {
       using (var tempDir = new TemporaryDirectory()) {
         var project = BuildProject(tempDir.Path, "foo").AddSources(fileFilter: "*.cs");
-        tempDir.CreateEmptyFile(TargetDir[project], "A.cs");
+        tempDir.CreateEmptyFile(BudDir[project], "A.cs");
         var files = Sources[project].Take(1).Wait();
         IsEmpty(files);
       }
@@ -158,10 +158,10 @@ namespace Bud.BaseProjects {
     [Test]
     public void Clean_deletes_non_empty_target_folders() {
       using (var tmpDir = new TemporaryDirectory()) {
-        tmpDir.CreateEmptyFile("target", "foo.txt");
-        tmpDir.CreateEmptyFile("target", "dir", "bar.txt");
+        tmpDir.CreateEmptyFile(".bud", "foo.txt");
+        tmpDir.CreateEmptyFile(".bud", "dir", "bar.txt");
         BuildProject(Combine(tmpDir.Path), "A").Get(Clean);
-        IsFalse(Exists(Combine(tmpDir.Path, "target")));
+        IsFalse(Exists(Combine(tmpDir.Path, ".bud")));
       }
     }
 

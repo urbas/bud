@@ -225,7 +225,7 @@ namespace Bud.V1 {
 
     #region Bare Project
 
-    public const string TargetDirName = "target";
+    public const string BudDirName = ".bud";
 
     public const string DefaultVersion = "0.0.1";
 
@@ -245,10 +245,10 @@ namespace Bud.V1 {
     ///   This directory is by default deleted through the <see cref="Clean" />
     ///   command.
     /// </summary>
-    public static readonly Key<string> TargetDir = nameof(TargetDir);
+    public static readonly Key<string> BudDir = nameof(BudDir);
 
     /// <summary>
-    ///   By default, deletes the entire <see cref="TargetDir" />
+    ///   By default, deletes the entire <see cref="BudDir" />
     /// </summary>
     public static readonly Key<Unit> Clean = nameof(Clean);
 

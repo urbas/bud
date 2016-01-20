@@ -26,7 +26,7 @@ namespace Bud.NuGet {
 
     internal static IObservable<IImmutableSet<string>> ResolveAssemblies(IConf c)
       => Sources[c].Select(sources => {
-        var resolvedAssembliesFile = Combine(TargetDir[c], "resolved_assemblies");
+        var resolvedAssembliesFile = Combine(BudDir[c], "resolved_assemblies");
         if (File.Exists(resolvedAssembliesFile) &&
             IsNewerThan(resolvedAssembliesFile, sources)) {
           return ReadAllLines(resolvedAssembliesFile)
@@ -35,7 +35,7 @@ namespace Bud.NuGet {
         var resolvedAssemblies = AssemblyResolver[c]
           .Resolve(sources, ProjectDir[c])
           .ToImmutableHashSet();
-        CreateDirectory(TargetDir[c]);
+        CreateDirectory(BudDir[c]);
         WriteAllLines(resolvedAssembliesFile, resolvedAssemblies);
         return resolvedAssemblies;
       });

@@ -153,7 +153,7 @@ namespace Bud.Cs {
     [Test]
     public void CSharp_files_in_the_target_folder_must_not_be_listed() {
       using (var tempDir = new TemporaryDirectory()) {
-        var csFile = tempDir.CreateEmptyFile("target", "A.cs");
+        var csFile = tempDir.CreateEmptyFile(".bud", "A.cs");
         That(Sources[CsLibrary(tempDir.Path, "Foo")].Take(1).Wait(),
              Is.Not.Contains(csFile));
       }

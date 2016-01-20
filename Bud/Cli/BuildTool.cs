@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Bud.Cs;
 using Bud.V1;
 using Microsoft.CodeAnalysis;
@@ -30,9 +32,22 @@ namespace Bud.Cli {
                                         CompileOutput compileOutput) {
       var buildDefinition = LoadBuildConfiguration(compileOutput.AssemblyPath);
       foreach (var command in commands) {
-        buildDefinition.Get<IObservable<object>>(command)
-                       .ObserveOn(new EventLoopScheduler())
+        ExecuteCommand(buildDefinition, command);
+      }
+    }
+
+    private static void ExecuteCommand(IConf buildDefinition, string command) {
+      var optionalValue = buildDefinition.TryGet<object>(command);
+      if (!optionalValue.HasValue) {
+        return;
+      }
+      var observableValue = optionalValue.Value as IObservable<object>;
+      if (observableValue != null) {
+        observableValue.ObserveOn(new EventLoopScheduler())
                        .Wait();
+      } else {
+        var taskValue = optionalValue.Value as Task;
+        taskValue?.Wait();
       }
     }
 
@@ -47,7 +62,7 @@ namespace Bud.Cli {
       var assembly = Assembly.LoadFile(assemblyPath);
       var buildDefinitionType = assembly
         .GetExportedTypes()
-        .First(typeof (IBuild).IsAssignableFrom);
+        .First(typeof(IBuild).IsAssignableFrom);
       var buildDefinition = buildDefinitionType
         .GetConstructor(Type.EmptyTypes)
         .Invoke(new object[] {});
@@ -61,12 +76,13 @@ namespace Bud.Cli {
         .AddSourceFile(c => Combine(ProjectDir[c], "Build.cs"));
 
     private static IEnumerable<string> BudDependencies { get; } = ImmutableList.Create(
-      typeof (BuildTool).Assembly.Location,
-      typeof (object).Assembly.Location,
-      typeof (Enumerable).Assembly.Location,
-      typeof (ImmutableArray).Assembly.Location,
-      typeof (Observable).Assembly.Location,
-      typeof (ResourceDescription).Assembly.Location,
+      typeof(BuildTool).Assembly.Location,
+      typeof(object).Assembly.Location,
+      typeof(Enumerable).Assembly.Location,
+      typeof(ImmutableArray).Assembly.Location,
+      typeof(Observable).Assembly.Location,
+      typeof(ResourceDescription).Assembly.Location,
+      typeof(Unit).Assembly.Location,
       "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.Runtime.dll",
       "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.IO.dll");
   }

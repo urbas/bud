@@ -64,7 +64,7 @@ namespace Bud.NuGet {
         var project = TestProject(tmpDir.Path)
           .SetValue(AssemblyResolver, resolver.Object)
           .ToCompiled();
-        tmpDir.CreateFile("Moo.dll\nZoo.dll", ("A"/TargetDir)[project], "resolved_assemblies");
+        tmpDir.CreateFile("Moo.dll\nZoo.dll", ("A"/BudDir)[project], "resolved_assemblies");
 
         ("A"/ResolvedAssemblies)[project].Take(1).Wait();
 
@@ -86,6 +86,6 @@ namespace Bud.NuGet {
     }
 
     private static string[] ReadResolvedAssembliesCache(IConf project)
-      => ReadAllLines(Combine(("A"/TargetDir)[project], "resolved_assemblies"));
+      => ReadAllLines(Combine(("A"/BudDir)[project], "resolved_assemblies"));
   }
 }

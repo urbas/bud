@@ -16,7 +16,7 @@ namespace Bud.BaseProjects {
     [Test]
     public void Target_directory_is_within_the_project_directory() {
       var project = BuildProject("fooDir", "foo");
-      AreEqual(Combine(ProjectDir[project], "target"), TargetDir[project]);
+      AreEqual(Combine(ProjectDir[project], ".bud"), BudDir[project]);
     }
 
     [Test]

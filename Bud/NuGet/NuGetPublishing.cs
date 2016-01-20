@@ -24,7 +24,7 @@ namespace Bud.NuGet {
                                   ImmutableDictionary<string, string>.Empty);
 
     private static string DefaultPackageOutputDir(IConf c)
-      => Combine(TargetDir[c], PackageOutputDirName);
+      => Combine(BudDir[c], PackageOutputDirName);
 
     private static IObservable<string> DefaultPackage(IConf c)
       => PackageFiles[c].Select(packageFiles => Packager[c].Pack(

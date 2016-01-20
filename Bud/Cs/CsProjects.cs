@@ -81,7 +81,7 @@ namespace Bud.Cs {
       => new[] {
         "obj",
         "bin",
-        TargetDir[c],
+        BudDir[c],
         ("NuGetPackageReference"/ProjectDir)[c]
       };
   }
