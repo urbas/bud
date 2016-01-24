@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Reactive;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Bud.Cs;
+using Bud.Reactive;
+using Bud.Util;
 using Bud.V1;
 using Microsoft.CodeAnalysis;
 using static System.IO.Directory;
 using static System.IO.Path;
+using static Bud.Util.Option;
 using static Bud.V1.Api;
 
 namespace Bud.Cli {
@@ -25,31 +27,32 @@ namespace Bud.Cli {
       }
     }
 
-    private static CompileOutput CompileBuildConfiguration()
-      => CreateBuildConfiguration().TakeOne(Compile);
-
-    private static void ExecuteCommands(string[] commands,
-                                        CompileOutput compileOutput) {
+    public static void ExecuteCommands(IEnumerable<string> commands,
+                                       CompileOutput compileOutput) {
       var buildDefinition = LoadBuildConfiguration(compileOutput.AssemblyPath);
       foreach (var command in commands) {
         ExecuteCommand(buildDefinition, command);
       }
     }
 
-    private static void ExecuteCommand(IConf buildDefinition, string command) {
+    public static Option<object> ExecuteCommand(IConf buildDefinition, string command) {
       var optionalValue = buildDefinition.TryGet<object>(command);
       if (!optionalValue.HasValue) {
-        return;
+        return None<object>();
       }
-      var observableValue = optionalValue.Value as IObservable<object>;
-      if (observableValue != null) {
-        observableValue.ObserveOn(new EventLoopScheduler())
-                       .Wait();
-      } else {
-        var taskValue = optionalValue.Value as Task;
-        taskValue?.Wait();
+      var optionalResults = ObservableResults.TryCollect(optionalValue.Value);
+      if (optionalResults.HasValue) {
+        return optionalResults.Value as object;
       }
+      var task = optionalValue.Value as Task;
+      if (task != null) {
+        return TaskResults.Await(task);
+      }
+      return optionalValue.Value;
     }
+
+    private static CompileOutput CompileBuildConfiguration()
+      => CreateBuildConfiguration().TakeOne(Compile);
 
     private static void PrintCompilationErrors(CompileOutput compilationOutput) {
       Console.WriteLine("Could not compile the build configuration.");

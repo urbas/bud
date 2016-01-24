@@ -2,11 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Reactive.Testing;
-using Moq;
 using NUnit.Framework;
 using static System.Reactive.Linq.Observable;
-using static Bud.IO.FileWatchers;
-using static Bud.Reactive.ObservableResources;
 using static NUnit.Framework.Assert;
 
 namespace Bud.Reactive {

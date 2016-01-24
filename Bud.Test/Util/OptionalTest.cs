@@ -25,11 +25,11 @@ namespace Bud.Util {
 
     [Test]
     public void ToString_returns_none()
-      => AreEqual("None", None<int>().ToString());
+      => AreEqual("None<System.Int32>", None<int>().ToString());
 
     [Test]
     public void ToString_returns_some_with_value()
-      => AreEqual("Some(42)", Some(42).ToString());
+      => AreEqual("Some<System.Int32>(42)", Some(42).ToString());
 
     [Test]
     public void GetOrElse_returns_the_contained_value()
@@ -51,6 +51,35 @@ namespace Bud.Util {
     public void Lazy_GetOrElse_does_not_invoke_the_callback()
       => DoesNotThrow(
         () => Some(42).GetOrElse(new Mock<Func<int>>(MockBehavior.Strict).Object));
+
+    [Test]
+    public void OrElse_returns_the_contained_value()
+      => AreEqual(Some(42), Some(42).OrElse(9001));
+
+    [Test]
+    public void OrElse_returns_the_default_value()
+      => AreEqual(Some(9001), None<int>().OrElse(9001));
+
+    [Test]
+    public void Lazy_OrElse_returns_the_contained_value()
+      => AreEqual(Some(42), Some(42).OrElse(() => 9001));
+
+    [Test]
+    public void Lazy_OrElse_returns_the_default_value()
+      => AreEqual(Some(9001), None<int>().OrElse(() => 9001));
+
+    [Test]
+    public void Lazy_OrElse_does_not_invoke_the_callback()
+      => DoesNotThrow(
+        () => Some(42).OrElse(new Mock<Func<int>>(MockBehavior.Strict).Object));
+
+    [Test]
+    public void Map_returns_None_for_None()
+      => AreEqual(None<int>(), None<string>().Map(int.Parse));
+
+    [Test]
+    public void Map_returns_Some_with_new_value_for_Some()
+      => AreEqual(Some(42), Some("42").Map(int.Parse));
 
     [Test]
     public void Gather_returns_values()

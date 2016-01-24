@@ -121,6 +121,7 @@
     <Compile Include="BaseProjects\BareProjectsTest.cs" />
     <Compile Include="BaseProjects\BuildProjectsTest.cs" />
     <Compile Include="BudBuild.cs" />
+    <Compile Include="Cli\BuildToolTest.cs" />
     <Compile Include="Collections\EnumerableUtilsTest.cs" />
     <Compile Include="Collections\ImmutableListsTest.cs" />
     <Compile Include="Configuration\CachingConfTest.cs" />
@@ -152,6 +153,8 @@
     <EmbeddedResource Include="NuGet\SinglePackageTest\packages.config" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reactive\ObservableResourcesTest.cs" />
+    <Compile Include="Reactive\ObservableResultsTest.cs" />
+    <Compile Include="Reactive\TaskResultsTest.cs" />
     <Compile Include="Reactive\WaitingObservablesTest.cs" />
     <Compile Include="Util\OptionalTest.cs" />
     <Compile Include="Util\StringsTest.cs" />

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
+using static Bud.Util.Option;
 
 namespace Bud.Util {
   public struct Option<T> {
@@ -13,11 +14,14 @@ namespace Bud.Util {
       HasValue = true;
     }
 
-    public T GetOrElse(T defaultValue)
-      => HasValue ? Value : defaultValue;
+    public T GetOrElse(T defaultValue) => HasValue ? Value : defaultValue;
+    public T GetOrElse(Func<T> defaultValue) => HasValue ? Value : defaultValue();
+    public static implicit operator Option<T>(T value) => new Option<T>(value);
+    public Option<T> OrElse(T defaultValue) => HasValue ? this : defaultValue;
+    public Option<T> OrElse(Func<T> defaultValue) => HasValue ? this : defaultValue();
 
-    public T GetOrElse(Func<T> defaultValue)
-      => HasValue ? Value : defaultValue();
+    public Option<TResult> Map<TResult>(Func<T, TResult> mapFunc)
+      => HasValue ? mapFunc(Value) : None<TResult>();
 
     public bool Equals(Option<T> other)
       => HasValue == other.HasValue
@@ -25,8 +29,8 @@ namespace Bud.Util {
 
     public override bool Equals(object obj)
       => !ReferenceEquals(null, obj)
-      && obj is Option<T> 
-      && Equals((Option<T>) obj);
+         && obj is Option<T>
+         && Equals((Option<T>) obj);
 
     public override int GetHashCode() {
       unchecked {
@@ -34,10 +38,9 @@ namespace Bud.Util {
       }
     }
 
-    public override string ToString() => HasValue ? $"Some({Value})" : "None";
-
-    public static implicit operator Option<T>(T value)
-      => new Option<T>(value);
+    public override string ToString() {
+      return HasValue ? $"Some<{GetType().GetGenericArguments()[0]}>({Value})" : $"None<{GetType().GetGenericArguments()[0]}>";
+    }
   }
 
   public static class Option {

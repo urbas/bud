@@ -12,9 +12,21 @@
 
 - I want to install Bud from Chocolatey.
 
-- [Ongoing] I want to clean my projects without cleaning the resolved packages.
+- I want to use Bud in Visual Source.
 
-  - [Ongoing] Add support to call `bud */Clean`.
+- I want to clean my projects without cleaning the resolved packages.
+
+  - [Workaround] You can define a top-level task that does what you want:
+
+        Clean.Init(c => {
+          c.TryGet("Bud"/Clean);
+          c.TryGet("Bud.Test"/Clean);
+          return Unit.Default;
+        })
+
+  - [Proposal 1] We can introduce an 'Alias(Key, ...)' function to be used like this: `Alias(Clean, "Bud/Clean", "Bud.Test/Clean")`. One can then define arbitrary aliases that suit the needs of the developer.
+
+  - [Proposal 2] We could allow wildcard keys, such as `bud */Clean` and `bud **/Clean`. (Partially implemented in git history: 195bde314a1e717143dac800a733efbcadcd3b86)
 
 - Alias `bud Command` to `bud **/Command`. Do not alias absolute paths like `bud /Command` or wildcarded paths like `bud */Command` and `bud a/**/b`.
 
@@ -22,7 +34,7 @@
 
 - I want to generate MSBuild solution and project files for my projects.
 
-- I want some all the help to be in `README.md`. After 1 minute, I should be able to build my project.
+- I want some help in `README.md`. After 1 minute, I should be able to build my project.
 
 - I want to define a generic build which doesn't rebuild if sources are up-to-date with outputs.
 
