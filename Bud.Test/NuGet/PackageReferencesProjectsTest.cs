@@ -28,6 +28,7 @@ namespace Bud.NuGet {
               Has.Exactly(1).Empty);
 
     [Test]
+    [Category("IntegrationTest")]
     public void Assemblies_are_resolved_from_the_packages_config_file() {
       using (var tmpDir = new TemporaryDirectory()) {
         var packageConfigFile = CreatePackagesConfigFile(tmpDir);
@@ -44,6 +45,7 @@ namespace Bud.NuGet {
     }
 
     [Test]
+    [Category("IntegrationTest")]
     public void Assemblies_are_stored_in_the_target_folder() {
       using (var tmpDir = new TemporaryDirectory()) {
         var packageConfigFile = CreatePackagesConfigFile(tmpDir);
