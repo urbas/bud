@@ -20,7 +20,7 @@ namespace Bud.NuGet {
         var package = tmpDir.CreateFileFromResource($"Bud.NuGet.{OutputPackageName}",
                                                     OutputPackageName);
         var repository = tmpDir.CreateDir("repository");
-        IsTrue(publisher.Publish(package, $"file://{repository}", null));
+        IsTrue(publisher.Publish(package, $"file://{repository}", None<string>()));
         That(Path.Combine(repository, OutputPackageName),
              Does.Exist);
       }

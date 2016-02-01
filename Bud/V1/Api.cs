@@ -215,6 +215,13 @@ namespace Bud.V1 {
 
     public static Key<IPackager> Packager = nameof(Packager);
 
+    /// <summary>
+    ///   The directory relative to which NuGet should look for
+    ///   <see cref="PackageFiles" /> that have relative source paths.
+    ///   By default it is the current working directory.
+    /// </summary>
+    public static Key<string> PackageBaseDir = nameof(PackageBaseDir);
+
     public static Key<string> PackageOutputDir = nameof(PackageOutputDir);
 
     public static Key<IObservable<IEnumerable<PackageFile>>> PackageFiles = nameof(PackageFiles);
@@ -225,7 +232,7 @@ namespace Bud.V1 {
 
     #region Bare Project
 
-    public const string BudDirName = ".bud";
+    public const string BuildDirName = "build";
 
     public const string DefaultVersion = "0.0.1";
 
@@ -245,10 +252,10 @@ namespace Bud.V1 {
     ///   This directory is by default deleted through the <see cref="Clean" />
     ///   command.
     /// </summary>
-    public static readonly Key<string> BudDir = nameof(BudDir);
+    public static readonly Key<string> BuildDir = nameof(BuildDir);
 
     /// <summary>
-    ///   By default, deletes the entire <see cref="BudDir" />
+    ///   By default, deletes the entire <see cref="BuildDir" />
     /// </summary>
     public static readonly Key<Unit> Clean = nameof(Clean);
 
@@ -341,6 +348,12 @@ namespace Bud.V1 {
     ///   under the <see cref="ProjectDir" />.
     /// </summary>
     public static Key<string> PackagesConfigFile = nameof(PackagesConfigFile);
+
+    /// <summary>
+    ///   A list of paths to assemblies. These paths are resolved from NuGet
+    ///   package references.
+    /// </summary>
+    public static Key<IObservable<IImmutableList<PackageReference>>> ReferencedPackages = nameof(ReferencedPackages);
 
     /// <summary>
     ///   A list of paths to assemblies. These paths are resolved from NuGet

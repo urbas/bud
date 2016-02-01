@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Reactive.Linq;
+using Bud.Util;
 using Bud.V1;
 using static System.IO.Path;
 using static System.Linq.Enumerable;
-using static Bud.Util.Option;
 using static Bud.V1.Api;
 
 namespace Bud.NuGet {
@@ -15,6 +16,10 @@ namespace Bud.NuGet {
             .Init(PackageMetadata, DefaultPackageMetadata)
             .Init(PackageOutputDir, DefaultPackageOutputDir)
             .Init(Publish, DefaultPublish)
+            .Init(PackageBaseDir, _ => Directory.GetCurrentDirectory())
+            .InitValue(PublishApiKey, Option.None<string>())
+            .InitValue(Packager, new NuGetPackager())
+            .InitValue(Publisher, new NuGetPublisher())
             .Init(Package, DefaultPackage)
             .Init(PackageFiles, DefaultPackageFiles);
 
@@ -24,11 +29,12 @@ namespace Bud.NuGet {
                                   ImmutableDictionary<string, string>.Empty);
 
     private static string DefaultPackageOutputDir(IConf c)
-      => Combine(BudDir[c], PackageOutputDirName);
+      => Combine(BuildDir[c], PackageOutputDirName);
 
     private static IObservable<string> DefaultPackage(IConf c)
       => PackageFiles[c].Select(packageFiles => Packager[c].Pack(
         PackageOutputDir[c],
+        PackageBaseDir[c],
         ProjectId[c],
         Api.Version[c],
         packageFiles,
@@ -38,12 +44,11 @@ namespace Bud.NuGet {
     private static IObservable<IEnumerable<PackageFile>> DefaultPackageFiles(IConf c)
       => Output[c].Select(files => files.Select(ToContentFiles));
 
-    private static IObservable<bool> DefaultPublish(IConf c) {
-      return Package[c]
+    private static IObservable<bool> DefaultPublish(IConf c)
+      => Package[c]
         .Select(package => Publisher[c].Publish(package,
                                                 PublishUrl[c],
                                                 PublishApiKey[c]));
-    }
 
     private static PackageFile ToContentFiles(string file)
       => new PackageFile(file, $"content/{GetFileName(file)}");

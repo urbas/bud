@@ -1,15 +1,16 @@
-using NuGet.Frameworks;
+using System;
 
 namespace Bud.NuGet {
   public struct FrameworkAssemblyReference {
     public string AssemblyName { get; }
-    public NuGetFramework Framework { get; }
+    public Version Framework { get; }
 
-    public FrameworkAssemblyReference(string assemblyName, NuGetFramework framework) {
+    public FrameworkAssemblyReference(string assemblyName, Version framework) {
       AssemblyName = assemblyName;
       Framework = framework;
     }
 
-    public override string ToString() => $"AssemblyName: {AssemblyName}, Framework: {Framework}";
+    public override string ToString()
+      => $"FrameworkAssemblyReference(AssemblyName: {AssemblyName}, Framework: {Framework})";
   }
 }

@@ -114,6 +114,7 @@
     <Compile Include="Configuration\ConfAccessException.cs" />
     <Compile Include="Cs\CsProjects.cs" />
     <Compile Include="Cs\RoslynCsCompiler.cs" />
+    <Compile Include="IO\HashBasedCaching.cs" />
     <Compile Include="IO\ValueUpdater.cs" />
     <Compile Include="IO\FileWatcher.cs" />
     <Compile Include="IO\IValueStore.cs" />
@@ -122,13 +123,16 @@
     <Compile Include="NuGet\IPackager.cs" />
     <Compile Include="NuGet\IPublisher.cs" />
     <Compile Include="NuGet\NuGetExecutable.cs" />
+    <Compile Include="NuGet\NuGetPackageDownloader.cs" />
     <Compile Include="NuGet\NuGetPackager.cs" />
+    <Compile Include="NuGet\NuGetPackageReferencesReader.cs" />
     <Compile Include="NuGet\NuGetPublisher.cs" />
     <Compile Include="NuGet\NuGetPublishing.cs" />
     <Compile Include="NuGet\NuGetPushArgsBuilder.cs" />
     <Compile Include="NuGet\PackageDependency.cs" />
     <Compile Include="NuGet\PackageFile.cs" />
     <Compile Include="NuGet\NuGetPackageMetadata.cs" />
+    <Compile Include="NuGet\PackageReference.cs" />
     <Compile Include="NuGet\PackageReferencesProjects.cs" />
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolver.cs" />
     <Compile Include="NuGet\IPackageResolver.cs" />

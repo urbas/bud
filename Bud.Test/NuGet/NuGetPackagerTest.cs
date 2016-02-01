@@ -21,7 +21,7 @@ namespace Bud.NuGet {
     [Test]
     public void Creates_a_package() {
       using (var tmpDir = new TemporaryDirectory()) {
-        var txtFile = tmpDir.CreateEmptyFile("A.txt");
+        tmpDir.CreateEmptyFile("A.txt");
         var dllFile = tmpDir.CreateEmptyFile("Foo.Bar.dll");
         var optionalFields = new Dictionary<string, string> {
           {"title", "foo-title"},
@@ -39,7 +39,7 @@ namespace Bud.NuGet {
         }.ToImmutableDictionary();
 
         var package = Pack(tmpDir, optionalFields, new[] {
-          new PackageFile(txtFile, "content/A.txt"),
+          new PackageFile("A.txt", "content/A.txt"),
           new PackageFile(dllFile, "lib/net40/Foo.Bar.dll"),
         });
 
@@ -78,14 +78,35 @@ namespace Bud.NuGet {
       }
     }
 
-    private string Pack(TemporaryDirectory tmpDir, IImmutableDictionary<string, string> optionalFields, PackageFile[] packageFiles)
-      => packager.Pack(tmpDir.CreateDir("out"),
+    [Test]
+    [Ignore("There's a bug in NuGet triggered by directories that are prefixed with a dot.")]
+    public void Package_can_be_created_with_files_in_dot_prefixed_directories() {
+      using (var tmpDir = new TemporaryDirectory()) {
+        var dllFile = tmpDir.CreateEmptyFile(".Foo", "A.dll");
+
+        var package = Pack(tmpDir,
+                           ImmutableDictionary<string, string>.Empty,
+                           new[] {new PackageFile(dllFile, "lib/A.dll")},
+                           new PackageDependency[] {});
+        
+        That(package, Does.Exist);
+      }
+    }
+
+    private string Pack(TemporaryDirectory baseDir, IImmutableDictionary<string, string> optionalFields, PackageFile[] packageFiles) {
+      var packageDependencies = new[] {
+        new PackageDependency("Moo.Zar", "3.2.1")
+      };
+      return Pack(baseDir, optionalFields, packageFiles, packageDependencies);
+    }
+
+    private string Pack(TemporaryDirectory baseDir, IImmutableDictionary<string, string> optionalFields, PackageFile[] packageFiles, PackageDependency[] packageDependencies)
+      => packager.Pack(baseDir.CreateDir("out"),
+                       baseDir.Path,
                        "Foo.Bar",
                        "1.2.3",
                        packageFiles,
-                       new[] {
-                         new PackageDependency("Moo.Zar", "3.2.1")
-                       },
+                       packageDependencies,
                        new NuGetPackageMetadata(Authors,
                                                 Description,
                                                 optionalFields));

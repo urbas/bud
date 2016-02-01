@@ -4,16 +4,16 @@ using System.Collections.Generic;
 namespace Bud.NuGet {
   public class FrameworkAssemblyReferencesAggregator {
     public static IDictionary<string, Version> AggregateReferences(
-      IEnumerable<Tuple<string, Version>> frameworkAssemblyReferences) {
+      IEnumerable<FrameworkAssemblyReference> frameworkAssemblyReferences) {
       var aggregatedReferences = new Dictionary<string, Version>();
       foreach (var assemblyToVersion in frameworkAssemblyReferences) {
         Version existingVersion;
-        if (aggregatedReferences.TryGetValue(assemblyToVersion.Item1, out existingVersion)) {
-          if (assemblyToVersion.Item2 > existingVersion) {
-            aggregatedReferences[assemblyToVersion.Item1] = assemblyToVersion.Item2;
+        if (aggregatedReferences.TryGetValue(assemblyToVersion.AssemblyName, out existingVersion)) {
+          if (assemblyToVersion.Framework > existingVersion) {
+            aggregatedReferences[assemblyToVersion.AssemblyName] = assemblyToVersion.Framework;
           }
         } else {
-          aggregatedReferences[assemblyToVersion.Item1] = assemblyToVersion.Item2;
+          aggregatedReferences[assemblyToVersion.AssemblyName] = assemblyToVersion.Framework;
         }
       }
       return aggregatedReferences;

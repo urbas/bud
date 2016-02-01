@@ -132,6 +132,8 @@
     <Compile Include="Cs\CsProjectsTest.cs" />
     <Compile Include="Cs\RoslynCsCompilationTest.cs" />
     <Compile Include="Cs\TimedEmittingCompilerTest.cs" />
+    <Compile Include="IO\HashBasedCachingTest.cs" />
+    <Compile Include="IO\MemoryStreams.cs" />
     <Compile Include="IO\ValueUpdaterTest.cs" />
     <Compile Include="IO\DiffTest.cs" />
     <Compile Include="IO\FileUtilsTest.cs" />
@@ -142,12 +144,15 @@
     <Compile Include="IO\FileWatchersTest.cs" />
     <Compile Include="IO\FileWatcherTest.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReferenceVersionAggregatorTest.cs" />
+    <Compile Include="NuGet\NuGetPackageDownloaderTest.cs" />
+    <Compile Include="NuGet\NuGetPackageReferencesReaderTest.cs" />
     <Compile Include="NuGet\NuGetPackagerTest.cs" />
     <Compile Include="NuGet\NuGetPublisherTest.cs" />
     <Compile Include="NuGet\NuGetPublishingTest.cs" />
     <Compile Include="NuGet\NuGetPushCliArgsBuilderTest.cs" />
     <Compile Include="NuGet\PackageConfigTestUtils.cs" />
     <Compile Include="NuGet\PackageReferencesProjectsTest.cs" />
+    <Compile Include="NuGet\PackageReferenceTest.cs" />
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolverTest.cs" />
     <Compile Include="NuGet\NuGetAssemblyResolverTest.cs" />
     <EmbeddedResource Include="NuGet\SinglePackageTest\packages.config" />

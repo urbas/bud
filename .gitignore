@@ -20,4 +20,4 @@ packages/
 # Build
 obj/
 bin/
-.bud/
+build/

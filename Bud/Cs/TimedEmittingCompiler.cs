@@ -74,6 +74,6 @@ namespace Bud.Cs {
     }
 
     private static string GetOutputAssemblyPath(IConf conf)
-      => Path.Combine(BudDir[conf], AssemblyName[conf]);
+      => Path.Combine(BuildDir[conf], AssemblyName[conf]);
   }
 }

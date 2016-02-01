@@ -42,7 +42,7 @@ namespace Bud.BaseProjects {
       .Add(BuildSupport)
       .Add(SourceProcessorsSupport)
       .Add(Input, c => ProcessedSources[c])
-      .ExcludeSourceDir(c => BudDir[c])
+      .ExcludeSourceDir(c => BuildDir[c])
       .Init(DependenciesInput, GatherOutputsFromDependencies);
 
     internal static Conf CreateBuildProject(string projectDir, string projectId)

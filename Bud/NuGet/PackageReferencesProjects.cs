@@ -1,13 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Reactive.Linq;
+using Bud.IO;
 using Bud.V1;
 using static System.IO.Directory;
-using static System.IO.File;
 using static System.IO.Path;
 using static Bud.BaseProjects.BuildProjects;
-using static Bud.IO.FileUtils;
+using static Bud.NuGet.NuGetPackageDownloader;
+using static Bud.NuGet.NuGetPackageReferencesReader;
 using static Bud.V1.Api;
 
 namespace Bud.NuGet {
@@ -17,27 +18,39 @@ namespace Bud.NuGet {
       .Add(SourcesSupport)
       .AddSourceFile(c => PackagesConfigFile[c])
       .InitValue(AssemblyResolver, new NuGetPackageResolver())
+      .Init(ReferencedPackages, ReadReferencedPackagesFromSources)
       .Init(PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
       .Init(ResolvedAssemblies, ResolveAssemblies);
+
+    private static IObservable<IImmutableList<PackageReference>>
+      ReadReferencedPackagesFromSources(IConf c)
+      => Sources[c].Select(LoadReferences)
+                   .Select(ImmutableList.ToImmutableList);
 
     internal static Conf CreatePackageReferencesProject(string dir, string projectId)
       => BareProject(dir, projectId)
         .Add(PackageReferencesProjectSettings);
 
     internal static IObservable<IImmutableSet<string>> ResolveAssemblies(IConf c)
-      => Sources[c].Select(sources => {
-        var resolvedAssembliesFile = Combine(BudDir[c], "resolved_assemblies");
-        if (File.Exists(resolvedAssembliesFile) &&
-            IsNewerThan(resolvedAssembliesFile, sources)) {
-          return ReadAllLines(resolvedAssembliesFile)
-            .ToImmutableHashSet();
-        }
-        var resolvedAssemblies = AssemblyResolver[c]
-          .Resolve(sources, ProjectDir[c])
-          .ToImmutableHashSet();
-        CreateDirectory(BudDir[c]);
-        WriteAllLines(resolvedAssembliesFile, resolvedAssemblies);
-        return resolvedAssemblies;
+      => ReferencedPackages[c].Select(packageReferences => {
+        var resolvedAssembliesFile = Combine(BuildDir[c], "resolved_assemblies");
+        CreateDirectory(BuildDir[c]);
+        var hash = PackageReference.GetHash(packageReferences);
+        var resolvedAssemblies = HashBasedCaching.Get(
+          resolvedAssembliesFile,
+          hash,
+          () => DownloadAndResolvePackages(c, packageReferences));
+        return resolvedAssemblies.ToImmutableHashSet();
       });
+
+    private static IEnumerable<string> DownloadAndResolvePackages(IConf c, IImmutableList<PackageReference> packageReferences) {
+      var packagesDir = Combine(ProjectDir[c], "packages");
+      CreateDirectory(packagesDir);
+      if (!DownloadPackages(packageReferences, packagesDir)) {
+        throw new Exception($"Could not download packages: {string.Join(", ", packageReferences)}");
+      }
+      return AssemblyResolver[c]
+        .Resolve(packageReferences, packagesDir, ProjectDir[c]);
+    }
   }
 }

@@ -19,11 +19,11 @@ namespace Bud.BaseProjects {
         .InitValue(ProjectId, projectId)
         .InitValue(ProjectDir, projectDir)
         .InitValue(Version, version)
-        .Init(BudDir, c => Combine(ProjectDir[c], BudDirName))
+        .Init(BuildDir, c => Combine(ProjectDir[c], BuildDirName))
         .Init(Clean, DefaultClean);
 
     internal static Unit DefaultClean(IConf c) {
-      var targetDir = BudDir[c];
+      var targetDir = BuildDir[c];
       if (Exists(targetDir)) {
         Delete(targetDir, true);
       }

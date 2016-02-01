@@ -1,12 +1,16 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Linq;
 using System.Reactive.Linq;
 using Bud.IO;
 using Bud.V1;
 using Moq;
+using NuGet.Frameworks;
+using NuGet.Versioning;
 using NUnit.Framework;
 using static System.IO.File;
 using static System.IO.Path;
+using static Bud.NuGet.NuGetPackageReferencesReader;
 using static Bud.NuGet.PackageConfigTestUtils;
 using static Bud.V1.Api;
 using static NUnit.Framework.Assert;
@@ -64,12 +68,28 @@ namespace Bud.NuGet {
         var project = TestProject(tmpDir.Path)
           .SetValue(AssemblyResolver, resolver.Object)
           .ToCompiled();
-        tmpDir.CreateFile("Moo.dll\nZoo.dll", ("A"/BudDir)[project], "resolved_assemblies");
+        tmpDir.CreateFile(
+          "4D-31-2B-41-83-A6-87-D8-FC-8C-92-C7-F3-CE-60-E9\nMoo.dll\nZoo.dll",
+          ("A"/BuildDir)[project], "resolved_assemblies");
 
         ("A"/ResolvedAssemblies)[project].Take(1).Wait();
 
         That(ReadResolvedAssembliesCache(project),
              Is.EquivalentTo(new[] {"Moo.dll", "Zoo.dll"}));
+      }
+    }
+
+    [Test]
+    public void ReferencedPackages_lists_package_references_read_from() {
+      using (var tmpDir = new TemporaryDirectory()) {
+        CreatePackagesConfigFile(tmpDir);
+        var project = TestProject(tmpDir.Path);
+        That(project.Get(ReferencedPackages).Take(1).Wait(),
+             Is.EqualTo(new[] {
+               new PackageReference("Urbas.Example.Foo",
+                                    NuGetVersion.Parse("1.0.1"),
+                                    NuGetFramework.Parse("net46"))
+             }));
       }
     }
 
@@ -79,13 +99,15 @@ namespace Bud.NuGet {
     private static Mock<IPackageResolver> MockPackageResolver(string packageConfigFile,
                                                               IEnumerable<string> assemblies) {
       var resolver = new Mock<IPackageResolver>(MockBehavior.Strict);
-      resolver.Setup(self => self.Resolve(new[] {packageConfigFile},
+      var packageReferences = LoadReferences(packageConfigFile);
+      resolver.Setup(self => self.Resolve(packageReferences,
+                                          It.IsAny<string>(),
                                           It.IsAny<string>()))
               .Returns(assemblies.ToImmutableHashSet());
       return resolver;
     }
 
-    private static string[] ReadResolvedAssembliesCache(IConf project)
-      => ReadAllLines(Combine(("A"/BudDir)[project], "resolved_assemblies"));
+    private static IEnumerable<string> ReadResolvedAssembliesCache(IConf project)
+      => ReadAllLines(Combine(("A"/BuildDir)[project], "resolved_assemblies")).Skip(1);
   }
 }

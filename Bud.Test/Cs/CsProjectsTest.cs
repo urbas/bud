@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -153,7 +154,7 @@ namespace Bud.Cs {
     [Test]
     public void CSharp_files_in_the_target_folder_must_not_be_listed() {
       using (var tempDir = new TemporaryDirectory()) {
-        var csFile = tempDir.CreateEmptyFile(".bud", "A.cs");
+        var csFile = tempDir.CreateEmptyFile("build", "A.cs");
         That(Sources[CsLibrary(tempDir.Path, "Foo")].Take(1).Wait(),
              Is.Not.Contains(csFile));
       }
@@ -168,10 +169,32 @@ namespace Bud.Cs {
                                 .SetValue(Packager, packager.Object)
                                 .Add(Dependencies, "../A"));
       packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
+                                 Directory.GetCurrentDirectory(),
                                  "B",
                                  DefaultVersion,
                                  new[] {new PackageFile("B.dll", "lib/B.dll"),},
                                  new[] {new PackageDependency("A", DefaultVersion)},
+                                 It.IsAny<NuGetPackageMetadata>()))
+              .Returns("B.nupkg");
+      projects.Get("B"/Package).Take(1).Wait();
+      packager.VerifyAll();
+    }
+
+    [Test]
+    public void Package_must_contain_references_to_own_packages() {
+      var packager = new Mock<IPackager>(MockBehavior.Strict);
+      var projects = Projects(CsLibrary("bDir", "A")
+                                .SetValue(Api.Version, "4.2.0"),
+                              CsLibrary("bDir", "B")
+                                .Clear(Output).Add(Output, "B.dll")
+                                .SetValue(Packager, packager.Object)
+                                .Add(Dependencies, "../A"));
+      packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
+                                 Directory.GetCurrentDirectory(),
+                                 "B",
+                                 DefaultVersion,
+                                 new[] {new PackageFile("B.dll", "lib/B.dll"),},
+                                 new[] {new PackageDependency("A", "4.2.0") },
                                  It.IsAny<NuGetPackageMetadata>()))
               .Returns("B.nupkg");
       projects.Get("B"/Package).Take(1).Wait();

@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Immutable;
+using System.IO;
 using System.Reactive.Linq;
 using Bud.V1;
 using Moq;
 using NUnit.Framework;
 using static System.IO.Path;
 using static Bud.NuGet.NuGetPublishing;
+using static Bud.Util.Option;
 using static Bud.V1.Api;
 using static NUnit.Framework.Assert;
 
@@ -23,7 +25,8 @@ namespace Bud.NuGet {
         .Add(NuGetPublishingSupport)
         .SetValue(Packager, packager.Object);
 
-      packager.Setup(self => self.Pack(Combine(BudDir[project], PackageOutputDirName),
+      packager.Setup(self => self.Pack(Combine(BuildDir[project], PackageOutputDirName),
+                                       Directory.GetCurrentDirectory(),
                                        "Foo",
                                        DefaultVersion,
                                        new[] {new PackageFile(fileToPackage, "content/Foo.txt")},
@@ -48,12 +51,40 @@ namespace Bud.NuGet {
         .SetValue(PublishApiKey, "publish api key");
 
       packager.Setup(self => self.Publish(package,
-                                       "publish url",
-                                       "publish api key"))
+                                          "publish url",
+                                          "publish api key"))
               .Returns(true);
 
-      AreEqual(new [] {true}, project.Get(Publish).ToEnumerable());
+      AreEqual(new[] {true}, project.Get(Publish).ToEnumerable());
       packager.VerifyAll();
     }
+
+    [Test]
+    public void Default_packager_is_the_NuGet_CLI_implementation()
+      => That(BareProject("fooDir", "Foo")
+                .Add(NuGetPublishingSupport)
+                .Get(Packager),
+              Is.InstanceOf<NuGetPackager>());
+
+    [Test]
+    public void Default_publisher_is_the_NuGet_CLI_implementation()
+      => That(BareProject("fooDir", "Foo")
+                .Add(NuGetPublishingSupport)
+                .Get(Publisher),
+              Is.InstanceOf<NuGetPublisher>());
+
+    [Test]
+    public void Default_PublishApiKey_is_set_to_None()
+      => That(BareProject("fooDir", "Foo")
+                .Add(NuGetPublishingSupport)
+                .Get(PublishApiKey),
+              Is.EqualTo(None<string>()));
+
+    [Test]
+    public void Default_PackageBaseDir_is_set_to_the_current_working_directory()
+      => That(BareProject("fooDir", "Foo")
+                .Add(NuGetPublishingSupport)
+                .Get(PackageBaseDir),
+              Is.EqualTo(Directory.GetCurrentDirectory()));
   }
 }

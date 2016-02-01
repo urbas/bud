@@ -7,13 +7,13 @@ using static Bud.NuGet.NuGetExecutable;
 
 namespace Bud.NuGet {
   public class NuGetPackager : IPackager {
-    public string Pack(string outputDir, string packageId, string version, IEnumerable<PackageFile> files, IEnumerable<PackageDependency> packageDependencies, NuGetPackageMetadata packageMetadata) {
+    public string Pack(string outputDir, string baseDir, string packageId, string version, IEnumerable<PackageFile> files, IEnumerable<PackageDependency> packageDependencies, NuGetPackageMetadata packageMetadata) {
       var nuspecFile = Combine(outputDir, $"{packageId}.nuspec");
       CreateDirectory(outputDir);
       CreateNuspecFile(nuspecFile, packageId, version, packageDependencies, packageMetadata, files);
       ExecuteNuGet($"pack {nuspecFile} " +
                    $"-OutputDirectory {outputDir} " +
-                   $"-BasePath {outputDir}");
+                   $"-BasePath {baseDir}");
       return Combine(outputDir, $"{packageId}.{version}.nupkg");
     }
 
