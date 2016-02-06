@@ -7,6 +7,7 @@ using static Bud.Util.Option;
 using static NUnit.Framework.Assert;
 
 namespace Bud.NuGet {
+  [Category("WindowsSpecific")]
   public class WindowsFrameworkAssemblyResolverTest {
     private static readonly Version Net2 = NuGetFramework.Parse("net2").Version;
     private static readonly Version Net35 = NuGetFramework.Parse("net35").Version;
