@@ -1,18 +1,24 @@
 # TODO List
 
-- [Done] Bud should use packages from NuGet's `packages.config` files.
-
-  - [Done] Invoke NuGet to download packages.
-
-  - [Done] Resolve referenced DLLs and references framework assemblies
-
-  - [Done] Make Bud compile itself through its `packages.config` file.
+- Use a stable release version of Immutable Collections.
 
 - [Ongoing] I want to publish my projects to NuGet.
+
+    - Publish Bud `0.5.0-alpha-1` to NuGet.
 
 - I want to install Bud from Chocolatey.
 
 - I want to use Bud in Visual Source.
+
+    - Bud should communicate to Visual Source through HTTP. The protocol:
+
+        - GET for `IObservable` keys takes 1, serializes to JSON, and returns it.
+
+        - GET for `Task` keys waits and return JSON-serialized result.
+
+        - GET for everything else simply returns a JSON-serialized result.
+
+        - WebSockets are available only for `IObservable` keys.
 
 - I want to clean my projects without cleaning the resolved packages.
 
