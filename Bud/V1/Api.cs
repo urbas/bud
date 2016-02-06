@@ -179,7 +179,7 @@ namespace Bud.V1 {
 
     /// <summary>
     ///   Publishes a project to a distribution endpoint. For example,
-    ///   projects like <see cref="CsLibrary(string)" /> are published
+    ///   projects like <see cref="CsLibrary(string, string)" /> are published
     ///   to a NuGet repository.
     /// </summary>
     /// <remarks>
@@ -230,7 +230,7 @@ namespace Bud.V1 {
 
     public static Conf NuGetPublishingProject(string projectDir, string projectId)
       => BareProject(projectDir, projectId)
-      .Add(NuGetPublishing.NuGetPublishingSupport);
+        .Add(NuGetPublishing.NuGetPublishingSupport);
 
     #endregion
 
@@ -334,9 +334,18 @@ namespace Bud.V1 {
     public static readonly Key<CSharpCompilationOptions> CsCompilationOptions = nameof(CsCompilationOptions);
     public static readonly Key<IImmutableList<ResourceDescription>> EmbeddedResources = nameof(EmbeddedResources);
 
+    /// <summary>
+    ///   Configures a C# library project named <paramref name="projectId" /> and placed in the
+    ///   directory with the same name. The project's directory will be placed  in the current
+    ///   working directory.
+    /// </summary>
     public static Conf CsLibrary(string projectId)
       => CsLibrary(projectId, projectId);
 
+    /// <summary>
+    ///   Similar to <see cref="CsLibrary(string)"/> but places the project in the specified
+    ///   folder.
+    /// </summary>
     public static Conf CsLibrary(string projectDir, string projectId)
       => CreateCsLibrary(projectDir, projectId);
 
@@ -365,7 +374,7 @@ namespace Bud.V1 {
     /// </summary>
     public static Key<IObservable<IImmutableSet<string>>> ResolvedAssemblies = nameof(ResolvedAssemblies);
 
-    public static Key<IPackageResolver> AssemblyResolver = nameof(AssemblyResolver);
+    public static Key<IAssemblyResolver> AssemblyResolver = nameof(AssemblyResolver);
 
     public static Conf PackageReferencesProject(string dir, string projectId)
       => CreatePackageReferencesProject(dir, projectId);

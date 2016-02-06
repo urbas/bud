@@ -13,10 +13,10 @@ using static Bud.NuGet.WindowsFrameworkAssemblyResolver;
 using static Bud.Util.Option;
 
 namespace Bud.NuGet {
-  public class NuGetPackageResolver : IPackageResolver {
-    public IEnumerable<string> Resolve(IEnumerable<PackageReference> packageReferences,
-                                       string packagesDir,
-                                       string cacheDir) {
+  public class NuGetAssemblyResolver : IAssemblyResolver {
+    public IEnumerable<string> FindAssembly(IEnumerable<PackageReference> packageReferences,
+                                            string packagesDir,
+                                            string cacheDir) {
       var packageRepository = CreatePackageRepository(packagesDir, cacheDir);
       var frameworkAssemblies = new List<FrameworkAssemblyReference>();
       var assemblies = new List<string>();

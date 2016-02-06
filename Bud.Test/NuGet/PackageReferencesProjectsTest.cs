@@ -66,7 +66,7 @@ namespace Bud.NuGet {
     public void Assemblies_are_loaded_from_cache() {
       using (var tmpDir = new TemporaryDirectory()) {
         CreatePackagesConfigFile(tmpDir);
-        var resolver = new Mock<IPackageResolver>(MockBehavior.Strict);
+        var resolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
         var project = TestProject(tmpDir.Path)
           .SetValue(AssemblyResolver, resolver.Object)
           .ToCompiled();
@@ -98,11 +98,11 @@ namespace Bud.NuGet {
     private static Conf TestProject(string baseDir = "a")
       => PackageReferencesProject(baseDir, "A");
 
-    private static Mock<IPackageResolver> MockPackageResolver(string packageConfigFile,
+    private static Mock<IAssemblyResolver> MockPackageResolver(string packageConfigFile,
                                                               IEnumerable<string> assemblies) {
-      var resolver = new Mock<IPackageResolver>(MockBehavior.Strict);
+      var resolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
       var packageReferences = LoadReferences(packageConfigFile);
-      resolver.Setup(self => self.Resolve(packageReferences,
+      resolver.Setup(self => self.FindAssembly(packageReferences,
                                           It.IsAny<string>(),
                                           It.IsAny<string>()))
               .Returns(assemblies.ToImmutableHashSet());

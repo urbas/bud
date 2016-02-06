@@ -9,7 +9,7 @@ using static NUnit.Framework.Assert;
 
 namespace Bud.NuGet {
   [Category("IntegrationTest")]
-  public class NuGetPackageResolverTest {
+  public class NuGetAssemblyResolverTest {
     private TemporaryDirectory tmpDir;
     private string packagesDir;
 
@@ -30,8 +30,8 @@ namespace Bud.NuGet {
 
     [Test]
     public void Resolve_a_list_of_assemblies_referenced_in_the_package() {
-      var assemblies = new NuGetPackageResolver()
-        .Resolve(new[] {packageReference}, packagesDir, tmpDir.Path);
+      var assemblies = new NuGetAssemblyResolver()
+        .FindAssembly(new[] {packageReference}, packagesDir, tmpDir.Path);
 
       That(assemblies.Select(GetFullPath),
            Has.Member(GetFullPath(ReferencedDll(tmpDir))));
@@ -39,8 +39,8 @@ namespace Bud.NuGet {
 
     [Test]
     public void Resolve_returns_a_list_of_existing_assembly_dlls() {
-      var assemblies = new NuGetPackageResolver()
-        .Resolve(new[] {packageReference}, packagesDir, tmpDir.Path);
+      var assemblies = new NuGetAssemblyResolver()
+        .FindAssembly(new[] {packageReference}, packagesDir, tmpDir.Path);
 
       That(assemblies, Has.All.Exist);
     }

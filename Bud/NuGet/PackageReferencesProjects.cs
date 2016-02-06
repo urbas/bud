@@ -17,7 +17,7 @@ namespace Bud.NuGet {
       .Empty
       .Add(SourcesSupport)
       .AddSourceFile(c => PackagesConfigFile[c])
-      .InitValue(AssemblyResolver, new NuGetPackageResolver())
+      .InitValue(AssemblyResolver, new NuGetAssemblyResolver())
       .Init(ReferencedPackages, ReadReferencedPackagesFromSources)
       .Init(PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
       .Init(ResolvedAssemblies, ResolveAssemblies);
@@ -50,7 +50,7 @@ namespace Bud.NuGet {
         throw new Exception($"Could not download packages: {string.Join(", ", packageReferences)}");
       }
       return AssemblyResolver[c]
-        .Resolve(packageReferences, packagesDir, ProjectDir[c]);
+        .FindAssembly(packageReferences, packagesDir, ProjectDir[c]);
     }
   }
 }

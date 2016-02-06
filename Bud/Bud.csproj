@@ -135,8 +135,8 @@
     <Compile Include="NuGet\PackageReference.cs" />
     <Compile Include="NuGet\PackageReferencesProjects.cs" />
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolver.cs" />
-    <Compile Include="NuGet\IPackageResolver.cs" />
-    <Compile Include="NuGet\NuGetPackageResolver.cs" />
+    <Compile Include="NuGet\IAssemblyResolver.cs" />
+    <Compile Include="NuGet\NuGetAssemblyResolver.cs" />
     <Compile Include="Reactive\ObservableResults.cs" />
     <Compile Include="Reactive\TaskResults.cs" />
     <Compile Include="Util\Option.cs" />
