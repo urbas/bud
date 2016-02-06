@@ -14,7 +14,7 @@ namespace Bud.NuGet {
     internal static Conf NuGetPublishingSupport
       = Conf.Empty
             .Init(PackageMetadata, DefaultPackageMetadata)
-            .Init(PackageOutputDir, DefaultPackageOutputDir)
+            .Init(PackageOutputDir, c => Combine(BuildDir[c], PackageOutputDirName))
             .Init(Publish, DefaultPublish)
             .Init(PackageBaseDir, _ => Directory.GetCurrentDirectory())
             .InitValue(PublishApiKey, Option.None<string>())
@@ -28,21 +28,31 @@ namespace Bud.NuGet {
                                   ProjectId[c],
                                   ImmutableDictionary<string, string>.Empty);
 
-    private static string DefaultPackageOutputDir(IConf c)
-      => Combine(BuildDir[c], PackageOutputDirName);
-
     private static IObservable<string> DefaultPackage(IConf c)
-      => PackageFiles[c].Select(packageFiles => Packager[c].Pack(
+      => PackageFiles[c].CombineLatest(GetReferencedPackages(c),
+                                       (packageFiles, referencedPackages) => Pack(c, packageFiles, referencedPackages));
+
+    private static IObservable<IImmutableList<PackageReference>> GetReferencedPackages(IConf c)
+      => c.TryGet(ReferencedPackages)
+          .GetOrElse(Observable.Return(ImmutableList<PackageReference>.Empty));
+
+    private static string Pack(IConf c,
+                               IEnumerable<PackageFile> packageFiles,
+                               IEnumerable<PackageReference> referencedPackages) {
+      return Packager[c].Pack(
         PackageOutputDir[c],
         PackageBaseDir[c],
         ProjectId[c],
         Api.Version[c],
         packageFiles,
-        PackageDependencies(c),
-        PackageMetadata[c]));
+        PackageDependencies(c).Concat(referencedPackages.Select(r => new PackageDependency(r.Id, r.Version.ToString()))),
+        PackageMetadata[c]);
+    }
 
     private static IObservable<IEnumerable<PackageFile>> DefaultPackageFiles(IConf c)
-      => Output[c].Select(files => files.Select(ToContentFiles));
+      => c.TryGet(Output)
+          .GetOrElse(Observable.Return(Empty<string>()))
+          .Select(files => files.Select(ToContentFiles));
 
     private static IObservable<bool> DefaultPublish(IConf c)
       => Package[c]

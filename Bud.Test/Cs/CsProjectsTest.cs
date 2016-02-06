@@ -10,6 +10,8 @@ using Bud.V1;
 using Microsoft.CodeAnalysis;
 using Microsoft.Reactive.Testing;
 using Moq;
+using NuGet.Frameworks;
+using NuGet.Versioning;
 using NUnit.Framework;
 using static System.IO.Path;
 using static Bud.V1.Api;
@@ -163,27 +165,7 @@ namespace Bud.Cs {
     [Test]
     public void Package_must_contain_the_dll_of_the_CsLibrary_project() {
       var packager = new Mock<IPackager>(MockBehavior.Strict);
-      var projects = Projects(CsLibrary("aDir", "A"),
-                              CsLibrary("bDir", "B")
-                                .Clear(Output).Add(Output, "B.dll")
-                                .SetValue(Packager, packager.Object)
-                                .Add(Dependencies, "../A"));
-      packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
-                                 Directory.GetCurrentDirectory(),
-                                 "B",
-                                 DefaultVersion,
-                                 new[] {new PackageFile("B.dll", "lib/B.dll"),},
-                                 new[] {new PackageDependency("A", DefaultVersion)},
-                                 It.IsAny<NuGetPackageMetadata>()))
-              .Returns("B.nupkg");
-      projects.Get("B"/Package).Take(1).Wait();
-      packager.VerifyAll();
-    }
-
-    [Test]
-    public void Package_must_contain_references_to_own_packages() {
-      var packager = new Mock<IPackager>(MockBehavior.Strict);
-      var projects = Projects(CsLibrary("bDir", "A")
+      var projects = Projects(CsLibrary("aDir", "A")
                                 .SetValue(Api.Version, "4.2.0"),
                               CsLibrary("bDir", "B")
                                 .Clear(Output).Add(Output, "B.dll")
@@ -194,7 +176,27 @@ namespace Bud.Cs {
                                  "B",
                                  DefaultVersion,
                                  new[] {new PackageFile("B.dll", "lib/B.dll"),},
-                                 new[] {new PackageDependency("A", "4.2.0") },
+                                 new[] {new PackageDependency("A", "4.2.0")},
+                                 It.IsAny<NuGetPackageMetadata>()))
+              .Returns("B.nupkg");
+      projects.Get("B"/Package).Take(1).Wait();
+      packager.VerifyAll();
+    }
+
+    [Test]
+    public void Package_must_contain_references_to_own_packages() {
+      var packager = new Mock<IPackager>(MockBehavior.Strict);
+      var projects = Projects(CsLibrary("bDir", "B")
+                                .Clear(Output).Add(Output, "B.dll")
+                                .SetValue(Packager, packager.Object)
+                                .Clear("NuGetPackageReference" / ReferencedPackages)
+                                .Add("NuGetPackageReference" / ReferencedPackages, new PackageReference("Foo", NuGetVersion.Parse("2.4.1"), NuGetFramework.Parse("net35"))));
+      packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
+                                 Directory.GetCurrentDirectory(),
+                                 "B",
+                                 DefaultVersion,
+                                 new[] {new PackageFile("B.dll", "lib/B.dll"),},
+                                 new[] {new PackageDependency("Foo", "2.4.1") },
                                  It.IsAny<NuGetPackageMetadata>()))
               .Returns("B.nupkg");
       projects.Get("B"/Package).Take(1).Wait();

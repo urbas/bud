@@ -1,9 +1,14 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Reactive.Linq;
+using Bud.IO;
 using Bud.V1;
 using Moq;
+using NuGet.Frameworks;
+using NuGet.Versioning;
 using NUnit.Framework;
 using static System.IO.Path;
 using static Bud.NuGet.NuGetPublishing;
@@ -16,26 +21,55 @@ namespace Bud.NuGet {
     [Test]
     public void Invokes_the_packager_with_the_right_parameters() {
       var packager = new Mock<IPackager>(MockBehavior.Strict);
-      const string package = "Foo.nupkg";
-      const string fileToPackage = "Foo.txt";
+      const string package = "B.nupkg";
+      const string fileToPackage = "B.txt";
 
-      var project = BareProject("fooDir", "Foo")
-        .Clear(Output)
-        .Add(Output, fileToPackage)
+      var projectA = BareProject("a", "A")
+        .SetValue(Api.Version, "1.2.3");
+      var project = BareProject("b", "B")
+        .Clear(Output).Add(Output, fileToPackage)
+        .Add(Dependencies, "../A")
+        .InitEmpty(ReferencedPackages).Add(ReferencedPackages, new PackageReference("C", NuGetVersion.Parse("4.5.7"), NuGetFramework.Parse("net35")))
         .Add(NuGetPublishingSupport)
         .SetValue(Packager, packager.Object);
+      var projects = Projects(projectA, project);
 
       packager.Setup(self => self.Pack(Combine(BuildDir[project], PackageOutputDirName),
                                        Directory.GetCurrentDirectory(),
-                                       "Foo",
+                                       "B",
                                        DefaultVersion,
-                                       new[] {new PackageFile(fileToPackage, "content/Foo.txt")},
-                                       new PackageDependency[] {},
-                                       new NuGetPackageMetadata(Environment.UserName, "Foo", ImmutableDictionary<string, string>.Empty)))
+                                       new[] {new PackageFile(fileToPackage, "content/B.txt")},
+                                       new [] {new PackageDependency("A", "1.2.3"), new PackageDependency("C", "4.5.7"), }, 
+                                       new NuGetPackageMetadata(Environment.UserName, "B", ImmutableDictionary<string, string>.Empty)))
               .Returns(package);
 
-      AreEqual(package, project.Get(Package).Take(1).Wait());
+      AreEqual(package, projects.Get("B" / Package).Take(1).Wait());
       packager.VerifyAll();
+    }
+
+    [Test]
+    [Category("IntegrationTest")]
+    public void Simplest_NuGet_publishing_project() {
+      using (var tmpDir = new TemporaryDirectory()) {
+        var project = NuGetPublishingProject(tmpDir.Path, "Foo")
+          .SetValue(PublishUrl, tmpDir.CreateDir("repo"));
+        AreEqual(new[] {false},
+                 Publish[project].ToEnumerable());
+      }
+    }
+
+    [Test]
+    [Category("IntegrationTest")]
+    public void NuGet_publishing_some_content() {
+      using (var tmpDir = new TemporaryDirectory()) {
+        var repoDir = tmpDir.CreateDir("repo");
+        string someFile = tmpDir.CreateFile("some content", "A.txt");
+        var project = NuGetPublishingProject(tmpDir.Path, "Foo")
+          .Add(PackageFiles, new PackageFile(someFile, "content/A.txt"))
+          .SetValue(PublishUrl, repoDir);
+        AreEqual(new[] {true},
+                 Publish[project].ToEnumerable());
+      }
     }
 
     [Test]

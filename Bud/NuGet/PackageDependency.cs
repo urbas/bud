@@ -22,6 +22,12 @@ namespace Bud.NuGet {
       return obj.GetType() == GetType() && Equals((PackageDependency) obj);
     }
 
+    public static bool operator ==(PackageDependency left, PackageDependency right)
+      => Equals(left, right);
+
+    public static bool operator !=(PackageDependency left, PackageDependency right)
+      => !Equals(left, right);
+
     public override int GetHashCode() {
       unchecked {
         return (PackageId.GetHashCode()*397) ^ Version.GetHashCode();

@@ -35,6 +35,7 @@ namespace Bud.Cs {
       .Add(AssemblyReferences, c => (NuGetPackageReferencesSubProjectId/ResolvedAssemblies)[c])
       .Set(NuGetPackageReferencesSubProjectId/ProjectDir, c => Combine(ProjectDir[c], "packages"))
       .Set(NuGetPackageReferencesSubProjectId/PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
+      .Init(ReferencedPackages, c => (NuGetPackageReferencesSubProjectId/ReferencedPackages)[c])
       .Set(PackageFiles, PackageLibDlls)
       .ExcludeSourceDirs(DefaultExcludedSourceDirs);
 

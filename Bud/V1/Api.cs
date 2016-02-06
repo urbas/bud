@@ -228,6 +228,10 @@ namespace Bud.V1 {
 
     public static Key<NuGetPackageMetadata> PackageMetadata = nameof(PackageMetadata);
 
+    public static Conf NuGetPublishingProject(string projectDir, string projectId)
+      => BareProject(projectDir, projectId)
+      .Add(NuGetPublishing.NuGetPublishingSupport);
+
     #endregion
 
     #region Bare Project

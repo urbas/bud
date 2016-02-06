@@ -7,14 +7,17 @@ using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Bud.Cs;
+using Bud.NuGet;
 using Bud.Reactive;
 using Bud.Util;
 using Bud.V1;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Directory;
 using static System.IO.Path;
 using static Bud.Util.Option;
 using static Bud.V1.Api;
+using Version = System.Version;
 
 namespace Bud.Cli {
   public class BuildTool {
@@ -85,8 +88,9 @@ namespace Bud.Cli {
       typeof(ImmutableArray).Assembly.Location,
       typeof(Observable).Assembly.Location,
       typeof(ResourceDescription).Assembly.Location,
+      typeof(CSharpCompilationOptions).Assembly.Location,
       typeof(Unit).Assembly.Location,
-      "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.Runtime.dll",
-      "C:/Program Files (x86)/Reference Assemblies/Microsoft/Framework/.NETFramework/v4.6/Facades/System.IO.dll");
+      WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.Runtime", Version.Parse("4.6.0.0")).Value,
+      WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.IO", Version.Parse("4.6.0.0")).Value);
   }
 }
