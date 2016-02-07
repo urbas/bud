@@ -44,7 +44,7 @@ namespace Bud.NuGet {
       });
 
     private static IEnumerable<string> DownloadAndResolvePackages(IConf c, IImmutableList<PackageReference> packageReferences) {
-      var packagesDir = Combine(ProjectDir[c], "packages");
+      var packagesDir = Combine(ProjectDir[c], "cache");
       CreateDirectory(packagesDir);
       if (!DownloadPackages(packageReferences, packagesDir)) {
         throw new Exception($"Could not download packages: {string.Join(", ", packageReferences)}");

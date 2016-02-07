@@ -1,7 +1,5 @@
 # TODO List
 
-- Use a stable release version of Immutable Collections.
-
 - [Ongoing] I want to publish my projects to NuGet.
 
     - Publish Bud `0.5.0-alpha-1` to NuGet.

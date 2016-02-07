@@ -110,8 +110,8 @@ namespace Bud.Cs {
     [Test]
     public void Referenced_packages_must_be_added_to_the_list_of_assembly_references() {
       var project = CsLibrary("Foo")
-        .Clear("NuGetPackageReference"/ResolvedAssemblies)
-        .Add("NuGetPackageReference"/ResolvedAssemblies, "Bar.dll");
+        .Clear("Packages"/ResolvedAssemblies)
+        .Add("Packages"/ResolvedAssemblies, "Bar.dll");
       That(AssemblyReferences[project].ToEnumerable(),
            Has.Exactly(1).EqualTo(new[] {"Bar.dll"}));
     }
@@ -119,12 +119,12 @@ namespace Bud.Cs {
     [Test]
     public void Referenced_packages_project_must_reside_in_the_packages_folder()
       => AreEqual(Combine("Foo", "packages"),
-                  CsLibrary("Foo").Get("NuGetPackageReference"/ProjectDir));
+                  CsLibrary("Foo").Get("Packages"/ProjectDir));
 
     [Test]
     public void Packages_config_file_must_be_read_from_the_root()
       => AreEqual(Combine("Foo", "packages.config"),
-                  CsLibrary("Foo").Get("NuGetPackageReference"/PackagesConfigFile));
+                  CsLibrary("Foo").Get("Packages"/PackagesConfigFile));
 
     [Test]
     public void CSharp_files_in_the_packages_folder_must_not_be_listed() {
@@ -189,8 +189,8 @@ namespace Bud.Cs {
       var projects = Projects(CsLibrary("bDir", "B")
                                 .Clear(Output).Add(Output, "B.dll")
                                 .SetValue(Packager, packager.Object)
-                                .Clear("NuGetPackageReference"/ReferencedPackages)
-                                .Add("NuGetPackageReference"/ReferencedPackages, new PackageReference("Foo", NuGetVersion.Parse("2.4.1"), NuGetFramework.Parse("net35"))));
+                                .Clear("Packages"/ReferencedPackages)
+                                .Add("Packages"/ReferencedPackages, new PackageReference("Foo", NuGetVersion.Parse("2.4.1"), NuGetFramework.Parse("net35"))));
       packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
                                  Directory.GetCurrentDirectory(),
                                  "B",

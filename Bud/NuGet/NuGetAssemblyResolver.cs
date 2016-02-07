@@ -17,7 +17,7 @@ namespace Bud.NuGet {
     public IEnumerable<string> FindAssembly(IEnumerable<PackageReference> packageReferences,
                                             string packagesDir,
                                             string cacheDir) {
-      var packageRepository = CreatePackageRepository(packagesDir, cacheDir);
+      var packageRepository = CreatePackageIndex(packagesDir, cacheDir);
       var frameworkAssemblies = new List<FrameworkAssemblyReference>();
       var assemblies = new List<string>();
       foreach (var packageReference in packageReferences) {
@@ -60,8 +60,8 @@ namespace Bud.NuGet {
       }
     }
 
-    private static NuGetv3LocalRepository CreatePackageRepository(string packagesDir, string cacheDir) {
-      var packagesV3Dir = Path.Combine(cacheDir, "packages-index");
+    private static NuGetv3LocalRepository CreatePackageIndex(string packagesDir, string cacheDir) {
+      var packagesV3Dir = Path.Combine(cacheDir, "index");
       NuGetExecutable.ExecuteNuGet($"init {packagesDir} {packagesV3Dir}");
       return new NuGetv3LocalRepository(packagesV3Dir, true);
     }

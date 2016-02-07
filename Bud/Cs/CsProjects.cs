@@ -17,7 +17,7 @@ using static Microsoft.CodeAnalysis.OutputKind;
 
 namespace Bud.Cs {
   internal static class CsProjects {
-    private const string NuGetPackageReferencesSubProjectId = "NuGetPackageReference";
+    private const string PackagesSubProjectId = "Packages";
 
     private static readonly Conf CsProjectSetting = Conf
       .Empty
@@ -32,16 +32,16 @@ namespace Bud.Cs {
       .InitValue(CsCompilationOptions,
                  new CSharpCompilationOptions(DynamicallyLinkedLibrary,
                                               warningLevel: 1))
-      .Add(AssemblyReferences, c => (NuGetPackageReferencesSubProjectId/ResolvedAssemblies)[c])
-      .Set(NuGetPackageReferencesSubProjectId/ProjectDir, c => Combine(ProjectDir[c], "packages"))
-      .Set(NuGetPackageReferencesSubProjectId/PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
-      .Init(ReferencedPackages, c => (NuGetPackageReferencesSubProjectId/ReferencedPackages)[c])
+      .Add(AssemblyReferences, c => (PackagesSubProjectId/ResolvedAssemblies)[c])
+      .Set(PackagesSubProjectId/ProjectDir, c => Combine(ProjectDir[c], "packages"))
+      .Set(PackagesSubProjectId/PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
+      .Init(ReferencedPackages, c => (PackagesSubProjectId/ReferencedPackages)[c])
       .Set(PackageFiles, PackageLibDlls)
       .ExcludeSourceDirs(DefaultExcludedSourceDirs);
 
     internal static Conf CsLibrary(string projectDir, string projectId)
       => BuildProject(projectDir, projectId)
-        .Add(PackageReferencesProject(projectDir, NuGetPackageReferencesSubProjectId))
+        .Add(PackageReferencesProject(projectDir, PackagesSubProjectId))
         .Add(CsProjectSetting);
 
     internal static Conf CsApp(string projectDir, string projectId)
@@ -89,7 +89,7 @@ namespace Bud.Cs {
         "obj",
         "bin",
         BuildDir[c],
-        (NuGetPackageReferencesSubProjectId/ProjectDir)[c]
+        (PackagesSubProjectId/ProjectDir)[c]
       };
   }
 }
