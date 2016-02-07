@@ -189,19 +189,23 @@ namespace Bud.Cs {
       var projects = Projects(CsLibrary("bDir", "B")
                                 .Clear(Output).Add(Output, "B.dll")
                                 .SetValue(Packager, packager.Object)
-                                .Clear("NuGetPackageReference" / ReferencedPackages)
-                                .Add("NuGetPackageReference" / ReferencedPackages, new PackageReference("Foo", NuGetVersion.Parse("2.4.1"), NuGetFramework.Parse("net35"))));
+                                .Clear("NuGetPackageReference"/ReferencedPackages)
+                                .Add("NuGetPackageReference"/ReferencedPackages, new PackageReference("Foo", NuGetVersion.Parse("2.4.1"), NuGetFramework.Parse("net35"))));
       packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
                                  Directory.GetCurrentDirectory(),
                                  "B",
                                  DefaultVersion,
                                  new[] {new PackageFile("B.dll", "lib/B.dll"),},
-                                 new[] {new PackageDependency("Foo", "2.4.1") },
+                                 new[] {new PackageDependency("Foo", "2.4.1")},
                                  It.IsAny<NuGetPackageMetadata>()))
               .Returns("B.nupkg");
       projects.Get("B"/Package).Take(1).Wait();
       packager.VerifyAll();
     }
+
+    [Test]
+    public void CsApp_produces_an_executable()
+      => AreEqual("Foo.exe", CsApp("Foo").Get(AssemblyName));
 
     private static Conf ProjectAOutputsFooDll(long initialTimestamp)
       => EmptyCSharpProject("A")

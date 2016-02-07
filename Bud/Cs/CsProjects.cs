@@ -39,21 +39,28 @@ namespace Bud.Cs {
       .Set(PackageFiles, PackageLibDlls)
       .ExcludeSourceDirs(DefaultExcludedSourceDirs);
 
-    private static IObservable<IEnumerable<PackageFile>> PackageLibDlls(IConf c)
-      => Output[c].Select(ToPackageFiles);
-
-    internal static Conf CreateCsLibrary(string projectDir, string projectId)
+    internal static Conf CsLibrary(string projectDir, string projectId)
       => BuildProject(projectDir, projectId)
         .Add(PackageReferencesProject(projectDir, NuGetPackageReferencesSubProjectId))
         .Add(CsProjectSetting);
 
-    internal static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
+    internal static Conf CsApp(string projectDir, string projectId)
+      => CsLibrary(projectDir, projectId)
+        .Modify(CsCompilationOptions, (_, oldValue) => oldValue.WithOutputKind(ConsoleApplication));
+
+    internal static Conf EmbedResourceImpl(Conf conf, string path, string nameInAssembly)
+      => conf.Add(EmbeddedResources, c => {
+        var resourceFile = IsPathRooted(path) ? path : Combine(ProjectDir[c], path);
+        return ToResourceDescriptor(resourceFile, nameInAssembly);
+      });
+
+    private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
       => Input[conf]
         .CombineLatest(ObserveDependencies(conf),
                        AssemblyReferences[conf], CompileInput.Create)
         .Select(Compiler[conf]).Do(PrintCompilationResult);
 
-    internal static void PrintCompilationResult(CompileOutput output) {
+    private static void PrintCompilationResult(CompileOutput output) {
       if (output.Success) {
         WriteLine($"Compiled '{GetFileNameWithoutExtension(output.AssemblyPath)}' in {output.CompilationTime.Milliseconds}ms.");
       } else {
@@ -64,21 +71,18 @@ namespace Bud.Cs {
       }
     }
 
-    internal static ResourceDescription ToResourceDescriptor(string resourceFile, string nameInAssembly)
+    private static ResourceDescription ToResourceDescriptor(string resourceFile, string nameInAssembly)
       => new ResourceDescription(nameInAssembly, () => File.OpenRead(resourceFile), true);
 
-    internal static IObservable<IEnumerable<CompileOutput>> ObserveDependencies(IConf c)
+    private static IObservable<IEnumerable<CompileOutput>> ObserveDependencies(IConf c)
       => Dependencies[c].Gather(dependency => c.TryGet(dependency/Compile))
                         .Combined();
 
-    internal static Conf EmbedResourceImpl(Conf conf, string path, string nameInAssembly)
-      => conf.Add(EmbeddedResources, c => {
-        var resourceFile = IsPathRooted(path) ? path : Combine(ProjectDir[c], path);
-        return ToResourceDescriptor(resourceFile, nameInAssembly);
-      });
-
     private static IEnumerable<PackageFile> ToPackageFiles(IEnumerable<string> dlls)
       => dlls.Select(dll => new PackageFile(dll, $"lib/{GetFileName(dll)}"));
+
+    private static IObservable<IEnumerable<PackageFile>> PackageLibDlls(IConf c)
+      => Output[c].Select(ToPackageFiles);
 
     private static IEnumerable<string> DefaultExcludedSourceDirs(IConf c)
       => new[] {

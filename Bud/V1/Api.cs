@@ -12,7 +12,6 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using static Bud.BaseProjects.BareProjects;
 using static Bud.BaseProjects.BuildProjects;
-using static Bud.Cs.CsProjects;
 using static Bud.NuGet.PackageReferencesProjects;
 
 namespace Bud.V1 {
@@ -347,10 +346,24 @@ namespace Bud.V1 {
     ///   folder.
     /// </summary>
     public static Conf CsLibrary(string projectDir, string projectId)
-      => CreateCsLibrary(projectDir, projectId);
+      => CsProjects.CsLibrary(projectDir, projectId);
+
+    /// <summary>
+    ///   Similar to <see cref="CsLibrary(string)"/> but produces a console application instead
+    ///   of a library.
+    /// </summary>
+    public static Conf CsApp(string projectId)
+      => CsApp(projectId, projectId);
+
+    /// <summary>
+    ///   Similar to <see cref="CsLibrary(string, string)"/> but produces a console application instead
+    ///   of a library.
+    /// </summary>
+    public static Conf CsApp(string projectDir, string projectId)
+      => CsProjects.CsApp(projectDir, projectId);
 
     public static Conf EmbedResource(this Conf conf, string path, string nameInAssembly)
-      => EmbedResourceImpl(conf, path, nameInAssembly);
+      => CsProjects.EmbedResourceImpl(conf, path, nameInAssembly);
 
     #endregion
 
