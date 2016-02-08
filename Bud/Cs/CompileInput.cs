@@ -7,20 +7,20 @@ namespace Bud.Cs {
   public class CompileInput {
     public IEnumerable<string> Sources { get; }
     public IEnumerable<CompileOutput> Dependencies { get; }
-    public IEnumerable<string> AssemblyReferences { get; }
+    public IEnumerable<string> Assemblies { get; }
 
     public CompileInput(IEnumerable<string> sources,
                         IEnumerable<CompileOutput> dependencies,
-                        IEnumerable<string> assemblyReferences) {
+                        IEnumerable<string> assemblies) {
       Sources = sources;
       Dependencies = dependencies;
-      AssemblyReferences = assemblyReferences;
+      Assemblies = assemblies;
     }
 
     protected bool Equals(CompileInput other)
       => Sources.SequenceEqual(other.Sources) &&
          Dependencies.SequenceEqual(other.Dependencies) &&
-         AssemblyReferences.SequenceEqual(other.AssemblyReferences);
+         Assemblies.SequenceEqual(other.Assemblies);
 
     public override bool Equals(object obj) {
       if (ReferenceEquals(null, obj)) {
@@ -36,7 +36,7 @@ namespace Bud.Cs {
       unchecked {
         var hashCode = ElementwiseHashCode(Sources);
         hashCode = (hashCode*397) ^ ElementwiseHashCode(Dependencies);
-        hashCode = (hashCode*397) ^ ElementwiseHashCode(AssemblyReferences);
+        hashCode = (hashCode*397) ^ ElementwiseHashCode(Assemblies);
         return hashCode;
       }
     }

@@ -41,7 +41,7 @@ namespace Bud.Cs {
       }
 
       var sources = input.Sources.Select(ToTimestampedFile).ToList();
-      var assemblies = input.AssemblyReferences
+      var assemblies = input.Assemblies
                             .Concat(input.Dependencies.Select(output => output.AssemblyPath))
                             .Select(ToTimestampedFile).ToList();
 

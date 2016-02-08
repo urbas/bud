@@ -11,8 +11,6 @@
         21:15:49.000> Bud.Test/Compile [Start]
         21:15:49.300> Bud.Test/Compile [Done in 300ms]
 
-- Publish Bud `0.5.0-alpha-1` to NuGet.
-
 - I want to install Bud from Chocolatey.
 
 - I want to use Bud in Visual Source.
