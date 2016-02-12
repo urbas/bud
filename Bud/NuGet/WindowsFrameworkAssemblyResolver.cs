@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using Bud.Util;
 using Microsoft.Win32;
@@ -22,135 +23,89 @@ namespace Bud.NuGet {
       = Combine(Net3PlusFrameworkPath, ".NETFramework");
 
     public static Option<string> ResolveFrameworkAssembly(string assemblyName, Version version) {
-      var assembly = None<string>();
       if (version.Major == 0) {
         version = new Version(int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue);
       }
-      if (version.Major >= 4) {
-        assembly = FindNet4PlusAssembly(assemblyName, version);
-      }
-      if (version >= new Version(3, 5) && !assembly.HasValue) {
-        assembly = FindNet3Assembly(5, assemblyName);
-      }
-      if (version >= new Version(3, 0) && !assembly.HasValue) {
-        assembly = FindNet3Assembly(0, assemblyName);
-      }
-      if (version >= new Version(2, 0) && !assembly.HasValue) {
-        assembly = FindNet2Assembly(assemblyName);
-      }
-      return assembly.HasValue ?
-               assembly :
-               AssemblyFoldersEx.FindAssembly(assemblyName, version);
+      var dllName = assemblyName + ".dll";
+      var foundDll = FrameworkDirs
+        .Where(frameworkDir => version >= frameworkDir.Version)
+        .Select(frameworkDir => Combine(frameworkDir.Dir, dllName))
+        .FirstOrDefault(Exists);
+      return foundDll ?? None<string>();
     }
 
-    private static Option<string> FindNet4PlusAssembly(string assemblyName, Version version) {
-      var rootReferenceAssemblyPath = ToNet4RawAssemblyPath(assemblyName,
-                                                            version);
-      if (Exists(rootReferenceAssemblyPath)) {
-        return rootReferenceAssemblyPath;
+    public static bool IsFrameworkAssembly(string dll)
+      => FrameworkDirs.Any(f => Exists(Combine(f.Dir, dll)));
+
+    public static ImmutableSortedSet<FrameworkDir> FrameworkDirs
+      => FrameworkDirsLazy.FrameworkDirsCache;
+
+    private static class FrameworkDirsLazy {
+      public static readonly ImmutableSortedSet<FrameworkDir> FrameworkDirsCache = GetFrameworkDirs();
+
+      private static ImmutableSortedSet<FrameworkDir> GetFrameworkDirs() {
+        var net4PlusDirs = Directory.EnumerateDirectories(Net4PlusFrameworkPath, "v*", SearchOption.TopDirectoryOnly);
+        var list = new List<FrameworkDir>();
+        foreach (var dir in net4PlusDirs) {
+          var facadesDir = Combine(dir, "Facades");
+          var frameworkVersion = Version.Parse(GetFileName(dir).Substring(1));
+          if (Directory.Exists(facadesDir)) {
+            list.Add(new FrameworkDir(frameworkVersion, facadesDir));
+          }
+          list.Add(new FrameworkDir(frameworkVersion, dir));
+        }
+        list.Add(new FrameworkDir(new Version(3, 5), Combine(Net3PlusFrameworkPath, "v3.5")));
+        list.Add(new FrameworkDir(new Version(3, 5), Combine(OldFrameworkPath, "v3.5")));
+        list.Add(new FrameworkDir(new Version(3, 0), Combine(Net3PlusFrameworkPath, "v3.0")));
+        list.Add(new FrameworkDir(new Version(3, 0), Combine(OldFrameworkPath, "v3.0")));
+        list.Add(new FrameworkDir(new Version(2, 0), Combine(OldFrameworkPath, "v2.0.50727")));
+
+        AddAssemblyFoldersEx(list);
+
+        return list.ToImmutableSortedSet(new FrameworkDirComparer());
       }
-      var facadeReferenceAssemblyPath = ToFacadePath(assemblyName, version);
-      if (Exists(facadeReferenceAssemblyPath)) {
-        return facadeReferenceAssemblyPath;
-      }
-      return None<string>();
-    }
 
-    private static string ToNet4RawAssemblyPath(string assemblyName,
-                                                Version version)
-      => Combine(Net4PlusFrameworkPath,
-                 ToNet4PlusDir(version),
-                 $"{assemblyName}.dll");
-
-    private static string ToFacadePath(string assemblyName,
-                                       Version version)
-      => Combine(Net4PlusFrameworkPath,
-                 ToNet4PlusDir(version),
-                 "Facades",
-                 $"{assemblyName}.dll");
-
-    private static string ToNet4PlusDir(Version version)
-      => version.Build == 0 ?
-           $"v{version.Major}.{version.Minor}" :
-           $"v{version.Major}.{version.Minor}.{version.Build}";
-
-    private static Option<string> FindNet3Assembly(int minorVersion,
-                                                     string assemblyName) {
-      var assembly = Combine(Net3PlusFrameworkPath,
-                             ToNet3Dir(minorVersion),
-                             $"{assemblyName}.dll");
-      if (Exists(assembly)) {
-        return assembly;
-      }
-      assembly = Combine(OldFrameworkPath,
-                         ToNet3Dir(minorVersion),
-                         $"{assemblyName}.dll");
-      return Exists(assembly) ? assembly : None<string>();
-    }
-
-    private static string ToNet3Dir(int minorVersion)
-      => $"v3.{minorVersion}";
-
-    private static Option<string> FindNet2Assembly(string assemblyName) {
-      var assembly = Combine(OldFrameworkPath,
-                             "v2.0.50727",
-                             $"{assemblyName}.dll");
-      return Exists(assembly) ? assembly : None<string>();
-    }
-
-    private static class AssemblyFoldersEx {
-      private static readonly ImmutableSortedDictionary<Version, IImmutableSet<string>>
-        VersionToFoldersMap = GetAssemblyFoldersEx();
-
-      public static Option<string> FindAssembly(string assemblyName,
-                                                  Version version) {
-        foreach (var versionFolders in VersionToFoldersMap) {
-          if (versionFolders.Key >= version) {
-            foreach (var folder in versionFolders.Value) {
-              var assemblyPath = Combine(folder, $"{assemblyName}.dll");
-              if (Exists(assemblyPath)) {
-                return assemblyPath;
-              }
-            }
-          } else {
-            break;
+      private static void AddAssemblyFoldersEx(ICollection<FrameworkDir> list) {
+        using (var netFrameworkRegKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\.NETFramework")) {
+          if (netFrameworkRegKey == null) {
+            return;
+          }
+          foreach (var versionKey in netFrameworkRegKey
+            .GetSubKeyNames()
+            .Where(key => key.StartsWith("v"))) {
+            CollectAssemblyFolders(netFrameworkRegKey, versionKey, list);
           }
         }
-        return None<string>();
       }
 
-      private static ImmutableSortedDictionary<Version, IImmutableSet<string>>
-        GetAssemblyFoldersEx() {
-        var netFrameworkRegKey = Registry
-          .LocalMachine
-          .OpenSubKey(@"SOFTWARE\Wow6432Node\Microsoft\.NETFramework");
-        var versions = netFrameworkRegKey
-          .GetSubKeyNames()
-          .Where(key => key.StartsWith("v")).ToImmutableSortedDictionary(
-            versionKey => Version.Parse(versionKey.Substring(1)),
-            versionKey => CollectAssemblyFolders(netFrameworkRegKey, versionKey),
-            new VersionComparerReverse());
-        return versions;
-      }
-
-      private static IImmutableSet<string>
-        CollectAssemblyFolders(RegistryKey netFrameworkRegKey,
-                               string verionKey) {
-        var assemblyFoldersKey = netFrameworkRegKey
-          .OpenSubKey($@"{verionKey}\AssemblyFoldersEx");
-        if (assemblyFoldersKey == null) {
-          return ImmutableHashSet<string>.Empty;
+      private static void CollectAssemblyFolders(RegistryKey netFrameworkRegKey,
+                                                 string versionKey,
+                                                 ICollection<FrameworkDir> list) {
+        var rawVersion = Version.Parse(versionKey.Substring(1));
+        var version = new Version(rawVersion.Major, rawVersion.Minor);
+        using (var assemblyFoldersKey = netFrameworkRegKey.OpenSubKey($@"{versionKey}\AssemblyFoldersEx")) {
+          if (assemblyFoldersKey == null) {
+            return;
+          }
+          foreach (var dirKey in assemblyFoldersKey.GetSubKeyNames()) {
+            using (var dirSubKey = assemblyFoldersKey.OpenSubKey(dirKey)) {
+              var dir = dirSubKey?.GetValue(null) as string;
+              if (!string.IsNullOrEmpty(dir)) {
+                list.Add(new FrameworkDir(version, dir));
+              }
+            }
+          }
         }
-        return assemblyFoldersKey
-          .GetSubKeyNames()
-          .Select(folderKey => assemblyFoldersKey.OpenSubKey(folderKey)?
-                                                 .GetValue(null) as string)
-          .Where(folder => !string.IsNullOrEmpty(folder))
-          .ToImmutableHashSet();
       }
 
-      private class VersionComparerReverse : IComparer<Version> {
-        public int Compare(Version x, Version y) => y.CompareTo(x);
+      private class FrameworkDirComparer : IComparer<FrameworkDir> {
+        public int Compare(FrameworkDir x, FrameworkDir y) {
+          var versionComparison = y.Version.CompareTo(x.Version);
+          if (versionComparison == 0) {
+            return string.Compare(y.Dir, x.Dir, StringComparison.Ordinal);
+          }
+          return versionComparison;
+        }
       }
     }
   }

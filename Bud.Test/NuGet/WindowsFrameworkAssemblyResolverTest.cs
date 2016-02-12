@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using NuGet.Frameworks;
 using NUnit.Framework;
 using static System.IO.Path;
@@ -91,5 +92,47 @@ namespace Bud.NuGet {
     public void Finds_a_reference_when_assembly_is_in_an_assembly_ex_dir()
       => IsTrue(ResolveFrameworkAssembly("Microsoft.VisualStudio.QualityTools.UnitTestFramework", Net45)
                   .HasValue);
+
+    [Test]
+    public void IsFrameworkAssembly_returns_true()
+      => IsTrue(IsFrameworkAssembly("System.dll"));
+
+    [Test]
+    public void IsFrameworkAssembly_returns_false()
+      => IsFalse(IsFrameworkAssembly("ThisIsSparta.dll"));
+
+    [Test]
+    public void IsFrameworkAssembly_returns_true_for_linq()
+      => IsTrue(IsFrameworkAssembly("System.Linq.dll"));
+
+    [Test]
+    public void FrameworkDirs_lists_all_supported_folders()
+      => That(FrameworkDirs,
+              Is.SupersetOf(new[] {
+                new FrameworkDir(new Version(4, 6, 1), Combine(Net4PlusFrameworkPath, "v4.6.1", "Facades")),
+                new FrameworkDir(new Version(4, 6, 1), Combine(Net4PlusFrameworkPath, "v4.6.1")),
+                new FrameworkDir(new Version(4, 6), Combine(Net4PlusFrameworkPath, "v4.6", "Facades")),
+                new FrameworkDir(new Version(4, 6), Combine(Net4PlusFrameworkPath, "v4.6")),
+                new FrameworkDir(new Version(4, 5, 2), Combine(Net4PlusFrameworkPath, "v4.5.2", "Facades")),
+                new FrameworkDir(new Version(4, 5, 2), Combine(Net4PlusFrameworkPath, "v4.5.2")),
+                new FrameworkDir(new Version(4, 5, 1), Combine(Net4PlusFrameworkPath, "v4.5.1", "Facades")),
+                new FrameworkDir(new Version(4, 5, 1), Combine(Net4PlusFrameworkPath, "v4.5.1")),
+                new FrameworkDir(new Version(4, 5), Combine(Net4PlusFrameworkPath, "v4.5", "Facades")),
+                new FrameworkDir(new Version(4, 5), Combine(Net4PlusFrameworkPath, "v4.5")),
+                new FrameworkDir(new Version(4, 0), Combine(Net4PlusFrameworkPath, "v4.0")),
+                new FrameworkDir(new Version(3, 5), Combine(Net4PlusFrameworkPath, "v3.5")),
+                new FrameworkDir(new Version(3, 5), Combine(Net3PlusFrameworkPath, "v3.5")),
+                new FrameworkDir(new Version(3, 5), Combine(OldFrameworkPath, "v3.5")),
+                new FrameworkDir(new Version(3, 0), Combine(Net3PlusFrameworkPath, "v3.0")),
+                new FrameworkDir(new Version(3, 0), Combine(OldFrameworkPath, "v3.0")),
+                new FrameworkDir(new Version(2, 0), Combine(OldFrameworkPath, "v2.0.50727")),
+              }));
+
+    [Test]
+    public void FrameworkDirs_is_ordered()
+      => That(FrameworkDirs.Take(FrameworkDirs.Count - 1)
+                           .Zip(FrameworkDirs.Skip(1),
+                                (f1, f2) => f1.Version >= f2.Version),
+              Has.All.True);
   }
 }

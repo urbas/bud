@@ -1,5 +1,9 @@
 # TODO List
 
+- [Ongoing] I want to install Bud from Chocolatey.
+
+- Add ability to reference packages and assemblies in buid configuration scripts.
+
 - Improved CLI Logging. Example: invoking `Bud.Test/Compile`
 
         21:15:45.000> Bud/Packages/Resolve [Start]
@@ -10,8 +14,6 @@
         21:15:49.000> Bud.Test/Packages/Resolve [Done in 750ms]
         21:15:49.000> Bud.Test/Compile [Start]
         21:15:49.300> Bud.Test/Compile [Done in 300ms]
-
-- I want to install Bud from Chocolatey.
 
 - I want to use Bud in Visual Source.
 
@@ -27,15 +29,17 @@
 
 - Compile projects in parallel.
 
-- Alias `bud Command` to `bud **/Command`. Do not alias absolute paths like `bud /Command` or wildcarded paths like `bud */Command` and `bud a/**/b`.
-
 - I want to test my projects.
+
+- Generate `csproj` files for projects.
 
 - I want to generate MSBuild solution and project files for my projects.
 
 - I want some help in `README.md`. After 1 minute, I should be able to build my project.
 
 - I want to define a generic build which doesn't rebuild if sources are up-to-date with outputs.
+
+    [Partial solution] Consider using `HashBasedCaching.GetLinesOrCache`.
 
 - Use less than 10ms to start a simple build.
 
@@ -52,3 +56,7 @@
   - [Proposal 1] We can introduce an 'Alias(Key, ...)' function to be used like this: `Alias(Clean, "Bud/Clean", "Bud.Test/Clean")`. One can then define arbitrary aliases that suit the needs of the developer.
 
   - [Proposal 2] We could allow wildcard keys, such as `bud */Clean` and `bud **/Clean`. (Partially implemented in git history: 195bde314a1e717143dac800a733efbcadcd3b86)
+
+- Alias `bud Command` to `bud **/Command`. Do not alias absolute paths like `bud /Command` or wildcarded paths like `bud */Command` and `bud a/**/b`.
+
+    - [Workaround] define a top-level command that you want to alias.

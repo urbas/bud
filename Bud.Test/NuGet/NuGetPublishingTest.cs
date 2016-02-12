@@ -29,7 +29,8 @@ namespace Bud.NuGet {
       var project = BareProject("b", "B")
         .Clear(Output).Add(Output, fileToPackage)
         .Add(Dependencies, "../A")
-        .InitEmpty(ReferencedPackages).Add(ReferencedPackages, new PackageReference("C", NuGetVersion.Parse("4.5.7"), NuGetFramework.Parse("net35")))
+        .InitEmpty(ReferencedPackages)
+        .Add(ReferencedPackages, new PackageReference("C", NuGetVersion.Parse("4.5.7"), NuGetFramework.Parse("net35")))
         .Add(NuGetPublishingSupport)
         .SetValue(Packager, packager.Object);
       var projects = Projects(projectA, project);
@@ -63,7 +64,7 @@ namespace Bud.NuGet {
     public void NuGet_publishing_some_content() {
       using (var tmpDir = new TemporaryDirectory()) {
         var repoDir = tmpDir.CreateDir("repo");
-        string someFile = tmpDir.CreateFile("some content", "A.txt");
+        var someFile = tmpDir.CreateFile("some content", "A.txt");
         var project = NuGetPublishingProject(tmpDir.Path, "Foo")
           .Add(PackageFiles, new PackageFile(someFile, "content/A.txt"))
           .SetValue(PublishUrl, repoDir);

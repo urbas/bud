@@ -115,11 +115,13 @@
     <Compile Include="Cs\CsProjects.cs" />
     <Compile Include="Cs\RoslynCsCompiler.cs" />
     <Compile Include="IO\HashBasedCaching.cs" />
+    <Compile Include="IO\PackageFile.cs" />
     <Compile Include="IO\ValueUpdater.cs" />
     <Compile Include="IO\FileWatcher.cs" />
     <Compile Include="IO\IValueStore.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReference.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReferencesAggregator.cs" />
+    <Compile Include="NuGet\FrameworkDir.cs" />
     <Compile Include="NuGet\IPackager.cs" />
     <Compile Include="NuGet\IPublisher.cs" />
     <Compile Include="NuGet\NuGetExecutable.cs" />
@@ -130,7 +132,6 @@
     <Compile Include="NuGet\NuGetPublishing.cs" />
     <Compile Include="NuGet\NuGetPushArgsBuilder.cs" />
     <Compile Include="NuGet\PackageDependency.cs" />
-    <Compile Include="NuGet\PackageFile.cs" />
     <Compile Include="NuGet\NuGetPackageMetadata.cs" />
     <Compile Include="NuGet\PackageReference.cs" />
     <Compile Include="NuGet\PackageReferencesProjects.cs" />

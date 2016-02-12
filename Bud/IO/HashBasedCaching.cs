@@ -9,9 +9,9 @@ using static Bud.Util.Option;
 namespace Bud.IO {
   public class HashBasedCaching {
     public static IEnumerable<string>
-      Get(string cacheFile,
-          string hash,
-          Func<IEnumerable<string>> contentLines) {
+      GetLinesOrCache(string cacheFile,
+                      string hash,
+                      Func<IEnumerable<string>> contentLines) {
       var calculatedDigest = hash;
       var resultFromCache = TryGetFromCache(cacheFile, calculatedDigest);
       if (resultFromCache.HasValue) {

@@ -6,7 +6,6 @@ using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
 using Bud.IO;
-using Bud.NuGet;
 using Bud.V1;
 using Microsoft.Reactive.Testing;
 using Moq;
@@ -24,7 +23,7 @@ namespace Bud.BaseProjects {
     public void DependenciesInput_must_be_empty_when_no_dependencies_given() {
       var projects = BuildProject("aDir", "A");
       AreEqual(new[] {Enumerable.Empty<string>()},
-               projects.Get(DependenciesInput).ToList().Wait());
+               projects.Get(DependenciesOutput).ToList().Wait());
     }
 
     [Test]
@@ -34,7 +33,7 @@ namespace Bud.BaseProjects {
                               BuildProject("bDir", "B")
                                 .Add(Dependencies, "../A"));
       AreEqual(new[] {"a"},
-               projects.Get("B"/DependenciesInput).Wait());
+               projects.Get("B"/DependenciesOutput).Wait());
     }
 
 
@@ -47,7 +46,7 @@ namespace Bud.BaseProjects {
                               BuildProject("bDir", "B")
                                 .SetValue(BuildPipelineScheduler, testScheduler)
                                 .Add(Dependencies, "../A"));
-      var bInput = projects.Get("B"/DependenciesInput).GetEnumerator();
+      var bInput = projects.Get("B"/DependenciesOutput).GetEnumerator();
       testScheduler.AdvanceBy(TimeSpan.FromSeconds(5).Ticks);
       IsTrue(bInput.MoveNext());
       AreEqual(new[] {"foo"}, bInput.Current);
@@ -173,6 +172,48 @@ namespace Bud.BaseProjects {
       }
     }
 
+    [Test]
+    [Category("IntegrationTest")]
+    public void DistributionZip_contains_Output() {
+      using (var tmpDir = new TemporaryDirectory()) {
+        var project = BuildProject(tmpDir.Path, "A")
+          .Add(Output, tmpDir.CreateEmptyFile("A.txt"));
+        var distZip = project.Get(DistributionZip).Take(1).Wait();
+        AreEqual(Combine(BuildDir[project], "dist-zip", "A.zip"),
+                 distZip);
+        ZipTestUtils.IsInZip(distZip, "A.txt");
+      }
+    }
+
+    [Test]
+    [Category("IntegrationTest")]
+    public void DistributionZip_contains_Output_of_Dependencies() {
+      using (var tmpDir = new TemporaryDirectory()) {
+        var projects = Projects(
+          BuildProject(tmpDir.Path, "A")
+            .Clear(Output).Add(Output, tmpDir.CreateEmptyFile("A.dll")),
+          BuildProject(tmpDir.Path, "B")
+            .Add(Dependencies, "../A")
+            .Clear(Output));
+        var distZip = projects.Get("B"/DistributionZip).Take(1).Wait();
+        ZipTestUtils.IsInZip(distZip, "A.dll");
+      }
+    }
+
+    [Test]
+    [Category("IntegrationTest")]
+    public void DistributionZip_contains_FilesToDistribute() {
+      using (var tmpDir = new TemporaryDirectory()) {
+        var fileA = tmpDir.CreateEmptyFile("A.dll");
+        var expectedDistZipPath = Combine(tmpDir.Path, "dist", "A.zip");
+        var project = DistributionSupport
+          .SetValue(DistributionZipPath, expectedDistZipPath)
+          .Add(FilesToDistribute, new PackageFile(fileA, "foo/bar/A.dll"));
+        var distZipPath = DistributionZip[project].Take(1).Wait();
+        AreEqual(expectedDistZipPath, distZipPath);
+        ZipTestUtils.IsInZip(distZipPath, "foo/bar/A.dll");
+      }
+    }
 
     private static IObservable<string[]> ChangingOutput(IScheduler scheduler)
       => Return(new[] {"foo"}).Delay(TimeSpan.FromSeconds(1), scheduler)

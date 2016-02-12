@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Bud.IO;
 
 namespace Bud.NuGet {
   public interface IPackager {

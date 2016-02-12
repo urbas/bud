@@ -120,6 +120,7 @@
   <ItemGroup>
     <Compile Include="BaseProjects\BareProjectsTest.cs" />
     <Compile Include="BaseProjects\BuildProjectsTest.cs" />
+    <Compile Include="BaseProjects\ZipTestUtils.cs" />
     <Compile Include="Cli\BuildToolTest.cs" />
     <Compile Include="Collections\EnumerableUtilsTest.cs" />
     <Compile Include="Collections\ImmutableListsTest.cs" />

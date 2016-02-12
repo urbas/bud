@@ -36,7 +36,7 @@ namespace Bud.NuGet {
         var resolvedAssembliesFile = Combine(BuildDir[c], "resolved_assemblies");
         CreateDirectory(BuildDir[c]);
         var hash = PackageReference.GetHash(packageReferences);
-        var resolvedAssemblies = HashBasedCaching.Get(
+        var resolvedAssemblies = HashBasedCaching.GetLinesOrCache(
           resolvedAssembliesFile,
           hash,
           () => DownloadAndResolvePackages(c, packageReferences));

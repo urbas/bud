@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -8,12 +10,18 @@ using Bud.IO;
 using Bud.Reactive;
 using Bud.Util;
 using Bud.V1;
+using static System.IO.Directory;
 using static System.IO.Path;
 using static Bud.IO.PathUtils;
 using static Bud.V1.Api;
 
 namespace Bud.BaseProjects {
   internal static class BuildProjects {
+    public static Conf DistributionSupport
+      = Conf.Empty
+            .InitEmpty(FilesToDistribute)
+            .Init(DistributionZip, CreateDistZip);
+
     internal static Conf BuildSupport
       = Conf.Empty
             .InitEmpty(Input)
@@ -41,9 +49,12 @@ namespace Bud.BaseProjects {
       .Empty
       .Add(BuildSupport)
       .Add(SourceProcessorsSupport)
+      .Add(DistributionSupport)
+      .Set(DistributionZipPath, DefaultDistributionZipPath)
+      .Add(FilesToDistribute, DistributeOutputAndDependencies)
       .Add(Input, c => ProcessedSources[c])
       .ExcludeSourceDir(c => BuildDir[c])
-      .Init(DependenciesInput, GatherOutputsFromDependencies);
+      .Init(DependenciesOutput, GatherOutputsFromDependencies);
 
     internal static Conf CreateBuildProject(string projectDir, string projectId)
       => BareProject(projectDir, projectId)
@@ -81,32 +92,67 @@ namespace Bud.BaseProjects {
         return InAnyDirFilter(dirs);
       });
 
-    internal static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
+    private static IObservable<IEnumerable<PackageFile>> DistributeOutputAndDependencies(IConf c)
+      => Output[c]
+        .CombineLatest(DependenciesOutput[c], Enumerable.Concat)
+        .Select(files => files.Select(file => new PackageFile(file, GetFileName(file))));
+
+    private static string DefaultDistributionZipPath(IConf c)
+      => Combine(BuildDir[c], "dist-zip", ProjectId[c] + ".zip");
+
+    private static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
       => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c],
                                    BuildPipelineScheduler[c]);
 
-    internal static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler
+    private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler
       = new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
 
-    internal static IObservable<IEnumerable<string>> GatherOutputsFromDependencies(IConf c)
+    private static IObservable<IEnumerable<string>> GatherOutputsFromDependencies(IConf c)
       => Dependencies[c]
         .Gather(dependency => c.TryGet(dependency/Output))
         .Combined();
 
-    internal static IObservable<IImmutableList<string>> DefaultSources(IConf c)
-      => Observable.Select(Observable.ObserveOn(SourceIncludes[c]
-                                                  .ToObservable(SourceFilter(c)), BuildPipelineScheduler[c])
-                                     .Calmed(c), ImmutableList.ToImmutableList);
+    private static IObservable<IImmutableList<string>> DefaultSources(IConf c)
+      => SourceIncludes[c]
+        .ToObservable(SourceFilter(c)).ObserveOn(BuildPipelineScheduler[c])
+        .Calmed(c).Select(ImmutableList.ToImmutableList);
 
-    internal static Func<string, bool> SourceFilter(IConf c) {
+    private static Func<string, bool> SourceFilter(IConf c) {
       var excludeFilters = SourceExcludeFilters[c];
       return sourceFile => !excludeFilters.Any(filter => filter(sourceFile));
     }
 
-    internal static IObservable<IImmutableList<string>> DefaultProcessSources(IConf project)
+    private static IObservable<IImmutableList<string>> DefaultProcessSources(IConf project)
       => SourceProcessors[project]
         .Aggregate(Sources[project] as IObservable<IEnumerable<string>>,
                    (sources, processor) => processor.Process(sources))
         .Select(ImmutableList.ToImmutableList);
+
+    private static IObservable<string> CreateDistZip(IConf c)
+      => FilesToDistribute[c]
+        .Select(files => CreateDistZip(c, files));
+
+    private static string CreateDistZip(IConf c, IEnumerable<PackageFile> allFiles) {
+      var distZipPath = DistributionZipPath[c];
+      CreateDirectory(GetDirectoryName(distZipPath));
+      using (var distZipStream = File.Open(distZipPath, FileMode.Create, FileAccess.Write)) {
+        using (var distZip = new ZipArchive(distZipStream, ZipArchiveMode.Create)) {
+          foreach (var file in allFiles) {
+            AddToZip(distZip, file);
+          }
+        }
+      }
+      return distZipPath;
+    }
+
+    private static void AddToZip(ZipArchive distZip, PackageFile path) {
+      var entry = distZip.CreateEntry(path.PathInPackage,
+                                      CompressionLevel.Optimal);
+      using (var entryStream = entry.Open()) {
+        using (var entryFile = File.OpenRead(path.FileToPackage)) {
+          entryFile.CopyTo(entryStream);
+        }
+      }
+    }
   }
 }

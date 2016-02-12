@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using Bud.IO;
 using Bud.NuGet;
 using Bud.Reactive;
 using Bud.Util;
@@ -24,8 +26,8 @@ namespace Bud.Cs {
       .Add(NuGetPublishingSupport)
       .AddSources(fileFilter: "*.cs")
       .Init(Compile, DefaultCSharpCompilation)
-      .Add(Build, c => Compile[c].Select(output => output.AssemblyPath))
-      .Init(AssemblyName, c => ProjectId[c] + CsCompilationOptions[c].OutputKind.ToExtension())
+      .Add(Build, DefaultBuild)
+      .Init(AssemblyName, DefaultAssemblyName)
       .InitEmpty(AssemblyReferences)
       .InitEmpty(EmbeddedResources)
       .Init(Compiler, TimedEmittingCompiler.Create)
@@ -37,7 +39,18 @@ namespace Bud.Cs {
       .Set(PackagesSubProjectId/PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
       .Init(ReferencedPackages, c => (PackagesSubProjectId/ReferencedPackages)[c])
       .Set(PackageFiles, PackageLibDlls)
+      .Add(FilesToDistribute, AssembliesPackagedPaths)
       .ExcludeSourceDirs(DefaultExcludedSourceDirs);
+
+    private static IObservable<IImmutableList<PackageFile>> AssembliesPackagedPaths(IConf c)
+      => AssemblyReferences[c].Select(PackageAssemblies)
+                              .Select(ImmutableList.ToImmutableList);
+
+    private static IEnumerable<PackageFile> PackageAssemblies(IImmutableList<string> files)
+      => from assemblyPath in files
+         let assemblyFileName = GetFileName(assemblyPath)
+         where !WindowsFrameworkAssemblyResolver.IsFrameworkAssembly(assemblyFileName)
+         select new PackageFile(assemblyPath, assemblyFileName);
 
     internal static Conf CsLibrary(string projectDir, string projectId)
       => BuildProject(projectDir, projectId)
@@ -53,6 +66,12 @@ namespace Bud.Cs {
         var resourceFile = IsPathRooted(path) ? path : Combine(ProjectDir[c], path);
         return ToResourceDescriptor(resourceFile, nameInAssembly);
       });
+
+    private static IObservable<string> DefaultBuild(IConf c)
+      => Compile[c].Select(output => output.AssemblyPath);
+
+    private static string DefaultAssemblyName(IConf c)
+      => ProjectId[c] + CsCompilationOptions[c].OutputKind.ToExtension();
 
     private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
       => Input[conf]

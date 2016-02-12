@@ -20,25 +20,25 @@ namespace Bud.IO {
     public void TearDown() => tmpDir.Dispose();
 
     [Test]
-    public void TryGetLines_calculates_and_returns_the_lines()
+    public void GetLinesOrCache_calculates_and_returns_the_lines()
       => AreEqual(GetSomeLines(),
-                  HashBasedCaching.Get(cacheFile, "a", GetSomeLines));
+                  HashBasedCaching.GetLinesOrCache(cacheFile, "a", GetSomeLines));
 
     [Test]
-    public void TryGetLines_does_not_calculate_on_the_second_call() {
-      HashBasedCaching.Get(cacheFile, "a", GetSomeLines);
+    public void GetLinesOrCache_does_not_calculate_on_the_second_call() {
+      HashBasedCaching.GetLinesOrCache(cacheFile, "a", GetSomeLines);
       var lineCalculator = new Mock<Func<IEnumerable<string>>>(MockBehavior.Strict);
       AreEqual(GetSomeLines(),
-               HashBasedCaching.Get(cacheFile, "a", lineCalculator.Object));
+               HashBasedCaching.GetLinesOrCache(cacheFile, "a", lineCalculator.Object));
     }
 
     [Test]
-    public void TryGetLines_calculates_when_the_digest_changes() {
-      HashBasedCaching.Get(cacheFile, "a", GetSomeLines);
+    public void GetLinesOrCache_calculates_when_the_digest_changes() {
+      HashBasedCaching.GetLinesOrCache(cacheFile, "a", GetSomeLines);
       var lineCalculator = new Mock<Func<IEnumerable<string>>>(MockBehavior.Strict);
       lineCalculator.Setup(s => s()).Returns(GetSomeLines());
       AreEqual(GetSomeLines(),
-               HashBasedCaching.Get(cacheFile, "b", lineCalculator.Object));
+               HashBasedCaching.GetLinesOrCache(cacheFile, "b", lineCalculator.Object));
       lineCalculator.VerifyAll();
     }
 

@@ -76,10 +76,9 @@ namespace Bud.V1 {
     public static readonly Key<IImmutableSet<string>> Dependencies = nameof(Dependencies);
 
     /// <summary>
-    ///   This observable stream contains aggregated output from all
-    ///   dependencies.
+    ///   This observable stream contains aggregated output from all dependencies.
     /// </summary>
-    public static readonly Key<IObservable<IEnumerable<string>>> DependenciesInput = nameof(DependenciesInput);
+    public static readonly Key<IObservable<IEnumerable<string>>> DependenciesOutput = nameof(DependenciesOutput);
 
     #endregion
 
@@ -275,6 +274,26 @@ namespace Bud.V1 {
     #endregion
 
     #region Build Project
+
+    /// <summary>
+    ///   Returns a list of files to package. These file will end up in
+    ///   the zip archive at <see cref="DistributionZipPath"/> produced by
+    ///   <see cref="DistributionZip"/>.
+    /// </summary>
+    public static readonly Key<IObservable<IImmutableList<PackageFile>>> FilesToDistribute = nameof(FilesToDistribute);
+
+    /// <summary>
+    ///   The path where <see cref="DistributionZip"/> should place the
+    ///   zip archive.
+    /// </summary>
+    public static readonly Key<string> DistributionZipPath = nameof(DistributionZipPath);
+
+    /// <summary>
+    ///   Creates a zip archive that contains all that is needed for the
+    ///   distribution of the project. It returns the path to the created
+    ///   archive.
+    /// </summary>
+    public static readonly Key<IObservable<string>> DistributionZip = nameof(DistributionZip);
 
     /// <param name="projectDir">see <see cref="ProjectDir" /></param>
     /// <param name="projectId">see <see cref="ProjectId" /></param>

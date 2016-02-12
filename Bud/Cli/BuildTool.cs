@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO.Compression;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
@@ -90,6 +91,8 @@ namespace Bud.Cli {
       typeof(ResourceDescription).Assembly.Location,
       typeof(CSharpCompilationOptions).Assembly.Location,
       typeof(Unit).Assembly.Location,
+      typeof(ZipArchive).Assembly.Location,
+      typeof(CompressionLevel).Assembly.Location,
       WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.Runtime", Version.Parse("4.6.0.0")).Value,
       WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.IO", Version.Parse("4.6.0.0")).Value);
   }
