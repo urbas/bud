@@ -4,10 +4,10 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Reactive.Linq;
 using Bud.IO;
-using Bud.Util;
 using Bud.V1;
 using static System.IO.Path;
 using static System.Linq.Enumerable;
+using static Bud.Util.Option;
 using static Bud.V1.Api;
 
 namespace Bud.NuGet {
@@ -17,8 +17,9 @@ namespace Bud.NuGet {
             .Init(PackageMetadata, DefaultPackageMetadata)
             .Init(PackageOutputDir, c => Combine(BuildDir[c], PackageOutputDirName))
             .Init(Publish, DefaultPublish)
+            .InitValue(PublishUrl, None<string>())
             .Init(PackageBaseDir, _ => Directory.GetCurrentDirectory())
-            .InitValue(PublishApiKey, Option.None<string>())
+            .InitValue(PublishApiKey, None<string>())
             .InitValue(Packager, new NuGetPackager())
             .InitValue(Publisher, new NuGetPublisher())
             .Init(Package, DefaultPackage)
