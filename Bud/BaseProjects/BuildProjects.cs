@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
@@ -10,18 +8,12 @@ using Bud.IO;
 using Bud.Reactive;
 using Bud.Util;
 using Bud.V1;
-using static System.IO.Directory;
 using static System.IO.Path;
 using static Bud.IO.PathUtils;
 using static Bud.V1.Api;
 
 namespace Bud.BaseProjects {
   internal static class BuildProjects {
-    public static Conf DistributionSupport
-      = Conf.Empty
-            .InitEmpty(FilesToDistribute)
-            .Init(DistributionZip, CreateDistZip);
-
     internal static Conf BuildSupport
       = Conf.Empty
             .InitEmpty(Input)
@@ -49,8 +41,8 @@ namespace Bud.BaseProjects {
       .Empty
       .Add(BuildSupport)
       .Add(SourceProcessorsSupport)
-      .Add(DistributionSupport)
-      .Set(DistributionZipPath, DefaultDistributionZipPath)
+      .Add(Distribution.DistributionSupport)
+      .Set(DistributionArchivePath, DefaultDistributionZipPath)
       .Add(FilesToDistribute, DistributeOutputAndDependencies)
       .Add(Input, c => ProcessedSources[c])
       .ExcludeSourceDir(c => BuildDir[c])
@@ -127,32 +119,5 @@ namespace Bud.BaseProjects {
         .Aggregate(Sources[project] as IObservable<IEnumerable<string>>,
                    (sources, processor) => processor.Process(sources))
         .Select(ImmutableList.ToImmutableList);
-
-    private static IObservable<string> CreateDistZip(IConf c)
-      => FilesToDistribute[c]
-        .Select(files => CreateDistZip(c, files));
-
-    private static string CreateDistZip(IConf c, IEnumerable<PackageFile> allFiles) {
-      var distZipPath = DistributionZipPath[c];
-      CreateDirectory(GetDirectoryName(distZipPath));
-      using (var distZipStream = File.Open(distZipPath, FileMode.Create, FileAccess.Write)) {
-        using (var distZip = new ZipArchive(distZipStream, ZipArchiveMode.Create)) {
-          foreach (var file in allFiles) {
-            AddToZip(distZip, file);
-          }
-        }
-      }
-      return distZipPath;
-    }
-
-    private static void AddToZip(ZipArchive distZip, PackageFile path) {
-      var entry = distZip.CreateEntry(path.PathInPackage,
-                                      CompressionLevel.Optimal);
-      using (var entryStream = entry.Open()) {
-        using (var entryFile = File.OpenRead(path.FileToPackage)) {
-          entryFile.CopyTo(entryStream);
-        }
-      }
-    }
   }
 }

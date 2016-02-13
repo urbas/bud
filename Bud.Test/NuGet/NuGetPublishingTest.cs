@@ -1,8 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.Linq;
 using System.Reactive.Linq;
 using Bud.IO;
 using Bud.V1;
@@ -25,7 +23,7 @@ namespace Bud.NuGet {
       const string fileToPackage = "B.txt";
 
       var projectA = BareProject("a", "A")
-        .SetValue(Api.Version, "1.2.3");
+        .SetValue(ProjectVersion, "1.2.3");
       var project = BareProject("b", "B")
         .Clear(Output).Add(Output, fileToPackage)
         .Add(Dependencies, "../A")
@@ -40,7 +38,7 @@ namespace Bud.NuGet {
                                        "B",
                                        DefaultVersion,
                                        new[] {new PackageFile(fileToPackage, "content/B.txt")},
-                                       new [] {new PackageDependency("A", "1.2.3"), new PackageDependency("C", "4.5.7"), }, 
+                                       new [] {new PackageDependency("A", "1.2.3"), new PackageDependency("C", "4.5.7") }, 
                                        new NuGetPackageMetadata(Environment.UserName, "B", ImmutableDictionary<string, string>.Empty)))
               .Returns(package);
 

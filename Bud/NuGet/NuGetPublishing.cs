@@ -44,7 +44,7 @@ namespace Bud.NuGet {
         PackageOutputDir[c],
         PackageBaseDir[c],
         ProjectId[c],
-        Api.Version[c],
+        ProjectVersion[c],
         packageFiles,
         PackageDependencies(c).Concat(referencedPackages.Select(r => new PackageDependency(r.Id, r.Version.ToString()))),
         PackageMetadata[c]);
@@ -69,6 +69,6 @@ namespace Bud.NuGet {
 
     private static PackageDependency ToPackageDependency(IConf c, string dependency)
       => new PackageDependency(c.Get(dependency/ProjectId),
-                               c.Get(dependency/Api.Version));
+                               c.Get(dependency/ProjectVersion));
   }
 }

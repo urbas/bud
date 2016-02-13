@@ -178,7 +178,7 @@ namespace Bud.BaseProjects {
       using (var tmpDir = new TemporaryDirectory()) {
         var project = BuildProject(tmpDir.Path, "A")
           .Add(Output, tmpDir.CreateEmptyFile("A.txt"));
-        var distZip = project.Get(DistributionZip).Take(1).Wait();
+        var distZip = project.Get(DistributionArchive).Take(1).Wait();
         AreEqual(Combine(BuildDir[project], "dist-zip", "A.zip"),
                  distZip);
         ZipTestUtils.IsInZip(distZip, "A.txt");
@@ -195,23 +195,8 @@ namespace Bud.BaseProjects {
           BuildProject(tmpDir.Path, "B")
             .Add(Dependencies, "../A")
             .Clear(Output));
-        var distZip = projects.Get("B"/DistributionZip).Take(1).Wait();
+        var distZip = projects.Get("B"/DistributionArchive).Take(1).Wait();
         ZipTestUtils.IsInZip(distZip, "A.dll");
-      }
-    }
-
-    [Test]
-    [Category("IntegrationTest")]
-    public void DistributionZip_contains_FilesToDistribute() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        var fileA = tmpDir.CreateEmptyFile("A.dll");
-        var expectedDistZipPath = Combine(tmpDir.Path, "dist", "A.zip");
-        var project = DistributionSupport
-          .SetValue(DistributionZipPath, expectedDistZipPath)
-          .Add(FilesToDistribute, new PackageFile(fileA, "foo/bar/A.dll"));
-        var distZipPath = DistributionZip[project].Take(1).Wait();
-        AreEqual(expectedDistZipPath, distZipPath);
-        ZipTestUtils.IsInZip(distZipPath, "foo/bar/A.dll");
       }
     }
 

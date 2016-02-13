@@ -110,6 +110,7 @@
   <ItemGroup>
     <Compile Include="BaseProjects\BareProjects.cs" />
     <Compile Include="BaseProjects\BuildProjects.cs" />
+    <Compile Include="BaseProjects\Distribution.cs" />
     <Compile Include="Collections\ImmutableLists.cs" />
     <Compile Include="Configuration\ConfAccessException.cs" />
     <Compile Include="Cs\CsProjects.cs" />

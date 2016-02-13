@@ -166,7 +166,7 @@ namespace Bud.Cs {
     public void Package_must_contain_the_dll_of_the_CsLibrary_project() {
       var packager = new Mock<IPackager>(MockBehavior.Strict);
       var projects = Projects(CsLibrary("aDir", "A")
-                                .SetValue(Api.Version, "4.2.0"),
+                                .SetValue(ProjectVersion, "4.2.0"),
                               CsLibrary("bDir", "B")
                                 .Clear(Output).Add(Output, "B.dll")
                                 .SetValue(Packager, packager.Object)
@@ -175,7 +175,7 @@ namespace Bud.Cs {
                                  Directory.GetCurrentDirectory(),
                                  "B",
                                  DefaultVersion,
-                                 new[] {new PackageFile("B.dll", "lib/B.dll"),},
+                                 new[] {new PackageFile("B.dll", "lib/B.dll")},
                                  new[] {new PackageDependency("A", "4.2.0")},
                                  It.IsAny<NuGetPackageMetadata>()))
               .Returns("B.nupkg");
@@ -195,7 +195,7 @@ namespace Bud.Cs {
                                  Directory.GetCurrentDirectory(),
                                  "B",
                                  DefaultVersion,
-                                 new[] {new PackageFile("B.dll", "lib/B.dll"),},
+                                 new[] {new PackageFile("B.dll", "lib/B.dll")},
                                  new[] {new PackageDependency("Foo", "2.4.1")},
                                  It.IsAny<NuGetPackageMetadata>()))
               .Returns("B.nupkg");
@@ -214,7 +214,7 @@ namespace Bud.Cs {
         var distZip = CsApp(tmpDir.Path, "A")
           .Clear(Output)
           .Add(AssemblyReferences, tmpDir.CreateEmptyFile("AssRef.dll"))
-          .Get(DistributionZip).Take(1).Wait();
+          .Get(DistributionArchive).Take(1).Wait();
         ZipTestUtils.IsInZip(distZip, "AssRef.dll");
       }
     }
@@ -226,7 +226,7 @@ namespace Bud.Cs {
         var project = CsApp(tmpDir.Path, "A")
           .Clear(Output)
           .Add(AssemblyReferences, tmpDir.CreateEmptyFile("System.Runtime.dll"));
-        var distZip = project.Get(DistributionZip).Take(1).Wait();
+        var distZip = project.Get(DistributionArchive).Take(1).Wait();
         ZipTestUtils.IsNotInZip(distZip, "System.Runtime.dll");
       }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using Bud.BaseProjects;
 using Bud.Configuration;
 using Bud.Cs;
 using Bud.IO;
@@ -232,6 +233,42 @@ namespace Bud.V1 {
 
     #endregion
 
+    #region Distribution Support
+
+    /// <summary>
+    ///   Returns a list of files to package. These file will end up in
+    ///   the archive at <see cref="DistributionArchivePath"/> produced by
+    ///   <see cref="DistributionArchive"/>.
+    /// </summary>
+    public static readonly Key<IObservable<IImmutableList<PackageFile>>> FilesToDistribute = nameof(FilesToDistribute);
+
+    /// <summary>
+    ///   The path where <see cref="DistributionArchive"/> should place the archive.
+    /// </summary>
+    public static readonly Key<string> DistributionArchivePath = nameof(DistributionArchivePath);
+
+    /// <summary>
+    ///   Creates an archive that contains all that is needed for the
+    ///   distribution of the project. It returns the path to the created
+    ///   archive.
+    /// </summary>
+    public static readonly Key<IObservable<string>> DistributionArchive = nameof(DistributionArchive);
+
+    /// <summary>
+    ///   Provides the <see cref="DistributionArchive"/> task, which produces
+    ///   a distributable archive. The default implementation of the distribution
+    ///   produces a ZIP archive in the <see cref="DistributionArchivePath"/>. This path 
+    ///   is not set by default, you have to set it to the desired value.
+    /// 
+    ///   <para>
+    ///     Add files to the <see cref="FilesToDistribute"/> list in order to include them
+    ///     in the produced ZIP archive.
+    ///   </para>
+    /// </summary>
+    public static Conf DistributionSupport => Distribution.DistributionSupport;
+
+    #endregion
+
     #region Bare Project
 
     public const string BuildDirName = "build";
@@ -264,7 +301,7 @@ namespace Bud.V1 {
     /// <summary>
     ///   The version of the project. By default, it's <see cref="DefaultVersion" />.
     /// </summary>
-    public static Key<string> Version = nameof(Version);
+    public static Key<string> ProjectVersion = nameof(ProjectVersion);
 
     /// <param name="projectDir">see <see cref="ProjectDir" /></param>
     /// <param name="projectId">see <see cref="ProjectId" /></param>
@@ -274,26 +311,6 @@ namespace Bud.V1 {
     #endregion
 
     #region Build Project
-
-    /// <summary>
-    ///   Returns a list of files to package. These file will end up in
-    ///   the zip archive at <see cref="DistributionZipPath"/> produced by
-    ///   <see cref="DistributionZip"/>.
-    /// </summary>
-    public static readonly Key<IObservable<IImmutableList<PackageFile>>> FilesToDistribute = nameof(FilesToDistribute);
-
-    /// <summary>
-    ///   The path where <see cref="DistributionZip"/> should place the
-    ///   zip archive.
-    /// </summary>
-    public static readonly Key<string> DistributionZipPath = nameof(DistributionZipPath);
-
-    /// <summary>
-    ///   Creates a zip archive that contains all that is needed for the
-    ///   distribution of the project. It returns the path to the created
-    ///   archive.
-    /// </summary>
-    public static readonly Key<IObservable<string>> DistributionZip = nameof(DistributionZip);
 
     /// <param name="projectDir">see <see cref="ProjectDir" /></param>
     /// <param name="projectId">see <see cref="ProjectId" /></param>
