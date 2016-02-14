@@ -18,7 +18,6 @@ using static System.IO.Directory;
 using static System.IO.Path;
 using static Bud.Util.Option;
 using static Bud.V1.Api;
-using Version = System.Version;
 
 namespace Bud.Cli {
   public class BuildTool {
@@ -93,6 +92,7 @@ namespace Bud.Cli {
       typeof(Unit).Assembly.Location,
       typeof(ZipArchive).Assembly.Location,
       typeof(CompressionLevel).Assembly.Location,
+      WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.Net.Http", Version.Parse("4.6.0.0")).Value,
       WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.Runtime", Version.Parse("4.6.0.0")).Value,
       WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.IO", Version.Parse("4.6.0.0")).Value);
   }
