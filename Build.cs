@@ -25,13 +25,8 @@ public class BudBuild : IBuild {
     var credentials = LoadBintrayCredentials(username);
     using (var httpClient = new HttpClient()) {
       using (var content = new StreamContent(File.OpenRead(archive))) {
-        content.Headers.Remove("Content-Type");
-        content.Headers.Add("Content-Type", "application/octet-stream");
-
         using (var request = new HttpRequestMessage(HttpMethod.Put, packageResourceAddress)) {
           request.Headers.Add("Authorization", $"Basic {credentials}");
-          request.Headers.Remove("Expect");
-          request.Headers.Add("Expect", "");
           request.Content = content;
           request.Method = HttpMethod.Put;
 
