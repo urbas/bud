@@ -5,16 +5,15 @@ using System.IO.Compression;
 using System.Reactive.Linq;
 using Bud.IO;
 using Bud.V1;
-using static System.IO.Directory;
-using static System.IO.Path;
 using static Bud.V1.Api;
 
-namespace Bud.BaseProjects {
+namespace Bud.Distribution {
   internal static class Distribution {
     internal static readonly Conf DistributionSupport
       = Conf.Empty
             .InitEmpty(FilesToDistribute)
-            .Init(DistributionArchive, CreateDistZip);
+            .Init(DistributionArchive, CreateDistZip)
+            .Init(Distribute, BinTrayDistribution.Distribute);
 
     private static IObservable<string> CreateDistZip(IConf c)
       => FilesToDistribute[c]
@@ -22,7 +21,8 @@ namespace Bud.BaseProjects {
 
     private static string CreateDistZip(IConf c, IEnumerable<PackageFile> allFiles) {
       var distZipPath = DistributionArchivePath[c];
-      CreateDirectory(GetDirectoryName(distZipPath));
+      Console.WriteLine($"Creating the distribution package at '{distZipPath}'...");
+      Directory.CreateDirectory(Path.GetDirectoryName(distZipPath));
       using (var distZipStream = File.Open(distZipPath, FileMode.Create, FileAccess.Write)) {
         using (var distZip = new ZipArchive(distZipStream, ZipArchiveMode.Create)) {
           foreach (var file in allFiles) {
@@ -30,6 +30,7 @@ namespace Bud.BaseProjects {
           }
         }
       }
+      Console.WriteLine($"Created the distribution package at '{distZipPath}'.");
       return distZipPath;
     }
 

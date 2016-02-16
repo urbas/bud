@@ -76,7 +76,8 @@ namespace Bud.Cs {
     private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
       => Input[conf]
         .CombineLatest(ObserveDependencies(conf),
-                       AssemblyReferences[conf], CompileInput.Create)
+                       AssemblyReferences[conf],
+                       CompileInput.Create)
         .Select(Compiler[conf]).Do(PrintCompilationResult);
 
     private static void PrintCompilationResult(CompileOutput output) {

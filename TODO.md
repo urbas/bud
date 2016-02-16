@@ -2,18 +2,28 @@
 
 - [Ongoing] I want to install Bud from Chocolatey.
 
+    - Cannot run from the distribution zip due to a problem with Immutable Collections:
+
+        ```
+        Unhandled Exception: System.TypeInitializationException: The type initializer for 'Bud.Cli.BuildTool' threw an exception. ---> System.IO.FileLoadException: Could not load file or assembly 'System.Collections.Immutable, Version=1.1.38.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' or one of its dependencies. The located assembly's manifest definition does not match the assembly reference. (Exception from HRESULT: 0x80131040) ---> System.IO.FileLoadException: Could not load file or assembly 'System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' or one of its dependencies. The located assembly's manifest definition does not match the assembly reference. (Exception from HRESULT: 0x80131040)
+        --- End of inner exception stack trace ---
+        at Bud.Cli.BuildTool..cctor()
+        --- End of inner exception stack trace ---
+        at Bud.Cli.BuildTool.Main(String[] args)
+        ```
+
 - Add ability to reference packages and assemblies in buid configuration scripts.
 
 - Improved CLI Logging. Example: invoking `Bud.Test/Compile`
 
-        21:15:45.000> Bud/Packages/Resolve [Start]
-        21:15:48.000> Bud/Packages/Resolve [Done in 3000ms]
-        21:15:48.000> Bud/Compile [Start]
-        21:15:48.250> Bud/Compile [Done in 250ms]
-        21:15:48.250> Bud.Test/Packages/Resolve [Start]
-        21:15:49.000> Bud.Test/Packages/Resolve [Done in 750ms]
-        21:15:49.000> Bud.Test/Compile [Start]
-        21:15:49.300> Bud.Test/Compile [Done in 300ms]
+        21:15:45.000> Bud/Packages/Resolve
+        21:15:48.000< Bud/Packages/Resolve [3000ms]
+        21:15:48.000> Bud/Compile
+        21:15:48.250< Bud/Compile [250ms]
+        21:15:48.250> Bud.Test/Packages/Resolve
+        21:15:49.000< Bud.Test/Packages/Resolve [750ms]
+        21:15:49.000> Bud.Test/Compile
+        21:15:49.300< Bud.Test/Compile [300ms]
 
 - I want to use Bud in Visual Source.
 
