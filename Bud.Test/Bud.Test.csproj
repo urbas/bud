@@ -174,9 +174,9 @@
     <EmbeddedResource Include="NuGet\Foo.Bar.1.2.3.nupkg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Bud\Bud.csproj">
+    <ProjectReference Include="..\bud\bud.csproj">
       <Project>{5d2c752c-65d5-4148-918a-ab11f8344e68}</Project>
-      <Name>Bud</Name>
+      <Name>bud</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
