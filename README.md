@@ -2,11 +2,13 @@
 
 Bud is a build tool.
 
-Bud is currently in development. The first release is planned for June 2016.
+Bud is currently in development. The first stable version `1.0.0` will be release in June 2016.
 
 ## Prerequisites
 
-- NuGet v3 must be installed and in the `PATH`.
+__All platforms__:
+
+- NuGet v3 must be installed and available on the `PATH`.
 
 ## Main features
 
