@@ -76,7 +76,7 @@ namespace Bud.Cli {
     }
 
     private static Conf CreateBuildConfiguration()
-      => CsLibrary(Combine(GetCurrentDirectory()), "BuildConf")
+      => CsLibrary(Combine(GetCurrentDirectory()), "Build")
         .Add(AssemblyReferences, BudDependencies)
         .Clear(SourceIncludes)
         .AddSourceFile(c => Combine(ProjectDir[c], "Build.cs"));
