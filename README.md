@@ -10,6 +10,16 @@ __All platforms__:
 
 - NuGet v3 must be installed and available on the `PATH`.
 
+## Installation
+
+1. Download the zip from: https://dl.bintray.com/matej/bud/bud-0.5.0-pre-1.zip
+
+1. Extract the zip somewhere and put `bud.exe` on the $PATH.
+
+> TODO: Provide a chocolatey package for installation on Windows
+
+> TODO: Provide a shim script, called `bud`, that runs `bud.exe` with mono on Linux and OSX.
+
 ## Main features
 
 - __Reactive__: inputs and outputs in Bud are reactive streams. For example, builds are re-triggered whenever an input changes (e.g.: a source file on the filesystem or an HTTP resource).

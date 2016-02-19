@@ -1,28 +1,30 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
+using Bud.Cli;
 using Bud.IO;
+using Bud.Util;
 using static System.IO.Directory;
 using static System.IO.File;
 using static System.IO.Path;
-using static Bud.NuGet.NuGetExecutable;
 
 namespace Bud.NuGet {
   public class NuGetPackager : IPackager {
-    public string Pack(string outputDir, string baseDir, string packageId, string version, IEnumerable<PackageFile> files, IEnumerable<PackageDependency> packageDependencies, NuGetPackageMetadata packageMetadata) {
+    public string Pack(string outputDir, string baseDir, string packageId, string version, IEnumerable<PackageFile> files, IEnumerable<PackageDependency> packageDependencies, NuGetPackageMetadata packageMetadata)
+      => CreatePackage(outputDir, baseDir, packageId, version, files, packageDependencies, packageMetadata, Option.None<string>());
+
+    public static string CreatePackage(string outputDir, string baseDir, string packageId, string version, IEnumerable<PackageFile> files, IEnumerable<PackageDependency> packageDependencies, NuGetPackageMetadata packageMetadata, Option<string> additionalArgs) {
       var nuspecFile = Combine(outputDir, $"{packageId}.nuspec");
       CreateDirectory(outputDir);
       CreateNuspecFile(nuspecFile, packageId, version, packageDependencies, packageMetadata, files);
-      var arguments = $"pack {nuspecFile} " +
-                      $"-OutputDirectory {outputDir} " +
-                      $"-BasePath {baseDir} " +
-                      "-NonInteractive";
-      Console.WriteLine($"Arguments: {arguments}");
-      ExecuteNuGet(arguments);
+      Exec.Run("nuget", $"pack {nuspecFile} " +
+                        $"-OutputDirectory {outputDir} " +
+                        $"-BasePath {baseDir} " +
+                        "-NonInteractive" +
+                        (additionalArgs.HasValue ? " " + additionalArgs.Value : ""));
       return Combine(outputDir, $"{packageId}.{version}.nupkg");
     }
 
-    private static void CreateNuspecFile(string nuspecFile, string packageId, string version, IEnumerable<PackageDependency> packageDependencies, NuGetPackageMetadata packageMetadata, IEnumerable<PackageFile> files) {
+    public static void CreateNuspecFile(string nuspecFile, string packageId, string version, IEnumerable<PackageDependency> packageDependencies, NuGetPackageMetadata packageMetadata, IEnumerable<PackageFile> files) {
       using (var stream = Open(nuspecFile, FileMode.Create, FileAccess.Write)) {
         using (var writer = new StreamWriter(stream)) {
           WriteNuspecContent(writer, packageId, version, packageDependencies, packageMetadata, files);

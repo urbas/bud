@@ -1,26 +1,45 @@
 using System;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Text;
+using Bud.Cli;
+using Bud.IO;
+using Bud.NuGet;
+using Bud.Util;
 using Bud.V1;
 using static Bud.V1.Api;
 
 namespace Bud.Distribution {
   public class BinTrayDistribution {
-    public static IObservable<bool> Distribute(IConf c) {
-      var projectId = ProjectId[c];
-      return Distribute(c, projectId, projectId, Environment.UserName);
-    }
+    public static IObservable<bool> Distribute(IConf c)
+      => Distribute(DistributionArchive[c],
+                    ProjectId[c],
+                    ProjectId[c],
+                    Environment.UserName,
+                    ProjectVersion[c],
+                    BuildDir[c]);
 
-    public static IObservable<bool> Distribute(IConf c, string repositoryId, string packadeId, string username)
-      => DistributionArchive[c]
-        .Select(archive => PushToBintray(repositoryId, packadeId, username, archive, ProjectVersion[c])
-                           && PushToChocolatey());
+    public static IObservable<bool> Distribute(IObservable<string> observedArchive,
+                                               string repositoryId,
+                                               string packadeId,
+                                               string username,
+                                               string packageVersion,
+                                               string buildDir)
+      => observedArchive.Select(
+        archive => PushToBintray(archive, repositoryId, packadeId, packageVersion, username)
+                     .Map(archiveUrl => PushToChoco(repositoryId, packadeId, packageVersion, archiveUrl, username, buildDir))
+                     .GetOrElse(false));
 
-    private static bool PushToBintray(string repositoryId, string packadeId, string username, string package, string packageVersion) {
-      var packagePublishUrl = BintrayPublishPackageUrl(packadeId, repositoryId, username, packageVersion);
+    public static Option<string> PushToBintray(string package,
+                                               string repositoryId,
+                                               string packageId,
+                                               string packageVersion,
+                                               string username) {
+      var packagePublishUrl = BintrayPublishPackageUrl(packageId, repositoryId, username, packageVersion);
       var credentials = LoadBintrayCredentials(username);
       using (var httpClient = new HttpClient()) {
         using (var content = new StreamContent(File.OpenRead(package))) {
@@ -32,25 +51,59 @@ namespace Bud.Distribution {
             var responseTask = httpClient.SendAsync(request);
             responseTask.Wait();
             using (var response = responseTask.Result) {
-              Console.WriteLine($"[PushToBintray] StatusCode: {response.StatusCode}");
-              return response.StatusCode == HttpStatusCode.Created;
+              return response.StatusCode == HttpStatusCode.Created ?
+                       BintrayArchiveDownloadUrl(repositoryId, packageId, username, packageVersion) :
+                       Option.None<string>();
             }
           }
         }
       }
     }
 
-    private static bool PushToChocolatey() {
-      return false;
+    public static bool PushToChoco(string repositoryId, string packageId, string packageVersion, string archiveUrl, string username, string buildDir) {
+      var scratchDir = CreateChocoScratchDir(buildDir);
+      var installScriptPath = CreateChocoInstallScript(packageId, archiveUrl, scratchDir);
+      var distPackage = CreateChocoPackage(packageId, packageVersion, username, scratchDir, installScriptPath);
+      return Exec.Run("cpush", distPackage) == 0;
     }
 
-    private static string ChocolateyInstallScript(string repositoryId,
-                                                  string packageId,
-                                                  string username,
-                                                  string packageVersion)
+    private static string CreateChocoPackage(string packageId, string packageVersion, string username, string scratchDir, string installScriptPath)
+      => NuGetPackager.CreatePackage(
+        scratchDir,
+        Directory.GetCurrentDirectory(),
+        packageId,
+        packageVersion,
+        new[] {new PackageFile(installScriptPath, "tools/chocolateyInstall.ps1"),},
+        Enumerable.Empty<PackageDependency>(),
+        new NuGetPackageMetadata(username,
+                                 packageId,
+                                 ImmutableDictionary<string, string>.Empty),
+        "-NoPackageAnalysis");
+
+    private static string CreateChocoScratchDir(string buildDir) {
+      var chocoDistDir = Path.Combine(buildDir, "choco-dist-package");
+      Directory.CreateDirectory(chocoDistDir);
+      return chocoDistDir;
+    }
+
+    private static string CreateChocoInstallScript(string packageId, string archiveUrl, string scratchDir) {
+      var chocoInstallScriptPath = Path.Combine(scratchDir, "chocolateyInstall.ps1");
+      var chocolateyInstallScript = ChocolateyInstallScript(packageId, archiveUrl);
+      File.WriteAllText(chocoInstallScriptPath, chocolateyInstallScript);
+      return chocoInstallScriptPath;
+    }
+
+    private static string ChocolateyInstallScript(string packageId,
+                                                  string archiveUrl)
       => $"Install-ChocolateyZipPackage '{packageId}' " +
-         $"'https://dl.bintray.com/{username}/{repositoryId}/{packageId}-{packageVersion}.zip' " +
-         " \"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\"";
+         $"'{archiveUrl}' " +
+         "\"$(Split-Path -parent $MyInvocation.MyCommand.Definition)\"";
+
+    private static string BintrayArchiveDownloadUrl(string repositoryId,
+                                                    string packageId,
+                                                    string username,
+                                                    string packageVersion)
+      => $"https://dl.bintray.com/{username}/{repositoryId}/{packageId}-{packageVersion}.zip";
 
     private static string BintrayPublishPackageUrl(string packageId,
                                                    string repositoryId,

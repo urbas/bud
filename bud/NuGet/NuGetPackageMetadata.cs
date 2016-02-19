@@ -1,6 +1,4 @@
 using System.Collections.Immutable;
-using System.Linq;
-using Bud.Collections;
 
 namespace Bud.NuGet {
   public struct NuGetPackageMetadata {

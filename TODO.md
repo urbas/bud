@@ -12,6 +12,8 @@
         at Bud.Cli.BuildTool.Main(String[] args)
         ```
 
+- All paths should be absolute (for example, the ProjectDir and BuildDir), even if the user specifies relative paths.
+
 - Add Linux support.
 
 - Add OSX support.

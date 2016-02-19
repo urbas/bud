@@ -174,7 +174,7 @@ namespace Bud.V1 {
 
     #region Publishing Support
 
-    public const string PackageOutputDirName = "package";
+    public const string PackageOutputDirName = "nuget-package";
 
     /// <summary>
     ///   Publishes a project to a distribution endpoint. For example,
@@ -258,7 +258,7 @@ namespace Bud.V1 {
     ///   Pushes the project to a distribution channel. The default implementation places
     ///   the <see cref="DistributionArchive"/> into BinTray, uploads a Chocolatey
     ///   package to the Chocolatey page, and returns <c>true</c> if the operation
-    ///   succeeds.
+    ///   succeeded.
     /// </summary>
     public static readonly Key<IObservable<bool>> Distribute = nameof(Distribute);
 

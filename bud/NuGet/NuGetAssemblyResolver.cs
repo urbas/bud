@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Bud.Cli;
 using Bud.Util;
 using NuGet.Frameworks;
 using NuGet.Packaging;
@@ -62,7 +63,7 @@ namespace Bud.NuGet {
 
     private static NuGetv3LocalRepository CreatePackageIndex(string packagesDir, string cacheDir) {
       var packagesV3Dir = Path.Combine(cacheDir, "index");
-      NuGetExecutable.ExecuteNuGet($"init {packagesDir} {packagesV3Dir}");
+      Exec.Run("nuget", $"init {packagesDir} {packagesV3Dir}");
       return new NuGetv3LocalRepository(packagesV3Dir, true);
     }
 

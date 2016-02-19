@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
+using Bud.Cli;
 using static System.IO.Path;
-using static Bud.NuGet.NuGetExecutable;
 
 namespace Bud.NuGet {
   public class NuGetPackageDownloader {
@@ -9,7 +9,7 @@ namespace Bud.NuGet {
                                         string outputDir) {
       var packagesConfigFile = Combine(outputDir, "packages.config");
       CreatePackagesConfigFile(packageReferences, Combine(outputDir, "packages.config"));
-      return ExecuteNuGet($"restore {packagesConfigFile} -PackagesDirectory {outputDir}") == 0;
+      return Exec.Run("nuget", $"restore {packagesConfigFile} -PackagesDirectory {outputDir}") == 0;
     }
 
     public static void CreatePackagesConfigFile(IEnumerable<PackageReference> packageReferences,
