@@ -33,20 +33,20 @@ __Windows__:
 Invoke this command on the command line (requires administrative rights):
 
 ```bash
-$ choco upgrade bud -version 0.5.0-pre-2 -pre
+$ choco upgrade bud -version 0.5.0-pre-3 -pre
 ```
 
 __Linux and OSX__:
 
 
-1. Download the zip from: https://dl.bintray.com/matej/bud/bud-0.5.0-pre-2.zip
+1. Download the zip from: https://dl.bintray.com/matej/bud/bud-0.5.0-pre-3.zip
 
-1. Extract the zip somewhere, say in `$HOME/.bud/bud-0.5.0-pre-2`.
+1. Extract the zip somewhere, say in `$HOME/.bud/bud-0.5.0-pre-3`.
 
 1. Invoke bud in the following way:
 
     ```bash
-    $ mono $HOME/.bud/bud-0.5.0-pre-2 <arguments>
+    $ mono $HOME/.bud/bud-0.5.0-pre-3 <arguments>
     ```
 
 _Warning_: Bud was not yet tested on Linux and OSX! Please let us know if you were unable to run bud on these platforms.

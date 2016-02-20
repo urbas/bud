@@ -1,14 +1,9 @@
 using System;
-using System.Collections.Immutable;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using Bud.Cli;
-using Bud.IO;
 using Bud.NuGet;
 using Bud.Util;
 using Bud.V1;
@@ -22,17 +17,13 @@ namespace Bud.Distribution {
                     ProjectId[c],
                     Environment.UserName,
                     ProjectVersion[c],
-                    BuildDir[c]);
+                    BuildDir[c],
+                    PackageMetadata[c]);
 
-    public static IObservable<bool> Distribute(IObservable<string> observedArchive,
-                                               string repositoryId,
-                                               string packadeId,
-                                               string username,
-                                               string packageVersion,
-                                               string buildDir)
+    public static IObservable<bool> Distribute(IObservable<string> observedArchive, string repositoryId, string packadeId, string username, string packageVersion, string buildDir, NuGetPackageMetadata packageMetadata)
       => observedArchive.Select(
         archive => PushToBintray(archive, repositoryId, packadeId, packageVersion, username)
-                     .Map(archiveUrl => ChocoDistribution.PushToChoco(repositoryId, packadeId, packageVersion, archiveUrl, username, buildDir))
+                     .Map(archiveUrl => ChocoDistribution.PushToChoco(repositoryId, packadeId, packageVersion, archiveUrl, username, buildDir, packageMetadata))
                      .GetOrElse(false));
 
     public static Option<string> PushToBintray(string package,

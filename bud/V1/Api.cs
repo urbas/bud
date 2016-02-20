@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Reactive;
 using System.Reactive.Concurrency;
-using Bud.BaseProjects;
 using Bud.Configuration;
 using Bud.Cs;
 using Bud.IO;
@@ -175,6 +174,11 @@ namespace Bud.V1 {
     #region Publishing Support
 
     public const string PackageOutputDirName = "nuget-package";
+
+    /// <summary>
+    ///   The home page of the project. For example, https://github.com/urbas/bud.
+    /// </summary>
+    public static readonly Key<Option<string>> ProjectUrl = nameof(ProjectUrl);
 
     /// <summary>
     ///   Publishes a project to a distribution endpoint. For example,

@@ -16,6 +16,7 @@ namespace Bud.NuGet {
       = Conf.Empty
             .Init(PackageMetadata, DefaultPackageMetadata)
             .Init(PackageOutputDir, c => Combine(BuildDir[c], PackageOutputDirName))
+            .InitValue(ProjectUrl, None<string>())
             .Init(Publish, DefaultPublish)
             .InitValue(PublishUrl, None<string>())
             .Init(PackageBaseDir, _ => Directory.GetCurrentDirectory())

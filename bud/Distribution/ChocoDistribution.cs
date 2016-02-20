@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Bud.Cli;
@@ -7,29 +6,28 @@ using Bud.IO;
 using Bud.NuGet;
 
 namespace Bud.Distribution {
-  static internal class ChocoDistribution {
-    public static bool PushToChoco(string repositoryId, string packageId, string packageVersion, string archiveUrl, string username, string buildDir) {
+  internal static class ChocoDistribution {
+    public static bool PushToChoco(string repositoryId, string packageId, string packageVersion, string archiveUrl, string username, string buildDir, NuGetPackageMetadata packageMetadata) {
       var scratchDir = CreateChocoScratchDir(buildDir);
       var installScriptPath = CreateChocoInstallScript(packageId, archiveUrl, scratchDir);
-      var distPackage = CreateChocoPackage(packageId, packageVersion, username, scratchDir, installScriptPath);
+      var distPackage = CreateChocoPackage(packageId, packageVersion, username, scratchDir, installScriptPath, packageMetadata);
       Console.WriteLine($"Starting to push to chocolatey ...");
       var success = Exec.Run("cpush", distPackage) == 0;
       Console.WriteLine($"Push to chocolatey success: {success}");
       return success;
     }
 
-    private static string CreateChocoPackage(string packageId, string packageVersion, string username, string scratchDir, string installScriptPath)
-      => NuGetPackager.CreatePackage(
+    private static string CreateChocoPackage(string packageId, string packageVersion, string username, string scratchDir, string installScriptPath, NuGetPackageMetadata packageMetadata) {
+      return NuGetPackager.CreatePackage(
         scratchDir,
         Directory.GetCurrentDirectory(),
         packageId,
         packageVersion,
         new[] {new PackageFile(installScriptPath, "tools/chocolateyInstall.ps1"),},
         Enumerable.Empty<PackageDependency>(),
-        new NuGetPackageMetadata(username,
-                                 packageId,
-                                 ImmutableDictionary<string, string>.Empty),
+        packageMetadata,
         "-NoPackageAnalysis");
+    }
 
     private static string CreateChocoScratchDir(string buildDir) {
       var chocoDistDir = Path.Combine(buildDir, "choco-dist-package");
