@@ -2,7 +2,19 @@
 
 Bud is a build tool.
 
-Bud is currently in development. The first stable version `1.0.0` will be release in June 2016.
+Bud is currently in development. The first stable version `1.0.0` will be released in June 2016.
+
+
+## Main features
+
+- __Reactive__: bud will perform actions when files change.
+
+- __Parallel__: tasks run in their own threads. Tasks push their output onto the build pipeline. This triggers dependent tasks.
+
+- __Incremental__: Bud tracks which inputs have changed. For example, Bud tells [Roslyn](https://github.com/dotnet/roslyn) to re-parse only changed C# files.
+
+- __Native REST API__ (TODO): Every task in Bud is defined through a REST-compliant resource string. For example, to get the dependencies of a project, you can issue an HTTP GET request on this resource `/MyProject/Dependencies`. Streams, like `/MyProject/Build` produce a WebSocket.
+
 
 ## Prerequisites
 
@@ -10,22 +22,33 @@ __All platforms__:
 
 - NuGet v3 must be installed and available on the `PATH`.
 
+__Windows__:
+
+- `choco` must be installed and available on the `PATH`. This is used to ppush distributions of applications to [Chocolatey](https://chocolatey.org/).
+
 ## Installation
 
-1. Download the zip from: https://dl.bintray.com/matej/bud/bud-0.5.0-pre-1.zip
+__Windows__:
 
-1. Extract the zip somewhere and put `bud.exe` on the $PATH.
+Invoke this command on the command line (requires administrative rights):
 
-> TODO: Provide a chocolatey package for installation on Windows
+```bash
+$ choco upgrade bud -version 0.5.0-pre-2 -pre
+```
+
+__Linux and OSX__:
+
+
+1. Download the zip from: https://dl.bintray.com/matej/bud/bud-0.5.0-pre-2.zip
+
+1. Extract the zip somewhere, say in `$HOME/.bud/bud-0.5.0-pre-2`.
+
+1. Invoke bud in the following way:
+
+    ```bash
+    $ mono $HOME/.bud/bud-0.5.0-pre-2 <arguments>
+    ```
+
+_Warning_: Bud was not yet tested on Linux and OSX! Please let us know if you were unable to run bud on these platforms.
 
 > TODO: Provide a shim script, called `bud`, that runs `bud.exe` with mono on Linux and OSX.
-
-## Main features
-
-- __Reactive__: inputs and outputs in Bud are reactive streams. For example, builds are re-triggered whenever an input changes (e.g.: a source file on the filesystem or an HTTP resource).
-
-- __Parallel__: projects are built in their own threads. They push their output onto the build pipeline. Dependent projects simply react and rebuild themselves.
-
-- __Incremental__: Bud is aware of which inputs have changed and whether the outputs are out of date. Bud's prime example of incremental compilation is the [Roslyn compiler](https://github.com/dotnet/roslyn). See [this video](https://www.youtube.com/watch?v=Lkx0-2l2V7w) for a demonstration of incremental compilation with Bud and Roslyn.
-
-- __Native REST API__ (TODO): Every task and resource in Bud is defined through a REST-compliant resource string. For example, to get the dependencies of a project, you can issue an HTTP GET request on this resource `/MyProject/Dependencies`. Streams, like `/MyProject/Build` produce a WebSocket.

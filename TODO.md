@@ -1,17 +1,5 @@
 # TODO List
 
-- [Ongoing] I want to install Bud from Chocolatey.
-
-    - Cannot run from the distribution zip due to a problem with Immutable Collections:
-
-        ```
-        Unhandled Exception: System.TypeInitializationException: The type initializer for 'Bud.Cli.BuildTool' threw an exception. ---> System.IO.FileLoadException: Could not load file or assembly 'System.Collections.Immutable, Version=1.1.38.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' or one of its dependencies. The located assembly's manifest definition does not match the assembly reference. (Exception from HRESULT: 0x80131040) ---> System.IO.FileLoadException: Could not load file or assembly 'System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a' or one of its dependencies. The located assembly's manifest definition does not match the assembly reference. (Exception from HRESULT: 0x80131040)
-        --- End of inner exception stack trace ---
-        at Bud.Cli.BuildTool..cctor()
-        --- End of inner exception stack trace ---
-        at Bud.Cli.BuildTool.Main(String[] args)
-        ```
-
 - All paths should be absolute (for example, the ProjectDir and BuildDir), even if the user specifies relative paths.
 
 - Add Linux support.

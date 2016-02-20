@@ -116,6 +116,7 @@
     <Compile Include="Cs\CsProjects.cs" />
     <Compile Include="Cs\RoslynCsCompiler.cs" />
     <Compile Include="Distribution\BinTrayDistribution.cs" />
+    <Compile Include="Distribution\ChocoDistribution.cs" />
     <Compile Include="Distribution\Distribution.cs" />
     <Compile Include="IO\HashBasedCaching.cs" />
     <Compile Include="IO\PackageFile.cs" />
