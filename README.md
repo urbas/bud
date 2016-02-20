@@ -46,7 +46,7 @@ __Linux and OSX__:
 1. Invoke bud in the following way:
 
     ```bash
-    $ mono $HOME/.bud/bud-0.5.0-pre-3 <arguments>
+    $ mono $HOME/.bud/bud-0.5.0-pre-3/bud.exe <arguments>
     ```
 
 _Warning_: Bud was not yet tested on Linux and OSX! Please let us know if you were unable to run bud on these platforms.
