@@ -4,8 +4,6 @@
 
 - Add OSX support.
 
-- Add ability to reference packages and assemblies in buid configuration scripts.
-
 - Improved CLI Logging. Example: invoking `Bud.Test/Compile`
 
         21:15:45.000> Bud/Packages/Resolve
