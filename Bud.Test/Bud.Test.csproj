@@ -122,6 +122,7 @@
     <Compile Include="BaseProjects\BuildProjectsTest.cs" />
     <Compile Include="BaseProjects\DistributionTest.cs" />
     <Compile Include="BaseProjects\ZipTestUtils.cs" />
+    <Compile Include="Cli\BuildScriptCompilationTest.cs" />
     <Compile Include="Cli\BuildToolTest.cs" />
     <Compile Include="Collections\EnumerableUtilsTest.cs" />
     <Compile Include="Collections\ImmutableListsTest.cs" />
@@ -162,7 +163,7 @@
     <Compile Include="Reactive\ObservableResultsTest.cs" />
     <Compile Include="Reactive\TaskResultsTest.cs" />
     <Compile Include="Reactive\WaitingObservablesTest.cs" />
-    <Compile Include="Util\OptionalTest.cs" />
+    <Compile Include="Util\OptionTest.cs" />
     <Compile Include="Util\StringsTest.cs" />
     <Compile Include="V1\ConfTest.cs" />
     <Compile Include="V1\EnumerableConfApiTest.cs" />

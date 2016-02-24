@@ -296,7 +296,23 @@ namespace Bud.V1 {
     ///   The build's directory. Ideally, all the sources of this build
     ///   should be located within this directory.
     /// </summary>
+    /// <remarks>
+    ///   If this is a relative directory then Bud will combine it with
+    ///   <see cref="BaseDir"/>. If this is an absolute directory, Bud
+    ///   will leave it unchanged.
+    /// </remarks>
     public static readonly Key<string> ProjectDir = nameof(ProjectDir);
+
+    /// <summary>
+    ///   The directory in which all defined projects live. Typically
+    ///   this is the directory of the <c>Build.cs</c> file that Bud
+    ///   is currently invoking.
+    /// </summary>
+    /// <remarks>
+    ///   Note that this value is only used if the project directories are
+    ///   relative paths.
+    /// </remarks>
+    public static readonly Key<string> BaseDir = nameof(BaseDir);
 
     /// <summary>
     ///   The directory where all outputs and generated files are placed.
@@ -436,6 +452,8 @@ namespace Bud.V1 {
     public static Key<IObservable<IImmutableSet<string>>> ResolvedAssemblies = nameof(ResolvedAssemblies);
 
     public static Key<IAssemblyResolver> AssemblyResolver = nameof(AssemblyResolver);
+
+    public static Key<NuGetPackageDownloader> PackageDownloader = nameof(PackageDownloader);
 
     public static Conf PackageReferencesProject(string dir, string projectId)
       => CreatePackageReferencesProject(dir, projectId);

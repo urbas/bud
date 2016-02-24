@@ -118,12 +118,12 @@ namespace Bud.Cs {
 
     [Test]
     public void Referenced_packages_project_must_reside_in_the_packages_folder()
-      => AreEqual(Combine("Foo", "packages"),
+      => AreEqual(Combine(Directory.GetCurrentDirectory(), "Foo", "packages"),
                   CsLibrary("Foo").Get("Packages"/ProjectDir));
 
     [Test]
     public void Packages_config_file_must_be_read_from_the_root()
-      => AreEqual(Combine("Foo", "packages.config"),
+      => AreEqual(Combine(Directory.GetCurrentDirectory(), "Foo", "packages.config"),
                   CsLibrary("Foo").Get("Packages"/PackagesConfigFile));
 
     [Test]

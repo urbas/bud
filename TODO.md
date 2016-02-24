@@ -1,7 +1,5 @@
 # TODO List
 
-- All paths should be absolute (for example, the ProjectDir and BuildDir), even if the user specifies relative paths.
-
 - Add Linux support.
 
 - Add OSX support.

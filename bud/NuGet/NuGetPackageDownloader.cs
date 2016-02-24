@@ -5,8 +5,11 @@ using static System.IO.Path;
 
 namespace Bud.NuGet {
   public class NuGetPackageDownloader {
-    public static bool DownloadPackages(IEnumerable<PackageReference> packageReferences,
-                                        string outputDir) {
+    public virtual bool DownloadPackages(IEnumerable<PackageReference> packageReference, string packagesCacheDir)
+      => InvokeNuGetRestore(packageReference, packagesCacheDir);
+
+    public static bool InvokeNuGetRestore(IEnumerable<PackageReference> packageReferences,
+                                          string outputDir) {
       var packagesConfigFile = Combine(outputDir, "packages.config");
       CreatePackagesConfigFile(packageReferences, Combine(outputDir, "packages.config"));
       return Exec.Run("nuget", $"restore {packagesConfigFile} -PackagesDirectory {outputDir}") == 0;

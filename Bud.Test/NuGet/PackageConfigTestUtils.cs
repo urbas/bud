@@ -1,4 +1,6 @@
 using Bud.IO;
+using NuGet.Frameworks;
+using NuGet.Versioning;
 
 namespace Bud.NuGet {
   public static class PackageConfigTestUtils {
@@ -9,5 +11,10 @@ namespace Bud.NuGet {
       => tmpDir.CreateFileFromResource(embeddedResourceName,
                                        tmpDir.Path,
                                        "packages.config");
+
+    public static readonly PackageReference FooReference
+      = new PackageReference("Urbas.Example.Foo",
+                             NuGetVersion.Parse("1.0.1"),
+                             NuGetFramework.Parse("net46"));
   }
 }

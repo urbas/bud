@@ -1,4 +1,5 @@
 using System.Reactive;
+using Bud.Util;
 using Bud.V1;
 using static System.IO.Directory;
 using static System.IO.Path;
@@ -17,10 +18,16 @@ namespace Bud.BaseProjects {
         .Add(DependenciesSupport)
         .Add(BuildSchedulingSupport)
         .InitValue(ProjectId, projectId)
-        .InitValue(ProjectDir, projectDir)
+        .Init(ProjectDir, c => GetProjectDir(c, projectDir))
         .InitValue(ProjectVersion, version)
         .Init(BuildDir, c => Combine(ProjectDir[c], BuildDirName))
         .Init(Clean, DefaultClean);
+
+    private static string GetProjectDir(IConf c, string projectDir)
+      => c.TryGet(BaseDir)
+          .OrElse(() => c.TryGet(".." / BaseDir))
+          .Map(baseDir => Combine(baseDir, projectDir))
+          .GetOrElse(() => Combine(GetCurrentDirectory(), projectDir));
 
     internal static Unit DefaultClean(IConf c) {
       var targetDir = BuildDir[c];

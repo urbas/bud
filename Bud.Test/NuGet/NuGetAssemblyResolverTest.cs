@@ -1,10 +1,9 @@
 using System.Linq;
 using Bud.IO;
-using NuGet.Frameworks;
-using NuGet.Versioning;
 using NUnit.Framework;
 using static System.IO.Path;
 using static Bud.NuGet.NuGetPackageDownloader;
+using static Bud.NuGet.PackageConfigTestUtils;
 using static NUnit.Framework.Assert;
 
 namespace Bud.NuGet {
@@ -13,16 +12,11 @@ namespace Bud.NuGet {
     private TemporaryDirectory tmpDir;
     private string packagesDir;
 
-    private readonly PackageReference packageReference
-      = new PackageReference("Urbas.Example.Foo",
-                             NuGetVersion.Parse("1.0.1"),
-                             NuGetFramework.Parse("net40"));
-
     [SetUp]
     public void SetUp() {
       tmpDir = new TemporaryDirectory();
       packagesDir = tmpDir.CreateDir("packages");
-      DownloadPackages(new[] {packageReference}, packagesDir);
+      InvokeNuGetRestore(new[] {FooReference}, packagesDir);
     }
 
     [TearDown]
@@ -31,7 +25,7 @@ namespace Bud.NuGet {
     [Test]
     public void Resolve_a_list_of_assemblies_referenced_in_the_package() {
       var assemblies = new NuGetAssemblyResolver()
-        .FindAssembly(new[] {packageReference}, packagesDir, tmpDir.Path);
+        .FindAssembly(new[] {FooReference}, packagesDir, tmpDir.Path);
 
       That(assemblies.Select(GetFullPath),
            Has.Member(GetFullPath(ReferencedDll(tmpDir))));
@@ -40,7 +34,7 @@ namespace Bud.NuGet {
     [Test]
     public void Resolve_returns_a_list_of_existing_assembly_dlls() {
       var assemblies = new NuGetAssemblyResolver()
-        .FindAssembly(new[] {packageReference}, packagesDir, tmpDir.Path);
+        .FindAssembly(new[] {FooReference}, packagesDir, tmpDir.Path);
 
       That(assemblies, Has.All.Exist);
     }

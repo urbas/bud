@@ -1,44 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO.Compression;
 using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Bud.Cs;
-using Bud.NuGet;
 using Bud.Reactive;
 using Bud.Util;
 using Bud.V1;
-using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
 using static System.IO.Directory;
 using static System.IO.Path;
+using static Bud.Cli.BuildScriptCompilation;
 using static Bud.Util.Option;
-using static Bud.V1.Api;
 
 namespace Bud.Cli {
   public class BuildTool {
-    public static void Main(string[] args) {
-      var compileOutput = CompileBuildConfiguration();
+    public static void Main(string[] args)
+      => ExecuteBuild(GetCurrentDirectory(), args);
+
+    private static void ExecuteBuild(string baseDir, IEnumerable<string> args) {
+      var buildScriptPath = Combine(baseDir, "Build.cs");
+      var compileOutput = CompileBuildScript(baseDir, buildScriptPath);
       if (compileOutput.Success) {
-        ExecuteCommands(args, compileOutput);
+        var buildDefinition = LoadBuildDefinition(compileOutput.AssemblyPath);
+        foreach (var command in args) {
+          ExecuteCommand(buildDefinition, command);
+        }
       } else {
         PrintCompilationErrors(compileOutput);
       }
     }
 
-    public static void ExecuteCommands(IEnumerable<string> commands,
-                                       CompileOutput compileOutput) {
-      var buildDefinition = LoadBuildConfiguration(compileOutput.AssemblyPath);
-      foreach (var command in commands) {
-        ExecuteCommand(buildDefinition, command);
-      }
-    }
-
-    public static Option<object> ExecuteCommand(IConf buildDefinition, string command) {
+    internal static Option<object> ExecuteCommand(IConf buildDefinition, string command) {
       var optionalValue = buildDefinition.TryGet<object>(command);
       if (!optionalValue.HasValue) {
         return None<object>();
@@ -54,9 +46,6 @@ namespace Bud.Cli {
       return optionalValue.Value;
     }
 
-    private static CompileOutput CompileBuildConfiguration()
-      => CreateBuildConfiguration().TakeOne(Compile);
-
     private static void PrintCompilationErrors(CompileOutput compilationOutput) {
       Console.WriteLine("Could not compile the build configuration.");
       foreach (var diagnostic in compilationOutput.Diagnostics) {
@@ -64,7 +53,7 @@ namespace Bud.Cli {
       }
     }
 
-    private static IConf LoadBuildConfiguration(string assemblyPath) {
+    private static IConf LoadBuildDefinition(string assemblyPath) {
       var assembly = Assembly.LoadFile(assemblyPath);
       var buildDefinitionType = assembly
         .GetExportedTypes()
@@ -72,28 +61,9 @@ namespace Bud.Cli {
       var buildDefinition = buildDefinitionType
         .GetConstructor(Type.EmptyTypes)
         .Invoke(new object[] {});
-      return ((IBuild) buildDefinition).Init().ToCompiled();
+      var buildConf = ((IBuild) buildDefinition)
+        .Init();
+      return buildConf.ToCompiled();
     }
-
-    private static Conf CreateBuildConfiguration()
-      => CsLibrary(Combine(GetCurrentDirectory()), "Build")
-        .Add(AssemblyReferences, BudDependencies)
-        .Clear(SourceIncludes)
-        .AddSourceFile(c => Combine(ProjectDir[c], "Build.cs"));
-
-    private static IEnumerable<string> BudDependencies { get; } = ImmutableList.Create(
-      typeof(BuildTool).Assembly.Location,
-      typeof(object).Assembly.Location,
-      typeof(Enumerable).Assembly.Location,
-      typeof(ImmutableArray).Assembly.Location,
-      typeof(Observable).Assembly.Location,
-      typeof(ResourceDescription).Assembly.Location,
-      typeof(CSharpCompilationOptions).Assembly.Location,
-      typeof(Unit).Assembly.Location,
-      typeof(ZipArchive).Assembly.Location,
-      typeof(CompressionLevel).Assembly.Location,
-      WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.Net.Http", Version.Parse("4.6.0.0")).Value,
-      WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.Runtime", Version.Parse("4.6.0.0")).Value,
-      WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.IO", Version.Parse("4.6.0.0")).Value);
   }
 }

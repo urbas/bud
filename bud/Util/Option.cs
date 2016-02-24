@@ -18,7 +18,9 @@ namespace Bud.Util {
     public T GetOrElse(Func<T> defaultValue) => HasValue ? Value : defaultValue();
     public static implicit operator Option<T>(T value) => new Option<T>(value);
     public Option<T> OrElse(T defaultValue) => HasValue ? this : defaultValue;
+    public Option<T> OrElse(Option<T> defaultValue) => HasValue ? this : defaultValue;
     public Option<T> OrElse(Func<T> defaultValue) => HasValue ? this : defaultValue();
+    public Option<T> OrElse(Func<Option<T>> defaultValue) => HasValue ? this : defaultValue();
 
     public Option<TResult> Map<TResult>(Func<T, TResult> mapFunc)
       => HasValue ? mapFunc(Value) : None<TResult>();

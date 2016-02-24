@@ -6,7 +6,7 @@ using static Bud.Util.Option;
 using static NUnit.Framework.Assert;
 
 namespace Bud.Util {
-  public class OptionalTest {
+  public class OptionTest {
     [Test]
     public void Equals_returns_false_when_comparing_none_with_some()
       => IsFalse(Some(42).Equals(None<int>()));
@@ -61,12 +61,28 @@ namespace Bud.Util {
       => AreEqual(Some(9001), None<int>().OrElse(9001));
 
     [Test]
+    public void OrElse_with_option_fallback_returns_the_contained_value()
+      => AreEqual(Some(42), Some(42).OrElse(Some(9001)));
+
+    [Test]
+    public void OrElse_with_option_fallback_returns_the_fallback()
+      => AreEqual(Some(9001), None<int>().OrElse(Some(9001)));
+
+    [Test]
     public void Lazy_OrElse_returns_the_contained_value()
       => AreEqual(Some(42), Some(42).OrElse(() => 9001));
 
     [Test]
     public void Lazy_OrElse_returns_the_default_value()
       => AreEqual(Some(9001), None<int>().OrElse(() => 9001));
+
+    [Test]
+    public void Lazy_OrElse_with_option_fallback_returns_the_contained_value()
+      => AreEqual(Some(42), Some(42).OrElse(() => Some(9001)));
+
+    [Test]
+    public void Lazy_OrElse_with_option_fallback_returns_the_fallback()
+      => AreEqual(Some(9001), None<int>().OrElse(() => Some(9001)));
 
     [Test]
     public void Lazy_OrElse_does_not_invoke_the_callback()

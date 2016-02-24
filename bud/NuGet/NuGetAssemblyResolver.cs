@@ -16,9 +16,9 @@ using static Bud.Util.Option;
 namespace Bud.NuGet {
   public class NuGetAssemblyResolver : IAssemblyResolver {
     public IEnumerable<string> FindAssembly(IEnumerable<PackageReference> packageReferences,
-                                            string packagesDir,
-                                            string cacheDir) {
-      var packageRepository = CreatePackageIndex(packagesDir, cacheDir);
+                                            string packagesCacheDir,
+                                            string scratchDir) {
+      var packageRepository = CreatePackageIndex(packagesCacheDir, scratchDir);
       var frameworkAssemblies = new List<FrameworkAssemblyReference>();
       var assemblies = new List<string>();
       foreach (var packageReference in packageReferences) {
@@ -28,7 +28,7 @@ namespace Bud.NuGet {
         frameworkAssemblies.AddRange(FindFrameworkAssemblyReferences(packageReference.Framework, nuspec.GetFrameworkReferenceGroups()));
 
         using (var fileStream = File.OpenRead(packageInfo.ZipPath)) {
-          AddAssembliesFromPackage(packagesDir,
+          AddAssembliesFromPackage(packagesCacheDir,
                                    fileStream,
                                    assemblies,
                                    frameworkAssemblies,
@@ -42,7 +42,7 @@ namespace Bud.NuGet {
       return assemblies;
     }
 
-    private static void AddAssembliesFromPackage(string packagesDir,
+    private static void AddAssembliesFromPackage(string packagesCacheDir,
                                                  Stream fileStream,
                                                  List<string> assemblies,
                                                  List<FrameworkAssemblyReference> frameworkAssemblies,
@@ -50,7 +50,7 @@ namespace Bud.NuGet {
                                                  NuGetVersion packageVersion,
                                                  NuGetFramework targetFramework) {
       var nupkg = new PackageReader(fileStream, false);
-      var packageAssemblies = FindAssemblies(nupkg, packagesDir, targetFramework, packageId, packageVersion);
+      var packageAssemblies = FindAssemblies(nupkg, packagesCacheDir, targetFramework, packageId, packageVersion);
       if (packageAssemblies.Count > 0) {
         assemblies.AddRange(packageAssemblies);
       } else {
@@ -61,9 +61,9 @@ namespace Bud.NuGet {
       }
     }
 
-    private static NuGetv3LocalRepository CreatePackageIndex(string packagesDir, string cacheDir) {
-      var packagesV3Dir = Path.Combine(cacheDir, "index");
-      Exec.Run("nuget", $"init {packagesDir} {packagesV3Dir}");
+    private static NuGetv3LocalRepository CreatePackageIndex(string packagesCacheDir, string scratchDir) {
+      var packagesV3Dir = Path.Combine(scratchDir, "index");
+      Exec.Run("nuget", $"init {packagesCacheDir} {packagesV3Dir}");
       return new NuGetv3LocalRepository(packagesV3Dir, true);
     }
 

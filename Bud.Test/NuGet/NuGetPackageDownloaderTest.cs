@@ -8,18 +8,13 @@ using NuGet.Versioning;
 using NUnit.Framework;
 using static Bud.NuGet.NuGetPackageDownloader;
 using static System.IO.Path;
+using static Bud.NuGet.PackageConfigTestUtils;
 using static NUnit.Framework.Assert;
 
 namespace Bud.NuGet {
   [Category("IntegrationTest")]
   public class NuGetPackageDownloaderTest {
     private TemporaryDirectory tmpDir;
-
-    private readonly IEnumerable<PackageReference> packageReferences = new[] {
-      new PackageReference("Urbas.Example.Foo",
-                           NuGetVersion.Parse("1.0.1"),
-                           NuGetFramework.Parse("net40"))
-    };
 
     [SetUp]
     public void SetUp() => tmpDir = new TemporaryDirectory();
@@ -30,17 +25,17 @@ namespace Bud.NuGet {
     [Test]
     public void CreatePackagesConfigFile_creates_a_valid_packages_config_file() {
       var packagesConfigFile = Combine(tmpDir.Path, "packages.config");
-      CreatePackagesConfigFile(packageReferences, packagesConfigFile);
+      CreatePackagesConfigFile(new[] {FooReference}, packagesConfigFile);
       using (var fileStream = File.OpenRead(packagesConfigFile)) {
         var packagesConfigReader = new PackagesConfigReader(fileStream);
-        AreEqual(packageReferences,
+        AreEqual(new[] {FooReference},
                  packagesConfigReader.GetPackages().Select(ToBudPackageReference));
       }
     }
 
     [Test]
     public void DownloadPackages_places_the_referenced_packages_into_the_given_folder() {
-      IsTrue(DownloadPackages(packageReferences, tmpDir.Path));
+      IsTrue(InvokeNuGetRestore(new[] {FooReference}, tmpDir.Path));
       That(ReferencedDll(tmpDir), Does.Exist);
     }
 
@@ -49,7 +44,7 @@ namespace Bud.NuGet {
       var wrongReferences = new[] {
         new PackageReference("Wrong package ID", NuGetVersion.Parse("9.9.9"), NuGetFramework.UnsupportedFramework)
       };
-      IsFalse(DownloadPackages(wrongReferences, tmpDir.Path));
+      IsFalse(InvokeNuGetRestore(wrongReferences, tmpDir.Path));
     }
 
     private static string ReferencedDll(TemporaryDirectory tmpDir)
