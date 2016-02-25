@@ -1,5 +1,9 @@
 # TODO List
 
+- Use NuGet instead of `choco` in `ChocoDistribution.cs`.
+
+- I want some help in `README.md`. After 1 minute, I should be able to build my project.
+
 - Add Linux support.
 
     - Run tests on TravisCI or Appveryor.
@@ -39,13 +43,13 @@
 
 - I want to generate MSBuild solution and project files for my projects.
 
-- I want some help in `README.md`. After 1 minute, I should be able to build my project.
-
 - I want to define a generic build which doesn't rebuild if sources are up-to-date with outputs.
 
     [Partial solution] Consider using `HashBasedCaching.GetLinesOrCache`.
 
 - Use less than 10ms to start a simple build.
+
+## Postponed
 
 - I want to clean my projects without cleaning the resolved packages.
 
