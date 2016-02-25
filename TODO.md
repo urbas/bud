@@ -2,7 +2,11 @@
 
 - Add Linux support.
 
+    - Run tests on TravisCI or Appveryor.
+
 - Add OSX support.
+
+    - Any OSX-based CI services? Get a Mac?
 
 - Improved CLI Logging. Example: invoking `Bud.Test/Compile`
 
