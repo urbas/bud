@@ -12,8 +12,8 @@ namespace Bud.Distribution {
       var installScriptPath = CreateChocoInstallScript(packageId, archiveUrl, scratchDir);
       var distPackage = CreateChocoPackage(packageId, packageVersion, username, scratchDir, installScriptPath, packageMetadata);
       Console.WriteLine($"Starting to push to chocolatey ...");
-      // TODO: use nuget instead:
-      // nuget.exe push bud.0.0.2.nupkg -source https://chocolatey.org/ -NonInteractive
+      // TODO: use nuget instead. Read the ApiKey from somewhere.
+      //      var success = NuGetExecutable.Instance.Run($"push {distPackage} -source https://chocolatey.org/ -NonInteractive");
       var success = Exec.Run("cpush", distPackage) == 0;
       Console.WriteLine($"Push to chocolatey success: {success}");
       return success;

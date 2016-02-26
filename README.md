@@ -1,6 +1,7 @@
 [Installation](#installation)
 - [Windows](#windows)
 - [Linux and OSX](#linux-and-osx)
+[Quick start](#quick-start)
 [Main features](#main-features)
 
 # Bud
@@ -12,7 +13,7 @@ Bud is currently in development. Release of version `1.0.0` is scheduled for Jun
 
 ## Installation
 
-- NuGet v3 must be installed and available on the `PATH`.
+NuGet v3 must be installed and available on the `PATH` on all platforms.
 
 
 ### Windows
@@ -45,6 +46,31 @@ $ choco upgrade bud -version 0.5.0-pre-3 -pre
 __Warning__: Bud was not yet tested on Linux and OSX! Please let us know if you were unable to run bud on these platforms.
 
 > TODO: Provide a shim script, called `bud`, that runs `bud.exe` with mono on Linux and OSX.
+> TODO: provide a better installation method for Bud (perhaps just cloning from GitHub and running a script; similar to `rbenv`).
+
+
+## Quick start
+
+> TODO: Describe project creation.
+> TODO: Add project initialisation. Maybe via `bud -g CsApp Your.Project` or `bud -g CsLib Your.Project`
+
+## Building
+
+The following command builds continuously (until you press `Ctrl+C`):
+
+```bash
+$ bud Your.Project/Build
+```
+
+It rebuilds every time you change a file.
+
+## Publishing
+
+The following command publishes your project to NuGet:
+
+```bash
+$ bud Your.Project/Publish
+```
 
 
 ## Main features
