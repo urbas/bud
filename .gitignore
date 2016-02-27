@@ -21,3 +21,6 @@ packages/
 obj/
 bin/
 build/
+
+# IntelliJ IDEA
+.idea/

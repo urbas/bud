@@ -193,6 +193,7 @@
     <Compile Include="Reactive\ObservableResources.cs" />
     <Compile Include="Reactive\WaitingObservables.cs" />
     <Compile Include="Util\Strings.cs" />
+    <Compile Include="..\Build.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
