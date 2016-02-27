@@ -1,5 +1,23 @@
 # TODO List
 
+- Performance benchmarks:
+
+    - Startup time (compiling `Build.cs`; loading it after it is built).
+
+    - Compiling variously-sized projects (check a project out from git, cold-compile it, warm-compile it, hot-compile it, clean-compile it).
+
+- Tests for API-breaking changes:
+
+    - Add this feature to Bud (so that everyone can do backwards-compatibility tests).
+
+    - Add backwards-compatibility checks to Bud's build itself.
+
+- Incremental compilation:
+
+    - Add the ability to use hashes instead of timestamps for incremental compilation.
+
+    - Check if Roslyn can compile files separately and implement true incremental compilation.
+
 - Use NuGet instead of `choco` in `ChocoDistribution.cs`.
 
 - I want some help in `README.md`. After 1 minute, I should be able to build my project.
