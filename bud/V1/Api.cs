@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using Bud.BaseProjects;
 using Bud.Configuration;
 using Bud.Cs;
 using Bud.IO;
@@ -10,9 +12,6 @@ using Bud.NuGet;
 using Bud.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using static Bud.BaseProjects.BareProjects;
-using static Bud.BaseProjects.BuildProjects;
-using static Bud.NuGet.PackageReferencesProjects;
 
 namespace Bud.V1 {
   /// <summary>
@@ -35,8 +34,17 @@ namespace Bud.V1 {
   public static class Api {
     #region Project Grouping
 
-    public static Conf Project(string scope, params IConfBuilder[] confs)
-      => Conf.Group(scope, confs);
+    public static Conf Project(string projectId, params IConfBuilder[] confs) {
+      if (string.IsNullOrEmpty(projectId)) {
+        throw new ArgumentNullException(nameof(projectId), "A project's ID must not be null or empty.");
+      }
+      if (projectId.Contains("/")) {
+        throw new ArgumentException($"Project ID '{projectId}' is invalid. It must not contain the character '/'.", nameof(projectId));
+      }
+      return Conf.Group(projectId, confs)
+                 .Init(BaseDir, c => c.TryGet(".."/BaseDir)
+                                      .GetOrElse(Directory.GetCurrentDirectory));
+    }
 
     public static Conf Projects(params IConfBuilder[] confs)
       => Conf.Group((IEnumerable<IConfBuilder>) confs);
@@ -182,7 +190,7 @@ namespace Bud.V1 {
 
     /// <summary>
     ///   Publishes a project to a distribution endpoint. For example,
-    ///   projects like <see cref="CsLibrary(string, string)" /> are published
+    ///   projects like <see cref="CsLib" /> are published
     ///   to a NuGet repository.
     /// </summary>
     /// <remarks>
@@ -241,13 +249,13 @@ namespace Bud.V1 {
 
     /// <summary>
     ///   Returns a list of files to package. These file will end up in
-    ///   the archive at <see cref="DistributionArchivePath"/> produced by
-    ///   <see cref="DistributionArchive"/>.
+    ///   the archive at <see cref="DistributionArchivePath" /> produced by
+    ///   <see cref="DistributionArchive" />.
     /// </summary>
     public static readonly Key<IObservable<IImmutableList<PackageFile>>> FilesToDistribute = nameof(FilesToDistribute);
 
     /// <summary>
-    ///   The path where <see cref="DistributionArchive"/> should place the archive.
+    ///   The path where <see cref="DistributionArchive" /> should place the archive.
     /// </summary>
     public static readonly Key<string> DistributionArchivePath = nameof(DistributionArchivePath);
 
@@ -260,20 +268,19 @@ namespace Bud.V1 {
 
     /// <summary>
     ///   Pushes the project to a distribution channel. The default implementation places
-    ///   the <see cref="DistributionArchive"/> into BinTray, uploads a Chocolatey
+    ///   the <see cref="DistributionArchive" /> into BinTray, uploads a Chocolatey
     ///   package to the Chocolatey page, and returns <c>true</c> if the operation
     ///   succeeded.
     /// </summary>
     public static readonly Key<IObservable<bool>> Distribute = nameof(Distribute);
 
     /// <summary>
-    ///   Provides the <see cref="DistributionArchive"/> task, which produces
+    ///   Provides the <see cref="DistributionArchive" /> task, which produces
     ///   a distributable archive. The default implementation of the distribution
-    ///   produces a ZIP archive in the <see cref="DistributionArchivePath"/>. This path 
+    ///   produces a ZIP archive in the <see cref="DistributionArchivePath" />. This path
     ///   is not set by default, you have to set it to the desired value.
-    /// 
     ///   <para>
-    ///     Add files to the <see cref="FilesToDistribute"/> list in order to include them
+    ///     Add files to the <see cref="FilesToDistribute" /> list in order to include them
     ///     in the produced ZIP archive.
     ///   </para>
     /// </summary>
@@ -298,15 +305,15 @@ namespace Bud.V1 {
     /// </summary>
     /// <remarks>
     ///   If this is a relative directory then Bud will combine it with
-    ///   <see cref="BaseDir"/>. If this is an absolute directory, Bud
+    ///   <see cref="BaseDir" />. If this is an absolute directory, Bud
     ///   will leave it unchanged.
     /// </remarks>
     public static readonly Key<string> ProjectDir = nameof(ProjectDir);
 
     /// <summary>
-    ///   The directory in which all defined projects live. Typically
-    ///   this is the directory of the <c>Build.cs</c> file that Bud
-    ///   is currently invoking.
+    ///   The directory relative to which all <see cref="ProjectDir"/> paths are
+    ///   calculated. By default this is the directory of the <c>Build.cs</c> file
+    ///   that Bud is currently invoking. It can be overridden.
     /// </summary>
     /// <remarks>
     ///   Note that this value is only used if the project directories are
@@ -331,10 +338,19 @@ namespace Bud.V1 {
     /// </summary>
     public static Key<string> ProjectVersion = nameof(ProjectVersion);
 
+    /// <param name="projectId">see <see cref="ProjectId" />.</param>
+    /// <remarks>
+    ///   This method delegates to <see cref="BareProject(string, string)" />
+    ///   it uses <paramref name="projectId" /> as both the project dir and
+    ///   project ID.
+    /// </remarks>
+    public static Conf BareProject(string projectId)
+      => BareProjects.BareProject(projectId, projectId);
+
     /// <param name="projectDir">see <see cref="ProjectDir" /></param>
     /// <param name="projectId">see <see cref="ProjectId" /></param>
     public static Conf BareProject(string projectDir, string projectId)
-      => CreateBareProject(projectDir, projectId);
+      => BareProjects.BareProject(projectDir, projectId);
 
     #endregion
 
@@ -343,7 +359,7 @@ namespace Bud.V1 {
     /// <param name="projectDir">see <see cref="ProjectDir" /></param>
     /// <param name="projectId">see <see cref="ProjectId" /></param>
     public static Conf BuildProject(string projectDir, string projectId)
-      => CreateBuildProject(projectDir, projectId);
+      => BuildProjects.BuildProject(projectDir, projectId);
 
     /// <summary>
     ///   Adds files found in <paramref name="subDir" /> to <see cref="Sources" />.
@@ -360,13 +376,13 @@ namespace Bud.V1 {
     /// </param>
     /// <returns>the modified project</returns>
     public static Conf AddSources(this Conf c, string subDir = null, string fileFilter = "*", bool includeSubdirs = true)
-      => AddSourcesImpl(c, subDir, fileFilter, includeSubdirs);
+      => BuildProjects.AddSourcesImpl(c, subDir, fileFilter, includeSubdirs);
 
     /// <summary>
     ///   Adds individual source files to the project.
     /// </summary>
     public static Conf AddSourceFiles(this Conf c, params string[] relativeFilePaths)
-      => AddSourceFilesImpl(c, relativeFilePaths);
+      => BuildProjects.AddSourceFilesImpl(c, relativeFilePaths);
 
     /// <summary>
     ///   Removes the given list of subdirectories from sources.
@@ -384,7 +400,7 @@ namespace Bud.V1 {
     ///   Removes the given list of subdirectories from sources.
     /// </summary>
     public static Conf ExcludeSourceDirs(this Conf c, Func<IConf, IEnumerable<string>> subDirs)
-      => ExcludeSourceDirsImpl(c, subDirs);
+      => BuildProjects.ExcludeSourceDirsImpl(c, subDirs);
 
     #endregion
 
@@ -402,25 +418,25 @@ namespace Bud.V1 {
     ///   directory with the same name. The project's directory will be placed  in the current
     ///   working directory.
     /// </summary>
-    public static Conf CsLibrary(string projectId)
-      => CsLibrary(projectId, projectId);
+    public static Conf CsLib(string projectId)
+      => CsLib(projectId, projectId);
 
     /// <summary>
-    ///   Similar to <see cref="CsLibrary(string)"/> but places the project in the specified
+    ///   Similar to <see cref="CsLib(string)" /> but places the project in the specified
     ///   folder.
     /// </summary>
-    public static Conf CsLibrary(string projectDir, string projectId)
-      => CsProjects.CsLibrary(projectDir, projectId);
+    public static Conf CsLib(string projectDir, string projectId)
+      => CsProjects.CsLib(projectDir, projectId);
 
     /// <summary>
-    ///   Similar to <see cref="CsLibrary(string)"/> but produces a console application instead
+    ///   Similar to <see cref="CsLib(string)" /> but produces a console application instead
     ///   of a library.
     /// </summary>
     public static Conf CsApp(string projectId)
       => CsApp(projectId, projectId);
 
     /// <summary>
-    ///   Similar to <see cref="CsLibrary(string, string)"/> but produces a console application instead
+    ///   Similar to <see cref="CsLib" /> but produces a console application instead
     ///   of a library.
     /// </summary>
     public static Conf CsApp(string projectDir, string projectId)
@@ -456,7 +472,7 @@ namespace Bud.V1 {
     public static Key<NuGetPackageDownloader> PackageDownloader = nameof(PackageDownloader);
 
     public static Conf PackageReferencesProject(string dir, string projectId)
-      => CreatePackageReferencesProject(dir, projectId);
+      => PackageReferencesProjects.CreatePackageReferencesProject(dir, projectId);
 
     #endregion
   }

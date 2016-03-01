@@ -52,13 +52,13 @@ namespace Bud.Cs {
          where !WindowsFrameworkAssemblyResolver.IsFrameworkAssembly(assemblyFileName)
          select new PackageFile(assemblyPath, assemblyFileName);
 
-    internal static Conf CsLibrary(string projectDir, string projectId)
+    internal static Conf CsLib(string projectDir, string projectId)
       => BuildProject(projectDir, projectId)
         .Add(PackageReferencesProject(projectDir, PackagesSubProjectId))
         .Add(CsProjectSetting);
 
     internal static Conf CsApp(string projectDir, string projectId)
-      => CsLibrary(projectDir, projectId)
+      => CsLib(projectDir, projectId)
         .Modify(CsCompilationOptions, (_, oldValue) => oldValue.WithOutputKind(ConsoleApplication));
 
     internal static Conf EmbedResourceImpl(Conf conf, string path, string nameInAssembly)

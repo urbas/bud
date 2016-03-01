@@ -1,5 +1,4 @@
 using System.Reactive;
-using Bud.Util;
 using Bud.V1;
 using static System.IO.Directory;
 using static System.IO.Path;
@@ -11,7 +10,7 @@ namespace Bud.BaseProjects {
     internal static readonly Conf DependenciesSupport
       = Conf.Empty.InitEmpty(Dependencies);
 
-    internal static Conf CreateBareProject(string projectDir,
+    internal static Conf BareProject(string projectDir,
                                            string projectId,
                                            string version = DefaultVersion)
       => Project(projectId)
@@ -25,7 +24,7 @@ namespace Bud.BaseProjects {
 
     private static string GetProjectDir(IConf c, string projectDir)
       => c.TryGet(BaseDir)
-          .OrElse(() => c.TryGet(".." / BaseDir))
+          .OrElse(() => c.TryGet(".."/BaseDir))
           .Map(baseDir => Combine(baseDir, projectDir))
           .GetOrElse(() => Combine(GetCurrentDirectory(), projectDir));
 

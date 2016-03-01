@@ -10,6 +10,7 @@ using Bud.V1;
 using static System.IO.Directory;
 using static System.IO.Path;
 using static Bud.Cli.BuildScriptCompilation;
+using static Bud.Cli.BuildScriptLoading;
 using static Bud.Util.Option;
 
 namespace Bud.Cli {
@@ -21,7 +22,8 @@ namespace Bud.Cli {
       var buildScriptPath = Combine(baseDir, "Build.cs");
       var compileOutput = CompileBuildScript(baseDir, buildScriptPath);
       if (compileOutput.Success) {
-        var buildDefinition = LoadBuildDefinition(compileOutput.AssemblyPath);
+        string assemblyPath = compileOutput.AssemblyPath;
+        var buildDefinition = LoadBuildDefinition(assemblyPath, baseDir);
         foreach (var command in args) {
           ExecuteCommand(buildDefinition, command);
         }
@@ -51,19 +53,6 @@ namespace Bud.Cli {
       foreach (var diagnostic in compilationOutput.Diagnostics) {
         Console.WriteLine(diagnostic);
       }
-    }
-
-    private static IConf LoadBuildDefinition(string assemblyPath) {
-      var assembly = Assembly.LoadFile(assemblyPath);
-      var buildDefinitionType = assembly
-        .GetExportedTypes()
-        .First(typeof(IBuild).IsAssignableFrom);
-      var buildDefinition = buildDefinitionType
-        .GetConstructor(Type.EmptyTypes)
-        .Invoke(new object[] {});
-      var buildConf = ((IBuild) buildDefinition)
-        .Init();
-      return buildConf.ToCompiled();
     }
   }
 }

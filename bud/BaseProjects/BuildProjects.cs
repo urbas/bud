@@ -48,7 +48,7 @@ namespace Bud.BaseProjects {
       .ExcludeSourceDir(c => BuildDir[c])
       .Init(DependenciesOutput, GatherOutputsFromDependencies);
 
-    internal static Conf CreateBuildProject(string projectDir, string projectId)
+    internal static Conf BuildProject(string projectDir, string projectId)
       => BareProject(projectDir, projectId)
         .Add(BuildProjectSettings);
 

@@ -24,14 +24,14 @@ namespace Bud.Cs {
     public void Assembly_name_must_use_the_project_id() {
       using (var tempDir = new TemporaryDirectory()) {
         AreEqual("Foo.dll",
-                 CsLibrary(tempDir.Path, "Foo").Get(AssemblyName));
+                 CsLib(tempDir.Path, "Foo").Get(AssemblyName));
       }
     }
 
     [Test]
     public void CSharp_sources_must_be_listed() {
       using (var tempDir = new TemporaryDirectory()) {
-        var cSharpProject = CsLibrary(tempDir.Path, "Foo");
+        var cSharpProject = CsLib(tempDir.Path, "Foo");
         var sourceFile = tempDir.CreateEmptyFile("TestMainClass.cs");
         That(Sources[cSharpProject].Take(1).Wait(),
              Contains.Item(sourceFile));
@@ -41,7 +41,7 @@ namespace Bud.Cs {
     [Test]
     public void CSharp_sources_in_nested_directories_must_be_listed() {
       using (var tempDir = new TemporaryDirectory()) {
-        var cSharpProject = CsLibrary(tempDir.Path, "Foo");
+        var cSharpProject = CsLib(tempDir.Path, "Foo");
         var sourceFile = tempDir.CreateEmptyFile("Bud", "TestMainClass.cs");
         That(Sources[cSharpProject].Take(1).Wait(),
              Contains.Item(sourceFile));
@@ -51,7 +51,7 @@ namespace Bud.Cs {
     [Test]
     public void Non_csharp_files_must_not_be_listed() {
       using (var tempDir = new TemporaryDirectory()) {
-        var cSharpProject = CsLibrary(tempDir.Path, "Foo");
+        var cSharpProject = CsLib(tempDir.Path, "Foo");
         var textFile = tempDir.CreateEmptyFile("Bud", "TextFile.txt");
         That(Sources[cSharpProject].Take(1).Wait(),
              Is.Not.Contains(textFile));
@@ -63,7 +63,7 @@ namespace Bud.Cs {
       var cSharpCompiler = new Mock<Func<CompileInput, CompileOutput>>(MockBehavior.Strict);
       cSharpCompiler.Setup(self => self(CompileInputTestUtils.ToCompileInput("A.cs", null, null)))
                     .Returns(EmptyCompileOutput());
-      var projectA = CsLibrary("foo", "A")
+      var projectA = CsLib("foo", "A")
         .SetValue(Compiler, cSharpCompiler.Object)
         .Clear(Input)
         .Add(Input, "A.cs");
@@ -76,7 +76,7 @@ namespace Bud.Cs {
       var cSharpCompiler = new Mock<Func<CompileInput, CompileOutput>>(MockBehavior.Strict);
       cSharpCompiler.Setup(self => self(CompileInputTestUtils.ToCompileInput(null, null, "A.dll")))
                     .Returns(EmptyCompileOutput());
-      var projectA = CsLibrary("foo", "A")
+      var projectA = CsLib("foo", "A")
         .SetValue(Compiler, cSharpCompiler.Object)
         .Clear(Input)
         .Add(AssemblyReferences, "A.dll");
@@ -109,7 +109,7 @@ namespace Bud.Cs {
 
     [Test]
     public void Referenced_packages_must_be_added_to_the_list_of_assembly_references() {
-      var project = CsLibrary("Foo")
+      var project = CsLib("Foo")
         .Clear("Packages"/ResolvedAssemblies)
         .Add("Packages"/ResolvedAssemblies, "Bar.dll");
       That(AssemblyReferences[project].ToEnumerable(),
@@ -119,18 +119,18 @@ namespace Bud.Cs {
     [Test]
     public void Referenced_packages_project_must_reside_in_the_packages_folder()
       => AreEqual(Combine(Directory.GetCurrentDirectory(), "Foo", "packages"),
-                  CsLibrary("Foo").Get("Packages"/ProjectDir));
+                  CsLib("Foo").Get("Packages"/ProjectDir));
 
     [Test]
     public void Packages_config_file_must_be_read_from_the_root()
       => AreEqual(Combine(Directory.GetCurrentDirectory(), "Foo", "packages.config"),
-                  CsLibrary("Foo").Get("Packages"/PackagesConfigFile));
+                  CsLib("Foo").Get("Packages"/PackagesConfigFile));
 
     [Test]
     public void CSharp_files_in_the_packages_folder_must_not_be_listed() {
       using (var tempDir = new TemporaryDirectory()) {
         var csFile = tempDir.CreateEmptyFile("packages", "A.cs");
-        That(Sources[CsLibrary(tempDir.Path, "Foo")].Take(1).Wait(),
+        That(Sources[CsLib(tempDir.Path, "Foo")].Take(1).Wait(),
              Is.Not.Contains(csFile));
       }
     }
@@ -139,7 +139,7 @@ namespace Bud.Cs {
     public void CSharp_files_in_the_obj_folder_must_not_be_listed() {
       using (var tempDir = new TemporaryDirectory()) {
         var csFile = tempDir.CreateEmptyFile("obj", "A.cs");
-        That(Sources[CsLibrary(tempDir.Path, "Foo")].Take(1).Wait(),
+        That(Sources[CsLib(tempDir.Path, "Foo")].Take(1).Wait(),
              Is.Not.Contains(csFile));
       }
     }
@@ -148,7 +148,7 @@ namespace Bud.Cs {
     public void CSharp_files_in_the_bin_folder_must_not_be_listed() {
       using (var tempDir = new TemporaryDirectory()) {
         var csFile = tempDir.CreateEmptyFile("bin", "A.cs");
-        That(Sources[CsLibrary(tempDir.Path, "Foo")].Take(1).Wait(),
+        That(Sources[CsLib(tempDir.Path, "Foo")].Take(1).Wait(),
              Is.Not.Contains(csFile));
       }
     }
@@ -157,7 +157,7 @@ namespace Bud.Cs {
     public void CSharp_files_in_the_target_folder_must_not_be_listed() {
       using (var tempDir = new TemporaryDirectory()) {
         var csFile = tempDir.CreateEmptyFile("build", "A.cs");
-        That(Sources[CsLibrary(tempDir.Path, "Foo")].Take(1).Wait(),
+        That(Sources[CsLib(tempDir.Path, "Foo")].Take(1).Wait(),
              Is.Not.Contains(csFile));
       }
     }
@@ -165,9 +165,9 @@ namespace Bud.Cs {
     [Test]
     public void Package_must_contain_the_dll_of_the_CsLibrary_project() {
       var packager = new Mock<IPackager>(MockBehavior.Strict);
-      var projects = Projects(CsLibrary("aDir", "A")
+      var projects = Projects(CsLib("aDir", "A")
                                 .SetValue(ProjectVersion, "4.2.0"),
-                              CsLibrary("bDir", "B")
+                              CsLib("bDir", "B")
                                 .Clear(Output).Add(Output, "B.dll")
                                 .SetValue(Packager, packager.Object)
                                 .Add(Dependencies, "../A"));
@@ -186,7 +186,7 @@ namespace Bud.Cs {
     [Test]
     public void Package_must_contain_references_to_own_packages() {
       var packager = new Mock<IPackager>(MockBehavior.Strict);
-      var projects = Projects(CsLibrary("bDir", "B")
+      var projects = Projects(CsLib("bDir", "B")
                                 .Clear(Output).Add(Output, "B.dll")
                                 .SetValue(Packager, packager.Object)
                                 .Clear("Packages"/ReferencedPackages)
@@ -241,7 +241,7 @@ namespace Bud.Cs {
         .Add(Dependencies, dependencies);
 
     private static Conf EmptyCSharpProject(string projectId)
-      => CsLibrary(projectId, projectId)
+      => CsLib(projectId, projectId)
         .Clear(SourceIncludes)
         .Clear(AssemblyReferences);
 
@@ -273,7 +273,7 @@ namespace Bud.Cs {
     private static Conf
       ProjectAWithUpdatingSources(IScheduler testScheduler,
                                   Func<CompileInput, CompileOutput> compiler)
-      => CsLibrary("a", "A")
+      => CsLib("a", "A")
         .SetValue(BuildPipelineScheduler, testScheduler)
         .Clear(SourceIncludes)
         .Add(SourceIncludes, FileADelayedUpdates(testScheduler))

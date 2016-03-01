@@ -111,6 +111,7 @@
     <Compile Include="BaseProjects\BareProjects.cs" />
     <Compile Include="BaseProjects\BuildProjects.cs" />
     <Compile Include="Cli\BuildScriptCompilation.cs" />
+    <Compile Include="Cli\BuildScriptLoading.cs" />
     <Compile Include="Cli\Exec.cs" />
     <Compile Include="Collections\ImmutableLists.cs" />
     <Compile Include="Configuration\ConfAccessException.cs" />

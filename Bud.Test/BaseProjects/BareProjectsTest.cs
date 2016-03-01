@@ -9,12 +9,17 @@ using static Bud.V1.Api;
 namespace Bud.BaseProjects {
   public class BareProjectsTest {
     [Test]
-    public void Set_the_projectDir()
+    public void Set_ProjectDir()
       => AreEqual(Combine(GetCurrentDirectory(), "bar"),
                   ProjectDir[BareProject("bar", "Foo")]);
 
     [Test]
-    public void Set_the_projectId()
+    public void Set_ProjectDir_from_ProjectId()
+      => AreEqual(Combine(GetCurrentDirectory(), "Foo"),
+                  ProjectDir[BareProject("Foo")]);
+
+    [Test]
+    public void Set_ProjectId()
       => AreEqual("Foo", ProjectId[BareProject("bar", "Foo")]);
 
     [Test]
@@ -28,11 +33,16 @@ namespace Bud.BaseProjects {
       => IsEmpty(Dependencies[BuildProject("bar", "Foo")]);
 
     [Test]
+    public void BaseDir_is_set_to_the_current_working_directory()
+      => AreEqual(GetCurrentDirectory(),
+                  BaseDir[BareProject("A")]);
+
+    [Test]
     public void ProjectDir_must_be_relative_to_BaseDir() {
       using (var tmpDir = new TemporaryDirectory()) {
         AreEqual(Combine(tmpDir.Path, "foo"),
                  BareProject("foo", "Foo")
-                   .InitValue(BaseDir, tmpDir.Path)
+                   .SetValue(BaseDir, tmpDir.Path)
                    .Get(ProjectDir));
       }
     }
@@ -51,7 +61,7 @@ namespace Bud.BaseProjects {
       using (var tmpDir = new TemporaryDirectory()) {
         AreEqual(tmpDir.Path,
                  BareProject(tmpDir.Path, "Foo")
-                   .InitValue(BaseDir, tmpDir.Path)
+                   .SetValue(BaseDir, tmpDir.Path)
                    .Get(ProjectDir));
       }
     }
@@ -61,7 +71,7 @@ namespace Bud.BaseProjects {
       using (var tmpDir = new TemporaryDirectory()) {
         AreEqual(Combine(tmpDir.Path, "foo"),
                  Projects(BareProject("foo", "Foo"))
-                   .InitValue(BaseDir, tmpDir.Path)
+                   .SetValue(BaseDir, tmpDir.Path)
                    .Get("Foo"/ProjectDir));
       }
     }
@@ -76,7 +86,7 @@ namespace Bud.BaseProjects {
       using (var tmpDir = new TemporaryDirectory()) {
         AreEqual(tmpDir.Path,
                  BareProject("", "Foo")
-                   .InitValue(BaseDir, tmpDir.Path)
+                   .SetValue(BaseDir, tmpDir.Path)
                    .Get(ProjectDir));
       }
     }

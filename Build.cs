@@ -6,6 +6,6 @@ public class BudBuild : IBuild {
     => Projects(CsApp("bud")
                   .SetValue(ProjectVersion, "0.5.0-pre-3")
                   .Modify(PackageMetadata, (c, metadata) => metadata.WithField("projectUrl", "https://github.com/urbas/bud")),
-                CsLibrary("Bud.Test")
+                CsLib("Bud.Test")
                   .Add(Dependencies, "../bud"));
 }
