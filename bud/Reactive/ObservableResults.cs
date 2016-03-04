@@ -10,7 +10,7 @@ using static Bud.Util.Option;
 namespace Bud.Reactive {
   public class ObservableResults {
     private static readonly Type ObservableTypeDefinition = typeof(IObservable<object>).GetGenericTypeDefinition();
-    private static readonly MethodInfo ObservableToEnumerableMethodInfo = typeof(Observable).GetMethod("ToEnumerable");
+    private static readonly MethodInfo ObservableToEnumerableMethodInfo = typeof(Observable).GetMethod(nameof(Observable.ToEnumerable));
 
     public static Option<IEnumerable<object>> TryCollect(object observable)
       => observable == null ?

@@ -34,8 +34,9 @@ namespace Bud.NuGet {
 
     internal static IObservable<IImmutableSet<string>> ResolveAssemblies(IConf c)
       => ReferencedPackages[c].Select(packageReferences => {
-        var resolvedAssembliesFile = Combine(BuildDir[c], "resolved_assemblies");
-        CreateDirectory(BuildDir[c]);
+        var buildDir = BuildDir[c];
+        var resolvedAssembliesFile = Combine(buildDir, "resolved_assemblies");
+        CreateDirectory(buildDir);
         var hash = PackageReference.GetHash(packageReferences);
         var resolvedAssemblies = HashBasedCaching.GetLinesOrCache(
           resolvedAssembliesFile,
@@ -44,7 +45,7 @@ namespace Bud.NuGet {
         return resolvedAssemblies.ToImmutableHashSet();
       });
 
-    private static IEnumerable<string> DownloadAndResolvePackages(IConf c, IImmutableList<PackageReference> packageReferences) {
+    private static IEnumerable<string> DownloadAndResolvePackages(IConf c, IReadOnlyCollection<PackageReference> packageReferences) {
       var packagesDir = Combine(ProjectDir[c], "cache");
       CreateDirectory(packagesDir);
       if (packageReferences.Count == 0) {
