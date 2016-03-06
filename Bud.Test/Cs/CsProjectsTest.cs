@@ -59,27 +59,15 @@ namespace Bud.Cs {
     }
 
     [Test]
-    public void Compiler_is_invoked_with_input_sources() {
+    public void Compiler_is_invoked_with_sources_and_assembly_references() {
       var cSharpCompiler = new Mock<Func<CompileInput, CompileOutput>>(MockBehavior.Strict);
-      cSharpCompiler.Setup(self => self(CompileInputTestUtils.ToCompileInput("A.cs", null, null)))
-                    .Returns(EmptyCompileOutput());
       var projectA = CsLib("foo", "A")
         .SetValue(Compiler, cSharpCompiler.Object)
-        .Clear(Input)
-        .Add(Input, "A.cs");
-      Compile[projectA].Take(1).Wait();
-      cSharpCompiler.VerifyAll();
-    }
-
-    [Test]
-    public void Compiler_is_invoked_with_assembly_references() {
-      var cSharpCompiler = new Mock<Func<CompileInput, CompileOutput>>(MockBehavior.Strict);
-      cSharpCompiler.Setup(self => self(CompileInputTestUtils.ToCompileInput(null, null, "A.dll")))
-                    .Returns(EmptyCompileOutput());
-      var projectA = CsLib("foo", "A")
-        .SetValue(Compiler, cSharpCompiler.Object)
-        .Clear(Input)
+        .Clear(Input).Add(Input, "A.cs")
         .Add(AssemblyReferences, "A.dll");
+      var assemblyReferences = projectA.Get(AssemblyReferences).ToEnumerable().First();
+      cSharpCompiler.Setup(self => self(new CompileInput(new [] {"A.cs"}, Enumerable.Empty<CompileOutput>(), assemblyReferences)))
+                    .Returns(EmptyCompileOutput());
       Compile[projectA].Take(1).Wait();
       cSharpCompiler.VerifyAll();
     }
@@ -108,12 +96,17 @@ namespace Bud.Cs {
     }
 
     [Test]
+    public void Mscorlib_must_be_in_the_list_of_assembly_references()
+      => That(CsLib("Foo").Get(AssemblyReferences).ToEnumerable().First(),
+              Has.Some.Contains("mscorlib.dll"));
+
+    [Test]
     public void Referenced_packages_must_be_added_to_the_list_of_assembly_references() {
       var project = CsLib("Foo")
         .Clear("Packages"/ResolvedAssemblies)
         .Add("Packages"/ResolvedAssemblies, "Bar.dll");
-      That(AssemblyReferences[project].ToEnumerable(),
-           Has.Exactly(1).EqualTo(new[] {"Bar.dll"}));
+      That(AssemblyReferences[project].ToEnumerable().First(),
+           Has.Some.EqualTo("Bar.dll"));
     }
 
     [Test]
