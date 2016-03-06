@@ -231,6 +231,19 @@ namespace Bud.Cs {
       }
     }
 
+    [Test]
+    [Category("IntegrationTest")]
+    public void Projects_must_reference_the_mscorlib_assembly() {
+      using (var tmpDir = new TemporaryDirectory()) {
+        tmpDir.CreateFile(
+          "public class App {public static void Main(string[] args) => System.Console.WriteLine(\"Hello World!\");}",
+          "App.cs");
+        var project = CsProjects.CsLib(tmpDir.Path, "Foo");
+        var compileOutput = project.Get(Compile).Take(1).Wait();
+        IsTrue(compileOutput.Success);
+      }
+    }
+
     private static Conf ProjectAOutputsFooDll(long initialTimestamp)
       => EmptyCSharpProject("A")
         .SetValue(Compiler, input => EmptyCompileOutput(initialTimestamp++));

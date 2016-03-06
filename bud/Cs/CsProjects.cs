@@ -35,6 +35,7 @@ namespace Bud.Cs {
                  new CSharpCompilationOptions(DynamicallyLinkedLibrary,
                                               warningLevel: 1))
       .Add(AssemblyReferences, c => (PackagesSubProjectId/ResolvedAssemblies)[c])
+      .Add(AssemblyReferences, WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("mscorlib", new Version(0, 0)).Value)
       .Set(PackagesSubProjectId/ProjectDir, c => Combine(ProjectDir[c], "packages"))
       .Set(PackagesSubProjectId/PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
       .Init(ReferencedPackages, c => (PackagesSubProjectId/ReferencedPackages)[c])
