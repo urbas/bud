@@ -1,8 +1,11 @@
-[Installation](#installation)
-- [Windows](#windows)
-- [Linux and OSX](#linux-and-osx)
+[Installing on Windows](#installing-on-windows)
+
+[Installing on Linux and OSX](#installing-on-linux-and-osx)
+
 [Quick start](#quick-start)
+
 [Main features](#main-features)
+
 [TODO](#todo)
 
 # Bud
@@ -12,29 +15,24 @@ Bud is a build tool.
 Bud is currently in development. Release of version `1.0.0` is scheduled for June 2016.
 
 
-## Installation
-
-NuGet v3 must be installed and available on the `PATH` on all platforms.
-
-
-### Windows
+## Installing on Windows
 
 Install [Chocolatey](https://chocolatey.org/).
 
-Install NuGet v3.
+Install NuGet 3.3.0 or above (via chocolatey: `choco install nuget.commandline`).
 
-Invoke this command (requires administrative rights):
+Install Bud with this command (requires administrative rights):
 
 ```bash
 $ choco upgrade bud -version 0.5.0-pre-3 -pre
 ```
 
 
-### Linux and OSX
+## Installing on Linux and OSX
 
-1. Install nuget v3.
+1. Install nuget v3 (must be on `PATH`).
 
-1. Download the zip from: https://dl.bintray.com/matej/bud/bud-0.5.0-pre-3.zip
+1. Download the zip from https://dl.bintray.com/matej/bud/bud-0.5.0-pre-3.zip
 
 1. Extract the zip somewhere, say in `$HOME/.bud/bud-0.5.0-pre-3`.
 
@@ -52,8 +50,40 @@ __Warning__: Bud was not yet tested on Linux and OSX! Please let us know if you 
 
 ## Quick start
 
-> TODO: Describe project creation.
-> TODO: Add project initialisation. Maybe via `bud -g CsApp Your.Project` or `bud -g CsLib Your.Project`
+Create an empty folder (this will be the root of your solution). Let's call this folder `<root>`.
+
+In the `<root>` folder, create the project folder, say `<root>/Your.Project`.
+
+Create the file `<root>/Build.cs` with the following contents:
+
+```csharp
+using Bud.V1;
+using static Bud.V1.Api;
+
+public class BudBuild : IBuild {
+  public Conf Init() => CsApp("Your.Project");
+}
+```
+
+Create a "Hello World!" application. For example, create the file `Your.Project/App.cs` with
+the following contents:
+
+```csharp
+namespace Your.Project {
+  public class App {
+    public static void Main(string[] args)
+      => System.Console.WriteLine("Hello World!");
+  }
+}
+```
+
+Then go to the `<root>` folder, and invoke the following command:
+
+```bash
+bud Your.Project/Build
+```
+
+> TODO: Add automatic project generation (for even easier quickstart). Maybe via `bud -g CsApp Your.Project` or `bud -g CsLib Your.Project`
 
 ## Building
 
@@ -63,7 +93,7 @@ The following command builds continuously (until you press `Ctrl+C`):
 $ bud Your.Project/Build
 ```
 
-It rebuilds every time you change a file.
+Bud will rebuild every time you change a source file.
 
 ## Publishing
 
