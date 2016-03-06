@@ -1,18 +1,16 @@
-[Installing on Windows](#installing-on-windows)
+__Table of contents__
 
-[Installing on Linux and OSX](#installing-on-linux-and-osx)
+* [About](#about)
+* [Installing on Windows](#installing-on-windows)
+* [Installing on Linux and OSX](#installing-on-linux-and-osx)
+* [Quick start](#quick-start)
+* [Main features](#main-features)
+* [TODO](#todo)
 
-[Quick start](#quick-start)
 
-[Main features](#main-features)
+## About
 
-[TODO](#todo)
-
-# Bud
-
-Bud is a build tool.
-
-Bud is currently in development. Release of version `1.0.0` is scheduled for June 2016.
+Bud is a build tool. Bud is currently in development. Release of version `1.0.0` is scheduled for June 2016.
 
 
 ## Installing on Windows
