@@ -10,8 +10,11 @@ namespace Bud.Configuration {
     private readonly object configValueCacheGuard = new object();
 
     public Option<T> TryGet<T>(Key<T> key, Func<Key<T>, Option<T>> fallbackConf) {
+      Option<T> cachedValue;
+      if (TryGetFromCache(key, out cachedValue)) {
+        return cachedValue;
+      }
       lock (configValueCacheGuard) {
-        Option<T> cachedValue;
         if (TryGetFromCache(key, out cachedValue)) {
           return cachedValue;
         }
