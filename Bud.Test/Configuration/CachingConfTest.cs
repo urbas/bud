@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Bud.V1;
 using Moq;
 using NUnit.Framework;
@@ -59,5 +60,15 @@ namespace Bud.Configuration {
       => Assert.AreEqual("42",
                          cachingConf.TryGet("defined", objectFunc.Object)
                                     .Value);
+
+    [Test]
+    public void Nested_concurrent_access_to_different_keys_must_not_deadlock() {
+      var result = cachingConf.TryGet<int>("A", key => {
+        var task = Task.Run(() => cachingConf.TryGet<int>("B", _ => 1).Value);
+        task.Wait();
+        return 42 + task.Result;
+      });
+      Assert.AreEqual(43, result.Value);
+    }
   }
 }

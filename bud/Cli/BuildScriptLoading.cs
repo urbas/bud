@@ -5,12 +5,12 @@ using Bud.V1;
 
 namespace Bud.Cli {
   public static class BuildScriptLoading {
-    public static IConf LoadBuildDefinition(string assemblyPath, string baseDir)
-      => LoadBuildDefinition(LoadBuildConf(assemblyPath), baseDir);
-
-    internal static IConf LoadBuildDefinition(Conf buildConf, string baseDir)
+    public static IConf LoadBuildDefinition(Conf buildConf, string baseDir)
       => buildConf.InitValue(Api.BaseDir, baseDir)
                   .ToCompiled();
+
+    public static IConf LoadBuildDefinition(string assemblyPath, string baseDir)
+      => LoadBuildDefinition(LoadBuildConf(assemblyPath), baseDir);
 
     private static Conf LoadBuildConf(string assemblyPath) {
       var assembly = Assembly.LoadFile(assemblyPath);

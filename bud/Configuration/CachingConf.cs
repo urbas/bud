@@ -2,36 +2,61 @@ using System;
 using System.Collections.Immutable;
 using Bud.Util;
 using Bud.V1;
-using static Bud.Util.Option;
 
 namespace Bud.Configuration {
   public class CachingConf {
-    private ImmutableDictionary<string, object> configValueCache = ImmutableDictionary<string, object>.Empty;
+    private ImmutableDictionary<string, object> cache = ImmutableDictionary<string, object>.Empty;
     private readonly object configValueCacheGuard = new object();
 
     public Option<T> TryGet<T>(Key<T> key, Func<Key<T>, Option<T>> fallbackConf) {
-      Option<T> cachedValue;
-      if (TryGetFromCache(key, out cachedValue)) {
-        return cachedValue;
-      }
-      lock (configValueCacheGuard) {
-        if (TryGetFromCache(key, out cachedValue)) {
-          return cachedValue;
+      CacheEntry<T> cachedValue;
+      if (!TryGetFromCache(key, out cachedValue)) {
+        lock (configValueCacheGuard) {
+          if (!TryGetFromCache(key, out cachedValue)) {
+            cachedValue = new CacheEntry<T>(key, fallbackConf);
+            cache = cache.Add(key, cachedValue);
+          }
         }
-        var calculatedValue = fallbackConf(key);
-        configValueCache = configValueCache.Add(key, calculatedValue);
-        return calculatedValue;
       }
+      return cachedValue.Value;
     }
 
-    private bool TryGetFromCache<T>(Key<T> key, out Option<T> outValue) {
+    private bool TryGetFromCache<T>(Key<T> key, out CacheEntry<T> outValue) {
       object configValue;
-      if (configValueCache.TryGetValue(key, out configValue)) {
-        outValue = (Option<T>) configValue;
+      if (cache.TryGetValue(key, out configValue)) {
+        outValue = (CacheEntry<T>) configValue;
         return true;
       }
-      outValue = None<T>();
+      outValue = null;
       return false;
+    }
+
+    private sealed class CacheEntry<T> {
+      private Option<T> value;
+      private bool isComputed;
+      private readonly Key<T> key;
+      private readonly Func<Key<T>, Option<T>> computation;
+
+      public CacheEntry(Key<T> key, Func<Key<T>, Option<T>> computation) {
+        this.key = key;
+        this.computation = computation;
+      }
+
+      public Option<T> Value {
+        get {
+          if (isComputed) {
+            return value;
+          }
+          lock (this) {
+            if (isComputed) {
+              return value;
+            }
+            value = computation(key);
+            isComputed = true;
+            return value;
+          }
+        }
+      }
     }
   }
 }
