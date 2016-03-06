@@ -31,3 +31,17 @@ Build the `bud.sln` solution.
 Test the `Bud.Test` project with NUnit.
 
 > TODO: Implement testing in Bud.
+
+# Publishing
+
+Publishes to NuGet:
+
+```bash
+bud bud/Publish
+```
+
+Publishes to Chocolatey:
+
+```bash
+bud bud/Distribute
+```
