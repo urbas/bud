@@ -56,7 +56,7 @@ namespace Bud.Cli {
         "    => Projects(CsApp(\"bud\")\n" +
         "                  .SetValue(ProjectVersion, \"0.5.0-pre-3\")\n" +
         "                  .Modify(PackageMetadata, (c, metadata) => metadata.WithField(\"projectUrl\", \"https://github.com/urbas/bud\")),\n" +
-        "                CsLibrary(\"Bud.Test\")\n" +
+        "                CsLib(\"Bud.Test\")\n" +
         "                  .Add(Dependencies, \"../bud\"));\n" +
         "}",
         "Build.cs");
