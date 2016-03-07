@@ -1,5 +1,6 @@
 using System;
 using System.Diagnostics;
+using Bud.Util;
 
 namespace Bud.Cli {
   public static class Exec {
@@ -7,17 +8,24 @@ namespace Bud.Cli {
     ///   Runs the command, suppresses all its output, and throws an exception
     ///   if it returns a no-zero error code.
     /// </summary>
-    public static void RunCheckedQuietly(string executablePath, string arguments) {
-      var process = CreateWindowlessProcess(executablePath, arguments);
+    public static Process
+      RunCheckedQuietly(string executablePath,
+                        Option<string> arguments = default(Option<string>),
+                        Option<string> workingDir = default(Option<string>)) {
+      var process = CreateWindowlessProcess(executablePath, arguments, workingDir);
       process.Start();
       process.WaitForExit();
       if (process.ExitCode != 0) {
-        throw new Exception($"The command '{executablePath}' with arguments '{arguments}' returned an error code of {process.ExitCode}.");
+        throw new Exception($"Command '{executablePath}' with arguments '{arguments}' at working dir '{workingDir}' failed with error code {process.ExitCode}.");
       }
+      return process;
     }
 
-    public static int Run(string executablePath, string arguments) {
-      var process = CreateWindowlessProcess(executablePath, arguments);
+    public static int
+      Run(string executablePath,
+          Option<string> arguments = default(Option<string>),
+          Option<string> workingDir = default(Option<string>)) {
+      var process = CreateWindowlessProcess(executablePath, arguments, workingDir);
       process.OutputDataReceived += ProcessOnOutputDataReceived;
       process.Start();
       process.BeginOutputReadLine();
@@ -26,15 +34,23 @@ namespace Bud.Cli {
       return process.ExitCode;
     }
 
-    private static Process CreateWindowlessProcess(string executablePath, string arguments)
-      => new Process {
-        StartInfo = new ProcessStartInfo(executablePath, arguments) {
-          CreateNoWindow = true,
-          UseShellExecute = false,
-          RedirectStandardOutput = true,
-          RedirectStandardError = true
-        }
+    private static Process
+      CreateWindowlessProcess(string executablePath,
+                              Option<string> arguments = default(Option<string>),
+                              Option<string> workingDir = default(Option<string>)) {
+      var process = new Process();
+      var argumentsString = arguments.GetOrElse(string.Empty);
+      process.StartInfo = new ProcessStartInfo(executablePath, argumentsString) {
+        CreateNoWindow = true,
+        UseShellExecute = false,
+        RedirectStandardOutput = true,
+        RedirectStandardError = true
       };
+      if (workingDir.HasValue) {
+        process.StartInfo.WorkingDirectory = workingDir.Value;
+      }
+      return process;
+    }
 
     private static void ReadErrorOutput(Process process) {
       var errorOutput = process.StandardError.ReadToEnd();

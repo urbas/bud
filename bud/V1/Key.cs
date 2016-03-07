@@ -16,12 +16,10 @@ namespace Bud.V1 {
     public override string ToString() => Id;
   }
 
-  public struct Key
-  {
+  public struct Key {
     public readonly string Id;
 
-    public Key(string id)
-    {
+    public Key(string id) {
       Id = id;
     }
 
