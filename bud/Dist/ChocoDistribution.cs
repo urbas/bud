@@ -5,12 +5,12 @@ using Bud.Cli;
 using Bud.IO;
 using Bud.NuGet;
 
-namespace Bud.Distribution {
+namespace Bud.Dist {
   internal static class ChocoDistribution {
     public static bool PushToChoco(string repositoryId, string packageId, string packageVersion, string archiveUrl, string username, string buildDir, NuGetPackageMetadata packageMetadata) {
       var scratchDir = CreateChocoScratchDir(buildDir);
       var installScriptPath = CreateChocoInstallScript(packageId, archiveUrl, scratchDir);
-      var distPackage = CreateChocoPackage(packageId, packageVersion, username, scratchDir, installScriptPath, packageMetadata);
+      var distPackage = CreateChocoPackage(packageId, packageVersion, scratchDir, installScriptPath, packageMetadata);
       Console.WriteLine($"Starting to push to chocolatey ...");
       // TODO: use nuget instead. Read the ApiKey from somewhere.
       //      var success = NuGetExecutable.Instance.Run($"push {distPackage} -source https://chocolatey.org/ -NonInteractive");
@@ -19,7 +19,7 @@ namespace Bud.Distribution {
       return success;
     }
 
-    private static string CreateChocoPackage(string packageId, string packageVersion, string username, string scratchDir, string installScriptPath, NuGetPackageMetadata packageMetadata) {
+    private static string CreateChocoPackage(string packageId, string packageVersion, string scratchDir, string installScriptPath, NuGetPackageMetadata packageMetadata) {
       return NuGetPackager.CreatePackage(
         scratchDir,
         Directory.GetCurrentDirectory(),

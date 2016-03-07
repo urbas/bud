@@ -9,7 +9,7 @@ using Bud.Util;
 using Bud.V1;
 using static Bud.V1.Api;
 
-namespace Bud.Distribution {
+namespace Bud.Dist {
   public class BinTrayDistribution {
     public static IObservable<bool> Distribute(IConf c)
       => Distribute(DistributionArchive[c],

@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using Bud.Dist;
 using Bud.IO;
 using Bud.Reactive;
 using Bud.Util;
@@ -41,7 +42,7 @@ namespace Bud.BaseProjects {
       .Empty
       .Add(BuildSupport)
       .Add(SourceProcessorsSupport)
-      .Add(Distribution.Distribution.DistributionSupport)
+      .Add(ProjectDistribution.DistributionSupport)
       .Set(DistributionArchivePath, DefaultDistributionZipPath)
       .Add(FilesToDistribute, DistributeOutputAndDependencies)
       .Add(Input, c => ProcessedSources[c])

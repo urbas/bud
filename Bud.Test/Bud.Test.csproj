@@ -120,7 +120,6 @@
   <ItemGroup>
     <Compile Include="BaseProjects\BareProjectsTest.cs" />
     <Compile Include="BaseProjects\BuildProjectsTest.cs" />
-    <Compile Include="BaseProjects\DistributionTest.cs" />
     <Compile Include="BaseProjects\ZipTestUtils.cs" />
     <Compile Include="Cli\BuildScriptLoadingTest.cs" />
     <Compile Include="Cli\BuildScriptCompilationTest.cs" />
@@ -135,6 +134,7 @@
     <Compile Include="Cs\CsProjectsTest.cs" />
     <Compile Include="Cs\RoslynCsCompilationTest.cs" />
     <Compile Include="Cs\TimedEmittingCompilerTest.cs" />
+    <Compile Include="Dist\ProjectDistributionTest.cs" />
     <Compile Include="IO\HashBasedCachingTest.cs" />
     <Compile Include="IO\MemoryStreams.cs" />
     <Compile Include="IO\ValueUpdaterTest.cs" />

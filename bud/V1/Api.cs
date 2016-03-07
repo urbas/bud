@@ -284,7 +284,7 @@ namespace Bud.V1 {
     ///     in the produced ZIP archive.
     ///   </para>
     /// </summary>
-    public static Conf DistributionSupport => Distribution.Distribution.DistributionSupport;
+    public static Conf DistributionSupport => Dist.ProjectDistribution.DistributionSupport;
 
     #endregion
 
