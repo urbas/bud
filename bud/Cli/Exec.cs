@@ -4,6 +4,18 @@ using Bud.Util;
 
 namespace Bud.Cli {
   public static class Exec {
+    public static string
+      GetOutput(string executablePath,
+                Option<string> arguments = default(Option<string>),
+                Option<string> workingDir = default(Option<string>)) {
+      var process = CreateProcess(executablePath,
+                                  arguments,
+                                  workingDir);
+      process.Start();
+      process.WaitForExit();
+      return process.StandardOutput.ReadToEnd();
+    }
+
     /// <summary>
     ///   Runs the command, suppresses all its output, and throws an exception
     ///   if it returns a no-zero error code.
@@ -12,7 +24,7 @@ namespace Bud.Cli {
       RunCheckedQuietly(string executablePath,
                         Option<string> arguments = default(Option<string>),
                         Option<string> workingDir = default(Option<string>)) {
-      var process = CreateWindowlessProcess(executablePath, arguments, workingDir);
+      var process = CreateProcess(executablePath, arguments, workingDir);
       process.Start();
       process.WaitForExit();
       if (process.ExitCode != 0) {
@@ -21,11 +33,11 @@ namespace Bud.Cli {
       return process;
     }
 
-    public static int
+    public static int 
       Run(string executablePath,
           Option<string> arguments = default(Option<string>),
           Option<string> workingDir = default(Option<string>)) {
-      var process = CreateWindowlessProcess(executablePath, arguments, workingDir);
+      var process = CreateProcess(executablePath, arguments, workingDir);
       process.OutputDataReceived += ProcessOnOutputDataReceived;
       process.Start();
       process.BeginOutputReadLine();
@@ -35,9 +47,9 @@ namespace Bud.Cli {
     }
 
     private static Process
-      CreateWindowlessProcess(string executablePath,
-                              Option<string> arguments = default(Option<string>),
-                              Option<string> workingDir = default(Option<string>)) {
+      CreateProcess(string executablePath,
+                    Option<string> arguments = default(Option<string>),
+                    Option<string> workingDir = default(Option<string>)) {
       var process = new Process();
       var argumentsString = arguments.GetOrElse(string.Empty);
       process.StartInfo = new ProcessStartInfo(executablePath, argumentsString) {
