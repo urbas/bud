@@ -53,6 +53,9 @@ namespace Bud.Util {
       public static readonly Option<T> Instance = new Option<T>();
     }
 
+    public static Option<T> Flatten<T>(this Option<Option<T>> nestedOption)
+      => nestedOption.HasValue ? nestedOption.Value : None<T>();
+
     public static IEnumerable<T> Gather<T>(this IEnumerable<Option<T>> enumerable)
       => enumerable.Where(optional => optional.HasValue)
                    .Select(optional => optional.Value);

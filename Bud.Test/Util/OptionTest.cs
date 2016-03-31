@@ -119,5 +119,20 @@ namespace Bud.Util {
       => AreEqual(new[] {"1", "3"},
                   new[] {1, 2, 3, 4}.ToObservable()
                                     .Gather(number => number%2 == 1 ? Some(number.ToString()) : None<string>()).ToList().Wait());
+
+    [Test]
+    public void Flatten_returns_none_when_given_a_nested_none()
+      => AreEqual(None<int>(),
+                  Some(None<int>()).Flatten());
+
+    [Test]
+    public void Flatten_returns_none_when_given_none()
+      => AreEqual(None<int>(),
+                  None<Option<int>>().Flatten());
+
+    [Test]
+    public void Flatten_returns_none_when_given_a_nested_some_option()
+      => AreEqual(Some(42),
+                  Some(Some(42)).Flatten());
   }
 }
