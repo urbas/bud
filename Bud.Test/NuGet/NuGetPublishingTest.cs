@@ -38,11 +38,11 @@ namespace Bud.NuGet {
                                        "B",
                                        DefaultVersion,
                                        new[] {new PackageFile(fileToPackage, "content/B.txt")},
-                                       new [] {new PackageDependency("A", "1.2.3"), new PackageDependency("C", "4.5.7") }, 
+                                       new[] {new PackageDependency("A", "1.2.3"), new PackageDependency("C", "4.5.7")},
                                        new NuGetPackageMetadata(Environment.UserName, "B", ImmutableDictionary<string, string>.Empty)))
               .Returns(package);
 
-      AreEqual(package, projects.Get("B" / Package).Take(1).Wait());
+      AreEqual(package, projects.Get("B"/Package).Take(1).Wait());
       packager.VerifyAll();
     }
 
@@ -119,5 +119,20 @@ namespace Bud.NuGet {
                 .Add(NuGetPublishingSupport)
                 .Get(PackageBaseDir),
               Is.EqualTo(Directory.GetCurrentDirectory()));
+
+    [Test]
+    public void Default_PackageMetadata_has_no_ProjectUrl()
+      => That(BareProject("fooDir", "Foo")
+                .Add(NuGetPublishingSupport)
+                .Get(PackageMetadata).OptionalFields,
+              Does.Not.Contains("projectUrl"));
+
+    [Test]
+    public void Default_PackageMetadata_has_the_provided_ProjectUrl()
+      => That(BareProject("fooDir", "Foo")
+                .Add(NuGetPublishingSupport)
+                .SetValue(ProjectUrl, "some url")
+                .Get(PackageMetadata).OptionalFields["projectUrl"],
+              Is.EqualTo("some url"));
   }
 }

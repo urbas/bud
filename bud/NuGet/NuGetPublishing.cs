@@ -29,7 +29,16 @@ namespace Bud.NuGet {
     private static NuGetPackageMetadata DefaultPackageMetadata(IConf c)
       => new NuGetPackageMetadata(Environment.UserName,
                                   ProjectId[c],
-                                  ImmutableDictionary<string, string>.Empty);
+                                  ExtractOptionalFields(c));
+
+    private static IImmutableDictionary<string, string> ExtractOptionalFields(IConf c) {
+      var projectUrl = c.TryGet(ProjectUrl).Flatten();
+      if (projectUrl.HasValue) {
+        return ImmutableDictionary<string, string>.Empty
+          .Add("projectUrl", projectUrl.Value);
+      }
+      return ImmutableDictionary<string, string>.Empty;
+    }
 
     private static IObservable<string> DefaultPackage(IConf c)
       => PackageFiles[c].CombineLatest(GetReferencedPackages(c),
