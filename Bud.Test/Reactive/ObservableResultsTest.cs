@@ -23,17 +23,37 @@ namespace Bud.Reactive {
                   ObservableResults.TryCollect(new[] {1, 42}.ToObservable()).Value);
 
     [Test]
-    public void IsObservable_returns_false_when_parameter_is_not_observable()
+    public void TryTakeOne_returns_None_when_given_null()
+      => AreEqual(None<object>(),
+                  ObservableResults.TryTakeOne(null));
+
+    [Test]
+    public void TryTakeOne_returns_None_when_given_an_empty_observable()
+      => AreEqual(None<object>(),
+                  ObservableResults.TryTakeOne(Observable.Empty<object>()));
+
+    [Test]
+    public void TryTakeOne_returns_first_value_from_given_observed_strings()
+      => AreEqual("a",
+                  ObservableResults.TryTakeOne(new[] { "a", "b" }.ToObservable()).Value);
+
+    [Test]
+    public void TryTakeOne_returns_first_value_from_given_observable()
+      => AreEqual(42,
+                  ObservableResults.TryTakeOne(new[] { 42, 1 }.ToObservable()).Value);
+
+    [Test]
+    public void GetObservedType_returns_None_when_parameter_is_not_observable()
       => AreEqual(None<Type>(),
                   ObservableResults.GetObservedType(42));
 
     [Test]
-    public void IsObservable_returns_true_when_parameter_is_observable()
+    public void GetObservedType_returns_int_type_when_parameter_is_observable_of_int()
       => AreEqual(Some(typeof(int)),
                   ObservableResults.GetObservedType(Observable.Return(42)));
 
     [Test]
-    public void IsObservable_returns_false_when_parameter_is_null()
+    public void GetObservedType_returns_None_when_parameter_is_null()
       => AreEqual(None<Type>(),
                   ObservableResults.GetObservedType(null));
   }
