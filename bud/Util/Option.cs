@@ -40,9 +40,10 @@ namespace Bud.Util {
       }
     }
 
-    public override string ToString() {
-      return HasValue ? $"Some<{GetType().GetGenericArguments()[0]}>({Value})" : $"None<{GetType().GetGenericArguments()[0]}>";
-    }
+    public override string ToString()
+      => HasValue ?
+           $"Some<{GetType().GetGenericArguments()[0]}>({Value})" :
+           $"None<{GetType().GetGenericArguments()[0]}>";
   }
 
   public static class Option {

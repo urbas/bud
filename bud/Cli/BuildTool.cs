@@ -37,9 +37,9 @@ namespace Bud.Cli {
       if (!optionalValue.HasValue) {
         return None<object>();
       }
-      var optionalResults = ObservableResults.TryCollect(optionalValue.Value);
+      var optionalResults = ObservableResults.TryTakeOne(optionalValue.Value);
       if (optionalResults.HasValue) {
-        return optionalResults.Value as object;
+        return optionalResults.Value;
       }
       var task = optionalValue.Value as Task;
       if (task != null) {

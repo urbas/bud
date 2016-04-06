@@ -21,7 +21,7 @@ namespace Bud.Cli {
 
     [Test]
     public void ExecuteCommand_returns_the_observed_value()
-      => AreEqual(new[] {42},
+      => AreEqual(42,
                   ExecuteCommand(Observed42Conf(), "A").Value);
 
     [Test]
