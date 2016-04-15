@@ -10,7 +10,7 @@ __Table of contents__
 
 ## About
 
-Bud is a build tool. Bud is currently in development. Release of version `1.0.0` is scheduled for June 2016.
+Bud is a build tool. Release of version `1.0.0` is scheduled for June 2017.
 
 
 ## Installing on Windows
@@ -46,63 +46,25 @@ __Warning__: Bud was not yet tested on Linux and OSX! Please let us know if you 
 > TODO: provide a better installation method for Bud (perhaps just cloning from GitHub and running a script; similar to `rbenv`).
 
 
-## Quick start
+## Outline
 
-Create an empty folder (this will be the root of your solution). Let's call this folder `<root>`.
+### Build scripts
 
-In the `<root>` folder, create the project folder, say `<root>/Your.Project`.
-
-Create the file `<root>/Build.cs` with the following contents:
+Build script is a C# 6.0 file, named `Build.cs`. It must contain a class that implements the `IBuild` interface:
 
 ```csharp
-using Bud.V1;
-using static Bud.V1.Api;
-
-public class BudBuild : IBuild {
-  public Conf Init() => CsApp("Your.Project");
+public interface IBuild {
+  Conf Init();
 }
 ```
 
-Create a "Hello World!" application. For example, create the file `Your.Project/App.cs` with
-the following contents:
+The type `Conf` contains the entire build definition.
 
-```csharp
-namespace Your.Project {
-  public class App {
-    public static void Main(string[] args)
-      => System.Console.WriteLine("Hello World!");
-  }
-}
-```
+When you invoke `bud` in a directory that contains a build script, it will compile the build script, place the resulting DLL into the `/build` folder.
 
-Then go to the `<root>` folder, and invoke the following command:
+### Projects
 
-```bash
-bud Your.Project/Build
-```
-
-> TODO: Add automatic project generation (for even easier quickstart). Maybe via `bud -g CsApp Your.Project` or `bud -g CsLib Your.Project`
-
-## Building
-
-The following command builds continuously (until you press `Ctrl+C`):
-
-```bash
-$ bud Your.Project/Build
-```
-
-Bud will rebuild every time you change a source file.
-
-## Publishing
-
-The following command publishes your project to NuGet:
-
-```bash
-$ bud Your.Project/Publish
-```
-
-
-## Main features
+Plain projects consist of the following:
 
 - __Reactive__: bud will perform actions when files change.
 
@@ -131,8 +93,6 @@ $ bud Your.Project/Publish
 
     - Add the ability to use hashes instead of timestamps for incremental compilation.
 
-    - Check if Roslyn can compile files separately and implement true incremental compilation.
-
 - Use NuGet instead of `choco` in `ChocoDistribution.cs`.
 
 - I want some help in `README.md`. After 1 minute, I should be able to build my project.
@@ -156,6 +116,18 @@ $ bud Your.Project/Publish
         21:15:49.000> Bud.Test/Compile
         21:15:49.300< Bud.Test/Compile [300ms]
 
+- Compile projects in parallel.
+
+- I want to test my projects.
+
+- I want to define a generic build which doesn't rebuild if sources are up-to-date with outputs.
+
+    [Partial solution] Consider using `HashBasedCaching.GetLinesOrCache`.
+
+- Use less than 10ms to start a simple build.
+
+## Postponed
+
 - I want to use Bud in Visual Source.
 
     - Bud should communicate to Visual Source through HTTP. The protocol:
@@ -168,21 +140,9 @@ $ bud Your.Project/Publish
 
         - WebSockets are available only for `IObservable` keys.
 
-- Compile projects in parallel.
-
-- I want to test my projects.
-
 - Generate `csproj` files for projects.
 
 - I want to generate MSBuild solution and project files for my projects.
-
-- I want to define a generic build which doesn't rebuild if sources are up-to-date with outputs.
-
-    [Partial solution] Consider using `HashBasedCaching.GetLinesOrCache`.
-
-- Use less than 10ms to start a simple build.
-
-## Postponed
 
 - I want to clean my projects without cleaning the resolved packages.
 
