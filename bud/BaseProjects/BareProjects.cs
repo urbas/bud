@@ -11,8 +11,8 @@ namespace Bud.BaseProjects {
       = Conf.Empty.InitEmpty(Dependencies);
 
     internal static Conf BareProject(string projectDir,
-                                           string projectId,
-                                           string version = DefaultVersion)
+                                     string projectId,
+                                     string version = DefaultVersion)
       => Project(projectId)
         .Add(DependenciesSupport)
         .Add(BuildSchedulingSupport)

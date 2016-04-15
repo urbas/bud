@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using Bud.IO;
 using Microsoft.CodeAnalysis;
@@ -27,7 +28,7 @@ namespace Bud.Cs {
       using (var tempDir = new TemporaryDirectory()) {
         var compiler = CreateCompiler();
         var fileA = tempDir.CreateFile("public class A {}", "A.cs");
-        var compilationOutput = compiler.Compile(new[] {fileA}, new[] {typeof (object).Assembly.Location});
+        var compilationOutput = compiler.Compile(new[] {fileA}, new[] {typeof(object).Assembly.Location});
         var outputPath = Path.Combine(tempDir.Path, "A.dll");
         var emitResult = compilationOutput.Emit(outputPath);
         Assert.IsTrue(emitResult.Success);
@@ -41,7 +42,7 @@ namespace Bud.Cs {
       using (var tempDir = new TemporaryDirectory()) {
         var compiler = CreateCompiler();
         var fileA = tempDir.CreateFile("public class", "A.cs");
-        var compilationOutput = compiler.Compile(new[] {fileA}, new[] {typeof (object).Assembly.Location});
+        var compilationOutput = compiler.Compile(new[] {fileA}, new[] {typeof(object).Assembly.Location});
         var outputPath = Path.Combine(tempDir.Path, "A.dll");
         var emitResult = compilationOutput.Emit(outputPath);
         Assert.IsFalse(emitResult.Success);
@@ -56,9 +57,9 @@ namespace Bud.Cs {
         var compiler = CreateCompiler();
         var fileA = tempDir.CreateFile("public class", "A.cs");
         var outputPath = Path.Combine(tempDir.Path, "A.dll");
-        Assert.IsFalse(compiler.Compile(new[] {fileA}, new[] {typeof (object).Assembly.Location}).Emit(outputPath).Success);
+        Assert.IsFalse(compiler.Compile(new[] {fileA}, new[] {typeof(object).Assembly.Location}).Emit(outputPath).Success);
         File.WriteAllText(fileA, "public class A {}");
-        Assert.IsTrue(compiler.Compile(new[] {fileA}, new[] {typeof (object).Assembly.Location}).Emit(outputPath).Success);
+        Assert.IsTrue(compiler.Compile(new[] {fileA}, new[] {typeof(object).Assembly.Location}).Emit(outputPath).Success);
       }
     }
 
@@ -69,7 +70,7 @@ namespace Bud.Cs {
         var fileA = tempDir.CreateFile("public class A {}", "A.cs");
         var outputPath = Path.Combine(tempDir.Path, "A.dll");
         Assert.IsFalse(compiler.Compile(new[] {fileA}, Empty<string>()).Emit(outputPath).Success);
-        Assert.IsTrue(compiler.Compile(new[] {fileA}, new[] {typeof (object).Assembly.Location}).Emit(outputPath).Success);
+        Assert.IsTrue(compiler.Compile(new[] {fileA}, new[] {typeof(object).Assembly.Location}).Emit(outputPath).Success);
       }
     }
 
@@ -78,7 +79,7 @@ namespace Bud.Cs {
       using (var tempDir = new TemporaryDirectory()) {
         var compiler = CreateCompiler();
         var fileB = tempDir.CreateFile("public class B : A {}", "B.cs");
-        var compilationOutput = compiler.Compile(new[] {fileB}, new[] {typeof (object).Assembly.Location});
+        var compilationOutput = compiler.Compile(new[] {fileB}, new[] {typeof(object).Assembly.Location});
         var outputPath = Path.Combine(tempDir.Path, "B.dll");
         Assert.IsFalse(compilationOutput.Emit(outputPath).Success);
       }
@@ -91,10 +92,29 @@ namespace Bud.Cs {
         var fileA = tempDir.CreateFile("public class A {}", "A.cs");
         var fileB = tempDir.CreateFile("public class B : A {}", "B.cs");
         var aOutputAssembly = Path.Combine(tempDir.Path, "A.dll");
-        compiler.Compile(new[] {fileA}, new[] {typeof (object).Assembly.Location}).Emit(aOutputAssembly);
-        var b = compiler.Compile(new[] {fileB}, new[] {typeof (object).Assembly.Location, aOutputAssembly});
+        compiler.Compile(new[] {fileA}, new[] {typeof(object).Assembly.Location}).Emit(aOutputAssembly);
+        var b = compiler.Compile(new[] {fileB}, new[] {typeof(object).Assembly.Location, aOutputAssembly});
         var outputPath = Path.Combine(tempDir.Path, "B.dll");
         var emitResult = b.Emit(outputPath);
+        Assert.IsTrue(emitResult.Success);
+      }
+    }
+
+    [Test]
+    public void Compiles_when_internals_of_dependency_are_used() {
+      using (var tempDir = new TemporaryDirectory()) {
+        var fileA = tempDir.CreateFile("public class A {internal const int I=42;}", "A.cs");
+        var fileAssemblyInfo = tempDir.CreateFile("public class A {internal const int I=42;}", "A.cs");
+        var fileB = tempDir.CreateFile("using System.Runtime.CompilerServices;\n" +
+                                       "[assembly: InternalsVisibleTo(\"B\")]", "AssemblyInfo.cs");
+        var assemblyA = Path.Combine(tempDir.Path, "A.dll");
+        new RoslynCsCompilation("A", new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+          .Compile(new[] {fileA, fileAssemblyInfo}, new[] {typeof(object).Assembly.Location})
+          .Emit(assemblyA);
+        var emitResult = new RoslynCsCompilation("B", new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary))
+          .Compile(new[] {fileB}, new[] {typeof(object).Assembly.Location, assemblyA})
+          .Emit(Path.Combine(tempDir.Path, "B.dll"));
+        Console.WriteLine($"{string.Join("\n", emitResult.Diagnostics)}");
         Assert.IsTrue(emitResult.Success);
       }
     }

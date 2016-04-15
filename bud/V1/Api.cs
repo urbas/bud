@@ -311,7 +311,7 @@ namespace Bud.V1 {
     public static readonly Key<string> ProjectDir = nameof(ProjectDir);
 
     /// <summary>
-    ///   The directory relative to which all <see cref="ProjectDir"/> paths are
+    ///   The directory relative to which all <see cref="ProjectDir" /> paths are
     ///   calculated. By default this is the directory of the <c>Build.cs</c> file
     ///   that Bud is currently invoking. It can be overridden.
     /// </summary>
@@ -409,7 +409,12 @@ namespace Bud.V1 {
     public static readonly Key<IObservable<CompileOutput>> Compile = nameof(Compile);
     public static readonly Key<Func<CompileInput, CompileOutput>> Compiler = nameof(Compiler);
     public static readonly Key<IObservable<IImmutableList<string>>> AssemblyReferences = nameof(AssemblyReferences);
+
+    /// <summary>
+    ///   The name of the assembly to be built (with the extension).
+    /// </summary>
     public static readonly Key<string> AssemblyName = nameof(AssemblyName);
+
     public static readonly Key<CSharpCompilationOptions> CsCompilationOptions = nameof(CsCompilationOptions);
     public static readonly Key<IImmutableList<ResourceDescription>> EmbeddedResources = nameof(EmbeddedResources);
 
