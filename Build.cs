@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reactive.Linq;
 using Bud.Cli;
+using Bud.Dist;
 using Bud.Util;
 using Bud.V1;
 using Newtonsoft.Json;
@@ -27,34 +28,53 @@ public class BudBuild : IBuild {
       Directory.Delete(benchmarksDir, true);
     }
     Directory.CreateDirectory(benchmarksDir);
-    var budExe = CreateBudDistribution(c, benchmarksDir);
+    var budExe = CreateBudExe(c, benchmarksDir);
     const string revisionToBuild = "33e7262924b1eee21b521533c09d019d93a9b080";
     CopyRepo(BaseDir[c], cloneDir, revisionToBuild);
+    var revisionToBenchmark = Exec.GetOutput("git", "rev-parse HEAD");
     var benchmark = new BenchmarkResults(
-      Exec.GetOutput("git", "rev-parse HEAD"),
+      revisionToBenchmark,
       "Mat's Lenovo Yoga 2 Pro",
       ImmutableList.Create(
-//        MeasureColdBuildScriptLoad(budExe, cloneDir),
-//        MeasureWarmBuildScriptLoad(budExe, cloneDir),
-        MeasureColdProjectCompilation(budExe, cloneDir)));
-    JsonSerializer.CreateDefault().Serialize(Console.Out, benchmark);
-    // TODO: Benchmark 4: warm compile Bud.Test
-    // TODO: Benchmark 5: warm compile Bud.Test with one source file touched
-    // TODO: Benchmark 6: warm compile Bud.Test with one source file changed
-    // TODO: Benchmark 7: warm compile Bud.Test with one source file in Bud touched
-    // TODO: Benchmark 8: warm compile Bud.Test with one source file in Bud changed
-    // TODO: Upload the zipped JSON containing benchmark results to BinTray.
-    // TODO:   - PackageId: bud-benchmarks
-    // TODO:   - vYYYY.M.D-bhhmmss
-    // TODO: Take 7 samples of each measurement, discard the min and max, and take the average.
+        MeasureColdBuildScriptLoad(budExe, cloneDir),
+        MeasureWarmBuildScriptLoad(budExe, cloneDir),
+        MeasureColdProjectCompilation(budExe, cloneDir),
+        MeasureWarmProjectCompilation(budExe, cloneDir),
+        MeasureWarmProjectCompilationOneFileTouched(budExe, cloneDir),
+        MeasureWarmProjectCompilationOneDependentFileTouched(budExe, cloneDir),
+        MeasureWarmProjectCompilationOneFileChanged(budExe, cloneDir),
+        MeasureWarmProjectCompilationOneDependentFileChanged(budExe, cloneDir)
+        ));
+    var benchmarkResultsFile = Path.Combine(benchmarksDir, "benchmark-results.json");
+    using (var fileWriter = File.Open(benchmarkResultsFile, FileMode.Create, FileAccess.Write)) {
+      using (var textFileWriter = new StreamWriter(fileWriter)) {
+        JsonSerializer
+          .CreateDefault(new JsonSerializerSettings {Formatting = Formatting.Indented})
+          .Serialize(textFileWriter, benchmark);
+      }
+    }
+    Console.WriteLine($"Version format: {DateTime.Now.ToString("yyyy.M.d-bHHmmss")}");
+    var pushedUrl = BinTrayDistribution.PushToBintray(benchmarkResultsFile,
+                                                      "bud",
+                                                      "bud-benchmarks",
+                                                      $"{DateTime.Now.ToString("yyyy.M.d-bHHmmss")}-{revisionToBenchmark.Substring(0, 8)}",
+                                                      "matej");
+    if (pushedUrl.HasValue) {
+      Console.WriteLine($"Pushed to {pushedUrl.Value}");
+    } else {
+      throw new Exception("Failed to push benchmark results to bintray.");
+    }
+    // TODO: Add benchmarks for long chains of projects.
+    // TODO: Add benchmarks for projects with loads of independent dependencies.
     // TODO: Do some nice visualisations with the average, error bars, and commit history.
     return null;
   }
 
   private static Measurement MeasureColdBuildScriptLoad(string budExe, string cloneDir) {
+    Console.WriteLine("Cold build script load:");
     var samples = ImmutableList.CreateBuilder<Sample>();
     for (int i = 0; i < SampleCount; i++) {
-      Console.WriteLine($"Cold build script load run {i+1}/{SampleCount}");
+      Console.WriteLine($"{i + 1}/{SampleCount}");
       samples.Add(RunBud(budExe, cloneDir));
       ResetRepo(cloneDir);
     }
@@ -62,10 +82,11 @@ public class BudBuild : IBuild {
   }
 
   private static Measurement MeasureWarmBuildScriptLoad(string budExe, string cloneDir) {
+    Console.WriteLine("Warm build script load:");
     var samples = ImmutableList.CreateBuilder<Sample>();
     RunBud(budExe, cloneDir);
     for (int i = 0; i < SampleCount; i++) {
-      Console.WriteLine($"Warm build script load run {i+1}/{SampleCount}");
+      Console.WriteLine($"{i + 1}/{SampleCount}");
       samples.Add(RunBud(budExe, cloneDir));
     }
     ResetRepo(cloneDir);
@@ -73,14 +94,89 @@ public class BudBuild : IBuild {
   }
 
   private static Measurement MeasureColdProjectCompilation(string budExe, string projectDir) {
+    Console.WriteLine("Cold Bud.Test compile:");
     var samples = ImmutableList.CreateBuilder<Sample>();
     RunBud(budExe, projectDir);
     for (int i = 0; i < SampleCount; i++) {
-      Console.WriteLine($"Cold Bud.Test compile run {i+1}/{SampleCount}");
+      Console.WriteLine($"{i + 1}/{SampleCount}");
       samples.Add(RunBud(budExe, projectDir, "Bud.Test/Compile"));
       RunBud(budExe, projectDir, "Bud/Clean Bud.Test/Clean");
     }
+    ResetRepo(projectDir);
     return new Measurement("cold compile Bud.Test", samples.ToImmutable());
+  }
+
+  private static Measurement MeasureWarmProjectCompilation(string budExe, string projectDir) {
+    Console.WriteLine("Warm Bud.Test compile:");
+    var samples = ImmutableList.CreateBuilder<Sample>();
+    RunBud(budExe, projectDir);
+    RunBud(budExe, projectDir, "Bud.Test/Compile");
+    for (int i = 0; i < SampleCount; i++) {
+      Console.WriteLine($"{i + 1}/{SampleCount}");
+      samples.Add(RunBud(budExe, projectDir, "Bud.Test/Compile"));
+    }
+    ResetRepo(projectDir);
+    return new Measurement("warm compile Bud.Test", samples.ToImmutable());
+  }
+
+  private static Measurement MeasureWarmProjectCompilationOneFileTouched(string budExe, string projectDir) {
+    var fileToTouch = Path.Combine(projectDir, "Bud.Test", "V1", "KeysTest.cs");
+    Console.WriteLine($"Warm Bud.Test compile (touched file '{fileToTouch}'):");
+    var samples = ImmutableList.CreateBuilder<Sample>();
+    RunBud(budExe, projectDir);
+    RunBud(budExe, projectDir, "Bud.Test/Compile");
+    for (int i = 0; i < SampleCount; i++) {
+      File.SetLastWriteTimeUtc(fileToTouch, DateTime.UtcNow);
+      Console.WriteLine($"{i + 1}/{SampleCount}");
+      samples.Add(RunBud(budExe, projectDir, "Bud.Test/Compile"));
+    }
+    ResetRepo(projectDir);
+    return new Measurement("warm compile Bud.Test, touched a Bud.Test source file", samples.ToImmutable());
+  }
+
+  private static Measurement MeasureWarmProjectCompilationOneFileChanged(string budExe, string projectDir) {
+    var fileToChange = Path.Combine(projectDir, "Bud.Test", "V1", "KeysTest.cs");
+    Console.WriteLine($"Warm Bud.Test compile (changed file '{fileToChange}'):");
+    var samples = ImmutableList.CreateBuilder<Sample>();
+    RunBud(budExe, projectDir);
+    RunBud(budExe, projectDir, "Bud.Test/Compile");
+    for (int i = 0; i < SampleCount; i++) {
+      File.AppendAllText(fileToChange, "\n// Just a comment\n");
+      Console.WriteLine($"{i + 1}/{SampleCount}");
+      samples.Add(RunBud(budExe, projectDir, "Bud.Test/Compile"));
+    }
+    ResetRepo(projectDir);
+    return new Measurement("warm compile Bud.Test, changed a Bud.Test source file", samples.ToImmutable());
+  }
+
+  private static Measurement MeasureWarmProjectCompilationOneDependentFileTouched(string budExe, string projectDir) {
+    var fileToTouch = Path.Combine(projectDir, "bud", "V1", "Keys.cs");
+    Console.WriteLine($"Warm Bud.Test compile (touched file '{fileToTouch}'):");
+    var samples = ImmutableList.CreateBuilder<Sample>();
+    RunBud(budExe, projectDir);
+    RunBud(budExe, projectDir, "Bud.Test/Compile");
+    for (int i = 0; i < SampleCount; i++) {
+      File.SetLastWriteTimeUtc(fileToTouch, DateTime.UtcNow);
+      Console.WriteLine($"{i + 1}/{SampleCount}");
+      samples.Add(RunBud(budExe, projectDir, "Bud.Test/Compile"));
+    }
+    ResetRepo(projectDir);
+    return new Measurement("warm compile Bud.Test, touched a bud source file", samples.ToImmutable());
+  }
+
+  private static Measurement MeasureWarmProjectCompilationOneDependentFileChanged(string budExe, string projectDir) {
+    var fileToChange = Path.Combine(projectDir, "bud", "V1", "Keys.cs");
+    Console.WriteLine($"Warm Bud.Test compile (changed file '{fileToChange}'):");
+    var samples = ImmutableList.CreateBuilder<Sample>();
+    RunBud(budExe, projectDir);
+    RunBud(budExe, projectDir, "Bud.Test/Compile");
+    for (int i = 0; i < SampleCount; i++) {
+      File.AppendAllText(fileToChange, "\n// Just a comment\n");
+      Console.WriteLine($"{i + 1}/{SampleCount}");
+      samples.Add(RunBud(budExe, projectDir, "Bud.Test/Compile"));
+    }
+    ResetRepo(projectDir);
+    return new Measurement("warm compile Bud.Test, changed a bud source file", samples.ToImmutable());
   }
 
   private static Sample RunBud(string budExe, string cloneDir, Option<string> buildCommand = default(Option<string>))
@@ -95,7 +191,7 @@ public class BudBuild : IBuild {
   ///   path to Bud's executable which is runnable as-is (all
   ///   required libraries are in the same folder).
   /// </returns>
-  private static string CreateBudDistribution(IConf c, string benchmarksDir) {
+  private static string CreateBudExe(IConf c, string benchmarksDir) {
     var filesToDist = c.Get("bud"/FilesToDistribute).Take(1).Wait();
     var budExeDir = Path.Combine(benchmarksDir, "bud-exe");
     foreach (var packageFile in filesToDist) {
