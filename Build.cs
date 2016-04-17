@@ -32,7 +32,7 @@ public class BudBuild : IBuild {
     const string revisionToBuild = "33e7262924b1eee21b521533c09d019d93a9b080";
     CopyRepo(BaseDir[c], cloneDir, revisionToBuild);
     var revisionToBenchmark = Exec.GetOutput("git", "rev-parse HEAD");
-    var benchmark = new BenchmarkResults(
+    var benchmarkResults = new BenchmarkResults(
       revisionToBenchmark,
       "Mat's Lenovo Yoga 2 Pro",
       ImmutableList.Create(
@@ -50,10 +50,9 @@ public class BudBuild : IBuild {
       using (var textFileWriter = new StreamWriter(fileWriter)) {
         JsonSerializer
           .CreateDefault(new JsonSerializerSettings {Formatting = Formatting.Indented})
-          .Serialize(textFileWriter, benchmark);
+          .Serialize(textFileWriter, benchmarkResults);
       }
     }
-    Console.WriteLine($"Version format: {DateTime.Now.ToString("yyyy.M.d-bHHmmss")}");
     var pushedUrl = BinTrayDistribution.PushToBintray(benchmarkResultsFile,
                                                       "bud",
                                                       "bud-benchmarks",
@@ -67,7 +66,7 @@ public class BudBuild : IBuild {
     // TODO: Add benchmarks for long chains of projects.
     // TODO: Add benchmarks for projects with loads of independent dependencies.
     // TODO: Do some nice visualisations with the average, error bars, and commit history.
-    return null;
+    return benchmarkResults;
   }
 
   private static Measurement MeasureColdBuildScriptLoad(string budExe, string cloneDir) {
