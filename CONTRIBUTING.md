@@ -39,7 +39,7 @@ Test the `Bud.Test` project with NUnit.
 bud benchmark
 ```
 
-This will produce the file `build/benchmarks/benchmark-results.json`.
+This will produce the file `build/benchmarks/benchmark-results.json` and push it to [BinTray](https://bintray.com/matej/bud/bud-benchmarks/view#files).
 
 
 # Publishing
