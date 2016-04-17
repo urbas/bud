@@ -25,7 +25,11 @@ namespace Bud.Cli {
                         Option<string> arguments = default(Option<string>),
                         Option<string> workingDir = default(Option<string>)) {
       var process = CreateProcess(executablePath, arguments, workingDir);
+      // NOTE: If we don't read the output to end sometimes processes get stuck.
+      process.OutputDataReceived += (s, a) => {};
       process.Start();
+      process.BeginOutputReadLine();
+      process.StandardError.ReadToEnd();
       process.WaitForExit();
       if (process.ExitCode != 0) {
         throw new Exception($"Command '{executablePath}' with arguments '{arguments}' at working dir '{workingDir}' failed with error code {process.ExitCode}.");
