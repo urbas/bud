@@ -34,7 +34,7 @@ public class BudBuild : IBuild {
     var revisionToBenchmark = Exec.GetOutput("git", "rev-parse HEAD");
     var benchmarkResults = new BenchmarkResults(
       revisionToBenchmark,
-      "Mat's Lenovo Yoga 2 Pro",
+      Environment.MachineName,
       ImmutableList.Create(
         MeasureColdBuildScriptLoad(budExe, cloneDir),
         MeasureWarmBuildScriptLoad(budExe, cloneDir),
@@ -57,7 +57,8 @@ public class BudBuild : IBuild {
                                                       "bud",
                                                       "bud-benchmarks",
                                                       $"{DateTime.Now.ToString("yyyy.M.d-bHHmmss")}-{revisionToBenchmark.Substring(0, 8)}",
-                                                      "matej");
+                                                      "matej",
+                                                      "json");
     if (pushedUrl.HasValue) {
       Console.WriteLine($"Pushed to {pushedUrl.Value}");
     } else {
