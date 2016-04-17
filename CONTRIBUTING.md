@@ -39,7 +39,7 @@ Test the `Bud.Test` project with NUnit.
 bud benchmark
 ```
 
-This will produce the file `build/benchmark.json`.
+This will produce the file `build/benchmarks/benchmark-results.json`.
 
 
 # Publishing
