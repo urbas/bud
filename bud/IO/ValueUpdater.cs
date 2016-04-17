@@ -15,7 +15,7 @@ namespace Bud.IO {
       = ImmutableDictionary<TInput, TOutput>.Empty;
 
     public ValueUpdater(IValueStore<TOutput> valueStore,
-                               Func<TInput, TOutput> valueFactory) {
+                        Func<TInput, TOutput> valueFactory) {
       ValueStore = valueStore;
       this.valueFactory = valueFactory;
       LastDiff = Diff.Empty<TInput>();
