@@ -11,6 +11,7 @@ using Bud.NuGet;
 using Bud.V1;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Newtonsoft.Json;
 using static Bud.V1.Api;
 
 namespace Bud.Cli {
@@ -26,6 +27,7 @@ namespace Bud.Cli {
       typeof(Unit).Assembly.Location,
       typeof(ZipArchive).Assembly.Location,
       typeof(CompressionLevel).Assembly.Location,
+      typeof(JsonSerializer).Assembly.Location,
       WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.Net.Http", Version.Parse("4.6.0.0")).Value,
       WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.Runtime", Version.Parse("4.6.0.0")).Value,
       WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.IO", Version.Parse("4.6.0.0")).Value);

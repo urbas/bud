@@ -32,6 +32,16 @@ Test the `Bud.Test` project with NUnit.
 
 > TODO: Implement testing in Bud.
 
+
+# Performance measurement
+
+```bash
+bud benchmark
+```
+
+This will produce the file `build/benchmarks/benchmark-results.json` and push it to [BinTray](https://bintray.com/matej/bud/bud-benchmarks/view#files).
+
+
 # Publishing
 
 Publishes to NuGet:

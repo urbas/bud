@@ -115,12 +115,6 @@ $ bud Your.Project/Publish
 
 ## TODO
 
-- Performance benchmarks:
-
-    - Startup time (compiling `Build.cs`; loading it after it is built).
-
-    - Compiling variously-sized projects (check a project out from git, cold-compile it, warm-compile it, hot-compile it, clean-compile it).
-
 - Tests for API-breaking changes:
 
     - Add this feature to Bud (so that everyone can do backwards-compatibility tests).

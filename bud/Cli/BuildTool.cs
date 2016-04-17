@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Bud.Cs;
 using Bud.Reactive;
@@ -15,7 +13,7 @@ using static Bud.Util.Option;
 
 namespace Bud.Cli {
   public class BuildTool {
-    public static void Main(string[] args)
+    public static void Main(string[] args) 
       => ExecuteBuild(GetCurrentDirectory(), args);
 
     private static void ExecuteBuild(string baseDir, IEnumerable<string> args) {

@@ -22,7 +22,7 @@ namespace Bud.Dist {
 
     public static IObservable<bool> Distribute(IObservable<string> observedArchive, string repositoryId, string packadeId, string username, string packageVersion, string buildDir, NuGetPackageMetadata packageMetadata)
       => observedArchive.Select(
-        archive => PushToBintray(archive, repositoryId, packadeId, packageVersion, username)
+        archive => PushToBintray(archive, repositoryId, packadeId, packageVersion, username, "zip")
                      .Map(archiveUrl => ChocoDistribution.PushToChoco(repositoryId, packadeId, packageVersion, archiveUrl, username, buildDir, packageMetadata))
                      .GetOrElse(false));
 
@@ -30,8 +30,9 @@ namespace Bud.Dist {
                                                string repositoryId,
                                                string packageId,
                                                string packageVersion,
-                                               string username) {
-      var packagePublishUrl = BintrayPublishPackageUrl(packageId, repositoryId, username, packageVersion);
+                                               string username,
+                                               string fileExtension) {
+      var packagePublishUrl = BintrayPublishPackageUrl(packageId, repositoryId, username, packageVersion, fileExtension);
       var apiKey = LoadBintrayApiKey(username);
       Console.WriteLine("Starting to upload to bintray...");
       using (var httpClient = new HttpClient()) {
@@ -69,10 +70,11 @@ namespace Bud.Dist {
     private static string BintrayPublishPackageUrl(string packageId,
                                                    string repositoryId,
                                                    string username,
-                                                   string packageVersion)
+                                                   string packageVersion,
+                                                   string fileExtension)
       => "https://api.bintray.com/" +
          $"content/{username}/{repositoryId}/{packageId}/" +
-         $"{packageVersion}/{packageId}-{packageVersion}.zip?publish=1";
+         $"{packageVersion}/{packageId}-{packageVersion}.{fileExtension}?publish=1";
 
     private static string LoadBintrayApiKey(string username) {
       var apiKeyFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
