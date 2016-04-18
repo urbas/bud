@@ -53,7 +53,7 @@ namespace Bud.Dist {
               responseContentTask.Wait();
               Console.WriteLine($"Upload to bintray response body: {responseContentTask.Result}");
               return uploadSuccess ?
-                       BintrayArchiveDownloadUrl(repositoryId, packageId, username, packageVersion) :
+                       BintrayArchiveDownloadUrl(repositoryId, packageId, username, packageVersion, fileExtension) :
                        Option.None<string>();
             }
           }
@@ -64,8 +64,11 @@ namespace Bud.Dist {
     private static string BintrayArchiveDownloadUrl(string repositoryId,
                                                     string packageId,
                                                     string username,
-                                                    string packageVersion)
-      => $"https://dl.bintray.com/{username}/{repositoryId}/{packageId}-{packageVersion}.zip";
+                                                    string packageVersion,
+                                                    string fileExtension)
+      => "https://dl.bintray.com/" +
+         $"{username}/{repositoryId}/" +
+         $"{packageId}-{packageVersion}.{fileExtension}";
 
     private static string BintrayPublishPackageUrl(string packageId,
                                                    string repositoryId,
