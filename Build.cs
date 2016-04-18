@@ -11,40 +11,65 @@ using Newtonsoft.Json;
 using static Bud.V1.Api;
 
 public class BudBuild : IBuild {
-  private const int SampleCount = 7;
-
   public Conf Init()
     => Projects(CsApp("bud")
                   .SetValue(ProjectVersion, "0.5.0-pre-5")
                   .SetValue(ProjectUrl, "https://github.com/urbas/bud"),
                 CsLib("Bud.Test")
                   .Add(Dependencies, "../bud"))
-      .Init("benchmark", Benchmark);
+      .Init("benchmark", BudBenchmarks.Benchmark);
+}
 
-  private static BenchmarkResults Benchmark(IConf c) {
-    var benchmarksDir = Path.Combine(BaseDir[c], BuildDirName, "benchmarks");
+internal static class BudBenchmarks {
+  private const int SampleCount = 7;
+
+  internal static BenchmarkResults Benchmark(IConf c) {
+    var benchmarksDir = CreateBenchmarksDir(c);
+    var cloneDir = CloneProjectToBuild(c, benchmarksDir);
+    var budExe = CreateBudExe(c, benchmarksDir);
+    var revisionBeingBenchmarked = Exec.GetOutput("git", "rev-parse HEAD");
+    var benchmarkResults = new BenchmarkResults(revisionBeingBenchmarked,
+                                                Environment.MachineName,
+                                                TakeMeasurements(budExe, cloneDir));
+    var pushedUrl = PushBenchmarkResultsToBinTray(benchmarksDir,
+                                                  benchmarkResults,
+                                                  revisionBeingBenchmarked);
+    if (!pushedUrl.HasValue) {
+      throw new Exception("Failed to push benchmark results to bintray.");
+    }
+    // TODO: Add benchmarks for long chains of projects.
+    // TODO: Add benchmarks for projects with loads of independent dependencies.
+    // TODO: Do some nice visualisations with the average, error bars, and commit history.
+    Console.WriteLine($"Pushed to {pushedUrl.Value}");
+    return benchmarkResults;
+  }
+
+  private static Option<string> PushBenchmarkResultsToBinTray(string benchmarksDir, BenchmarkResults benchmarkResults, string revisionToBenchmark)
+    => BinTrayDistribution.PushToBintray(
+      CreateBenchmarkResultsFile(benchmarksDir, benchmarkResults),
+      "bud",
+      "bud-benchmarks",
+      $"{DateTime.Now.ToString("yyyy.M.d-bHHmmss")}-{revisionToBenchmark.Substring(0, 8)}",
+      "matej",
+      "json");
+
+  private static string CloneProjectToBuild(IConf c, string benchmarksDir) {
     var cloneDir = Path.Combine(benchmarksDir, "bud-repo");
+    const string revisionToBuild = "33e7262924b1eee21b521533c09d019d93a9b080";
+    CopyRepo(BaseDir[c], cloneDir, revisionToBuild);
+    return cloneDir;
+  }
+
+  private static string CreateBenchmarksDir(IConf c) {
+    var benchmarksDir = Path.Combine(BaseDir[c], BuildDirName, "benchmarks");
     if (Directory.Exists(benchmarksDir)) {
       Directory.Delete(benchmarksDir, true);
     }
     Directory.CreateDirectory(benchmarksDir);
-    var budExe = CreateBudExe(c, benchmarksDir);
-    const string revisionToBuild = "33e7262924b1eee21b521533c09d019d93a9b080";
-    CopyRepo(BaseDir[c], cloneDir, revisionToBuild);
-    var revisionToBenchmark = Exec.GetOutput("git", "rev-parse HEAD");
-    var benchmarkResults = new BenchmarkResults(
-      revisionToBenchmark,
-      Environment.MachineName,
-      ImmutableList.Create(
-        MeasureColdBuildScriptLoad(budExe, cloneDir),
-        MeasureWarmBuildScriptLoad(budExe, cloneDir),
-        MeasureColdProjectCompilation(budExe, cloneDir),
-        MeasureWarmProjectCompilation(budExe, cloneDir),
-        MeasureWarmProjectCompilationOneFileTouched(budExe, cloneDir),
-        MeasureWarmProjectCompilationOneDependentFileTouched(budExe, cloneDir),
-        MeasureWarmProjectCompilationOneFileChanged(budExe, cloneDir),
-        MeasureWarmProjectCompilationOneDependentFileChanged(budExe, cloneDir)
-        ));
+    return benchmarksDir;
+  }
+
+  private static string CreateBenchmarkResultsFile(string benchmarksDir, BenchmarkResults benchmarkResults) {
     var benchmarkResultsFile = Path.Combine(benchmarksDir, "benchmark-results.json");
     using (var fileWriter = File.Open(benchmarkResultsFile, FileMode.Create, FileAccess.Write)) {
       using (var textFileWriter = new StreamWriter(fileWriter)) {
@@ -53,22 +78,19 @@ public class BudBuild : IBuild {
           .Serialize(textFileWriter, benchmarkResults);
       }
     }
-    var pushedUrl = BinTrayDistribution.PushToBintray(benchmarkResultsFile,
-                                                      "bud",
-                                                      "bud-benchmarks",
-                                                      $"{DateTime.Now.ToString("yyyy.M.d-bHHmmss")}-{revisionToBenchmark.Substring(0, 8)}",
-                                                      "matej",
-                                                      "json");
-    if (pushedUrl.HasValue) {
-      Console.WriteLine($"Pushed to {pushedUrl.Value}");
-    } else {
-      throw new Exception("Failed to push benchmark results to bintray.");
-    }
-    // TODO: Add benchmarks for long chains of projects.
-    // TODO: Add benchmarks for projects with loads of independent dependencies.
-    // TODO: Do some nice visualisations with the average, error bars, and commit history.
-    return benchmarkResults;
+    return benchmarkResultsFile;
   }
+
+  private static ImmutableList<Measurement> TakeMeasurements(string budExe, string cloneDir)
+    => ImmutableList.Create(
+      MeasureColdBuildScriptLoad(budExe, cloneDir),
+      MeasureWarmBuildScriptLoad(budExe, cloneDir),
+      MeasureColdProjectCompilation(budExe, cloneDir),
+      MeasureWarmProjectCompilation(budExe, cloneDir),
+      MeasureWarmProjectCompilationOneFileTouched(budExe, cloneDir),
+      MeasureWarmProjectCompilationOneDependentFileTouched(budExe, cloneDir),
+      MeasureWarmProjectCompilationOneFileChanged(budExe, cloneDir),
+      MeasureWarmProjectCompilationOneDependentFileChanged(budExe, cloneDir));
 
   private static Measurement MeasureColdBuildScriptLoad(string budExe, string cloneDir) {
     Console.WriteLine("Cold build script load:");
