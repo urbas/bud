@@ -32,6 +32,16 @@ namespace Bud.Dist {
                                                string packageVersion,
                                                string username,
                                                string fileExtension) {
+      Func<Stream> contentFetcher = () => File.OpenRead(package);
+      return PushToBintray(contentFetcher, repositoryId, packageId, packageVersion, username, fileExtension);
+    }
+
+    public static Option<string> PushToBintray(Func<Stream> contentFetcher,
+                                               string repositoryId,
+                                               string packageId,
+                                               string packageVersion,
+                                               string username,
+                                               string fileExtension) {
       var packagePublishUrl = BintrayPublishPackageUrl(packageId, repositoryId, username, packageVersion, fileExtension);
       var apiKey = LoadBintrayApiKey(username);
       Console.WriteLine("Starting to upload to bintray...");
@@ -39,7 +49,7 @@ namespace Bud.Dist {
         var credentials = ToBasicAuthCredentials(username, apiKey);
         httpClient.Timeout = TimeSpan.FromMinutes(15);
         Console.WriteLine($"Timeout: {httpClient.Timeout}");
-        using (var content = new StreamContent(File.OpenRead(package))) {
+        using (var content = new StreamContent(contentFetcher())) {
           using (var request = new HttpRequestMessage(HttpMethod.Put, packagePublishUrl)) {
             request.Headers.Add("Authorization", $"Basic {credentials}");
             request.Content = content;

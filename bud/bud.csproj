@@ -114,6 +114,10 @@
   <ItemGroup>
     <Compile Include="BaseProjects\BareProjects.cs" />
     <Compile Include="BaseProjects\BuildProjects.cs" />
+    <Compile Include="Benchmarks\BenchmarkResults.cs" />
+    <Compile Include="Benchmarks\CpuTimeSample.cs" />
+    <Compile Include="Benchmarks\ISample.cs" />
+    <Compile Include="Benchmarks\Measurement.cs" />
     <Compile Include="Cli\BuildScriptCompilation.cs" />
     <Compile Include="Cli\BuildScriptLoading.cs" />
     <Compile Include="Cli\Exec.cs" />

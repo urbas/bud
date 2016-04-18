@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.IO;
 using System.Reactive.Linq;
+using Bud.Benchmarks;
 using Bud.Cli;
 using Bud.Dist;
 using Bud.Util;
@@ -31,9 +31,8 @@ internal static class BudBenchmarks {
     var benchmarkResults = new BenchmarkResults(revisionBeingBenchmarked,
                                                 Environment.MachineName,
                                                 TakeMeasurements(budExe, cloneDir));
-    var pushedUrl = PushBenchmarkResultsToBinTray(benchmarksDir,
-                                                  benchmarkResults,
-                                                  revisionBeingBenchmarked);
+    benchmarkResults.ToJsonFile(Path.Combine(benchmarksDir, "benchmark-results.json"));
+    var pushedUrl = benchmarkResults.PushToBintray("bud", "bud-benchmarks", "matej");
     if (!pushedUrl.HasValue) {
       throw new Exception("Failed to push benchmark results to bintray.");
     }
@@ -43,15 +42,6 @@ internal static class BudBenchmarks {
     Console.WriteLine($"Pushed to {pushedUrl.Value}");
     return benchmarkResults;
   }
-
-  private static Option<string> PushBenchmarkResultsToBinTray(string benchmarksDir, BenchmarkResults benchmarkResults, string revisionToBenchmark)
-    => BinTrayDistribution.PushToBintray(
-      CreateBenchmarkResultsFile(benchmarksDir, benchmarkResults),
-      "bud",
-      "bud-benchmarks",
-      $"{DateTime.Now.ToString("yyyy.M.d-bHHmmss")}-{revisionToBenchmark.Substring(0, 8)}",
-      "matej",
-      "json");
 
   private static string CloneProjectToBuild(IConf c, string benchmarksDir) {
     var cloneDir = Path.Combine(benchmarksDir, "bud-repo");
@@ -69,18 +59,6 @@ internal static class BudBenchmarks {
     return benchmarksDir;
   }
 
-  private static string CreateBenchmarkResultsFile(string benchmarksDir, BenchmarkResults benchmarkResults) {
-    var benchmarkResultsFile = Path.Combine(benchmarksDir, "benchmark-results.json");
-    using (var fileWriter = File.Open(benchmarkResultsFile, FileMode.Create, FileAccess.Write)) {
-      using (var textFileWriter = new StreamWriter(fileWriter)) {
-        JsonSerializer
-          .CreateDefault(new JsonSerializerSettings {Formatting = Formatting.Indented})
-          .Serialize(textFileWriter, benchmarkResults);
-      }
-    }
-    return benchmarkResultsFile;
-  }
-
   private static ImmutableList<Measurement> TakeMeasurements(string budExe, string cloneDir)
     => ImmutableList.Create(
       MeasureColdBuildScriptLoad(budExe, cloneDir),
@@ -94,7 +72,7 @@ internal static class BudBenchmarks {
 
   private static Measurement MeasureColdBuildScriptLoad(string budExe, string cloneDir) {
     Console.WriteLine("Cold build script load:");
-    var samples = ImmutableList.CreateBuilder<Sample>();
+    var samples = ImmutableList.CreateBuilder<ISample>();
     for (int i = 0; i < SampleCount; i++) {
       Console.WriteLine($"{i + 1}/{SampleCount}");
       samples.Add(RunBud(budExe, cloneDir));
@@ -105,7 +83,7 @@ internal static class BudBenchmarks {
 
   private static Measurement MeasureWarmBuildScriptLoad(string budExe, string cloneDir) {
     Console.WriteLine("Warm build script load:");
-    var samples = ImmutableList.CreateBuilder<Sample>();
+    var samples = ImmutableList.CreateBuilder<ISample>();
     RunBud(budExe, cloneDir);
     for (int i = 0; i < SampleCount; i++) {
       Console.WriteLine($"{i + 1}/{SampleCount}");
@@ -117,7 +95,7 @@ internal static class BudBenchmarks {
 
   private static Measurement MeasureColdProjectCompilation(string budExe, string projectDir) {
     Console.WriteLine("Cold Bud.Test compile:");
-    var samples = ImmutableList.CreateBuilder<Sample>();
+    var samples = ImmutableList.CreateBuilder<ISample>();
     RunBud(budExe, projectDir);
     for (int i = 0; i < SampleCount; i++) {
       Console.WriteLine($"{i + 1}/{SampleCount}");
@@ -130,7 +108,7 @@ internal static class BudBenchmarks {
 
   private static Measurement MeasureWarmProjectCompilation(string budExe, string projectDir) {
     Console.WriteLine("Warm Bud.Test compile:");
-    var samples = ImmutableList.CreateBuilder<Sample>();
+    var samples = ImmutableList.CreateBuilder<ISample>();
     RunBud(budExe, projectDir);
     RunBud(budExe, projectDir, "Bud.Test/Compile");
     for (int i = 0; i < SampleCount; i++) {
@@ -144,7 +122,7 @@ internal static class BudBenchmarks {
   private static Measurement MeasureWarmProjectCompilationOneFileTouched(string budExe, string projectDir) {
     var fileToTouch = Path.Combine(projectDir, "Bud.Test", "V1", "KeysTest.cs");
     Console.WriteLine($"Warm Bud.Test compile (touched file '{fileToTouch}'):");
-    var samples = ImmutableList.CreateBuilder<Sample>();
+    var samples = ImmutableList.CreateBuilder<ISample>();
     RunBud(budExe, projectDir);
     RunBud(budExe, projectDir, "Bud.Test/Compile");
     for (int i = 0; i < SampleCount; i++) {
@@ -159,7 +137,7 @@ internal static class BudBenchmarks {
   private static Measurement MeasureWarmProjectCompilationOneFileChanged(string budExe, string projectDir) {
     var fileToChange = Path.Combine(projectDir, "Bud.Test", "V1", "KeysTest.cs");
     Console.WriteLine($"Warm Bud.Test compile (changed file '{fileToChange}'):");
-    var samples = ImmutableList.CreateBuilder<Sample>();
+    var samples = ImmutableList.CreateBuilder<ISample>();
     RunBud(budExe, projectDir);
     RunBud(budExe, projectDir, "Bud.Test/Compile");
     for (int i = 0; i < SampleCount; i++) {
@@ -174,7 +152,7 @@ internal static class BudBenchmarks {
   private static Measurement MeasureWarmProjectCompilationOneDependentFileTouched(string budExe, string projectDir) {
     var fileToTouch = Path.Combine(projectDir, "bud", "V1", "Keys.cs");
     Console.WriteLine($"Warm Bud.Test compile (touched file '{fileToTouch}'):");
-    var samples = ImmutableList.CreateBuilder<Sample>();
+    var samples = ImmutableList.CreateBuilder<ISample>();
     RunBud(budExe, projectDir);
     RunBud(budExe, projectDir, "Bud.Test/Compile");
     for (int i = 0; i < SampleCount; i++) {
@@ -189,7 +167,7 @@ internal static class BudBenchmarks {
   private static Measurement MeasureWarmProjectCompilationOneDependentFileChanged(string budExe, string projectDir) {
     var fileToChange = Path.Combine(projectDir, "bud", "V1", "Keys.cs");
     Console.WriteLine($"Warm Bud.Test compile (changed file '{fileToChange}'):");
-    var samples = ImmutableList.CreateBuilder<Sample>();
+    var samples = ImmutableList.CreateBuilder<ISample>();
     RunBud(budExe, projectDir);
     RunBud(budExe, projectDir, "Bud.Test/Compile");
     for (int i = 0; i < SampleCount; i++) {
@@ -201,13 +179,8 @@ internal static class BudBenchmarks {
     return new Measurement("warm compile Bud.Test, changed a bud source file", samples.ToImmutable());
   }
 
-  private static Sample RunBud(string budExe, string cloneDir, Option<string> buildCommand = default(Option<string>))
-    => ToSample(Exec.RunCheckedQuietly(budExe, buildCommand.GetOrElse(""), cloneDir));
-
-  private static Sample ToSample(Process executionInfo)
-    => new Sample(executionInfo.TotalProcessorTime,
-                  executionInfo.UserProcessorTime,
-                  executionInfo.PrivilegedProcessorTime);
+  private static CpuTimeSample RunBud(string budExe, string cloneDir, Option<string> buildCommand = default(Option<string>))
+    => CpuTimeSample.ToSample(Exec.RunCheckedQuietly(budExe, buildCommand.GetOrElse(""), cloneDir));
 
   /// <returns>
   ///   path to Bud's executable which is runnable as-is (all
@@ -234,38 +207,4 @@ internal static class BudBenchmarks {
     Exec.RunCheckedQuietly("git", $"-C {repoDir} reset --hard HEAD");
     Exec.RunCheckedQuietly("git", $"-C {repoDir} clean -q -fdx .");
   }
-}
-
-public class BenchmarkResults {
-  public BenchmarkResults(string vcsRevision, string machine, IImmutableList<Measurement> measurements) {
-    VcsRevision = vcsRevision;
-    Machine = machine;
-    Measurements = measurements;
-  }
-
-  public string VcsRevision { get; }
-  public string Machine { get; }
-  public IImmutableList<Measurement> Measurements { get; }
-}
-
-public class Measurement {
-  public Measurement(string id, IImmutableList<Sample> samples) {
-    Id = id;
-    Samples = samples;
-  }
-
-  public string Id { get; }
-  public IImmutableList<Sample> Samples { get; }
-}
-
-public class Sample {
-  public Sample(TimeSpan totalTime, TimeSpan userTime, TimeSpan systemTime) {
-    TotalTime = totalTime;
-    UserTime = userTime;
-    SystemTime = systemTime;
-  }
-
-  public TimeSpan TotalTime { get; }
-  public TimeSpan UserTime { get; }
-  public TimeSpan SystemTime { get; }
 }
