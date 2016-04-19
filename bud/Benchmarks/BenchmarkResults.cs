@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Bud.Dist;
 using Bud.Util;
@@ -38,7 +39,7 @@ namespace Bud.Benchmarks {
     /// <returns>the url from which the uploaded benchmark JSON can be downloaded.</returns>
     public Option<string> PushToBintray(string repositoryId, string packageId, string username)
       => BinTrayDistribution.PushToBintray(
-        () => new MemoryStream(Encoding.UTF8.GetBytes(ToJson())),
+        () => new MemoryStream(Encoding.UTF8.GetBytes((string) ToJson())),
         repositoryId,
         packageId,
         $"{DateTime.Now.ToString("yyyy.M.d-bHHmmss")}-{VcsRevision.Substring(0, 8)}",
@@ -54,6 +55,44 @@ namespace Bud.Benchmarks {
         WriteJson(stringWriter);
         return stringWriter.ToString();
       }
+    }
+
+    public static BenchmarkResults FromJson(string json)
+      => JsonConvert.DeserializeObject<BenchmarkResults>(json);
+
+    protected bool Equals(BenchmarkResults other)
+      => string.Equals(Context, other.Context) &&
+                                                     Measurements.SequenceEqual(other.Measurements) && 
+                                                     string.Equals(VcsRevision, other.VcsRevision);
+
+    public override bool Equals(object obj) {
+      if (ReferenceEquals(null, obj)) {
+        return false;
+      }
+      if (ReferenceEquals(this, obj)) {
+        return true;
+      }
+      if (obj.GetType() != this.GetType()) {
+        return false;
+      }
+      return Equals((BenchmarkResults) obj);
+    }
+
+    public override int GetHashCode() {
+      unchecked {
+        var hashCode = Context.GetHashCode();
+        hashCode = (hashCode*397) ^ Measurements.GetHashCode();
+        hashCode = (hashCode*397) ^ VcsRevision.GetHashCode();
+        return hashCode;
+      }
+    }
+
+    public static bool operator ==(BenchmarkResults left, BenchmarkResults right) {
+      return Equals(left, right);
+    }
+
+    public static bool operator !=(BenchmarkResults left, BenchmarkResults right) {
+      return !Equals(left, right);
     }
   }
 }
