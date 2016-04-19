@@ -25,7 +25,7 @@ internal static class BudBenchmarks {
     var benchmarksDir = CreateBenchmarksDir(c);
     var cloneDir = CloneProjectToBuild(c, benchmarksDir);
     var budExe = CreateBudExe(c, benchmarksDir);
-    var revisionBeingBenchmarked = Exec.GetOutput("git", "rev-parse HEAD");
+    var revisionBeingBenchmarked = Exec.GetOutput("git", "rev-parse HEAD").Trim();
     var benchmarkResults = new BenchmarkResults(revisionBeingBenchmarked,
                                                 Environment.MachineName,
                                                 TakeMeasurements(budExe, cloneDir));
