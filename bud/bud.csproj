@@ -120,6 +120,7 @@
     <Compile Include="Cli\BuildScriptCompilation.cs" />
     <Compile Include="Cli\BuildScriptLoading.cs" />
     <Compile Include="Cli\Exec.cs" />
+    <Compile Include="Collections\DictionaryUtils.cs" />
     <Compile Include="Collections\ImmutableLists.cs" />
     <Compile Include="Configuration\ConfAccessException.cs" />
     <Compile Include="Cs\CsProjects.cs" />

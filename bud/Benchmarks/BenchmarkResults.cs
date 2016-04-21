@@ -31,7 +31,7 @@ namespace Bud.Benchmarks {
     }
 
     /// <summary>
-    /// JSON serializes this object and pushes it to bintray.
+    ///   JSON serializes this object and pushes it to bintray.
     /// </summary>
     /// <param name="repositoryId">the repository id to which to push the benchmark JSON.</param>
     /// <param name="packageId">the name of the BinTray package to upload.</param>
@@ -50,20 +50,15 @@ namespace Bud.Benchmarks {
       => JsonSerializer.CreateDefault(new JsonSerializerSettings {Formatting = Formatting.Indented})
                        .Serialize(writer, this);
 
-    public string ToJson() {
-      using (var stringWriter = new StringWriter()) {
-        WriteJson(stringWriter);
-        return stringWriter.ToString();
-      }
-    }
+    public string ToJson() => JsonConvert.SerializeObject(this, Formatting.Indented);
 
     public static BenchmarkResults FromJson(string json)
       => JsonConvert.DeserializeObject<BenchmarkResults>(json);
 
     protected bool Equals(BenchmarkResults other)
       => string.Equals(Context, other.Context) &&
-                                                     Measurements.SequenceEqual(other.Measurements) && 
-                                                     string.Equals(VcsRevision, other.VcsRevision);
+         Measurements.SequenceEqual(other.Measurements) &&
+         string.Equals(VcsRevision, other.VcsRevision);
 
     public override bool Equals(object obj) {
       if (ReferenceEquals(null, obj)) {
@@ -72,10 +67,7 @@ namespace Bud.Benchmarks {
       if (ReferenceEquals(this, obj)) {
         return true;
       }
-      if (obj.GetType() != this.GetType()) {
-        return false;
-      }
-      return Equals((BenchmarkResults) obj);
+      return obj.GetType() == this.GetType() && Equals((BenchmarkResults) obj);
     }
 
     public override int GetHashCode() {
@@ -94,5 +86,7 @@ namespace Bud.Benchmarks {
     public static bool operator !=(BenchmarkResults left, BenchmarkResults right) {
       return !Equals(left, right);
     }
+
+    public override string ToString() => ToJson();
   }
 }

@@ -126,6 +126,7 @@
     <Compile Include="Cli\BuildScriptLoadingTest.cs" />
     <Compile Include="Cli\BuildScriptCompilationTest.cs" />
     <Compile Include="Cli\BuildToolTest.cs" />
+    <Compile Include="Collections\DictionaryUtilsTest.cs" />
     <Compile Include="Collections\EnumerableUtilsTest.cs" />
     <Compile Include="Collections\ImmutableListsTest.cs" />
     <Compile Include="Configuration\CachingConfTest.cs" />

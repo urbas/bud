@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Immutable;
 using System.Linq;
+using Bud.Collections;
+using Newtonsoft.Json;
 
 namespace Bud.Benchmarks {
   public class Measurement {
@@ -54,7 +56,7 @@ namespace Bud.Benchmarks {
     protected bool Equals(Measurement other)
       => string.Equals(Id, other.Id) &&
          other.Samples.Count == Samples.Count &&
-         Samples.Zip(other.Samples, (sample1, sample2) => sample1.SequenceEqual(sample2))
+         Samples.Zip(other.Samples, DictionaryUtils.DictionariesEqual)
                 .All(b => b);
 
     public override bool Equals(object obj) {
@@ -83,5 +85,8 @@ namespace Bud.Benchmarks {
     public static bool operator !=(Measurement left, Measurement right) {
       return !Equals(left, right);
     }
+
+    public override string ToString()
+      => JsonConvert.SerializeObject(this, Formatting.Indented);
   }
 }
