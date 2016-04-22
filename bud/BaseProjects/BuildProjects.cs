@@ -21,12 +21,8 @@ namespace Bud.BaseProjects {
             .InitEmpty(Build)
             .Init(Output, c => Build[c]);
 
-    internal static readonly Conf BuildSchedulingSupport
-      = BuildPipelineScheduler
-        .Init(_ => DefauBuildPipelineScheduler.Value);
-
     internal static readonly Conf SourcesSupport
-      = BuildSchedulingSupport
+      = BareProjects.BuildSchedulingSupport
         .InitEmpty(SourceIncludes)
         .InitEmpty(SourceExcludeFilters)
         .InitValue(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
@@ -96,9 +92,6 @@ namespace Bud.BaseProjects {
     private static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
       => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c],
                                    BuildPipelineScheduler[c]);
-
-    private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler
-      = new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
 
     private static IObservable<IEnumerable<string>> GatherOutputsFromDependencies(IConf c)
       => Dependencies[c]

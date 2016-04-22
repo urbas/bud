@@ -1,14 +1,22 @@
+using System;
 using System.Reactive;
+using System.Reactive.Concurrency;
 using Bud.V1;
 using static System.IO.Directory;
 using static System.IO.Path;
-using static Bud.BaseProjects.BuildProjects;
 using static Bud.V1.Api;
 
 namespace Bud.BaseProjects {
   internal static class BareProjects {
     internal static readonly Conf DependenciesSupport
       = Conf.Empty.InitEmpty(Dependencies);
+
+    private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler
+      = new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
+
+    internal static readonly Conf BuildSchedulingSupport
+      = BuildPipelineScheduler
+        .Init(_ => DefauBuildPipelineScheduler.Value);
 
     internal static Conf BareProject(string projectDir,
                                      string projectId,
