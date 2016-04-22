@@ -16,13 +16,13 @@ namespace Bud.NuGet {
       = Conf.Empty
             .Init(PackageMetadata, DefaultPackageMetadata)
             .Init(PackageOutputDir, c => Combine(BuildDir[c], PackageOutputDirName))
-            .InitValue(ProjectUrl, None<string>())
+            .Init(ProjectUrl, None<string>())
             .Init(Publish, DefaultPublish)
-            .InitValue(PublishUrl, None<string>())
+            .Init(PublishUrl, None<string>())
             .Init(PackageBaseDir, _ => Directory.GetCurrentDirectory())
-            .InitValue(PublishApiKey, None<string>())
-            .InitValue(Packager, new NuGetPackager())
-            .InitValue(Publisher, new NuGetPublisher())
+            .Init(PublishApiKey, None<string>())
+            .Init(Packager, new NuGetPackager())
+            .Init(Publisher, new NuGetPublisher())
             .Init(Package, DefaultPackage)
             .Init(PackageFiles, DefaultPackageFiles);
 

@@ -62,7 +62,7 @@ namespace Bud.Cs {
     public void Compiler_is_invoked_with_sources_and_assembly_references() {
       var cSharpCompiler = new Mock<Func<CompileInput, CompileOutput>>(MockBehavior.Strict);
       var projectA = CsLib("foo", "A")
-        .SetValue(Compiler, cSharpCompiler.Object)
+        .Set(Compiler, cSharpCompiler.Object)
         .Clear(Input).Add(Input, "A.cs")
         .Add(AssemblyReferences, "A.dll");
       var assemblyReferences = projectA.Get(AssemblyReferences).ToEnumerable().First();
@@ -79,7 +79,7 @@ namespace Bud.Cs {
                     .Returns(EmptyCompileOutput());
       var projectA = Projects(ProjectAOutputsFooDll(42),
                               ProjectWithDependencies("B", "../A")
-                                .SetValue(Compiler, cSharpCompiler.Object));
+                                .Set(Compiler, cSharpCompiler.Object));
       projectA.Get("B"/Compile).Take(1).Wait();
       cSharpCompiler.VerifyAll();
     }
@@ -159,10 +159,10 @@ namespace Bud.Cs {
     public void Package_must_contain_the_dll_of_the_CsLibrary_project() {
       var packager = new Mock<IPackager>(MockBehavior.Strict);
       var projects = Projects(CsLib("aDir", "A")
-                                .SetValue(ProjectVersion, "4.2.0"),
+                                .Set(ProjectVersion, "4.2.0"),
                               CsLib("bDir", "B")
                                 .Clear(Output).Add(Output, "B.dll")
-                                .SetValue(Packager, packager.Object)
+                                .Set(Packager, packager.Object)
                                 .Add(Dependencies, "../A"));
       packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
                                  Directory.GetCurrentDirectory(),
@@ -181,7 +181,7 @@ namespace Bud.Cs {
       var packager = new Mock<IPackager>(MockBehavior.Strict);
       var projects = Projects(CsLib("bDir", "B")
                                 .Clear(Output).Add(Output, "B.dll")
-                                .SetValue(Packager, packager.Object)
+                                .Set(Packager, packager.Object)
                                 .Clear("Packages"/ReferencedPackages)
                                 .Add("Packages"/ReferencedPackages, new PackageReference("Foo", NuGetVersion.Parse("2.4.1"), NuGetFramework.Parse("net35"))));
       packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
@@ -239,7 +239,7 @@ namespace Bud.Cs {
 
     private static Conf ProjectAOutputsFooDll(long initialTimestamp)
       => EmptyCSharpProject("A")
-        .SetValue(Compiler, input => EmptyCompileOutput(initialTimestamp++));
+        .Set(Compiler, input => EmptyCompileOutput(initialTimestamp++));
 
     private static Conf ProjectWithDependencies(string projectId,
                                                 params string[] dependencies)
@@ -280,10 +280,10 @@ namespace Bud.Cs {
       ProjectAWithUpdatingSources(IScheduler testScheduler,
                                   Func<CompileInput, CompileOutput> compiler)
       => CsLib("a", "A")
-        .SetValue(BuildPipelineScheduler, testScheduler)
+        .Set(BuildPipelineScheduler, testScheduler)
         .Clear(SourceIncludes)
         .Add(SourceIncludes, FileADelayedUpdates(testScheduler))
         .Clear(AssemblyReferences)
-        .SetValue(Compiler, compiler);
+        .Set(Compiler, compiler);
   }
 }

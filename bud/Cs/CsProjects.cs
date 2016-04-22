@@ -31,7 +31,7 @@ namespace Bud.Cs {
       .InitEmpty(AssemblyReferences)
       .InitEmpty(EmbeddedResources)
       .Init(Compiler, TimedEmittingCompiler.Create)
-      .InitValue(CsCompilationOptions,
+      .Init(CsCompilationOptions,
                  new CSharpCompilationOptions(DynamicallyLinkedLibrary,
                                               warningLevel: 1))
       .Add(AssemblyReferences, c => (PackagesSubProjectId/ResolvedAssemblies)[c])

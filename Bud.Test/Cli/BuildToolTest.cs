@@ -35,15 +35,15 @@ namespace Bud.Cli {
                   ExecuteCommand(TaskVoidConf(), "A"));
 
     private static IConf Raw42Conf()
-      => Conf.Empty.InitValue("A", 42).ToCompiled();
+      => Conf.Empty.Init("A", 42).ToCompiled();
 
     private static IConf Observed42Conf()
-      => Conf.Empty.InitValue("A", Observable.Return(42)).ToCompiled();
+      => Conf.Empty.Init("A", Observable.Return(42)).ToCompiled();
 
     private static IConf Task42Conf()
-      => Conf.Empty.InitValue("A", Task.FromResult(42)).ToCompiled();
+      => Conf.Empty.Init("A", Task.FromResult(42)).ToCompiled();
 
     private static IConf TaskVoidConf()
-      => Conf.Empty.InitValue("A", Task.Run(() => {})).ToCompiled();
+      => Conf.Empty.Init("A", Task.Run(() => {})).ToCompiled();
   }
 }

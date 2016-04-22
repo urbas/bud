@@ -14,7 +14,7 @@ namespace Bud.Dist {
         var expectedDistZipPath = Path.Combine(tmpDir.Path, "dist", "A.zip");
 
         var project = Api.DistributionSupport
-          .SetValue(Api.DistributionArchivePath, expectedDistZipPath)
+          .Set(Api.DistributionArchivePath, expectedDistZipPath)
           .Add(Api.FilesToDistribute, new PackageFile(fileA, "foo/bar/A.dll"));
 
         var distZipPath = Api.DistributionArchive[project].Take(1).Wait();

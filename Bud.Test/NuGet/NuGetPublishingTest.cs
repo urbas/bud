@@ -23,14 +23,14 @@ namespace Bud.NuGet {
       const string fileToPackage = "B.txt";
 
       var projectA = BareProject("a", "A")
-        .SetValue(ProjectVersion, "1.2.3");
+        .Set(ProjectVersion, "1.2.3");
       var project = BareProject("b", "B")
         .Clear(Output).Add(Output, fileToPackage)
         .Add(Dependencies, "../A")
         .InitEmpty(ReferencedPackages)
         .Add(ReferencedPackages, new PackageReference("C", NuGetVersion.Parse("4.5.7"), NuGetFramework.Parse("net35")))
         .Add(NuGetPublishingSupport)
-        .SetValue(Packager, packager.Object);
+        .Set(Packager, packager.Object);
       var projects = Projects(projectA, project);
 
       packager.Setup(self => self.Pack(Combine(BuildDir[project], PackageOutputDirName),
@@ -51,7 +51,7 @@ namespace Bud.NuGet {
     public void Simplest_NuGet_publishing_project() {
       using (var tmpDir = new TemporaryDirectory()) {
         var project = NuGetPublishingProject(tmpDir.Path, "Foo")
-          .SetValue(PublishUrl, tmpDir.CreateDir("repo"));
+          .Set(PublishUrl, tmpDir.CreateDir("repo"));
         AreEqual(new[] {false},
                  Publish[project].ToEnumerable());
       }
@@ -65,7 +65,7 @@ namespace Bud.NuGet {
         var someFile = tmpDir.CreateFile("some content", "A.txt");
         var project = NuGetPublishingProject(tmpDir.Path, "Foo")
           .Add(PackageFiles, new PackageFile(someFile, "content/A.txt"))
-          .SetValue(PublishUrl, repoDir);
+          .Set(PublishUrl, repoDir);
         AreEqual(new[] {true},
                  Publish[project].ToEnumerable());
       }
@@ -78,10 +78,10 @@ namespace Bud.NuGet {
 
       var project = BareProject("fooDir", "Foo")
         .Add(NuGetPublishingSupport)
-        .SetValue(Publisher, packager.Object)
-        .SetValue(Package, Observable.Return(package))
-        .SetValue(PublishUrl, "publish url")
-        .SetValue(PublishApiKey, "publish api key");
+        .Set(Publisher, packager.Object)
+        .Set(Package, Observable.Return(package))
+        .Set(PublishUrl, "publish url")
+        .Set(PublishApiKey, "publish api key");
 
       packager.Setup(self => self.Publish(package,
                                           "publish url",
@@ -131,7 +131,7 @@ namespace Bud.NuGet {
     public void Default_PackageMetadata_has_the_provided_ProjectUrl()
       => That(BareProject("fooDir", "Foo")
                 .Add(NuGetPublishingSupport)
-                .SetValue(ProjectUrl, "some url")
+                .Set(ProjectUrl, "some url")
                 .Get(PackageMetadata).OptionalFields["projectUrl"],
               Is.EqualTo("some url"));
   }

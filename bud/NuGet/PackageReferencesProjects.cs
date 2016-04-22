@@ -17,8 +17,8 @@ namespace Bud.NuGet {
       .Empty
       .Add(SourcesSupport)
       .AddSourceFile(c => PackagesConfigFile[c])
-      .InitValue(AssemblyResolver, new NuGetAssemblyResolver())
-      .InitValue(PackageDownloader, new NuGetPackageDownloader())
+      .Init(AssemblyResolver, new NuGetAssemblyResolver())
+      .Init(PackageDownloader, new NuGetPackageDownloader())
       .Init(ReferencedPackages, ReadReferencedPackagesFromSources)
       .Init(PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
       .Init(ResolvedAssemblies, ResolveAssemblies);

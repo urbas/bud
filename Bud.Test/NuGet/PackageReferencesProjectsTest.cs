@@ -34,7 +34,7 @@ namespace Bud.NuGet {
         var resolvedAssemblies = ImmutableList.Create("Foo.dll", "Bar.dll");
         var resolver = MockResolver(new[] {FooReference}, resolvedAssemblies, tmpDir);
         var project = TestProject(tmpDir.Path)
-          .SetValue(AssemblyResolver, resolver.Object)
+          .Set(AssemblyResolver, resolver.Object)
           .ToCompiled();
 
         ("A"/ResolvedAssemblies)[project].Take(1).Wait();
@@ -51,7 +51,7 @@ namespace Bud.NuGet {
         var downloader = new Mock<NuGetPackageDownloader>(MockBehavior.Strict);
         var project = TestProject(tmpDir.Path)
           .Clear(ReferencedPackages)
-          .SetValue(PackageDownloader, downloader.Object);
+          .Set(PackageDownloader, downloader.Object);
 
         ResolvedAssemblies[project].Take(1).Wait();
       }
@@ -65,8 +65,8 @@ namespace Bud.NuGet {
         var downloader = MockDownloader(new[] {FooReference}, tmpDir);
         var resolver = MockResolver(new[] {FooReference}, expectedAssemblies, tmpDir);
         var project = TestProject(tmpDir.Path)
-          .SetValue(PackageDownloader, downloader.Object)
-          .SetValue(AssemblyResolver, resolver.Object);
+          .Set(PackageDownloader, downloader.Object)
+          .Set(AssemblyResolver, resolver.Object);
 
         var actualAssemblies = ResolvedAssemblies[project].Take(1).ToEnumerable();
 
@@ -82,7 +82,7 @@ namespace Bud.NuGet {
         CreatePackagesConfigFile(tmpDir);
         var resolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
         var project = TestProject(tmpDir.Path)
-          .SetValue(AssemblyResolver, resolver.Object)
+          .Set(AssemblyResolver, resolver.Object)
           .ToCompiled();
         tmpDir.CreateFile(
           "4D-31-2B-41-83-A6-87-D8-FC-8C-92-C7-F3-CE-60-E9\nMoo.dll\nZoo.dll",

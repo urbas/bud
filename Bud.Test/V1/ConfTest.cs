@@ -20,30 +20,30 @@ namespace Bud.V1 {
 
     [Test]
     public void Const_defines_a_constant_valued_configuration()
-      => AreEqual(42, A.SetValue(42).Get(A));
+      => AreEqual(42, A.Set(42).Get(A));
 
     [Test]
     public void Const_redefines_configurations()
-      => AreEqual(1, A.SetValue(42).SetValue(A, 1).Get(A));
+      => AreEqual(1, A.Set(42).Set(A, 1).Get(A));
 
     [Test]
     public void InitConst_defines_a_constant_valued_configuration()
-      => AreEqual(42, A.InitValue(42).Get(A));
+      => AreEqual(42, A.Init(42).Get(A));
 
     [Test]
     public void InitConst_does_not_redefine_configurations()
-      => AreEqual(42, A.InitValue(42).InitValue(A, 1).Get(A));
+      => AreEqual(42, A.Init(42).Init(A, 1).Get(A));
 
     [Test]
     public void Redefined_configuration_is_never_invoked() {
       var intConfig = new Mock<Func<IConf, int>>();
-      AreEqual(1, A.Init(intConfig.Object).SetValue(A, 1).Get(A));
+      AreEqual(1, A.Init(intConfig.Object).Set(A, 1).Get(A));
       intConfig.Verify(self => self(It.IsAny<IConf>()), Times.Never());
     }
 
     [Test]
     public void Modified_configurations_modify_old_values()
-      => AreEqual(43, A.InitValue(42)
+      => AreEqual(43, A.Init(42)
                        .Modify(A, (configs, oldConfig) => oldConfig + 1)
                        .Get(A));
 
@@ -57,19 +57,19 @@ namespace Bud.V1 {
 
     [Test]
     public void Throw_when_requiring_the_wrong_value_type()
-      => Throws<InvalidCastException>(() => AString.SetValue("foo").Get(A));
+      => Throws<InvalidCastException>(() => AString.Set("foo").Get(A));
 
     [Test]
     public void Get_a_subtype() {
       var expectedList = ImmutableArray.Create(42);
-      AreEqual(expectedList, FooEnumerable.InitValue(expectedList)
+      AreEqual(expectedList, FooEnumerable.Init(expectedList)
                                           .Get(FooList));
     }
 
     [Test]
     public void Defining_and_then_invoking_two_configurations_must_return_both_of_their_values() {
-      var conf = A.SetValue(42)
-                  .SetValue(B, 1337);
+      var conf = A.Set(42)
+                  .Set(B, 1337);
       AreEqual(42, conf.Get(A));
       AreEqual(1337, conf.Get(B));
     }
@@ -78,15 +78,15 @@ namespace Bud.V1 {
     public void Invoking_a_single_configuration_must_not_invoke_the_other() {
       var intConfig = new Mock<Func<IConf, int>>();
       A.Set(intConfig.Object)
-       .SetValue(B, 1337)
+       .Set(B, 1337)
        .Get(B);
       intConfig.Verify(self => self(It.IsAny<IConf>()), Times.Never);
     }
 
     [Test]
     public void Extended_configs_must_contain_configurations_from_the_original_as_well_as_extending_configs() {
-      var confA = A.SetValue(42);
-      var confB = B.SetValue(58);
+      var confA = A.Set(42);
+      var confB = B.Set(58);
       var combinedConfigs = confA.Add(confB);
       AreEqual(42, combinedConfigs.Get(A));
       AreEqual(58, combinedConfigs.Get(B));
@@ -100,7 +100,7 @@ namespace Bud.V1 {
 
     [Test]
     public void A_config_can_invoke_another_config()
-      => AreEqual(43, A.SetValue(42)
+      => AreEqual(43, A.Set(42)
                        .Set(B, configs => configs.Get(A) + 1)
                        .Get(B));
 
@@ -147,13 +147,13 @@ namespace Bud.V1 {
 
     [Test]
     public void Getting_values_of_nested_configurations() {
-      var subConf = Group("foo").SetValue(A, 42);
+      var subConf = Group("foo").Set(A, 42);
       AreEqual(42, subConf.Out().Get("foo"/A));
     }
 
     [Test]
     public void Getting_siblings_in_nested_configurations() {
-      var subConf = Group("foo").SetValue(A, 42)
+      var subConf = Group("foo").Set(A, 42)
                                 .Set(B, conf => 1 + A[conf]);
       AreEqual(43, subConf.Get(B));
     }
@@ -161,67 +161,67 @@ namespace Bud.V1 {
     [Test]
     public void Modifying_values_of_double_nested_configurations() {
       var subConf = Group("foo").In("bar")
-                                .SetValue(A, 42)
+                                .Set(A, 42)
                                 .Modify(A, (conf, oldValue) => 1 + oldValue);
       AreEqual(43, subConf.Get(A));
     }
 
     [Test]
     public void Nested_configurations_can_access_configurations_by_absolute_path() {
-      var confA = A.SetValue(42);
+      var confA = A.Set(42);
       var confB = Group("foo").Set(B, conf => 1 + conf.Get(Keys.Root/A));
       AreEqual(43, Group(confA, confB).Get("foo"/B));
     }
 
     [Test]
     public void Nested_configurations_can_access_configurations_by_relative_path() {
-      var confA = A.SetValue(42);
+      var confA = A.Set(42);
       var confB = Group("foo").Set(B, conf => 1 + conf.Get(".."/A));
       AreEqual(43, Group(confA, confB).Get("foo"/B));
     }
 
     [Test]
     public void Doubly_nested_configurations_can_access_configurations_by_relative_path() {
-      var confA = A.SetValue(42);
+      var confA = A.Set(42);
       var confB = Group("foo").In("bar").Set(B, conf => 1 + conf.Get("../.."/A));
       AreEqual(43, Group(confA, confB).Get("foo/bar"/B));
     }
 
     [Test]
     public void Triply_nested_configurations_can_access_configurations_by_relative_path() {
-      var confA = A.SetValue(42);
+      var confA = A.Set(42);
       var confB = Group("foo").In("bar").Set(B, conf => 1 + conf.Get("../../../moo"/A));
       AreEqual(43, Group("moo").Add(confA, confB).Get("foo/bar"/B));
     }
 
     [Test]
     public void Nested_configurations_can_access_configurations_in_other_branches_via_relative_paths() {
-      var confA = Group("foo").In("boo").SetValue(A, 42);
+      var confA = Group("foo").In("boo").Set(A, 42);
       var confB = Group("foo").In("bar").Set(B, conf => 1 + conf.Get("../boo"/A));
       AreEqual(43, Empty.Add(confA, confB).Get("foo/bar"/B));
     }
 
     [Test]
     public void Root_config_can_be_accessed_from_current_scope()
-      => AreEqual(42, (Keys.Root/A).SetValue(42).Get(A));
+      => AreEqual(42, (Keys.Root/A).Set(42).Get(A));
 
     [Test]
     public void Relative_reference_in_a_nested_modified_conf() {
-      var confA = Group("a").InitValue(A, 42).InitValue(B, 1);
+      var confA = Group("a").Init(A, 42).Init(B, 1);
       var confB = Empty.Modify(B, (conf, oldValue) => oldValue + A[conf]);
       AreEqual(43, confA.Add(confB).Get(B));
     }
 
     [Test]
     public void Relative_reference_in_a_nested_and_doubly_modified_conf() {
-      var confA = Group("a").InitValue(A, 42).InitValue(B, 1);
+      var confA = Group("a").Init(A, 42).Init(B, 1);
       var confB = Empty.Modify(B, (conf, oldValue) => oldValue + A[conf]);
       AreEqual(85, confA.Add(confB, confB).Get(B));
     }
 
     [Test]
     public void Relative_reference_in_a_nested_and_modified_conf_defined_in_another_scope() {
-      var confA = Group("a").InitValue(A, 42);
+      var confA = Group("a").Init(A, 42);
       var confB0 = Group("e").In("f").In("g").Set("../../.."/B, conf => 1 + ("../../.."/A)[conf]);
       var confB1 = Group("b").Modify("../a"/B, (conf, oldValue) => oldValue + ("../a"/A)[conf]);
       var confB2 = Group("c").In("d").Modify("../../a"/B, (conf, oldValue) => oldValue + ("../../a"/A)[conf]);
@@ -246,17 +246,17 @@ namespace Bud.V1 {
 
     [Test]
     public void TryGet_returns_an_optional_with_a_value_when_the_key_is_defined()
-      => IsTrue(Empty.SetValue(A, 42).TryGet(A).HasValue);
+      => IsTrue(Empty.Set(A, 42).TryGet(A).HasValue);
 
     [Test]
     public void TryGet_returns_an_optional_containing_the_value_of_the_key()
-      => AreEqual(42, Empty.SetValue(A, 42).TryGet(A).Value);
+      => AreEqual(42, Empty.Set(A, 42).TryGet(A).Value);
 
     [Test]
     public void Init_does_not_modify_a_defined_key_with_relative_path()
       => AreEqual(42,
-                  Empty.SetValue(A, 42)
-                       .In("a").InitValue(".."/A, 9001)
+                  Empty.Set(A, 42)
+                       .In("a").Init(".."/A, 9001)
                        .TryGet(Keys.Root/A).Value);
 
     private static async Task<int> AddFooTwiceConcurrently(IConf conf) {

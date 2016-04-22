@@ -20,14 +20,14 @@ namespace Bud.V1 {
     ///   Defines a constant-valued configuration.
     ///   If the configuration is already defined, then this method overwrites it.
     /// </summary>
-    public Conf SetValue<T>(Key<T> configKey, T value)
+    public Conf Set<T>(Key<T> configKey, T value)
       => Set(configKey, cfg => value);
 
     /// <summary>
     ///   Defines a constant-valued configuration.
     ///   If the configuration is already defined, then this method does nothing.
     /// </summary>
-    public Conf InitValue<T>(Key<T> configKey, T value)
+    public Conf Init<T>(Key<T> configKey, T value)
       => Init(configKey, cfg => value);
 
     /// <summary>

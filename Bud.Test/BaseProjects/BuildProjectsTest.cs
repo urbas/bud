@@ -29,7 +29,7 @@ namespace Bud.BaseProjects {
     [Test]
     public void DependenciesInput_must_contain_output_from_dependencies() {
       var projects = Projects(Api.BuildProject("aDir", "A")
-                                 .SetValue(Output, Return(new[] {"a"})),
+                                 .Set(Output, Return(new[] {"a"})),
                               Api.BuildProject("bDir", "B")
                                  .Add(Dependencies, "../A"));
       AreEqual(new[] {"a"},
@@ -41,10 +41,10 @@ namespace Bud.BaseProjects {
     public void DependenciesInput_reobserved_when_dependencies_change() {
       var testScheduler = new TestScheduler();
       var projects = Projects(Api.BuildProject("aDir", "A")
-                                 .SetValue(BuildPipelineScheduler, testScheduler)
-                                 .SetValue(Output, ChangingOutput(testScheduler)),
+                                 .Set(BuildPipelineScheduler, testScheduler)
+                                 .Set(Output, ChangingOutput(testScheduler)),
                               Api.BuildProject("bDir", "B")
-                                 .SetValue(BuildPipelineScheduler, testScheduler)
+                                 .Set(BuildPipelineScheduler, testScheduler)
                                  .Add(Dependencies, "../A"));
       var bInput = projects.Get("B"/DependenciesOutput).GetEnumerator();
       testScheduler.AdvanceBy(TimeSpan.FromSeconds(5).Ticks);

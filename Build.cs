@@ -11,8 +11,8 @@ using static Bud.V1.Api;
 public class BudBuild : IBuild {
   public Conf Init()
     => Projects(CsApp("bud")
-                  .SetValue(ProjectVersion, "0.5.1")
-                  .SetValue(ProjectUrl, "https://github.com/urbas/bud"),
+                  .Set(ProjectVersion, "0.5.1")
+                  .Set(ProjectUrl, "https://github.com/urbas/bud"),
                 CsLib("Bud.Test")
                   .Add(Dependencies, "../bud"))
       .Init("benchmark", BudBenchmarks.Benchmark);

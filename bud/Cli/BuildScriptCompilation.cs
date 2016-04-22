@@ -34,7 +34,7 @@ namespace Bud.Cli {
 
     public static CompileOutput CompileBuildScript(string baseDir, string buildScriptPath)
       => BuildScriptCompiler
-        .SetValue(BaseDir, baseDir)
+        .Set(BaseDir, baseDir)
         .TakeOne(Compile);
 
     private static Conf BuildScriptCompiler { get; }

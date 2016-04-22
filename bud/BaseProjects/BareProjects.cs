@@ -24,9 +24,9 @@ namespace Bud.BaseProjects {
       => Project(projectId)
         .Add(DependenciesSupport)
         .Add(BuildSchedulingSupport)
-        .InitValue(ProjectId, projectId)
+        .Init(ProjectId, projectId)
         .Init(ProjectDir, c => GetProjectDir(c, projectDir))
-        .InitValue(ProjectVersion, version)
+        .Init(ProjectVersion, version)
         .Init(BuildDir, c => Combine(ProjectDir[c], BuildDirName))
         .Init(Clean, DefaultClean);
 

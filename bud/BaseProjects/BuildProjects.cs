@@ -25,8 +25,8 @@ namespace Bud.BaseProjects {
       = BareProjects.BuildSchedulingSupport
         .InitEmpty(SourceIncludes)
         .InitEmpty(SourceExcludeFilters)
-        .InitValue(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
-        .InitValue(FilesObservatory, new LocalFilesObservatory())
+        .Init(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
+        .Init(FilesObservatory, new LocalFilesObservatory())
         .Init(Sources, DefaultSources);
 
     internal static readonly Conf SourceProcessorsSupport

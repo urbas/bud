@@ -8,7 +8,7 @@ namespace Bud.V1 {
     [Test]
     public void Nested_projects_must_inherit_BaseDir()
       => AreEqual("/Foo",
-                  Projects(Project("A")).SetValue(BaseDir, "/Foo").Get("A"/BaseDir));
+                  Projects(Project("A")).Set(BaseDir, "/Foo").Get("A"/BaseDir));
 
     [Test]
     public void ProjectId_cannot_be_null_or_empty()

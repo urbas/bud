@@ -42,7 +42,7 @@ namespace Bud.BaseProjects {
       using (var tmpDir = new TemporaryDirectory()) {
         AreEqual(Combine(tmpDir.Path, "foo"),
                  BareProject("foo", "Foo")
-                   .SetValue(BaseDir, tmpDir.Path)
+                   .Set(BaseDir, tmpDir.Path)
                    .Get(ProjectDir));
       }
     }
@@ -61,7 +61,7 @@ namespace Bud.BaseProjects {
       using (var tmpDir = new TemporaryDirectory()) {
         AreEqual(tmpDir.Path,
                  BareProject(tmpDir.Path, "Foo")
-                   .SetValue(BaseDir, tmpDir.Path)
+                   .Set(BaseDir, tmpDir.Path)
                    .Get(ProjectDir));
       }
     }
@@ -71,7 +71,7 @@ namespace Bud.BaseProjects {
       using (var tmpDir = new TemporaryDirectory()) {
         AreEqual(Combine(tmpDir.Path, "foo"),
                  Projects(BareProject("foo", "Foo"))
-                   .SetValue(BaseDir, tmpDir.Path)
+                   .Set(BaseDir, tmpDir.Path)
                    .Get("Foo"/ProjectDir));
       }
     }
@@ -86,7 +86,7 @@ namespace Bud.BaseProjects {
       using (var tmpDir = new TemporaryDirectory()) {
         AreEqual(tmpDir.Path,
                  BareProject("", "Foo")
-                   .SetValue(BaseDir, tmpDir.Path)
+                   .Set(BaseDir, tmpDir.Path)
                    .Get(ProjectDir));
       }
     }

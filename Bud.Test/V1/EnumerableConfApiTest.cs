@@ -20,28 +20,28 @@ namespace Bud.V1 {
     [Test]
     public void InitEmpty_does_not_changed_initialized_enumerables()
       => AreEqual(new[] {1},
-                  Conf.Empty.InitValue(enumerableKey, new[] {1})
+                  Conf.Empty.Init(enumerableKey, new[] {1})
                       .InitEmpty(enumerableKey)
                       .Get(enumerableKey));
 
     [Test]
     public void Clear_resets_enumerables()
-      => IsEmpty(Conf.Empty.InitValue(enumerableKey, new[] {1})
+      => IsEmpty(Conf.Empty.Init(enumerableKey, new[] {1})
                      .Clear(enumerableKey)
                      .Get(enumerableKey));
 
     [Test]
     public void Add_adds_values_to_enumerables()
       => AreEqual(new[] {1, 2},
-                  Conf.Empty.InitValue(enumerableKey, new[] {1})
+                  Conf.Empty.Init(enumerableKey, new[] {1})
                       .Add(enumerableKey, 2)
                       .Get(enumerableKey));
 
     [Test]
     public void Add_adds_computed_values_to_enumerables()
       => AreEqual(new[] {1, 43},
-                  Conf.Empty.InitValue(numberKey, 42)
-                      .InitValue(enumerableKey, new[] {1})
+                  Conf.Empty.Init(numberKey, 42)
+                      .Init(enumerableKey, new[] {1})
                       .Add(enumerableKey, c => numberKey[c] + 1)
                       .Get(enumerableKey));
 
@@ -58,7 +58,7 @@ namespace Bud.V1 {
 
     [Test]
     public void InitEmpty_does_not_changed_initialized_observed_enumerables()
-      => That(Conf.Empty.InitValue(observedEnumerableKey, Observable.Return(new[] {1}))
+      => That(Conf.Empty.Init(observedEnumerableKey, Observable.Return(new[] {1}))
                   .InitEmpty(observedEnumerableKey)
                   .Get(observedEnumerableKey)
                   .ToEnumerable(),
@@ -66,7 +66,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Clear_resets_ovbserved_enumerables()
-      => That(Conf.Empty.InitValue(observedEnumerableKey, Observable.Return(new[] {1}))
+      => That(Conf.Empty.Init(observedEnumerableKey, Observable.Return(new[] {1}))
                   .Clear(observedEnumerableKey)
                   .Get(observedEnumerableKey)
                   .ToEnumerable(),
@@ -75,21 +75,21 @@ namespace Bud.V1 {
     [Test]
     public void Add_adds_values_to_observed_enumerables()
       => AreEqual(new[] {1, 2, 3},
-                  Conf.Empty.InitValue(observedEnumerableKey, Observable.Return(new[] {1}))
+                  Conf.Empty.Init(observedEnumerableKey, Observable.Return(new[] {1}))
                       .Add(observedEnumerableKey, 2, 3)
                       .Get(observedEnumerableKey).Wait());
 
     [Test]
     public void Add_adds_observed_value_to_observed_enumerables()
       => AreEqual(new[] {1, 2},
-                  Conf.Empty.InitValue(observedEnumerableKey, Observable.Return(new[] {1}))
+                  Conf.Empty.Init(observedEnumerableKey, Observable.Return(new[] {1}))
                       .Add(observedEnumerableKey, Observable.Return(2))
                       .Get(observedEnumerableKey).Wait());
 
     [Test]
     public void Add_adds_observed_values_to_observed_enumerables()
       => AreEqual(new[] {1, 2, 3},
-                  Conf.Empty.InitValue(observedEnumerableKey, Observable.Return(new[] {1}))
+                  Conf.Empty.Init(observedEnumerableKey, Observable.Return(new[] {1}))
                       .Add(observedEnumerableKey, Observable.Return(new [] {2, 3}))
                       .Get(observedEnumerableKey).Wait());
 
@@ -106,28 +106,28 @@ namespace Bud.V1 {
     [Test]
     public void InitEmpty_does_not_changed_initialized_immutable_lists()
       => AreEqual(new[] {1},
-                  Conf.Empty.InitValue(immutableListKey, ImmutableList.Create(1))
+                  Conf.Empty.Init(immutableListKey, ImmutableList.Create(1))
                       .InitEmpty(immutableListKey)
                       .Get(immutableListKey));
 
     [Test]
     public void Clear_resets_immutable_lists()
-      => IsEmpty(Conf.Empty.InitValue(immutableListKey, ImmutableList.Create(1))
+      => IsEmpty(Conf.Empty.Init(immutableListKey, ImmutableList.Create(1))
                      .Clear(immutableListKey)
                      .Get(immutableListKey));
 
     [Test]
     public void Add_adds_values_to_immutable_lists()
       => AreEqual(new[] {1, 2},
-                  Conf.Empty.InitValue(immutableListKey, ImmutableList.Create(1))
+                  Conf.Empty.Init(immutableListKey, ImmutableList.Create(1))
                       .Add(immutableListKey, 2)
                       .Get(immutableListKey));
 
     [Test]
     public void Add_adds_computed_values_to_immutable_lists()
       => AreEqual(new[] {1, 43},
-                  Conf.Empty.InitValue(numberKey, 42)
-                      .InitValue(immutableListKey, ImmutableList.Create(1))
+                  Conf.Empty.Init(numberKey, 42)
+                      .Init(immutableListKey, ImmutableList.Create(1))
                       .Add(immutableListKey, c => numberKey[c] + 1)
                       .Get(immutableListKey));
 
@@ -144,7 +144,7 @@ namespace Bud.V1 {
 
     [Test]
     public void InitEmpty_does_not_changed_initialized_observed_immutable_lists()
-      => That(Conf.Empty.InitValue(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
+      => That(Conf.Empty.Init(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
                   .InitEmpty(observedIImmutableListKey)
                   .Get(observedIImmutableListKey)
                   .ToEnumerable(),
@@ -152,7 +152,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Clear_resets_ovbserved_immutable_lists()
-      => That(Conf.Empty.InitValue(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
+      => That(Conf.Empty.Init(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
                   .Clear(observedIImmutableListKey)
                   .Get(observedIImmutableListKey)
                   .ToEnumerable(),
@@ -161,21 +161,21 @@ namespace Bud.V1 {
     [Test]
     public void Add_adds_values_to_observed_immutable_lists()
       => AreEqual(new[] { 1, 2, 3 },
-                  Conf.Empty.InitValue(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
+                  Conf.Empty.Init(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
                       .Add(observedIImmutableListKey, 2, 3)
                       .Get(observedIImmutableListKey).Wait());
 
     [Test]
     public void Add_adds_observed_value_to_observed_immutable_lists()
       => AreEqual(new[] { 1, 2 },
-                  Conf.Empty.InitValue(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
+                  Conf.Empty.Init(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
                       .Add(observedIImmutableListKey, Observable.Return(2))
                       .Get(observedIImmutableListKey).Wait());
 
     [Test]
     public void Add_adds_observed_values_to_observed_immutable_lists()
       => AreEqual(new[] { 1, 2, 3 },
-                  Conf.Empty.InitValue(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
+                  Conf.Empty.Init(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
                       .Add(observedIImmutableListKey, Observable.Return(new[] { 2, 3 }))
                       .Get(observedIImmutableListKey).Wait());
 
@@ -192,28 +192,28 @@ namespace Bud.V1 {
     [Test]
     public void InitEmpty_does_not_changed_initialized_immutable_sets()
       => AreEqual(new[] {1},
-                  Conf.Empty.InitValue(immutableSetKey, ImmutableHashSet.Create(1))
+                  Conf.Empty.Init(immutableSetKey, ImmutableHashSet.Create(1))
                       .InitEmpty(immutableSetKey)
                       .Get(immutableSetKey));
 
     [Test]
     public void Clear_resets_immutable_sets()
-      => IsEmpty(Conf.Empty.InitValue(immutableSetKey, ImmutableHashSet.Create(1))
+      => IsEmpty(Conf.Empty.Init(immutableSetKey, ImmutableHashSet.Create(1))
                      .Clear(immutableSetKey)
                      .Get(immutableSetKey));
 
     [Test]
     public void Add_adds_values_to_immutable_sets()
       => AreEqual(new[] {1, 2},
-                  Conf.Empty.InitValue(immutableSetKey, ImmutableHashSet.Create(1))
+                  Conf.Empty.Init(immutableSetKey, ImmutableHashSet.Create(1))
                       .Add(immutableSetKey, 2)
                       .Get(immutableSetKey));
 
     [Test]
     public void Add_adds_computed_values_to_immutable_sets()
       => AreEqual(new[] {1, 43},
-                  Conf.Empty.InitValue(numberKey, 42)
-                      .InitValue(immutableSetKey, ImmutableHashSet.Create(1))
+                  Conf.Empty.Init(numberKey, 42)
+                      .Init(immutableSetKey, ImmutableHashSet.Create(1))
                       .Add(immutableSetKey, c => numberKey[c] + 1)
                       .Get(immutableSetKey));
 
@@ -230,7 +230,7 @@ namespace Bud.V1 {
 
     [Test]
     public void InitEmpty_does_not_changed_initialized_observed_immutable_sets()
-      => That(Conf.Empty.InitValue(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
+      => That(Conf.Empty.Init(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
                   .InitEmpty(observedImmutableSetKey)
                   .Get(observedImmutableSetKey)
                   .ToEnumerable(),
@@ -238,7 +238,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Clear_resets_ovbserved_immutable_sets()
-      => That(Conf.Empty.InitValue(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
+      => That(Conf.Empty.Init(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
                   .Clear(observedImmutableSetKey)
                   .Get(observedImmutableSetKey)
                   .ToEnumerable(),
@@ -247,21 +247,21 @@ namespace Bud.V1 {
     [Test]
     public void Add_adds_values_to_observed_immutable_sets()
       => AreEqual(new[] { 1, 2, 3 },
-                  Conf.Empty.InitValue(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
+                  Conf.Empty.Init(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
                       .Add(observedImmutableSetKey, 2, 3)
                       .Get(observedImmutableSetKey).Wait());
 
     [Test]
     public void Add_adds_observed_value_to_observed_immutable_sets()
       => AreEqual(new[] { 1, 2 },
-                  Conf.Empty.InitValue(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
+                  Conf.Empty.Init(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
                       .Add(observedImmutableSetKey, Observable.Return(2))
                       .Get(observedImmutableSetKey).Wait());
 
     [Test]
     public void Add_adds_observed_values_to_observed_immutable_sets()
       => AreEqual(new[] { 1, 2, 3 },
-                  Conf.Empty.InitValue(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
+                  Conf.Empty.Init(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
                       .Add(observedImmutableSetKey, Observable.Return(new[] { 2, 3 }))
                       .Get(observedImmutableSetKey).Wait());
 
