@@ -85,7 +85,7 @@ namespace Bud.V1 {
     public Option<T> TryGet<T>(Key<T> key)
       => ToCompiled().TryGet<T>(Keys.InterpretFromScope(key, Scope));
 
-    public void ApplyIn(ScopedDictionaryBuilder<IConfDefinition> configDefinitions) {
+    public void ApplyIn(DirectoryDictionary<IConfDefinition> configDefinitions) {
       foreach (var scopedConfBuilder in ScopedConfBuilders) {
         scopedConfBuilder.ConfBuilder
                          .ApplyIn(configDefinitions.In(scopedConfBuilder.Scope));
@@ -94,7 +94,7 @@ namespace Bud.V1 {
 
     public IConf ToCompiled() {
       var definitions = new Dictionary<string, IConfDefinition>();
-      ApplyIn(new ScopedDictionaryBuilder<IConfDefinition>(definitions, ImmutableList<string>.Empty));
+      ApplyIn(new DirectoryDictionary<IConfDefinition>(definitions, ImmutableList<string>.Empty));
       return new RawConf(definitions);
     }
 

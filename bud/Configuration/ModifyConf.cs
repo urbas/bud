@@ -10,11 +10,11 @@ namespace Bud.Configuration {
       ValueFactory = valueFactory;
     }
 
-    public override void ApplyIn(ScopedDictionaryBuilder<IConfDefinition> configDefinitions) {
+    public override void ApplyIn(DirectoryDictionary<IConfDefinition> configDefinitions) {
       var oldConfDefinition = configDefinitions.TryGet(Key);
       if (oldConfDefinition.HasValue) {
         var scopedValueFactory = WithScopedValueFactory(oldConfDefinition.Value,
-                                                        configDefinitions.Scope);
+                                                        configDefinitions.CurrentDirectory);
         configDefinitions.Set(Key, new ConfDefinition<T>(scopedValueFactory));
       } else {
         throw new ConfDefinitionException(Key, typeof(T), $"Could not modify the value of configuration '{Key}'. The configuration has not been initialized yet.");

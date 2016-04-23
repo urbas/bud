@@ -5,6 +5,6 @@ namespace Bud.Configuration {
     }
 
     public string Key { get; }
-    public abstract void ApplyIn(ScopedDictionaryBuilder<IConfDefinition> configDefinitions);
+    public abstract void ApplyIn(DirectoryDictionary<IConfDefinition> configDefinitions);
   }
 }

@@ -132,7 +132,7 @@
     <Compile Include="Configuration\CachingConfTest.cs" />
     <Compile Include="Configuration\RawConfTest.cs" />
     <Compile Include="Configuration\ScopedConfTest.cs" />
-    <Compile Include="Configuration\ScopedDictionaryBuilderTest.cs" />
+    <Compile Include="Configuration\DirectoryDictionaryTest.cs" />
     <Compile Include="Cs\CompileInputTestUtils.cs" />
     <Compile Include="Cs\CsProjectsTest.cs" />
     <Compile Include="Cs\RoslynCsCompilationTest.cs" />

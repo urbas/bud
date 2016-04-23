@@ -9,14 +9,14 @@ namespace Bud.Configuration {
       ValueFactory = valueFactory;
     }
 
-    public override void ApplyIn(ScopedDictionaryBuilder<IConfDefinition> configDefinitions)
+    public override void ApplyIn(DirectoryDictionary<IConfDefinition> configDefinitions)
       => SetConf.DefineConfIn(configDefinitions, ValueFactory, Key);
   }
 
   public static class SetConf {
-    public static void DefineConfIn<T>(ScopedDictionaryBuilder<IConfDefinition> configDefinitions, Func<IConf, T> valueFactory, string key) {
+    public static void DefineConfIn<T>(DirectoryDictionary<IConfDefinition> configDefinitions, Func<IConf, T> valueFactory, string key) {
       var confDefinition = new ConfDefinition<T>(conf => {
-        var scopedConf = ScopedConf.MakeScoped(configDefinitions.Scope, conf);
+        var scopedConf = ScopedConf.MakeScoped(configDefinitions.CurrentDirectory, conf);
         return valueFactory(scopedConf);
       });
       configDefinitions.Set(key, confDefinition);

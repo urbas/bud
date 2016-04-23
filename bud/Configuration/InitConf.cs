@@ -9,7 +9,7 @@ namespace Bud.Configuration {
       ValueFactory = valueFactory;
     }
 
-    public override void ApplyIn(ScopedDictionaryBuilder<IConfDefinition> configDefinitions) {
+    public override void ApplyIn(DirectoryDictionary<IConfDefinition> configDefinitions) {
       if (!configDefinitions.TryGet(Key).HasValue) {
         SetConf.DefineConfIn(configDefinitions, ValueFactory, Key);
       }

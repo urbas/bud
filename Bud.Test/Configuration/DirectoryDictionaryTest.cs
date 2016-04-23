@@ -5,14 +5,14 @@ using static Bud.Util.Option;
 using static NUnit.Framework.Assert;
 
 namespace Bud.Configuration {
-  public class ScopedDictionaryBuilderTest {
-    private ScopedDictionaryBuilder<string> builder;
+  public class DirectoryDictionaryTest {
+    private DirectoryDictionary<string> builder;
     private IDictionary<string, string> dictionary;
 
     [SetUp]
     public void SetUp() {
       dictionary = new Dictionary<string, string>();
-      builder = new ScopedDictionaryBuilder<string>(dictionary, ImmutableList<string>.Empty);
+      builder = new DirectoryDictionary<string>(dictionary, ImmutableList<string>.Empty);
     }
 
     [Test]
