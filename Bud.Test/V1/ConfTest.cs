@@ -127,19 +127,19 @@ namespace Bud.V1 {
 
     [Test]
     public void Empty_configuration_has_no_scope()
-      => IsEmpty(Empty.Scope);
+      => IsEmpty(Empty.CurrentDir);
 
     [Test]
     public void Descending_into_subscope()
-      => AreEqual(new[] {"foo"}, Empty.In("foo").Scope);
+      => AreEqual(new[] {"foo"}, Empty.In("foo").CurrentDir);
 
     [Test]
     public void Multiple_subscope_descend()
-      => AreEqual(new[] {"foo", "bar"}, Empty.In("foo").In("bar").Scope);
+      => AreEqual(new[] {"foo", "bar"}, Empty.In("foo").In("bar").CurrentDir);
 
     [Test]
     public void Scope_backtracking()
-      => IsEmpty(Group("foo").Out().Scope);
+      => IsEmpty(Group("foo").Out().CurrentDir);
 
     [Test]
     public void Throws_when_backtracking_from_empty_scope()

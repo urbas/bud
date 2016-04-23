@@ -8,12 +8,41 @@ using Bud.Util;
 namespace Bud.V1 {
   public class Conf : IConfBuilder {
     public static Conf Empty { get; } = new Conf(ImmutableList<ScopedConfBuilder>.Empty, ImmutableList<string>.Empty);
-    private ImmutableList<ScopedConfBuilder> ScopedConfBuilders { get; }
-    public ImmutableList<string> Scope { get; }
 
-    private Conf(ImmutableList<ScopedConfBuilder> scopedConfBuilders, ImmutableList<string> scope) {
+    /// <summary>
+    ///   The accumulated list of configurations. A value of a
+    ///   configuration is obtained by applying configuration builders
+    ///   one by one into a dictionary. Latter configuration builders
+    ///   in this list can values created by configuration builders
+    ///   that came before them.
+    ///   <para>
+    ///     Configuration builders come in three forms:
+    ///   </para>
+    ///   <para>
+    ///     - initialisation (see <see cref="InitConf{T}" />), which initialises
+    ///     the value of a configuration if the configuration has not yet been set,
+    ///   </para>
+    ///   <para>
+    ///     - overridding (see <see cref="SetConf{T}" />), which sets the
+    ///     value of a configuration regardless of whether the configuration was set, and
+    ///   </para>
+    ///   <para>
+    ///     - modification (see <see cref="ModifyConf{T}" />), which uses the previous
+    ///     value of a configuration to build the new value (useful for growing lists).
+    ///   </para>
+    /// </summary>
+    private ImmutableList<ScopedConfBuilder> ScopedConfBuilders { get; }
+
+    /// <summary>
+    ///   The current directory is used when new key-value pairs are
+    ///   added to this configuration. Keys will be interpreted as relative
+    ///   paths against this directory.
+    /// </summary>
+    public ImmutableList<string> CurrentDir { get; }
+
+    private Conf(ImmutableList<ScopedConfBuilder> scopedConfBuilders, ImmutableList<string> currentDir) {
       ScopedConfBuilders = scopedConfBuilders;
-      Scope = scope;
+      CurrentDir = currentDir;
     }
 
     /// <summary>
@@ -59,31 +88,32 @@ namespace Bud.V1 {
       => Add((IEnumerable<IConfBuilder>) otherConfs);
 
     public Conf Add(IEnumerable<IConfBuilder> otherConfs)
-      => new Conf(ScopedConfBuilders.AddRange(ToScopedConfBuilders(otherConfs, Scope)),
-                  Scope);
+      => new Conf(ScopedConfBuilders.AddRange(ToScopedConfBuilders(otherConfs, CurrentDir)),
+                  CurrentDir);
 
     /// <returns>
-    ///   a copy of self where the Scope is appended with <paramref name="scope" />.
+    ///   a copy of self where the <see cref="CurrentDir" /> is appended
+    ///   with <paramref name="subDir" />.
     /// </returns>
-    public Conf In(string scope)
-      => new Conf(ScopedConfBuilders, Scope.Add(scope));
+    public Conf In(string subDir)
+      => new Conf(ScopedConfBuilders, CurrentDir.Add(subDir));
 
     /// <returns>
     ///   a copy of self where the Scope has one element removed from the back.
     /// </returns>
     public Conf Out() {
-      if (Scope.IsEmpty) {
+      if (CurrentDir.IsEmpty) {
         throw new InvalidOperationException("Can not backtrack further. The Scope is already empty.");
       }
-      return new Conf(ScopedConfBuilders, Scope.RemoveAt(Scope.Count - 1));
+      return new Conf(ScopedConfBuilders, CurrentDir.RemoveAt(CurrentDir.Count - 1));
     }
 
     /// <param name="key">
     ///   The key for which to get the value. If the path of the key is relative,
-    ///   it will be interpreted with the <see cref="Scope" /> as the base path.
+    ///   it will be interpreted with the <see cref="CurrentDir" /> as the base path.
     /// </param>
     public Option<T> TryGet<T>(Key<T> key)
-      => ToCompiled().TryGet<T>(Keys.InterpretFromScope(key, Scope));
+      => ToCompiled().TryGet<T>(Keys.InterpretFromScope(key, CurrentDir));
 
     public void AddTo(DirectoryDictionary<IConfDefinition> configDefinitions) {
       foreach (var scopedConfBuilder in ScopedConfBuilders) {
@@ -105,7 +135,7 @@ namespace Bud.V1 {
     }
 
     public static Conf Group(params IConfBuilder[] confs)
-      => Group((IEnumerable<IConfBuilder>)confs);
+      => Group((IEnumerable<IConfBuilder>) confs);
 
     public static Conf Group(IEnumerable<IConfBuilder> confs)
       => Empty.Add(confs);
