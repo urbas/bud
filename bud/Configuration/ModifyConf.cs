@@ -6,18 +6,18 @@ namespace Bud.Configuration {
   public class ModifyConf<T> : ConfBuilder {
     private Func<IConf, T, T> ValueFactory { get; }
 
-    public ModifyConf(Key<T> key, Func<IConf, T, T> valueFactory) : base(key) {
+    public ModifyConf(Key<T> path, Func<IConf, T, T> valueFactory) : base(path) {
       ValueFactory = valueFactory;
     }
 
-    public override void ApplyIn(DirectoryDictionary<IConfDefinition> configDefinitions) {
-      var oldConfDefinition = configDefinitions.TryGet(Key);
+    public override void AddTo(DirectoryDictionary<IConfDefinition> configDefinitions) {
+      var oldConfDefinition = configDefinitions.TryGet(Path);
       if (oldConfDefinition.HasValue) {
         var scopedValueFactory = WithScopedValueFactory(oldConfDefinition.Value,
                                                         configDefinitions.CurrentDirectory);
-        configDefinitions.Set(Key, new ConfDefinition<T>(scopedValueFactory));
+        configDefinitions.Set(Path, new ConfDefinition<T>(scopedValueFactory));
       } else {
-        throw new ConfDefinitionException(Key, typeof(T), $"Could not modify the value of configuration '{Key}'. The configuration has not been initialized yet.");
+        throw new ConfDefinitionException(Path, typeof(T), $"Could not modify the value of configuration '{Path}'. The configuration has not been initialized yet.");
       }
     }
 

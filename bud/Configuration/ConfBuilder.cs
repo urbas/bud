@@ -1,10 +1,10 @@
 namespace Bud.Configuration {
   public abstract class ConfBuilder : IConfBuilder {
-    protected ConfBuilder(string key) {
-      Key = key;
+    protected ConfBuilder(string path) {
+      Path = path;
     }
 
-    public string Key { get; }
-    public abstract void ApplyIn(DirectoryDictionary<IConfDefinition> configDefinitions);
+    public string Path { get; }
+    public abstract void AddTo(DirectoryDictionary<IConfDefinition> configDefinitions);
   }
 }

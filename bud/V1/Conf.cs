@@ -85,16 +85,16 @@ namespace Bud.V1 {
     public Option<T> TryGet<T>(Key<T> key)
       => ToCompiled().TryGet<T>(Keys.InterpretFromScope(key, Scope));
 
-    public void ApplyIn(DirectoryDictionary<IConfDefinition> configDefinitions) {
+    public void AddTo(DirectoryDictionary<IConfDefinition> configDefinitions) {
       foreach (var scopedConfBuilder in ScopedConfBuilders) {
         scopedConfBuilder.ConfBuilder
-                         .ApplyIn(configDefinitions.In(scopedConfBuilder.Scope));
+                         .AddTo(configDefinitions.In(scopedConfBuilder.Scope));
       }
     }
 
     public IConf ToCompiled() {
       var definitions = new Dictionary<string, IConfDefinition>();
-      ApplyIn(new DirectoryDictionary<IConfDefinition>(definitions, ImmutableList<string>.Empty));
+      AddTo(new DirectoryDictionary<IConfDefinition>(definitions, ImmutableList<string>.Empty));
       return new RawConf(definitions);
     }
 
