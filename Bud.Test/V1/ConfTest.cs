@@ -44,13 +44,13 @@ namespace Bud.V1 {
     [Test]
     public void Modified_configurations_modify_old_values()
       => AreEqual(43, A.Init(42)
-                       .Modify(A, (configs, oldConfig) => oldConfig + 1)
+                       .Modify(A, IncrementByOne)
                        .Get(A));
 
     [Test]
     public void Throw_when_modifying_a_configuration_that_does_not_yet_exist() {
       var exception = Throws<ConfDefinitionException>(
-        () => A.Modify((configs, oldConfig) => oldConfig + 1).Get(A));
+        () => A.Modify(IncrementByOne).Get(A));
       AreEqual(A.Id, exception.Key);
       That(exception.Message, Contains.Substring(A.Id));
     }
@@ -264,5 +264,8 @@ namespace Bud.V1 {
       var second = Task.Run(() => A[conf]);
       return await first + await second;
     }
+
+    private static int IncrementByOne(IConf configs, int oldConfig)
+      => oldConfig + 1;
   }
 }
