@@ -126,23 +126,23 @@ namespace Bud.V1 {
     }
 
     [Test]
-    public void Empty_configuration_has_no_scope()
+    public void Empty_configuration_has_no_dir()
       => IsEmpty(Empty.CurrentDir);
 
     [Test]
-    public void Descending_into_subscope()
+    public void Descending_into_subdir()
       => AreEqual(new[] {"foo"}, Empty.In("foo").CurrentDir);
 
     [Test]
-    public void Multiple_subscope_descend()
+    public void Multiple_subdir_descend()
       => AreEqual(new[] {"foo", "bar"}, Empty.In("foo").In("bar").CurrentDir);
 
     [Test]
-    public void Scope_backtracking()
+    public void Dir_backtracking()
       => IsEmpty(Group("foo").Out().CurrentDir);
 
     [Test]
-    public void Throws_when_backtracking_from_empty_scope()
+    public void Throws_when_backtracking_from_empty_dir()
       => Throws<InvalidOperationException>(() => Empty.Out());
 
     [Test]
@@ -202,7 +202,7 @@ namespace Bud.V1 {
     }
 
     [Test]
-    public void Root_config_can_be_accessed_from_current_scope()
+    public void Root_config_can_be_accessed_from_current_dir()
       => AreEqual(42, (Keys.Root/A).Set(42).Get(A));
 
     [Test]
@@ -220,7 +220,7 @@ namespace Bud.V1 {
     }
 
     [Test]
-    public void Relative_reference_in_a_nested_and_modified_conf_defined_in_another_scope() {
+    public void Relative_reference_in_a_nested_and_modified_conf_defined_in_another_dir() {
       var confA = Group("a").Init(A, 42);
       var confB0 = Group("e").In("f").In("g").Set("../../.."/B, conf => 1 + ("../../.."/A)[conf]);
       var confB1 = Group("b").Modify("../a"/B, (conf, oldValue) => oldValue + ("../a"/A)[conf]);

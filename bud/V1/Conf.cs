@@ -36,7 +36,9 @@ namespace Bud.V1 {
     /// <summary>
     ///   The current directory is used when new key-value pairs are
     ///   added to this configuration. Keys will be interpreted as relative
-    ///   paths against this directory.
+    ///   paths against this directory. Say, if you add the key <c>A</c> to
+    ///   a conf with <see cref="CurrentDir"/> set to <c>foo/bar</c>, then
+    ///   the key will be added at <c>foo/bar/A</c>.
     /// </summary>
     public ImmutableList<string> CurrentDir { get; }
 
@@ -83,7 +85,7 @@ namespace Bud.V1 {
     public Conf Modify<T>(Key<T> configKey, Func<IConf, T, T> valueFactory)
       => Add(new ModifyConf<T>(configKey, valueFactory));
 
-    /// <returns>a copy of self with added configurations from <paramref name="otherConfs" />.</returns>
+    /// <returns>a copy of this conf with added configurations from <paramref name="otherConfs" />.</returns>
     public Conf Add(params IConfBuilder[] otherConfs)
       => Add((IEnumerable<IConfBuilder>) otherConfs);
 
