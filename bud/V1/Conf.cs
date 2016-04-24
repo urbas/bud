@@ -120,7 +120,7 @@ namespace Bud.V1 {
     public void AddTo(DirectoryDictionary<IConfDefinition> configDefinitions) {
       foreach (var scopedConfBuilder in ScopedConfBuilders) {
         scopedConfBuilder.ConfBuilder
-                         .AddTo(configDefinitions.In(scopedConfBuilder.Scope));
+                         .AddTo(configDefinitions.In(scopedConfBuilder.Dir));
       }
     }
 
