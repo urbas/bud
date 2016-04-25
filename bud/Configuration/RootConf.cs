@@ -6,11 +6,11 @@ using Bud.V1;
 using static Bud.Util.Option;
 
 namespace Bud.Configuration {
-  public class RawConf : IConf {
+  internal class RootConf : IConf {
     public IDictionary<string, IConfDefinition> ConfDefinitions { get; }
     private CachingConf CachingConf { get; }
 
-    public RawConf(IDictionary<string, IConfDefinition> confDefinitions) {
+    public RootConf(IDictionary<string, IConfDefinition> confDefinitions) {
       ConfDefinitions = confDefinitions;
       CachingConf = new CachingConf();
     }

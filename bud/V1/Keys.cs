@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Bud.Util;
 
@@ -50,38 +51,40 @@ namespace Bud.V1 {
     }
 
     /// <returns>
-    ///   a concatenation of the <paramref name="scope" /> collection separated by
+    ///   a concatenation of the <paramref name="dir" /> collection separated by
     ///   <see cref="SeparatorAsString" />.
     /// </returns>
-    public static string ConvertScopeToString(IEnumerable<string> scope)
-      => string.Join(SeparatorAsString, scope);
+    public static string DirToString(IEnumerable<string> dir)
+      => string.Join(SeparatorAsString, dir);
 
     /// <returns>
     ///   a string where all the leading backtrack strings are removed
     ///   from <paramref name="key" />.
     /// </returns>
     /// <remarks>
-    ///   Given the key <c>../../a/b/c</c> and Scope <c>{ foo, bar, moo }</c>
+    ///   Given the <paramref name="key"/> <c>../../a/b/c</c> and
+    ///  <paramref name="dir"/> <c>{ foo, bar, moo }</c>
     ///   the method will return <c>foo/a/b/c</c>.
     /// </remarks>
-    public static string ToFullPath(string key, ICollection<string> scope)
-      => IsAbsolute(key) ? key.Substring(1) : InterpretFromScope(key, scope);
+    public static string ToFullPath(string key, IImmutableList<string> dir)
+      => IsAbsolute(key) ? key.Substring(1) : InterpretFromDir(key, dir);
 
     /// <remarks>
-    ///   Given the key <c>../../a/b/c</c> and Scope <c>{ foo, bar, moo }</c>
+    ///   Given the <paramref name="key"/> <c>../../a/b/c</c> and
+    ///  <paramref name="dir"/> <c>{ foo, bar, moo }</c>
     ///   the method will return <c>foo/a/b/c</c>.
     /// </remarks>
-    public static string InterpretFromScope(string key, ICollection<string> scope) {
-      if (IsAbsolute(key) || scope.Count == 0) {
+    public static string InterpretFromDir(string key, IImmutableList<string> dir) {
+      if (IsAbsolute(key) || dir.Count == 0) {
         return key;
       }
       var backtracks = CountBacktracks(key);
-      if (backtracks >= scope.Count) {
-        return key.Substring(scope.Count * BacktrackPath.Length);
+      if (backtracks >= dir.Count) {
+        return key.Substring(dir.Count * BacktrackPath.Length);
       }
-      var backtrackedScope = scope.Take(scope.Count - backtracks);
+      var backtrackedScope = dir.Take(dir.Count - backtracks);
       var keyWithBacktracksRemoved = key.Substring(backtracks * BacktrackPath.Length);
-      return ConvertScopeToString(backtrackedScope) + Separator + keyWithBacktracksRemoved;
+      return DirToString(backtrackedScope) + Separator + keyWithBacktracksRemoved;
     }
   }
 }

@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace Bud.V1 {
   public class KeysTest {
-    private readonly ImmutableArray<string> abcScope = ImmutableArray.Create("a", "b", "c");
+    private readonly ImmutableArray<string> abcDir = ImmutableArray.Create("a", "b", "c");
 
     [Test]
     public void CountBacktracks_must_return_0_for_absolute_keys()
@@ -19,20 +19,20 @@ namespace Bud.V1 {
       => Assert.AreEqual(2, Keys.CountBacktracks("../../foo"));
 
     [Test]
-    public void ConvertScopeToString_returns_an_empty_string_when_given_an_empty_scope()
-      => Assert.IsEmpty(Keys.ConvertScopeToString(Enumerable.Empty<string>()));
+    public void DirToString_returns_an_empty_string_when_given_an_empty_dir()
+      => Assert.IsEmpty(Keys.DirToString(Enumerable.Empty<string>()));
 
     [Test]
-    public void ConvertScopeToString_single_element_scope()
-      => Assert.AreEqual("foo", Keys.ConvertScopeToString(new[] {"foo"}));
+    public void DirToString_single_element_dir()
+      => Assert.AreEqual("foo", Keys.DirToString(new[] {"foo"}));
 
     [Test]
-    public void ConvertScopeToString_multi_element_scope()
+    public void DirToString_multi_element_dir()
       => Assert.AreEqual("foo/bar/zar",
-                         Keys.ConvertScopeToString(new[] {"foo", "bar", "zar"}));
+                         Keys.DirToString(new[] {"foo", "bar", "zar"}));
 
     [Test]
-    public void ToFullPath_returns_the_same_string_when_scope_is_empty()
+    public void ToFullPath_returns_the_same_string_when_dir_is_empty()
       => Assert.AreEqual("foo",
                          Keys.ToFullPath("foo", ImmutableList<string>.Empty));
 
@@ -42,42 +42,42 @@ namespace Bud.V1 {
                          Keys.ToFullPath("/foo", ImmutableList<string>.Empty));
 
     [Test]
-    public void ToFullPath_removes_the_leading_separator_for_any_scope()
+    public void ToFullPath_removes_the_leading_separator_for_any_dir()
       => Assert.AreEqual("foo",
-                         Keys.ToFullPath("/foo", abcScope));
+                         Keys.ToFullPath("/foo", abcDir));
 
     [Test]
-    public void ToFullPath_prepends_the_scope()
+    public void ToFullPath_prepends_the_dir()
       => Assert.AreEqual("a/b/c/foo",
-                         Keys.ToFullPath("foo", abcScope));
+                         Keys.ToFullPath("foo", abcDir));
 
     [Test]
-    public void ToFullPath_prepends_partial_scopes_when_backtracks_are_present()
+    public void ToFullPath_prepends_partial_dirs_when_backtracks_are_present()
       => Assert.AreEqual("a/foo",
-                         Keys.ToFullPath("../../foo", abcScope));
+                         Keys.ToFullPath("../../foo", abcDir));
 
     [Test]
-    public void InterpretFromScope_returns_unchanged_absolute_keys()
-      => Assert.AreEqual("/A", Keys.InterpretFromScope("/A", abcScope));
+    public void InterpretFromDir_returns_unchanged_absolute_keys()
+      => Assert.AreEqual("/A", Keys.InterpretFromDir("/A", abcDir));
 
     [Test]
-    public void InterpretFromScope_prepends_scope_to_relative_paths()
-      => Assert.AreEqual("a/b/c/A", Keys.InterpretFromScope("A", abcScope));
+    public void InterpretFromDir_prepends_dir_to_relative_paths()
+      => Assert.AreEqual("a/b/c/A", Keys.InterpretFromDir("A", abcDir));
 
     [Test]
-    public void InterpretFromScope_returns_unchanged_relative_keys_when_scope_is_empty()
-      => Assert.AreEqual("A", Keys.InterpretFromScope("A", ImmutableList<string>.Empty));
+    public void InterpretFromDir_returns_unchanged_relative_keys_when_dir_is_empty()
+      => Assert.AreEqual("A", Keys.InterpretFromDir("A", ImmutableList<string>.Empty));
 
     [Test]
-    public void InterpretFromScope_removes_all_backtracks_when_scope_size_matches_the_number_of_backtracks()
-      => Assert.AreEqual("A", Keys.InterpretFromScope("../../../A", abcScope));
+    public void InterpretFromDir_removes_all_backtracks_when_dir_size_matches_the_number_of_backtracks()
+      => Assert.AreEqual("A", Keys.InterpretFromDir("../../../A", abcDir));
 
     [Test]
-    public void InterpretFromScope_removes_some_backtracks_when_they_outnumber_the_scope_depth()
-      => Assert.AreEqual("../A", Keys.InterpretFromScope("../../../../A", abcScope));
+    public void InterpretFromDir_removes_some_backtracks_when_they_outnumber_the_dir_depth()
+      => Assert.AreEqual("../A", Keys.InterpretFromDir("../../../../A", abcDir));
 
     [Test]
-    public void InterpretFromScope_prepends_some_of_the_scope_when_scope_depth_outnumbers_backtracks()
-      => Assert.AreEqual("a/b/A", Keys.InterpretFromScope("../A", abcScope));
+    public void InterpretFromDir_prepends_some_of_the_dir_when_dir_depth_outnumbers_backtracks()
+      => Assert.AreEqual("a/b/A", Keys.InterpretFromDir("../A", abcDir));
   }
 }

@@ -7,7 +7,7 @@ using static NUnit.Framework.Assert;
 using Contains = NUnit.Framework.Contains;
 
 namespace Bud.Configuration {
-  public class RawConfTest {
+  public class RootConfTest {
     private static readonly Exception ExceptionInA = new Exception("a");
     private readonly ConfDefinition<int> defInt42 = new ConfDefinition<int>(_ => 42);
     private readonly ConfDefinition<int> defIntCallsA = new ConfDefinition<int>(c => c.Get<int>("A"));
@@ -20,7 +20,7 @@ namespace Bud.Configuration {
     [Test]
     public void Get_throws_an_exception_when_key_is_undefined() {
       Throws<ConfUndefinedException>(() => {
-        var emptyConf = new RawConf(ImmutableDictionary<string, IConfDefinition>.Empty);
+        var emptyConf = new RootConf(ImmutableDictionary<string, IConfDefinition>.Empty);
         emptyConf.Get<int>("A");
       });
     }
@@ -35,7 +35,7 @@ namespace Bud.Configuration {
 
     [Test]
     public void Get_returns_null() {
-      var conf = new RawConf(new Dictionary<string, IConfDefinition> {
+      var conf = new RootConf(new Dictionary<string, IConfDefinition> {
         {"A", defObjectNull}
       });
       IsNull(conf.Get<object>("A"));
@@ -43,7 +43,7 @@ namespace Bud.Configuration {
 
     [Test]
     public void TryGet_on_empty_returns_none() {
-      var conf = new RawConf(ImmutableDictionary<string, IConfDefinition>.Empty);
+      var conf = new RootConf(ImmutableDictionary<string, IConfDefinition>.Empty);
       IsFalse(conf.TryGet<object>("A").HasValue);
     }
 
@@ -74,13 +74,13 @@ namespace Bud.Configuration {
       AreEqual(ExceptionInA, exceptionB.InnerException);
     }
 
-    private RawConf ConfWithA42()
-      => new RawConf(new Dictionary<string, IConfDefinition> {
+    private RootConf ConfWithA42()
+      => new RootConf(new Dictionary<string, IConfDefinition> {
         {"A", defInt42}
       });
 
-    private RawConf KeysWithExceptions()
-      => new RawConf(new Dictionary<string, IConfDefinition> {
+    private RootConf KeysWithExceptions()
+      => new RootConf(new Dictionary<string, IConfDefinition> {
         {"A", defIntThrows},
         {"B", defIntCallsA},
       });

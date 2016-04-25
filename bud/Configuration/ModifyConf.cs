@@ -14,7 +14,7 @@ namespace Bud.Configuration {
       var oldConfDefinition = configDefinitions.TryGet(Path);
       if (oldConfDefinition.HasValue) {
         var scopedValueFactory = WithScopedValueFactory(oldConfDefinition.Value,
-                                                        configDefinitions.CurrentDirectory);
+                                                        configDefinitions.CurrentDir);
         configDefinitions.Set(Path, new ConfDefinition<T>(scopedValueFactory));
       } else {
         throw new ConfDefinitionException(Path, typeof(T), $"Could not modify the value of configuration '{Path}'. The configuration has not been initialized yet.");
@@ -22,9 +22,9 @@ namespace Bud.Configuration {
     }
 
     private Func<IConf, T> WithScopedValueFactory(IConfDefinition oldConfDefinition,
-                                                  ImmutableList<string> scope) {
+                                                  IImmutableList<string> scope) {
       return conf => {
-        var scopedConf = ScopedConf.MakeScoped(scope, conf);
+        var scopedConf = SubDirConf.ChangeDir(conf, scope);
         return ValueFactory(scopedConf, (T) oldConfDefinition.Value(conf));
       };
     }

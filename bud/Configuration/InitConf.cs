@@ -11,7 +11,7 @@ namespace Bud.Configuration {
 
     public override void AddTo(DirectoryDictionary<IConfDefinition> configDefinitions) {
       if (!configDefinitions.TryGet(Path).HasValue) {
-        SetConf.DefineConfIn(configDefinitions, ValueFactory, Path);
+        SetConf.AddTo(configDefinitions, ValueFactory, Path);
       }
     }
   }

@@ -127,19 +127,19 @@ namespace Bud.V1 {
 
     [Test]
     public void Empty_configuration_has_no_dir()
-      => IsEmpty(Empty.CurrentDir);
+      => IsEmpty(Empty.Dir);
 
     [Test]
     public void Descending_into_subdir()
-      => AreEqual(new[] {"foo"}, Empty.In("foo").CurrentDir);
+      => AreEqual(new[] {"foo"}, Empty.In("foo").Dir);
 
     [Test]
     public void Multiple_subdir_descend()
-      => AreEqual(new[] {"foo", "bar"}, Empty.In("foo").In("bar").CurrentDir);
+      => AreEqual(new[] {"foo", "bar"}, Empty.In("foo").In("bar").Dir);
 
     [Test]
     public void Dir_backtracking()
-      => IsEmpty(Group("foo").Out().CurrentDir);
+      => IsEmpty(Group("foo").Out().Dir);
 
     [Test]
     public void Throws_when_backtracking_from_empty_dir()

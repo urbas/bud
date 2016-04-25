@@ -3,13 +3,13 @@ using Bud.V1;
 using Bud.Util;
 
 namespace Bud.Configuration {
-  public class ScopedConf : IConf {
-    private ImmutableList<string> Scope { get; }
+  internal class SubDirConf : IConf {
+    private IImmutableList<string> Dir { get; }
     private IConf Conf { get; }
     private CachingConf CachingConf { get; }
 
-    private ScopedConf(ImmutableList<string> scope, IConf conf) {
-      Scope = scope;
+    private SubDirConf(IImmutableList<string> dir, IConf conf) {
+      Dir = dir;
       Conf = conf;
       CachingConf = new CachingConf();
     }
@@ -18,9 +18,9 @@ namespace Bud.Configuration {
       => CachingConf.TryGet(key, RawTryGet);
 
     private Option<T> RawTryGet<T>(Key<T> key)
-      => Conf.TryGet<T>(Keys.InterpretFromScope(key.Id, Scope));
+      => Conf.TryGet<T>(Keys.InterpretFromDir(key.Id, Dir));
 
-    public static IConf MakeScoped(ImmutableList<string> scope, IConf conf)
-      => scope.IsEmpty ? conf : new ScopedConf(scope, conf);
+    public static IConf ChangeDir(IConf conf, IImmutableList<string> dir)
+      => dir.Count == 0 ? conf : new SubDirConf(dir, conf);
   }
 }

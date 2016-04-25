@@ -8,7 +8,7 @@ using static Bud.V1.Keys;
 namespace Bud.Configuration {
   /// <summary>
   ///   The keys of this dictionary are slash-separated paths. This
-  ///   dictionary also maintains a <see cref="CurrentDirectory" />,
+  ///   dictionary also maintains a <see cref="CurrentDir" />,
   ///   which is used to resolve relative paths on insertion and on
   ///   lookup.
   /// </summary>
@@ -25,27 +25,27 @@ namespace Bud.Configuration {
     ///   The path relative to which key paths are interpreted
     ///   when looking up key-value pairs or inserting new key-value pairs.
     /// </summary>
-    public ImmutableList<string> CurrentDirectory { get; }
+    public IImmutableList<string> CurrentDir { get; }
 
     /// <summary>
     ///   Creates a directory dictionary which inserts values
-    ///   at paths interpreted from the given <see cref="CurrentDirectory" />.
+    ///   at paths interpreted from the given <see cref="CurrentDir" />.
     /// </summary>
     /// <param name="dictionary">
     ///   the underlying dictionary to which all key-value
     ///   pairs are inserted.
     /// </param>
-    /// <param name="currentDirectory">
+    /// <param name="currentDir">
     ///   the directory relative to which key paths are interpreted.
     /// </param>
     public DirectoryDictionary(IDictionary<string, T> dictionary,
-                               ImmutableList<string> currentDirectory) {
+                               IImmutableList<string> currentDir) {
       this.dictionary = dictionary;
-      CurrentDirectory = currentDirectory;
+      CurrentDir = currentDir;
     }
 
     /// <summary>
-    ///   Interprets the <paramref name="path" /> from the <see cref="CurrentDirectory" />
+    ///   Interprets the <paramref name="path" /> from the <see cref="CurrentDir" />
     ///   to an absolute path. The absolute path is then used to lookup the
     ///   value in this directory.
     /// </summary>
@@ -58,11 +58,11 @@ namespace Bud.Configuration {
     /// <remarks>
     ///   The method <see cref="Keys.ToFullPath" /> is used to
     ///   interpret the given <paramref name="path" />
-    ///   relative to the <see cref="CurrentDirectory" />.
+    ///   relative to the <see cref="CurrentDir" />.
     /// </remarks>
     public Option<T> TryGet(string path) {
       T value;
-      if (dictionary.TryGetValue(ToFullPath(path, CurrentDirectory), out value)) {
+      if (dictionary.TryGetValue(ToFullPath(path, CurrentDir), out value)) {
         return Some(value);
       }
       return None<T>();
@@ -70,7 +70,7 @@ namespace Bud.Configuration {
 
     /// <summary>
     ///   Interprets the <paramref name="path" /> relative to the
-    ///   <see cref="CurrentDirectory" /> and converts it to an absolute path.
+    ///   <see cref="CurrentDir" /> and converts it to an absolute path.
     ///   The resulting absolute path will be used as
     ///   the key. The key and value are inserted into the dictionary.
     /// </summary>
@@ -84,13 +84,13 @@ namespace Bud.Configuration {
     ///   this instance with the added value at the given path.
     /// </returns>
     public DirectoryDictionary<T> Set(string path, T value) {
-      var fullPath = ToFullPath(path, CurrentDirectory);
+      var fullPath = ToFullPath(path, CurrentDir);
       dictionary[fullPath] = value;
       return this;
     }
 
     /// <param name="subDirectory">
-    ///   The name of the directory to add to the <see cref="CurrentDirectory" />.
+    ///   The name of the directory to add to the <see cref="CurrentDir" />.
     /// </param>
     /// <returns>
     ///   A new directory dictionary with a changed current directory.
@@ -102,13 +102,13 @@ namespace Bud.Configuration {
     ///   <see cref="DirectoryDictionary{T}" /> instance.
     /// </remarks>
     public DirectoryDictionary<T> In(string subDirectory)
-      => new DirectoryDictionary<T>(dictionary, CurrentDirectory.Add(subDirectory));
+      => new DirectoryDictionary<T>(dictionary, CurrentDir.Add(subDirectory));
 
     /// <summary>
     ///   Same as <see cref="In(string)" /> but with multiple
     ///   levels of sub-directories.
     /// </summary>
     public DirectoryDictionary<T> In(IEnumerable<string> path)
-      => new DirectoryDictionary<T>(dictionary, CurrentDirectory.AddRange(path));
+      => new DirectoryDictionary<T>(dictionary, CurrentDir.AddRange(path));
   }
 }

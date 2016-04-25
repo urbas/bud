@@ -165,9 +165,9 @@
     <Compile Include="V1\Keys.cs" />
     <Compile Include="Cli\BuildTool.cs" />
     <Compile Include="Collections\EnumerableUtils.cs" />
-    <Compile Include="Configuration\RawConf.cs" />
+    <Compile Include="Configuration\RootConf.cs" />
     <Compile Include="Configuration\ScopedConfBuilder.cs" />
-    <Compile Include="Configuration\ScopedConf.cs" />
+    <Compile Include="Configuration\SubDirConf.cs" />
     <Compile Include="Configuration\DirectoryDictionary.cs" />
     <Compile Include="Cs\CompileInput.cs" />
     <Compile Include="Cs\CompileOutput.cs" />

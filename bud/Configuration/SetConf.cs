@@ -10,13 +10,16 @@ namespace Bud.Configuration {
     }
 
     public override void AddTo(DirectoryDictionary<IConfDefinition> configDefinitions)
-      => SetConf.DefineConfIn(configDefinitions, ValueFactory, Path);
+      => SetConf.AddTo(configDefinitions, ValueFactory, Path);
   }
 
   public static class SetConf {
-    public static void DefineConfIn<T>(DirectoryDictionary<IConfDefinition> configDefinitions, Func<IConf, T> valueFactory, string key) {
+    public static void AddTo<T>(DirectoryDictionary<IConfDefinition> configDefinitions,
+                                Func<IConf, T> valueFactory,
+                                string key) {
+      var dir = configDefinitions.CurrentDir;
       var confDefinition = new ConfDefinition<T>(conf => {
-        var scopedConf = ScopedConf.MakeScoped(configDefinitions.CurrentDirectory, conf);
+        var scopedConf = SubDirConf.ChangeDir(conf, dir);
         return valueFactory(scopedConf);
       });
       configDefinitions.Set(key, confDefinition);
