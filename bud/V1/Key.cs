@@ -43,7 +43,12 @@ namespace Bud.V1 {
     /// <param name="prefix">a slash-separated path.</param>
     /// <param name="key">a slash-separated path.</param>
     /// <returns>a joined path.</returns>
-    public static Key<T> operator /(Key prefix, Key<T> key) => prefix.Id + "/" + key.Id;
+    public static Key<T> operator /(Key prefix, Key<T> key) {
+      if (Keys.Root.Equals(prefix)) {
+        return Keys.SeparatorAsString + key.Id;
+      }
+      return prefix.Id + Keys.SeparatorAsString + key.Id;
+    }
 
     public bool IsAbsolute => Keys.IsAbsolute(Id);
     public override string ToString() => Id;
@@ -63,7 +68,13 @@ namespace Bud.V1 {
     /// <param name="prefix">a slash-separated path.</param>
     /// <param name="key">a slash-separated path.</param>
     /// <returns>a joined path.</returns>
-    public static Key operator /(Key key, string prefix) => new Key(key.Id + "/" + prefix);
+    public static Key operator /(Key key, string prefix) {
+      if (Keys.Root.Equals(key)) {
+        return new Key(Keys.SeparatorAsString + prefix);
+      }
+      return new Key(key.Id + "/" + prefix);
+    }
+
     public override string ToString() => Id;
   }
 }

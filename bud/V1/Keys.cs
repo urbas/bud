@@ -6,10 +6,10 @@ using Bud.Util;
 
 namespace Bud.V1 {
   public static class Keys {
-    public static readonly Key Root = new Key("");
     public const char Separator = '/';
     public const string BacktrackPath = "../";
     public const string SeparatorAsString = "/";
+    public static readonly Key Root = new Key(SeparatorAsString);
 
     public static Key<T> ToAbsolute<T>(this Key<T> configKey) {
       if (configKey.IsAbsolute) {
