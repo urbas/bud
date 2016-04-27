@@ -167,7 +167,7 @@
     <Compile Include="Collections\EnumerableUtils.cs" />
     <Compile Include="Configuration\RootConf.cs" />
     <Compile Include="Configuration\ScopedConfBuilder.cs" />
-    <Compile Include="Configuration\SubDirConf.cs" />
+    <Compile Include="Configuration\PerKeyConf.cs" />
     <Compile Include="Configuration\ConfDirectory.cs" />
     <Compile Include="Cs\CompileInput.cs" />
     <Compile Include="Cs\CompileOutput.cs" />

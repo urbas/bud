@@ -9,7 +9,7 @@ namespace Bud.V1 {
     public const char Separator = '/';
     public const string BacktrackPath = "../";
     public const string SeparatorAsString = "/";
-    public static readonly Key Root = new Key(SeparatorAsString);
+    public static readonly Key Root = SeparatorAsString;
 
     public static Key<T> ToAbsolute<T>(this Key<T> configKey) {
       if (configKey.IsAbsolute) {
@@ -75,7 +75,7 @@ namespace Bud.V1 {
     ///   the method will return <c>foo/a/b/c</c>.
     /// </remarks>
     public static string InterpretFromDir(string key, IImmutableList<string> dir) {
-      if (IsAbsolute(key) || dir.Count == 0) {
+      if (dir.Count == 0 || IsAbsolute(key)) {
         return key;
       }
       var backtracks = CountBacktracks(key);

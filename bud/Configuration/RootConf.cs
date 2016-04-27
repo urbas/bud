@@ -14,9 +14,10 @@ namespace Bud.Configuration {
     /// <summary>
     ///   A dictionary where all keys are paths without backtracks (i.e.: <c>..</c>).
     ///   These paths look like this: <c>foo/bar/zar</c>, <c>a/b/c/d</c>, etc.
-    ///   These paths are considered relative to the root.
+    ///   These paths are relative to the root.
     /// </summary>
     public IDictionary<string, IConfDefinition> ConfDefinitions { get; }
+
     private ConfCache Cache { get; }
 
     public RootConf(IDictionary<string, IConfDefinition> confDefinitions) {
@@ -27,12 +28,15 @@ namespace Bud.Configuration {
     public Option<T> TryGet<T>(Key<T> key)
       => Cache.TryGet(key.Relativize(), RawTryGet);
 
+    public Key Key { get; } = "/";
+
     private Option<T> RawTryGet<T>(Key<T> key) {
       IConfDefinition confDefinition;
       if (ConfDefinitions.TryGetValue(key, out confDefinition)) {
         object value;
         try {
-          value = confDefinition.Value(this);
+          var confForThisKey = new PerKeyConf(this, ImmutableList<string>.Empty, key);
+          value = confDefinition.Value(confForThisKey);
         } catch (Exception e) {
           var cex = e as ConfAccessException;
           if (cex != null) {

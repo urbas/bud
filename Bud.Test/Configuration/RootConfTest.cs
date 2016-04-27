@@ -74,6 +74,14 @@ namespace Bud.Configuration {
       AreEqual(ExceptionInA, exceptionB.InnerException);
     }
 
+    [Test]
+    public void Confs_can_retrieve_their_keys() {
+      var conf = new RootConf(new Dictionary<string, IConfDefinition> {
+        {"foo/A", new ConfDefinition<Key>(c => c.Key)}
+      });
+      AreEqual("foo/A", conf.Get<Key>("foo/A").Id);
+    }
+
     private RootConf ConfWithA42()
       => new RootConf(new Dictionary<string, IConfDefinition> {
         {"A", defInt42}

@@ -19,7 +19,7 @@ namespace Bud.Configuration {
                                 string key) {
       var dir = configDefinitions.CurrentDir;
       var confDefinition = new ConfDefinition<T>(conf => {
-        var scopedConf = SubDirConf.ChangeDir(conf, dir);
+        var scopedConf = new PerKeyConf(conf, dir, conf.Key);
         return valueFactory(scopedConf);
       });
       configDefinitions.Set(key, confDefinition);

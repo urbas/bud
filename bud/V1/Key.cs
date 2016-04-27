@@ -12,6 +12,7 @@ namespace Bud.V1 {
 
     public static implicit operator Key<T>(string id) => new Key<T>(id);
     public static implicit operator string(Key<T> key) => key.Id;
+    public static implicit operator Key(Key<T> key) => key.Id;
 
     /// <param name="conf">a bag of key-values.</param>
     /// <returns>
@@ -61,6 +62,9 @@ namespace Bud.V1 {
       Id = id;
     }
 
+    public static implicit operator Key(string id) => new Key(id);
+    public static implicit operator string(Key key) => key.Id;
+
     /// <summary>
     ///   Joins the <paramref name="prefix" /> with the
     ///   <paramref name="key" /> separated with a slash character.
@@ -70,9 +74,9 @@ namespace Bud.V1 {
     /// <returns>a joined path.</returns>
     public static Key operator /(Key key, string prefix) {
       if (Keys.Root.Equals(key)) {
-        return new Key(Keys.SeparatorAsString + prefix);
+        return Keys.SeparatorAsString + prefix;
       }
-      return new Key(key.Id + "/" + prefix);
+      return key.Id + "/" + prefix;
     }
 
     public override string ToString() => Id;

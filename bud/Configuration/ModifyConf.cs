@@ -22,9 +22,9 @@ namespace Bud.Configuration {
     }
 
     private Func<IConf, T> WithScopedValueFactory(IConfDefinition oldConfDefinition,
-                                                  IImmutableList<string> scope) {
+                                                  IImmutableList<string> dir) {
       return conf => {
-        var scopedConf = SubDirConf.ChangeDir(conf, scope);
+        var scopedConf = new PerKeyConf(conf, dir, conf.Key);
         return ValueFactory(scopedConf, (T) oldConfDefinition.Value(conf));
       };
     }

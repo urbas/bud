@@ -2,9 +2,10 @@ using System.Collections.Immutable;
 using Bud.V1;
 using Moq;
 using NUnit.Framework;
+using static NUnit.Framework.Assert;
 
 namespace Bud.Configuration {
-  public class SubDirConfTest {
+  public class PerKeyConfTest {
     private readonly ImmutableList<string> fooBarScope = ImmutableList.Create("foo", "bar");
     private Mock<IConf> wrappedConf;
     private IConf scopedConf;
@@ -13,16 +14,8 @@ namespace Bud.Configuration {
     public void SetUp() {
       wrappedConf = new Mock<IConf>();
       wrappedConf.Setup(self => self.TryGet<int>("foo/A")).Returns(42);
-      scopedConf = SubDirConf.ChangeDir(wrappedConf.Object, fooBarScope);
+      scopedConf = new PerKeyConf(wrappedConf.Object, fooBarScope, "a/b");
     }
-
-    [Test]
-    public void Do_not_wrap_conf_if_scope_is_empty()
-      => Assert.AreSame(wrappedConf.Object, SubDirConf.ChangeDir(wrappedConf.Object, ImmutableList<string>.Empty));
-
-    [Test]
-    public void Wrap_if_the_scope_is_non_empty()
-      => Assert.AreNotSame(wrappedConf.Object, SubDirConf.ChangeDir(wrappedConf.Object, fooBarScope));
 
     [Test]
     public void Delegate_absolute_keys() {
@@ -44,6 +37,15 @@ namespace Bud.Configuration {
 
     [Test]
     public void Return_value_calculated_by_wrapped_conf()
-      => Assert.AreEqual(42, scopedConf.TryGet<int>("../A").Value);
+      => AreEqual(42, scopedConf.TryGet<int>("../A").Value);
+
+    [Test]
+    public void Key_is_set() => AreEqual(new Key("a/b"), scopedConf.Key);
+
+    [Test]
+    public void Key_is_set_when_dir_is_not_set() {
+      var conf = (IConf) new PerKeyConf((IConf) wrappedConf.Object, ImmutableList<string>.Empty, "a/b");
+      AreEqual(new Key("a/b"), conf.Key);
+    }
   }
 }

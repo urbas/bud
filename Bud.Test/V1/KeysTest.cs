@@ -30,32 +30,32 @@ namespace Bud.V1 {
     [Test]
     public void DirToString_multi_element_dir()
       => AreEqual("foo/bar/zar",
-                         Keys.DirToString(new[] {"foo", "bar", "zar"}));
+                  Keys.DirToString(new[] {"foo", "bar", "zar"}));
 
     [Test]
     public void ToFullPath_returns_the_same_string_when_dir_is_empty()
       => AreEqual("foo",
-                         Keys.ToFullPath("foo", ImmutableList<string>.Empty));
+                  Keys.ToFullPath("foo", ImmutableList<string>.Empty));
 
     [Test]
     public void ToFullPath_removes_the_leading_separator()
       => AreEqual("foo",
-                         Keys.ToFullPath("/foo", ImmutableList<string>.Empty));
+                  Keys.ToFullPath("/foo", ImmutableList<string>.Empty));
 
     [Test]
     public void ToFullPath_removes_the_leading_separator_for_any_dir()
       => AreEqual("foo",
-                         Keys.ToFullPath("/foo", abcDir));
+                  Keys.ToFullPath("/foo", abcDir));
 
     [Test]
     public void ToFullPath_prepends_the_dir()
       => AreEqual("a/b/c/foo",
-                         Keys.ToFullPath("foo", abcDir));
+                  Keys.ToFullPath("foo", abcDir));
 
     [Test]
     public void ToFullPath_prepends_partial_dirs_when_backtracks_are_present()
       => AreEqual("a/foo",
-                         Keys.ToFullPath("../../foo", abcDir));
+                  Keys.ToFullPath("../../foo", abcDir));
 
     [Test]
     public void InterpretFromDir_returns_unchanged_absolute_keys()
