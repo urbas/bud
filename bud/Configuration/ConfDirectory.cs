@@ -15,11 +15,11 @@ namespace Bud.Configuration {
   /// <remarks>
   ///   This class is not thread safe.
   /// </remarks>
-  public class DirectoryDictionary<T> {
+  public class ConfDirectory {
     /// <summary>
     ///   The dictionary to which key-value pairs are added.
     /// </summary>
-    private readonly IDictionary<string, T> dictionary;
+    private readonly IDictionary<string, IConfDefinition> dictionary;
 
     /// <summary>
     ///   The path relative to which key paths are interpreted
@@ -38,8 +38,8 @@ namespace Bud.Configuration {
     /// <param name="currentDir">
     ///   the directory relative to which key paths are interpreted.
     /// </param>
-    public DirectoryDictionary(IDictionary<string, T> dictionary,
-                               IImmutableList<string> currentDir) {
+    public ConfDirectory(IDictionary<string, IConfDefinition> dictionary,
+                         IImmutableList<string> currentDir) {
       this.dictionary = dictionary;
       CurrentDir = currentDir;
     }
@@ -60,12 +60,12 @@ namespace Bud.Configuration {
     ///   interpret the given <paramref name="path" />
     ///   relative to the <see cref="CurrentDir" />.
     /// </remarks>
-    public Option<T> TryGet(string path) {
-      T value;
+    public Option<IConfDefinition> TryGet(string path) {
+      IConfDefinition value;
       if (dictionary.TryGetValue(ToFullPath(path, CurrentDir), out value)) {
         return Some(value);
       }
-      return None<T>();
+      return None<IConfDefinition>();
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ namespace Bud.Configuration {
     /// <returns>
     ///   this instance with the added value at the given path.
     /// </returns>
-    public DirectoryDictionary<T> Set(string path, T value) {
+    public ConfDirectory Set(string path, IConfDefinition value) {
       var fullPath = ToFullPath(path, CurrentDir);
       dictionary[fullPath] = value;
       return this;
@@ -99,16 +99,16 @@ namespace Bud.Configuration {
     /// </returns>
     /// <remarks>
     ///   This method will not modify this
-    ///   <see cref="DirectoryDictionary{T}" /> instance.
+    ///   <see cref="ConfDirectory" /> instance.
     /// </remarks>
-    public DirectoryDictionary<T> In(string subDirectory)
-      => new DirectoryDictionary<T>(dictionary, CurrentDir.Add(subDirectory));
+    public ConfDirectory In(string subDirectory)
+      => new ConfDirectory(dictionary, CurrentDir.Add(subDirectory));
 
     /// <summary>
     ///   Same as <see cref="In(string)" /> but with multiple
     ///   levels of sub-directories.
     /// </summary>
-    public DirectoryDictionary<T> In(IEnumerable<string> path)
-      => new DirectoryDictionary<T>(dictionary, CurrentDir.AddRange(path));
+    public ConfDirectory In(IEnumerable<string> path)
+      => new ConfDirectory(dictionary, CurrentDir.AddRange(path));
   }
 }

@@ -9,9 +9,9 @@ namespace Bud.Configuration {
       ValueFactory = valueFactory;
     }
 
-    public override void AddTo(DirectoryDictionary<IConfDefinition> configDefinitions) {
-      if (!configDefinitions.TryGet(Path).HasValue) {
-        SetConf.AddTo(configDefinitions, ValueFactory, Path);
+    public override void AddTo(ConfDirectory confDirectory) {
+      if (!confDirectory.TryGet(Path).HasValue) {
+        SetConf.AddTo(confDirectory, ValueFactory, Path);
       }
     }
   }

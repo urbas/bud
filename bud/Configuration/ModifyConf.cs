@@ -10,12 +10,12 @@ namespace Bud.Configuration {
       ValueFactory = valueFactory;
     }
 
-    public override void AddTo(DirectoryDictionary<IConfDefinition> configDefinitions) {
-      var oldConfDefinition = configDefinitions.TryGet(Path);
+    public override void AddTo(ConfDirectory confDirectory) {
+      var oldConfDefinition = confDirectory.TryGet(Path);
       if (oldConfDefinition.HasValue) {
         var scopedValueFactory = WithScopedValueFactory(oldConfDefinition.Value,
-                                                        configDefinitions.CurrentDir);
-        configDefinitions.Set(Path, new ConfDefinition<T>(scopedValueFactory));
+                                                        confDirectory.CurrentDir);
+        confDirectory.Set(Path, new ConfDefinition<T>(scopedValueFactory));
       } else {
         throw new ConfDefinitionException(Path, typeof(T), $"Could not modify the value of configuration '{Path}'. The configuration has not been initialized yet.");
       }

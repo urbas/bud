@@ -9,12 +9,12 @@ namespace Bud.Configuration {
       ValueFactory = valueFactory;
     }
 
-    public override void AddTo(DirectoryDictionary<IConfDefinition> configDefinitions)
-      => SetConf.AddTo(configDefinitions, ValueFactory, Path);
+    public override void AddTo(ConfDirectory confDirectory)
+      => SetConf.AddTo(confDirectory, ValueFactory, Path);
   }
 
   public static class SetConf {
-    public static void AddTo<T>(DirectoryDictionary<IConfDefinition> configDefinitions,
+    public static void AddTo<T>(ConfDirectory configDefinitions,
                                 Func<IConf, T> valueFactory,
                                 string key) {
       var dir = configDefinitions.CurrentDir;

@@ -168,7 +168,7 @@
     <Compile Include="Configuration\RootConf.cs" />
     <Compile Include="Configuration\ScopedConfBuilder.cs" />
     <Compile Include="Configuration\SubDirConf.cs" />
-    <Compile Include="Configuration\DirectoryDictionary.cs" />
+    <Compile Include="Configuration\ConfDirectory.cs" />
     <Compile Include="Cs\CompileInput.cs" />
     <Compile Include="Cs\CompileOutput.cs" />
     <Compile Include="Cs\ICompiler.cs" />

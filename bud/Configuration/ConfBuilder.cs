@@ -5,6 +5,6 @@ namespace Bud.Configuration {
     }
 
     public string Path { get; }
-    public abstract void AddTo(DirectoryDictionary<IConfDefinition> configDefinitions);
+    public abstract void AddTo(ConfDirectory confDirectory);
   }
 }

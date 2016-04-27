@@ -122,16 +122,16 @@ namespace Bud.V1 {
     public Option<T> TryGet<T>(Key<T> key)
       => ToCompiled().TryGet<T>(Keys.InterpretFromDir(key, Dir));
 
-    public void AddTo(DirectoryDictionary<IConfDefinition> configDefinitions) {
+    public void AddTo(ConfDirectory confDirectory) {
       foreach (var scopedConfBuilder in ScopedConfBuilders) {
         scopedConfBuilder.ConfBuilder
-                         .AddTo(configDefinitions.In(scopedConfBuilder.Dir));
+                         .AddTo(confDirectory.In(scopedConfBuilder.Dir));
       }
     }
 
     public IConf ToCompiled() {
       var definitions = new Dictionary<string, IConfDefinition>();
-      AddTo(new DirectoryDictionary<IConfDefinition>(definitions, ImmutableList<string>.Empty));
+      AddTo(new ConfDirectory(definitions, ImmutableList<string>.Empty));
       return new RootConf(definitions);
     }
 
