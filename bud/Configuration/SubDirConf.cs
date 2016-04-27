@@ -6,16 +6,16 @@ namespace Bud.Configuration {
   internal class SubDirConf : IConf {
     private IImmutableList<string> Dir { get; }
     private IConf Conf { get; }
-    private CachingConf CachingConf { get; }
+    private ConfCache Cache { get; }
 
     private SubDirConf(IImmutableList<string> dir, IConf conf) {
       Dir = dir;
       Conf = conf;
-      CachingConf = new CachingConf();
+      Cache = new ConfCache();
     }
 
     public Option<T> TryGet<T>(Key<T> key)
-      => CachingConf.TryGet(key, RawTryGet);
+      => Cache.TryGet(key, RawTryGet);
 
     private Option<T> RawTryGet<T>(Key<T> key)
       => Conf.TryGet<T>(Keys.InterpretFromDir(key.Id, Dir));

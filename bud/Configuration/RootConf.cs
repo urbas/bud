@@ -6,17 +6,26 @@ using Bud.V1;
 using static Bud.Util.Option;
 
 namespace Bud.Configuration {
+  /// <summary>
+  ///   A key-value configuration bag where all keys have paths relative
+  ///   to the root.
+  /// </summary>
   internal class RootConf : IConf {
+    /// <summary>
+    ///   A dictionary where all keys are paths without backtracks (i.e.: <c>..</c>).
+    ///   These paths look like this: <c>foo/bar/zar</c>, <c>a/b/c/d</c>, etc.
+    ///   These paths are considered relative to the root.
+    /// </summary>
     public IDictionary<string, IConfDefinition> ConfDefinitions { get; }
-    private CachingConf CachingConf { get; }
+    private ConfCache Cache { get; }
 
     public RootConf(IDictionary<string, IConfDefinition> confDefinitions) {
       ConfDefinitions = confDefinitions;
-      CachingConf = new CachingConf();
+      Cache = new ConfCache();
     }
 
     public Option<T> TryGet<T>(Key<T> key)
-      => CachingConf.TryGet(key.Relativize(), RawTryGet);
+      => Cache.TryGet(key.Relativize(), RawTryGet);
 
     private Option<T> RawTryGet<T>(Key<T> key) {
       IConfDefinition confDefinition;

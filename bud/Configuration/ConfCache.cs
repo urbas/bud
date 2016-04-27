@@ -4,7 +4,7 @@ using Bud.Util;
 using Bud.V1;
 
 namespace Bud.Configuration {
-  public class CachingConf {
+  public class ConfCache {
     private ImmutableDictionary<string, object> cache = ImmutableDictionary<string, object>.Empty;
     private readonly object configValueCacheGuard = new object();
 

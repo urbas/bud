@@ -175,7 +175,7 @@
     <Compile Include="Cs\OutputAssemblyKind.cs" />
     <Compile Include="Cs\RoslynCsCompilation.cs" />
     <Compile Include="Cs\TimedEmittingCompiler.cs" />
-    <Compile Include="Configuration\CachingConf.cs" />
+    <Compile Include="Configuration\ConfCache.cs" />
     <Compile Include="Configuration\ConfBuilder.cs" />
     <Compile Include="Configuration\IConfDefinition.cs" />
     <Compile Include="Configuration\IConfBuilder.cs" />
