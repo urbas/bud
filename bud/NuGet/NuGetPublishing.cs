@@ -19,7 +19,6 @@ namespace Bud.NuGet {
             .Init(ProjectUrl, None<string>())
             .Init(Publish, DefaultPublish)
             .Init(PublishUrl, None<string>())
-            .Init(PackageBaseDir, _ => Directory.GetCurrentDirectory())
             .Init(PublishApiKey, None<string>())
             .Init(Packager, new NuGetPackager())
             .Init(Publisher, new NuGetPublisher())
@@ -53,7 +52,7 @@ namespace Bud.NuGet {
                                IEnumerable<PackageReference> referencedPackages) {
       return Packager[c].Pack(
         PackageOutputDir[c],
-        PackageBaseDir[c],
+        BaseDir[c],
         ProjectId[c],
         ProjectVersion[c],
         packageFiles,

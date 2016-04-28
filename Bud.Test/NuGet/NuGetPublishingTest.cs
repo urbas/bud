@@ -114,13 +114,6 @@ namespace Bud.NuGet {
               Is.EqualTo(None<string>()));
 
     [Test]
-    public void Default_PackageBaseDir_is_set_to_the_current_working_directory()
-      => That(BareProject("fooDir", "Foo")
-                .Add(NuGetPublishingSupport)
-                .Get(PackageBaseDir),
-              Is.EqualTo(Directory.GetCurrentDirectory()));
-
-    [Test]
     public void Default_PackageMetadata_has_no_ProjectUrl()
       => That(BareProject("fooDir", "Foo")
                 .Add(NuGetPublishingSupport)

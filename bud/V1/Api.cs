@@ -226,13 +226,6 @@ namespace Bud.V1 {
 
     public static Key<IPackager> Packager = nameof(Packager);
 
-    /// <summary>
-    ///   The directory relative to which NuGet should look for
-    ///   <see cref="PackageFiles" /> that have relative source paths.
-    ///   By default it is the current working directory.
-    /// </summary>
-    public static Key<string> PackageBaseDir = nameof(PackageBaseDir);
-
     public static Key<string> PackageOutputDir = nameof(PackageOutputDir);
 
     public static Key<IObservable<IEnumerable<PackageFile>>> PackageFiles = nameof(PackageFiles);
