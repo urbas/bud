@@ -27,7 +27,7 @@ namespace Bud.BaseProjects {
         .Init(ProjectId, projectId)
         .Init(ProjectDir, c => GetProjectDir(c, projectDir))
         .Init(ProjectVersion, version)
-        .Init(BuildDir, c => Combine(ProjectDir[c], BuildDirName))
+        .Init(BuildDir, DefaultBuildDir)
         .Init(Clean, DefaultClean);
 
     private static string GetProjectDir(IConf c, string projectDir)
@@ -43,5 +43,8 @@ namespace Bud.BaseProjects {
       }
       return Unit.Default;
     }
+
+    private static string DefaultBuildDir(IConf c)
+      => Combine(BaseDir[c], BuildDirName, "project", GetDirectoryName(c.Key));
   }
 }

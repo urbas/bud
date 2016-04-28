@@ -90,5 +90,10 @@ namespace Bud.BaseProjects {
                    .Get(ProjectDir));
       }
     }
+
+    [Test]
+    public void BuildDir_points_to_a_subdirectory_of_the_build_directory_in_BaseDir()
+      => AreEqual(Combine(GetCurrentDirectory(), "build", "project", "A"),
+                  BareProject("A").Get(BuildDir));
   }
 }
