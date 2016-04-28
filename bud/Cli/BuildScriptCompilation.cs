@@ -41,6 +41,7 @@ namespace Bud.Cli {
       = CsLib("", "Build")
         .Add(AssemblyReferences, BudDependencies)
         .Clear(SourceIncludes)
-        .AddSourceFile(c => Path.Combine(ProjectDir[c], "Build.cs"));
+        .AddSourceFile(c => Path.Combine(ProjectDir[c], "Build.cs"))
+        .Set(BuildDir, c => Path.Combine(BaseDir[c], BuildDirName, "build-config"));
   }
 }

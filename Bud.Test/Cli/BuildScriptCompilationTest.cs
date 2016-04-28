@@ -35,7 +35,7 @@ namespace Bud.Cli {
     [Test]
     public void CompileBuildScript_places_the_Build_assembly_into_the_build_folder()
       => That(ValidBuildScript().AssemblyPath,
-              Is.EqualTo(Combine(tmpDir.Path, "build", "Build.dll"))
+              Is.EqualTo(Combine(tmpDir.Path, "build", "build-config", "Build.dll"))
                 .And.Exist);
 
     private CompileOutput InvokeCompileBuildScript()

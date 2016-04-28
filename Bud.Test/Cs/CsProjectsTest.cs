@@ -147,15 +147,6 @@ namespace Bud.Cs {
     }
 
     [Test]
-    public void CSharp_files_in_the_target_folder_must_not_be_listed() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var csFile = tempDir.CreateEmptyFile("build", "A.cs");
-        That(Sources[CsLib(tempDir.Path, "Foo")].Take(1).Wait(),
-             Is.Not.Contains(csFile));
-      }
-    }
-
-    [Test]
     public void Package_must_contain_the_dll_of_the_CsLibrary_project() {
       var packager = new Mock<IPackager>(MockBehavior.Strict);
       var projects = Projects(CsLib("aDir", "A")

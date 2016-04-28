@@ -109,7 +109,6 @@ namespace Bud.Cs {
       => new[] {
         "obj",
         "bin",
-        BuildDir[c],
         (PackagesSubProjectId/ProjectDir)[c]
       };
   }

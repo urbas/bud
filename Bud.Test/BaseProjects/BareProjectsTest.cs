@@ -23,10 +23,9 @@ namespace Bud.BaseProjects {
       => AreEqual("Foo", ProjectId[BareProject("bar", "Foo")]);
 
     [Test]
-    public void Target_directory_is_within_the_project_directory() {
-      var project = BuildProject("fooDir", "foo");
-      AreEqual(Combine(ProjectDir[project], "build"), BuildDir[project]);
-    }
+    public void BuildDir_is_within_the_base_build_directory()
+      => AreEqual(Combine(GetCurrentDirectory(), "build", "projects", "A"),
+                  BareProject("A").Get(BuildDir));
 
     [Test]
     public void Dependencies_should_be_initially_empty()
@@ -90,10 +89,5 @@ namespace Bud.BaseProjects {
                    .Get(ProjectDir));
       }
     }
-
-    [Test]
-    public void BuildDir_points_to_a_subdirectory_of_the_build_directory_in_BaseDir()
-      => AreEqual(Combine(GetCurrentDirectory(), "build", "project", "A"),
-                  BareProject("A").Get(BuildDir));
   }
 }
