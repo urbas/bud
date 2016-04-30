@@ -46,7 +46,7 @@ namespace Bud.NuGet {
       });
 
     private static IEnumerable<string> DownloadAndResolvePackages(IConf c, IReadOnlyCollection<PackageReference> packageReferences) {
-      var packagesDir = Combine(ProjectDir[c], "cache");
+      var packagesDir = Combine(BuildDir[c], "cache");
       CreateDirectory(packagesDir);
       if (packageReferences.Count == 0) {
         return Enumerable.Empty<string>();
@@ -55,7 +55,7 @@ namespace Bud.NuGet {
         throw new Exception($"Could not download packages: {string.Join(", ", packageReferences)}");
       }
       return AssemblyResolver[c]
-        .FindAssembly(packageReferences, packagesDir, ProjectDir[c]);
+        .FindAssembly(packageReferences, packagesDir, BuildDir[c]);
     }
   }
 }
