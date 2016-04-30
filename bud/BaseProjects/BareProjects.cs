@@ -45,6 +45,6 @@ namespace Bud.BaseProjects {
     }
 
     private static string DefaultBuildDir(IConf c)
-      => Combine(BaseDir[c], BuildDirName, "projects", GetDirectoryName(c.Key));
+      => Combine(BaseDir[c], BuildDirName, GetDirectoryName(c.Key));
   }
 }

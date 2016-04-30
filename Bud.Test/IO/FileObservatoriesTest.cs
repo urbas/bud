@@ -1,7 +1,6 @@
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
-using static Bud.IO.FileObservatories;
 using static NUnit.Framework.Assert;
 
 namespace Bud.IO {
