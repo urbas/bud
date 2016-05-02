@@ -173,34 +173,6 @@ namespace Bud.BaseProjects {
       }
     }
 
-    [Test]
-    [Category("IntegrationTest")]
-    public void DistributionZip_contains_Output() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        var project = Api.BuildProject(tmpDir.Path, "A")
-                         .Add(Output, tmpDir.CreateEmptyFile("A.txt"));
-        var distZip = project.Get(ChocoBinTrayDistribution.Zip).Take(1).Wait();
-        AreEqual(Combine(BuildDir[project], "dist-zip", "A.zip"),
-                 distZip);
-        ZipTestUtils.IsInZip(distZip, "A.txt");
-      }
-    }
-
-    [Test]
-    [Category("IntegrationTest")]
-    public void DistributionZip_contains_Output_of_Dependencies() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        var projects = Projects(
-          Api.BuildProject(tmpDir.Path, "A")
-             .Clear(Output).Add(Output, tmpDir.CreateEmptyFile("A.dll")),
-          Api.BuildProject(tmpDir.Path, "B")
-             .Add(Dependencies, "../A")
-             .Clear(Output));
-        var distZip = projects.Get("B"/ChocoBinTrayDistribution.Zip).Take(1).Wait();
-        ZipTestUtils.IsInZip(distZip, "A.dll");
-      }
-    }
-
     private static IObservable<string[]> ChangingOutput(IScheduler scheduler)
       => Return(new[] {"foo"}).Delay(TimeSpan.FromSeconds(1), scheduler)
                               .Concat(Return(new[] {"bar"})

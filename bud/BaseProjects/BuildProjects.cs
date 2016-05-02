@@ -78,14 +78,6 @@ namespace Bud.BaseProjects {
         return InAnyDirFilter(dirs);
       });
 
-    private static IObservable<IEnumerable<PackageFile>> DistributeOutputAndDependencies(IConf c)
-      => Output[c]
-        .CombineLatest(DependenciesOutput[c], Enumerable.Concat)
-        .Select(files => files.Select(file => new PackageFile(file, GetFileName(file))));
-
-    private static string DefaultDistributionZipPath(IConf c)
-      => Combine(BuildDir[c], "dist-zip", ProjectId[c] + ".zip");
-
     private static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
       => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c],
                                    BuildPipelineScheduler[c]);

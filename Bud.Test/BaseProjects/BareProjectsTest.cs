@@ -24,7 +24,7 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void BuildDir_is_within_the_base_build_directory()
-      => AreEqual(Combine(GetCurrentDirectory(), "build", "projects", "A"),
+      => AreEqual(Combine(GetCurrentDirectory(), "build", "A"),
                   BareProject("A").Get(BuildDir));
 
     [Test]

@@ -41,8 +41,6 @@ namespace Bud.Cs {
       .Set(PackagesSubProjectId/PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
       .Init(ReferencedPackages, c => (PackagesSubProjectId/ReferencedPackages)[c])
       .Set(PackageFiles, PackageLibDlls)
-      // TODO: Fix distribution to BinTray and Chocolatey
-      .Add(ChocoBinTrayDistribution.FilesToZip, AssembliesToPackage)
       .ExcludeSourceDirs(DefaultExcludedSourceDirs);
 
     private static IObservable<IImmutableList<PackageFile>> AssembliesToPackage(IConf c)
@@ -113,5 +111,13 @@ namespace Bud.Cs {
         "bin",
         (PackagesSubProjectId/ProjectDir)[c]
       };
+
+    private static IObservable<IEnumerable<PackageFile>> DistributeOutputAndDependencies(IConf c)
+      => Output[c]
+        .CombineLatest(DependenciesOutput[c], Enumerable.Concat)
+        .Select(files => files.Select(file => new PackageFile(file, GetFileName(file))));
+
+    private static string DefaultDistributionZipPath(IConf c)
+      => Combine(BuildDir[c], "dist-zip", ProjectId[c] + ".zip");
   }
 }

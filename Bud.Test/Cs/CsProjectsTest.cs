@@ -67,7 +67,7 @@ namespace Bud.Cs {
         .Clear(Input).Add(Input, "A.cs")
         .Add(AssemblyReferences, "A.dll");
       var assemblyReferences = projectA.Get(AssemblyReferences).ToEnumerable().First();
-      cSharpCompiler.Setup(self => self(new CompileInput(new [] {"A.cs"}, Enumerable.Empty<CompileOutput>(), assemblyReferences)))
+      cSharpCompiler.Setup(self => self(new CompileInput(new[] {"A.cs"}, Enumerable.Empty<CompileOutput>(), assemblyReferences)))
                     .Returns(EmptyCompileOutput());
       Compile[projectA].Take(1).Wait();
       cSharpCompiler.VerifyAll();
@@ -191,30 +191,6 @@ namespace Bud.Cs {
     [Test]
     public void CsApp_produces_an_executable()
       => AreEqual("Foo.exe", CsApp("Foo").Get(AssemblyName));
-
-    [Test]
-    [Category("IntegrationTest")]
-    public void DistributionZip_contains_assembly_references() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        var distZip = CsApp(tmpDir.Path, "A")
-          .Clear(Output)
-          .Add(AssemblyReferences, tmpDir.CreateEmptyFile("AssRef.dll"))
-          .Get(ChocoBinTrayDistribution.Zip).Take(1).Wait();
-        ZipTestUtils.IsInZip(distZip, "AssRef.dll");
-      }
-    }
-
-    [Test]
-    [Category("IntegrationTest")]
-    public void DistributionZip_does_not_contain_framework_assembly_references() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        var project = CsApp(tmpDir.Path, "A")
-          .Clear(Output)
-          .Add(AssemblyReferences, tmpDir.CreateEmptyFile("System.Runtime.dll"));
-        var distZip = project.Get(ChocoBinTrayDistribution.Zip).Take(1).Wait();
-        ZipTestUtils.IsNotInZip(distZip, "System.Runtime.dll");
-      }
-    }
 
     [Test]
     [Category("IntegrationTest")]
