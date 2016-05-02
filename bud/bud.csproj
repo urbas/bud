@@ -125,9 +125,10 @@
     <Compile Include="Configuration\ConfAccessException.cs" />
     <Compile Include="Cs\CsProjects.cs" />
     <Compile Include="Cs\RoslynCsCompiler.cs" />
-    <Compile Include="Dist\BinTrayDistribution.cs" />
-    <Compile Include="Dist\ChocoDistribution.cs" />
-    <Compile Include="Dist\ProjectDistribution.cs" />
+    <Compile Include="Dist\BinTray.cs" />
+    <Compile Include="Dist\ChocoBinTrayDistribution.cs" />
+    <Compile Include="Dist\Chocolatey.cs" />
+    <Compile Include="Dist\Zipper.cs" />
     <Compile Include="IO\HashBasedCaching.cs" />
     <Compile Include="IO\PackageFile.cs" />
     <Compile Include="IO\ValueUpdater.cs" />

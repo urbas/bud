@@ -42,16 +42,10 @@ bud benchmark
 This will produce the file `build/benchmarks/benchmark-results.json` and push it to [BinTray](https://bintray.com/matej/bud/bud-benchmarks/view#files).
 
 
-# Publishing
+# Releasing
 
 Publishes to NuGet:
 
 ```bash
-bud bud/Publish
-```
-
-Publishes to Chocolatey:
-
-```bash
-bud bud/Distribute
+bud bud/Publish bud/Distribute
 ```

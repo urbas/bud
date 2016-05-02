@@ -5,6 +5,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
+using Bud.Dist;
 using Bud.IO;
 using Bud.V1;
 using Microsoft.Reactive.Testing;
@@ -178,7 +179,7 @@ namespace Bud.BaseProjects {
       using (var tmpDir = new TemporaryDirectory()) {
         var project = Api.BuildProject(tmpDir.Path, "A")
                          .Add(Output, tmpDir.CreateEmptyFile("A.txt"));
-        var distZip = project.Get(DistributionArchive).Take(1).Wait();
+        var distZip = project.Get(ChocoBinTrayDistribution.Zip).Take(1).Wait();
         AreEqual(Combine(BuildDir[project], "dist-zip", "A.zip"),
                  distZip);
         ZipTestUtils.IsInZip(distZip, "A.txt");
@@ -195,7 +196,7 @@ namespace Bud.BaseProjects {
           Api.BuildProject(tmpDir.Path, "B")
              .Add(Dependencies, "../A")
              .Clear(Output));
-        var distZip = projects.Get("B"/DistributionArchive).Take(1).Wait();
+        var distZip = projects.Get("B"/ChocoBinTrayDistribution.Zip).Take(1).Wait();
         ZipTestUtils.IsInZip(distZip, "A.dll");
       }
     }

@@ -137,7 +137,7 @@
     <Compile Include="Cs\CsProjectsTest.cs" />
     <Compile Include="Cs\RoslynCsCompilationTest.cs" />
     <Compile Include="Cs\TimedEmittingCompilerTest.cs" />
-    <Compile Include="Dist\ProjectDistributionTest.cs" />
+    <Compile Include="Dist\ZipperTest.cs" />
     <Compile Include="IO\HashBasedCachingTest.cs" />
     <Compile Include="IO\MemoryStreams.cs" />
     <Compile Include="IO\ValueUpdaterTest.cs" />

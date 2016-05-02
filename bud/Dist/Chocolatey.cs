@@ -6,8 +6,14 @@ using Bud.IO;
 using Bud.NuGet;
 
 namespace Bud.Dist {
-  internal static class ChocoDistribution {
-    public static bool PushToChoco(string repositoryId, string packageId, string packageVersion, string archiveUrl, string username, string buildDir, NuGetPackageMetadata packageMetadata) {
+  public static class Chocolatey {
+    public static bool Push(string repositoryId,
+                            string packageId,
+                            string packageVersion,
+                            string archiveUrl,
+                            string username,
+                            string buildDir,
+                            NuGetPackageMetadata packageMetadata) {
       var scratchDir = CreateChocoScratchDir(buildDir);
       var installScriptPath = CreateChocoInstallScript(packageId, archiveUrl, scratchDir);
       var distPackage = CreateChocoPackage(packageId, packageVersion, scratchDir, installScriptPath, packageMetadata);
@@ -19,7 +25,11 @@ namespace Bud.Dist {
       return success;
     }
 
-    private static string CreateChocoPackage(string packageId, string packageVersion, string scratchDir, string installScriptPath, NuGetPackageMetadata packageMetadata) {
+    private static string CreateChocoPackage(string packageId,
+                                             string packageVersion,
+                                             string scratchDir,
+                                             string installScriptPath,
+                                             NuGetPackageMetadata packageMetadata) {
       return NuGetPackager.CreatePackage(
         scratchDir,
         Directory.GetCurrentDirectory(),

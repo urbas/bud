@@ -36,15 +36,16 @@ namespace Bud.Benchmarks {
     /// <param name="repositoryId">the repository id to which to push the benchmark JSON.</param>
     /// <param name="packageId">the name of the BinTray package to upload.</param>
     /// <param name="username">the BinTray username to use when calling into BinTray's API.</param>
+    /// <param name="uploadTimeout"></param>
     /// <returns>the url from which the uploaded benchmark JSON can be downloaded.</returns>
-    public Option<string> PushToBintray(string repositoryId, string packageId, string username)
-      => BinTrayDistribution.PushToBintray(
+    public string PushToBintray(string repositoryId, string packageId, string username, TimeSpan uploadTimeout)
+      => BinTray.PushToGenericRepo(
         () => new MemoryStream(Encoding.UTF8.GetBytes((string) ToJson())),
         repositoryId,
         packageId,
         $"{DateTime.Now.ToString("yyyy.M.d-bHHmmss")}-{VcsRevision.Substring(0, 8)}",
         username,
-        "json");
+        "json", uploadTimeout);
 
     public void WriteJson(TextWriter writer)
       => JsonSerializer.CreateDefault(new JsonSerializerSettings {Formatting = Formatting.Indented})

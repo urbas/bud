@@ -7,6 +7,7 @@ using System.Reactive.Concurrency;
 using Bud.BaseProjects;
 using Bud.Configuration;
 using Bud.Cs;
+using Bud.Dist;
 using Bud.IO;
 using Bud.NuGet;
 using Bud.Util;
@@ -179,6 +180,7 @@ namespace Bud.V1 {
 
     #endregion
 
+    // TODO: Publishing support is hard to generalise. Remove it from the generic API.
     #region Publishing Support
 
     public const string PackageOutputDirName = "nuget-package";
@@ -235,49 +237,6 @@ namespace Bud.V1 {
     public static Conf NuGetPublishingProject(string projectDir, string projectId)
       => BareProject(projectDir, projectId)
         .Add(NuGetPublishing.NuGetPublishingSupport);
-
-    #endregion
-
-    #region Distribution Support
-
-    /// <summary>
-    ///   Returns a list of files to package. These file will end up in
-    ///   the archive at <see cref="DistributionArchivePath" /> produced by
-    ///   <see cref="DistributionArchive" />.
-    /// </summary>
-    public static readonly Key<IObservable<IImmutableList<PackageFile>>> FilesToDistribute = nameof(FilesToDistribute);
-
-    /// <summary>
-    ///   The path where <see cref="DistributionArchive" /> should place the archive.
-    /// </summary>
-    public static readonly Key<string> DistributionArchivePath = nameof(DistributionArchivePath);
-
-    /// <summary>
-    ///   Creates an archive that contains all that is needed for the
-    ///   distribution of the project. It returns the path to the created
-    ///   archive.
-    /// </summary>
-    public static readonly Key<IObservable<string>> DistributionArchive = nameof(DistributionArchive);
-
-    /// <summary>
-    ///   Pushes the project to a distribution channel. The default implementation places
-    ///   the <see cref="DistributionArchive" /> into BinTray, uploads a Chocolatey
-    ///   package to the Chocolatey page, and returns <c>true</c> if the operation
-    ///   succeeded.
-    /// </summary>
-    public static readonly Key<IObservable<bool>> Distribute = nameof(Distribute);
-
-    /// <summary>
-    ///   Provides the <see cref="DistributionArchive" /> task, which produces
-    ///   a distributable archive. The default implementation of the distribution
-    ///   produces a ZIP archive in the <see cref="DistributionArchivePath" />. This path
-    ///   is not set by default, you have to set it to the desired value.
-    ///   <para>
-    ///     Add files to the <see cref="FilesToDistribute" /> list in order to include them
-    ///     in the produced ZIP archive.
-    ///   </para>
-    /// </summary>
-    public static Conf DistributionSupport => Dist.ProjectDistribution.DistributionSupport;
 
     #endregion
 
@@ -445,6 +404,8 @@ namespace Bud.V1 {
 
     #endregion
 
+    // TODO: Package referenes are hard to generify. This one is NuGet-centric.
+    // Move this out of the generic API.
     #region Package Reference Projects
 
     /// <summary>

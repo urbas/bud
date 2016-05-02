@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Linq;
+using Bud.Dist;
 using Bud.IO;
 using Bud.NuGet;
 using Bud.V1;
@@ -198,7 +199,7 @@ namespace Bud.Cs {
         var distZip = CsApp(tmpDir.Path, "A")
           .Clear(Output)
           .Add(AssemblyReferences, tmpDir.CreateEmptyFile("AssRef.dll"))
-          .Get(DistributionArchive).Take(1).Wait();
+          .Get(ChocoBinTrayDistribution.Zip).Take(1).Wait();
         ZipTestUtils.IsInZip(distZip, "AssRef.dll");
       }
     }
@@ -210,7 +211,7 @@ namespace Bud.Cs {
         var project = CsApp(tmpDir.Path, "A")
           .Clear(Output)
           .Add(AssemblyReferences, tmpDir.CreateEmptyFile("System.Runtime.dll"));
-        var distZip = project.Get(DistributionArchive).Take(1).Wait();
+        var distZip = project.Get(ChocoBinTrayDistribution.Zip).Take(1).Wait();
         ZipTestUtils.IsNotInZip(distZip, "System.Runtime.dll");
       }
     }

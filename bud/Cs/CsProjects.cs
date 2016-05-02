@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using Bud.Dist;
 using Bud.IO;
 using Bud.NuGet;
 using Bud.Reactive;
@@ -40,10 +41,11 @@ namespace Bud.Cs {
       .Set(PackagesSubProjectId/PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
       .Init(ReferencedPackages, c => (PackagesSubProjectId/ReferencedPackages)[c])
       .Set(PackageFiles, PackageLibDlls)
-      .Add(FilesToDistribute, AssembliesPackagedPaths)
+      // TODO: Fix distribution to BinTray and Chocolatey
+      .Add(ChocoBinTrayDistribution.FilesToZip, AssembliesToPackage)
       .ExcludeSourceDirs(DefaultExcludedSourceDirs);
 
-    private static IObservable<IImmutableList<PackageFile>> AssembliesPackagedPaths(IConf c)
+    private static IObservable<IImmutableList<PackageFile>> AssembliesToPackage(IConf c)
       => AssemblyReferences[c].Select(PackageAssemblies)
                               .Select(ImmutableList.ToImmutableList);
 

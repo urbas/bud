@@ -38,9 +38,6 @@ namespace Bud.BaseProjects {
       .Empty
       .Add(BuildSupport)
       .Add(SourceProcessorsSupport)
-      .Add(ProjectDistribution.DistributionSupport)
-      .Set(DistributionArchivePath, DefaultDistributionZipPath)
-      .Add(FilesToDistribute, DistributeOutputAndDependencies)
       .Add(Input, c => ProcessedSources[c])
       .ExcludeSourceDir(c => BuildDir[c])
       .Init(DependenciesOutput, GatherOutputsFromDependencies);
