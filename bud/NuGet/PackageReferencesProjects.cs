@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Reactive.Linq;
 using Bud.IO;
+using Bud.Util;
 using Bud.V1;
 using static System.IO.Directory;
 using static System.IO.Path;
@@ -28,8 +29,10 @@ namespace Bud.NuGet {
       => Sources[c].Select(LoadReferences)
                    .Select(ImmutableList.ToImmutableList);
 
-    internal static Conf CreatePackageReferencesProject(string dir, string projectId)
-      => BareProject(dir, projectId)
+    internal static Conf CreatePackageReferencesProject(string projectId,
+                                                        Option<string> projectDir = default(Option<string>),
+                                                        Option<string> baseDir = default(Option<string>))
+      => BareProject(projectId, projectDir, baseDir)
         .Add(PackageReferencesProjectSettings);
 
     internal static IObservable<IImmutableSet<string>> ResolveAssemblies(IConf c)

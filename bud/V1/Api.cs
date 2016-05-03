@@ -334,8 +334,7 @@ namespace Bud.V1 {
     ///   that Bud is currently invoking. It can be overridden.
     /// </summary>
     /// <remarks>
-    ///   Note that this value is only used if the project directories are
-    ///   relative paths.
+    ///   By default the <see cref="BuildDir" /> is located directly within this directory.
     /// </remarks>
     public static readonly Key<string> BaseDir = nameof(BaseDir);
 
@@ -358,9 +357,11 @@ namespace Bud.V1 {
 
     /// <param name="projectId">see <see cref="ProjectId" />.</param>
     /// <param name="projectDir">
-    ///   If none given, <see cref="BaseDir" /> will be taken as <see cref="ProjectDir" />.
+    ///   If none given, the <see cref="ProjectDir" /> will be <see cref="BaseDir" /> appended with the
+    ///   <see cref="ProjectId" />.
     ///   If the given path is relative, then the absolute <see cref="ProjectDir" /> will
-    ///   be resolved from the <see cref="BaseDir" />.
+    ///   be resolved from the <see cref="BaseDir" />. Note that the <paramref name="projectDir" />
+    ///   can be empty.
     ///   If the given path is absolute, the absolute path will be taken verbatim.
     /// </param>
     /// <param name="baseDir">see <see cref="BaseDir" />.</param>
@@ -380,8 +381,11 @@ namespace Bud.V1 {
 
     /// <param name="projectDir">see <see cref="ProjectDir" /></param>
     /// <param name="projectId">see <see cref="ProjectId" /></param>
-    public static Conf BuildProject(string projectDir, string projectId)
-      => BuildProjects.BuildProject(projectDir, projectId);
+    /// <param name="baseDir">see <see cref="BaseDir" />.</param>
+    public static Conf BuildProject(string projectId,
+                                    Option<string> projectDir = default(Option<string>),
+                                    Option<string> baseDir = default(Option<string>))
+      => BuildProjects.BuildProject(projectId, projectDir, baseDir);
 
     /// <summary>
     ///   Adds files found in <paramref name="subDir" /> to <see cref="Sources" />.
@@ -445,29 +449,20 @@ namespace Bud.V1 {
     ///   directory with the same name. The project's directory will be placed  in the current
     ///   working directory.
     /// </summary>
-    public static Conf CsLib(string projectId)
-      => CsLib(projectId, projectId);
+    public static Conf CsLib(string projectId,
+                             Option<string> projectDir = default(Option<string>),
+                             Option<string> baseDir = default(Option<string>))
+      => CsProjects.CsLib(projectId, projectDir, baseDir);
 
-    /// <summary>
-    ///   Similar to <see cref="CsLib(string)" /> but places the project in the specified
-    ///   folder.
-    /// </summary>
-    public static Conf CsLib(string projectDir, string projectId)
-      => CsProjects.CsLib(projectDir, projectId);
-
-    /// <summary>
-    ///   Similar to <see cref="CsLib(string)" /> but produces a console application instead
-    ///   of a library.
-    /// </summary>
-    public static Conf CsApp(string projectId)
-      => CsApp(projectId, projectId);
 
     /// <summary>
     ///   Similar to <see cref="CsLib" /> but produces a console application instead
     ///   of a library.
     /// </summary>
-    public static Conf CsApp(string projectDir, string projectId)
-      => CsProjects.CsApp(projectDir, projectId);
+    public static Conf CsApp(string projectId,
+                             Option<string> projectDir = default(Option<string>),
+                             Option<string> baseDir = default(Option<string>))
+      => CsProjects.CsApp(projectId, projectDir, baseDir);
 
     public static Conf EmbedResource(this Conf conf, string path, string nameInAssembly)
       => CsProjects.EmbedResourceImpl(conf, path, nameInAssembly);
@@ -498,8 +493,10 @@ namespace Bud.V1 {
 
     public static Key<NuGetPackageDownloader> PackageDownloader = nameof(PackageDownloader);
 
-    public static Conf PackageReferencesProject(string dir, string projectId)
-      => PackageReferencesProjects.CreatePackageReferencesProject(dir, projectId);
+    public static Conf PackageReferencesProject(string projectId,
+                                                Option<string> projectDir = default(Option<string>),
+                                                Option<string> baseDir = default(Option<string>))
+      => PackageReferencesProjects.CreatePackageReferencesProject(projectId, projectDir, baseDir);
 
     #endregion
   }

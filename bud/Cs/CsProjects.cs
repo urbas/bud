@@ -32,8 +32,8 @@ namespace Bud.Cs {
       .InitEmpty(EmbeddedResources)
       .Init(Compiler, TimedEmittingCompiler.Create)
       .Init(CsCompilationOptions,
-                 new CSharpCompilationOptions(DynamicallyLinkedLibrary,
-                                              warningLevel: 1))
+            new CSharpCompilationOptions(DynamicallyLinkedLibrary,
+                                         warningLevel: 1))
       .Add(AssemblyReferences, c => (PackagesSubProjectId/ResolvedAssemblies)[c])
       .Add(AssemblyReferences, WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("mscorlib", new Version(0, 0)).Value)
       .Set(PackagesSubProjectId/ProjectDir, c => Combine(ProjectDir[c], "packages"))
@@ -53,13 +53,17 @@ namespace Bud.Cs {
          where !WindowsFrameworkAssemblyResolver.IsFrameworkAssembly(assemblyFileName)
          select new PackageFile(assemblyPath, assemblyFileName);
 
-    internal static Conf CsLib(string projectDir, string projectId)
-      => BuildProject(projectDir, projectId)
-        .Add(PackageReferencesProject(projectDir, PackagesSubProjectId))
+    internal static Conf CsLib(string projectId,
+                               Option<string> projectDir = default(Option<string>),
+                               Option<string> baseDir = default(Option<string>))
+      => BuildProject(projectId, projectDir, baseDir)
+        .Add(PackageReferencesProject(PackagesSubProjectId, projectDir, baseDir))
         .Add(CsProjectSetting);
 
-    internal static Conf CsApp(string projectDir, string projectId)
-      => CsLib(projectDir, projectId)
+    internal static Conf CsApp(string projectId,
+                                   Option<string> projectDir = default(Option<string>),
+                                   Option<string> baseDir = default(Option<string>))
+      => CsLib(projectId, projectDir, baseDir)
         .Modify(CsCompilationOptions, (_, oldValue) => oldValue.WithOutputKind(ConsoleApplication));
 
     internal static Conf EmbedResourceImpl(Conf conf, string path, string nameInAssembly)

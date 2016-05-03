@@ -22,21 +22,19 @@ namespace Bud.BaseProjects {
     internal static Conf BareProject(string projectId,
                                      Option<string> projectDir,
                                      Option<string> baseDir)
-      => Project(projectId)
+      => Project(projectId, baseDir)
         .Add(DependenciesSupport)
         .Add(BuildSchedulingSupport)
         .Init(ProjectId, projectId)
         // TODO: Fix this!
-        .Init(ProjectDir, c => GetProjectDir(c, projectDir.Value))
+        .Init(ProjectDir, c => GetProjectDir(c, projectDir))
         .Init(ProjectVersion, DefaultVersion)
         .Init(BuildDir, DefaultBuildDir)
         .Init(Clean, DefaultClean);
 
-    private static string GetProjectDir(IConf c, string projectDir)
-      => c.TryGet(BaseDir)
-          .OrElse(() => c.TryGet(".."/BaseDir))
-          .Map(baseDir => Combine(baseDir, projectDir))
-          .GetOrElse(() => Combine(GetCurrentDirectory(), projectDir));
+    private static string GetProjectDir(IConf c, Option<string> projectDir)
+      => projectDir.Map(dir => Combine(BaseDir[c], dir))
+                   .GetOrElse(() => Combine(BaseDir[c], ProjectId[c]));
 
     internal static Unit DefaultClean(IConf c) {
       var targetDir = BuildDir[c];
