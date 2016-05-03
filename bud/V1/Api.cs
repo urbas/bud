@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.IO;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using Bud.BaseProjects;
@@ -34,18 +33,42 @@ namespace Bud.V1 {
   public static class Api {
     #region Project Grouping
 
-    public static Conf Project(string projectId, params IConfBuilder[] confs) {
+    /// <summary>
+    ///   Creates a grouping of configurations. This group will have the address of
+    ///   <c>projectId/...</c>. You can add projects into projects. For example,
+    ///   the code
+    ///   <code>
+    /// Project("A")
+    ///   .Set(Foo, 42)
+    ///   .Add(Project("B")
+    ///          .Set(Foo, 9001))
+    /// </code>
+    ///   would create configurations <c>A/Foo</c> and <c>A/B/Foo</c>.
+    /// </summary>
+    /// <param name="projectId">
+    ///   this ID will be used as the path for all configurations added
+    ///   to this project. For example, the <see cref="BuildDir" /> of
+    ///   this project will have the path <c>projectId/BuildDir</c>.
+    /// </param>
+    /// <param name="baseDir">the directory in which to place the <see cref="BuildDir" /> directory.</param>
+    /// <returns>a bag of configurations.</returns>
+    public static Conf Project(string projectId,
+                               Option<string> baseDir = default(Option<string>)) {
       if (string.IsNullOrEmpty(projectId)) {
         throw new ArgumentNullException(nameof(projectId), "A project's ID must not be null or empty.");
       }
       if (projectId.Contains("/")) {
         throw new ArgumentException($"Project ID '{projectId}' is invalid. It must not contain the character '/'.", nameof(projectId));
       }
-      return Conf.Group(projectId, confs)
-                 .Init(BaseDir, c => c.TryGet(".."/BaseDir)
-                                      .GetOrElse(() => {
-                                        throw new Exception("Could not determine the base directory.");
-                                      }));
+      return Conf.Group(projectId)
+                 .Init(BaseDir, c => baseDir.OrElse(() => c.TryGet(".."/BaseDir))
+                                            .GetOrElse(() => {
+                                              throw new Exception("Could not determine the base directory.");
+                                            }));
+      //                 c.TryGet(".."/BaseDir)
+      //                                            .GetOrElse(() => {
+      //                                              throw new Exception("Could not determine the base directory.");
+      //                                            }));
     }
 
     public static Conf Projects(params IConfBuilder[] confs)
@@ -334,18 +357,22 @@ namespace Bud.V1 {
     public static Key<string> ProjectVersion = nameof(ProjectVersion);
 
     /// <param name="projectId">see <see cref="ProjectId" />.</param>
+    /// <param name="projectDir">
+    ///   If none given, <see cref="BaseDir" /> will be taken as <see cref="ProjectDir" />.
+    ///   If the given path is relative, then the absolute <see cref="ProjectDir" /> will
+    ///   be resolved from the <see cref="BaseDir" />.
+    ///   If the given path is absolute, the absolute path will be taken verbatim.
+    /// </param>
+    /// <param name="baseDir">see <see cref="BaseDir" />.</param>
     /// <remarks>
     ///   This method delegates to <see cref="BareProject(string, string)" />
     ///   it uses <paramref name="projectId" /> as both the project dir and
     ///   project ID.
     /// </remarks>
-    public static Conf BareProject(string projectId)
-      => BareProjects.BareProject(projectId, projectId);
-
-    /// <param name="projectDir">see <see cref="ProjectDir" /></param>
-    /// <param name="projectId">see <see cref="ProjectId" /></param>
-    public static Conf BareProject(string projectDir, string projectId)
-      => BareProjects.BareProject(projectDir, projectId);
+    public static Conf BareProject(string projectId,
+                                   Option<string> projectDir = default(Option<string>),
+                                   Option<string> baseDir = default(Option<string>))
+      => BareProjects.BareProject(projectId, projectDir, baseDir);
 
     #endregion
 

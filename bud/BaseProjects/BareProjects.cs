@@ -1,6 +1,7 @@
 using System;
 using System.Reactive;
 using System.Reactive.Concurrency;
+using Bud.Util;
 using Bud.V1;
 using static System.IO.Directory;
 using static System.IO.Path;
@@ -18,15 +19,16 @@ namespace Bud.BaseProjects {
       = BuildPipelineScheduler
         .Init(_ => DefauBuildPipelineScheduler.Value);
 
-    internal static Conf BareProject(string projectDir,
-                                     string projectId,
-                                     string version = DefaultVersion)
+    internal static Conf BareProject(string projectId,
+                                     Option<string> projectDir,
+                                     Option<string> baseDir)
       => Project(projectId)
         .Add(DependenciesSupport)
         .Add(BuildSchedulingSupport)
         .Init(ProjectId, projectId)
-        .Init(ProjectDir, c => GetProjectDir(c, projectDir))
-        .Init(ProjectVersion, version)
+        // TODO: Fix this!
+        .Init(ProjectDir, c => GetProjectDir(c, projectDir.Value))
+        .Init(ProjectVersion, DefaultVersion)
         .Init(BuildDir, DefaultBuildDir)
         .Init(Clean, DefaultClean);
 

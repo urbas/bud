@@ -57,7 +57,12 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void Sources_should_be_initially_empty()
-      => IsEmpty(Sources[BuildProject("bar", "Foo")].Take(1).Wait());
+      => IsEmpty(Sources[ProjectA("/foo")].Take(1).Wait());
+
+    [Test]
+    public void Input_should_initially_observe_a_single_empty_inout()
+      => AreEqual(new[] {Enumerable.Empty<string>()},
+                  Input[ProjectA("/foo")].ToList().Wait());
 
     [Test]
     public void Sources_should_contain_added_files() {
@@ -80,10 +85,10 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void Sources_should_contain_files_from_added_directories() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var fileA = tempDir.CreateEmptyFile("A", "A.cs");
-        var fileB = tempDir.CreateEmptyFile("B", "B.cs");
-        var twoDirsProject = BuildProject(tempDir.Path, "foo")
+      using (var tmpDir = new TemporaryDirectory()) {
+        var fileA = tmpDir.CreateEmptyFile("A", "A.cs");
+        var fileB = tmpDir.CreateEmptyFile("B", "B.cs");
+        var twoDirsProject = ProjectA(tmpDir.Path)
           .AddSources("A")
           .AddSources("B");
         That(Sources[twoDirsProject].Take(1).Wait(),
@@ -93,22 +98,17 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void Sources_should_not_include_files_in_the_target_folder() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var project = BuildProject(tempDir.Path, "foo").AddSources(fileFilter: "*.cs");
-        tempDir.CreateEmptyFile(BuildDir[project], "A.cs");
+      using (var tmpDir = new TemporaryDirectory()) {
+        var project = ProjectA(tmpDir.Path).AddSources(fileFilter: "*.cs");
+        tmpDir.CreateEmptyFile(BuildDir[project], "A.cs");
         var files = Sources[project].Take(1).Wait();
         IsEmpty(files);
       }
     }
 
     [Test]
-    public void Input_should_initially_observe_a_single_empty_inout()
-      => AreEqual(new[] {Enumerable.Empty<string>()},
-                  Input[BuildProject("bar", "Foo")].ToList().Wait());
-
-    [Test]
     public void Input_contains_the_added_file() {
-      var buildProject = BuildProject("foo", "Foo")
+      var buildProject = ProjectA("/a")
         .Add(SourceIncludes, c => FilesObservatory[c].WatchFiles("foo/bar"));
       AreEqual(new[] {"foo/bar"},
                Input[buildProject].Take(1).Wait());
@@ -120,7 +120,7 @@ namespace Bud.BaseProjects {
       var expectedOutputFiles = new[] {"foo"};
       fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<IEnumerable<string>>>()))
                    .Returns(Return(expectedOutputFiles));
-      var actualOutputFiles = BuildProject("FooDir", "Foo")
+      var actualOutputFiles = ProjectA("/a")
         .Add(SourceProcessors, fileProcessor.Object)
         .Get(ProcessedSources)
         .Wait();
@@ -132,7 +132,7 @@ namespace Bud.BaseProjects {
     public void Source_processors_must_be_invoked_on_the_build_pipeline_thread() {
       int inputThreadId = 0;
       var fileProcessor = new ThreadIdRecordingInputProcessor();
-      BuildProject("fooDir", "A")
+      ProjectA("/a")
         .Add(SourceIncludes, new FileWatcher(Enumerable.Empty<string>(), Create<string>(observer => {
           Task.Run(() => {
             inputThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -149,7 +149,7 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void Default_input_contains_processed_sources() {
-      var projects = BuildProject("bDir", "B")
+      var projects = ProjectA("/a")
         .Add(SourceIncludes, new FileWatcher("b"))
         .Add(SourceProcessors, new FooAppenderInputProcessor());
       AreEqual(new[] {"bfoo"},
@@ -160,9 +160,7 @@ namespace Bud.BaseProjects {
     public void Clean_deletes_non_empty_target_folders() {
       using (var tmpDir = new TemporaryDirectory()) {
         tmpDir.CreateEmptyFile("build", "A", "foo", "foo.txt");
-        BuildProject("", "A")
-          .Set(BuildDir, tmpDir.Path)
-          .Get(Clean);
+        ProjectA(tmpDir.Path).Get(Clean);
         IsFalse(Exists(Combine(tmpDir.Path, "build", "A")));
       }
     }
@@ -170,36 +168,7 @@ namespace Bud.BaseProjects {
     [Test]
     public void Clean_does_nothing_when_the_target_folder_does_not_exist() {
       using (var tmpDir = new TemporaryDirectory()) {
-        BuildProject(Combine(tmpDir.Path), "A").Get(Clean);
-        IsFalse(Exists(Combine(tmpDir.Path, "target")));
-      }
-    }
-
-    [Test]
-    [Category("IntegrationTest")]
-    public void DistributionZip_contains_Output() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        var project = BuildProject(tmpDir.Path, "A")
-          .Add(Output, tmpDir.CreateEmptyFile("A.txt"));
-        var distZip = project.Get(DistributionArchive).Take(1).Wait();
-        AreEqual(Combine(BuildDir[project], "dist-zip", "A.zip"),
-                 distZip);
-        ZipTestUtils.IsInZip(distZip, "A.txt");
-      }
-    }
-
-    [Test]
-    [Category("IntegrationTest")]
-    public void DistributionZip_contains_Output_of_Dependencies() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        var projects = Projects(
-          BuildProject(tmpDir.Path, "A")
-            .Clear(Output).Add(Output, tmpDir.CreateEmptyFile("A.dll")),
-          BuildProject(tmpDir.Path, "B")
-            .Add(Dependencies, "../A")
-            .Clear(Output));
-        var distZip = projects.Get("B"/DistributionArchive).Take(1).Wait();
-        ZipTestUtils.IsInZip(distZip, "A.dll");
+        ProjectA(tmpDir.Path).Get(Clean);
       }
     }
 
@@ -221,5 +190,7 @@ namespace Bud.BaseProjects {
         return sources;
       }
     }
+
+    private static Conf ProjectA(string baseDir) => BuildProject("", "A").Set(BaseDir, baseDir);
   }
 }
