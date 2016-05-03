@@ -45,12 +45,16 @@ namespace Bud.V1 {
     /// </code>
     ///   would create configurations <c>A/Foo</c> and <c>A/B/Foo</c>.
     /// </summary>
-    /// <param name="projectId">
-    ///   this ID will be used as the path for all configurations added
-    ///   to this project. For example, the <see cref="BuildDir" /> of
-    ///   this project will have the path <c>projectId/BuildDir</c>.
+    /// <param name="projectId">see <see cref="ProjectId" />.</param>
+    /// <param name="baseDir">
+    ///   <para>
+    ///     The directory under which all projects should live. By default this is the directory
+    ///     where the <c>Build.cs</c> script is located.
+    ///   </para>
+    ///   <para>
+    ///     By default this is where the <see cref="BuildDir" /> will be located.
+    ///   </para>
     /// </param>
-    /// <param name="baseDir">the directory in which to place the <see cref="BuildDir" /> directory.</param>
     /// <returns>a bag of configurations.</returns>
     public static Conf Project(string projectId,
                                Option<string> baseDir = default(Option<string>)) {
@@ -65,10 +69,6 @@ namespace Bud.V1 {
                                             .GetOrElse(() => {
                                               throw new Exception("Could not determine the base directory.");
                                             }));
-      //                 c.TryGet(".."/BaseDir)
-      //                                            .GetOrElse(() => {
-      //                                              throw new Exception("Could not determine the base directory.");
-      //                                            }));
     }
 
     public static Conf Projects(params IConfBuilder[] confs)
@@ -257,8 +257,35 @@ namespace Bud.V1 {
 
     public static Key<NuGetPackageMetadata> PackageMetadata = nameof(PackageMetadata);
 
-    public static Conf NuGetPublishingProject(string projectDir, string projectId)
-      => BareProject(projectDir, projectId)
+    /// <param name="projectId">see <see cref="ProjectId" />.</param>
+    /// <param name="projectDir">
+    ///   This is the directory in which all sources of this project will live.
+    ///   <para>
+    ///     If none given, the <see cref="ProjectDir" /> will be <see cref="BaseDir" /> appended with the
+    ///     <see cref="ProjectId" />.
+    ///   </para>
+    ///   <para>
+    ///     If the given path is relative, then the absolute <see cref="ProjectDir" /> will
+    ///     be resolved from the <see cref="BaseDir" />. Note that the <paramref name="projectDir" />
+    ///     can be empty.
+    ///   </para>
+    ///   <para>
+    ///     If the given path is absolute, the absolute path will be taken verbatim.
+    ///   </para>
+    /// </param>
+    /// <param name="baseDir">
+    ///   <para>
+    ///     The directory under which all projects should live. By default this is the directory
+    ///     where the <c>Build.cs</c> script is located.
+    ///   </para>
+    ///   <para>
+    ///     By default this is where the <see cref="BuildDir" /> will be located.
+    ///   </para>
+    /// </param>
+    public static Conf NuGetPublishingProject(string projectId,
+                                              Option<string> projectDir = default(Option<string>),
+                                              Option<string> baseDir = default(Option<string>))
+      => BareProject(projectId, projectDir, baseDir)
         .Add(NuGetPublishing.NuGetPublishingSupport);
 
     #endregion
@@ -357,14 +384,29 @@ namespace Bud.V1 {
 
     /// <param name="projectId">see <see cref="ProjectId" />.</param>
     /// <param name="projectDir">
-    ///   If none given, the <see cref="ProjectDir" /> will be <see cref="BaseDir" /> appended with the
-    ///   <see cref="ProjectId" />.
-    ///   If the given path is relative, then the absolute <see cref="ProjectDir" /> will
-    ///   be resolved from the <see cref="BaseDir" />. Note that the <paramref name="projectDir" />
-    ///   can be empty.
-    ///   If the given path is absolute, the absolute path will be taken verbatim.
+    ///   This is the directory in which all sources of this project will live.
+    ///   <para>
+    ///     If none given, the <see cref="ProjectDir" /> will be <see cref="BaseDir" /> appended with the
+    ///     <see cref="ProjectId" />.
+    ///   </para>
+    ///   <para>
+    ///     If the given path is relative, then the absolute <see cref="ProjectDir" /> will
+    ///     be resolved from the <see cref="BaseDir" />. Note that the <paramref name="projectDir" />
+    ///     can be empty.
+    ///   </para>
+    ///   <para>
+    ///     If the given path is absolute, the absolute path will be taken verbatim.
+    ///   </para>
     /// </param>
-    /// <param name="baseDir">see <see cref="BaseDir" />.</param>
+    /// <param name="baseDir">
+    ///   <para>
+    ///     The directory under which all projects should live. By default this is the directory
+    ///     where the <c>Build.cs</c> script is located.
+    ///   </para>
+    ///   <para>
+    ///     By default this is where the <see cref="BuildDir" /> will be located.
+    ///   </para>
+    /// </param>
     /// <remarks>
     ///   This method delegates to <see cref="BareProject(string, string)" />
     ///   it uses <paramref name="projectId" /> as both the project dir and
@@ -379,9 +421,31 @@ namespace Bud.V1 {
 
     #region Build Project
 
-    /// <param name="projectDir">see <see cref="ProjectDir" /></param>
-    /// <param name="projectId">see <see cref="ProjectId" /></param>
-    /// <param name="baseDir">see <see cref="BaseDir" />.</param>
+    /// <param name="projectId">see <see cref="ProjectId" />.</param>
+    /// <param name="projectDir">
+    ///   This is the directory in which all sources of this project will live.
+    ///   <para>
+    ///     If none given, the <see cref="ProjectDir" /> will be <see cref="BaseDir" /> appended with the
+    ///     <see cref="ProjectId" />.
+    ///   </para>
+    ///   <para>
+    ///     If the given path is relative, then the absolute <see cref="ProjectDir" /> will
+    ///     be resolved from the <see cref="BaseDir" />. Note that the <paramref name="projectDir" />
+    ///     can be empty.
+    ///   </para>
+    ///   <para>
+    ///     If the given path is absolute, the absolute path will be taken verbatim.
+    ///   </para>
+    /// </param>
+    /// <param name="baseDir">
+    ///   <para>
+    ///     The directory under which all projects should live. By default this is the directory
+    ///     where the <c>Build.cs</c> script is located.
+    ///   </para>
+    ///   <para>
+    ///     By default this is where the <see cref="BuildDir" /> will be located.
+    ///   </para>
+    /// </param>
     public static Conf BuildProject(string projectId,
                                     Option<string> projectDir = default(Option<string>),
                                     Option<string> baseDir = default(Option<string>))
@@ -449,6 +513,31 @@ namespace Bud.V1 {
     ///   directory with the same name. The project's directory will be placed  in the current
     ///   working directory.
     /// </summary>
+    /// <param name="projectId">see <see cref="ProjectId" />.</param>
+    /// <param name="projectDir">
+    ///   This is the directory in which all sources of this project will live.
+    ///   <para>
+    ///     If none given, the <see cref="ProjectDir" /> will be <see cref="BaseDir" /> appended with the
+    ///     <see cref="ProjectId" />.
+    ///   </para>
+    ///   <para>
+    ///     If the given path is relative, then the absolute <see cref="ProjectDir" /> will
+    ///     be resolved from the <see cref="BaseDir" />. Note that the <paramref name="projectDir" />
+    ///     can be empty.
+    ///   </para>
+    ///   <para>
+    ///     If the given path is absolute, the absolute path will be taken verbatim.
+    ///   </para>
+    /// </param>
+    /// <param name="baseDir">
+    ///   <para>
+    ///     The directory under which all projects should live. By default this is the directory
+    ///     where the <c>Build.cs</c> script is located.
+    ///   </para>
+    ///   <para>
+    ///     By default this is where the <see cref="BuildDir" /> will be located.
+    ///   </para>
+    /// </param>
     public static Conf CsLib(string projectId,
                              Option<string> projectDir = default(Option<string>),
                              Option<string> baseDir = default(Option<string>))
@@ -459,6 +548,31 @@ namespace Bud.V1 {
     ///   Similar to <see cref="CsLib" /> but produces a console application instead
     ///   of a library.
     /// </summary>
+    /// <param name="projectId">see <see cref="ProjectId" />.</param>
+    /// <param name="projectDir">
+    ///   This is the directory in which all sources of this project will live.
+    ///   <para>
+    ///     If none given, the <see cref="ProjectDir" /> will be <see cref="BaseDir" /> appended with the
+    ///     <see cref="ProjectId" />.
+    ///   </para>
+    ///   <para>
+    ///     If the given path is relative, then the absolute <see cref="ProjectDir" /> will
+    ///     be resolved from the <see cref="BaseDir" />. Note that the <paramref name="projectDir" />
+    ///     can be empty.
+    ///   </para>
+    ///   <para>
+    ///     If the given path is absolute, the absolute path will be taken verbatim.
+    ///   </para>
+    /// </param>
+    /// <param name="baseDir">
+    ///   <para>
+    ///     The directory under which all projects should live. By default this is the directory
+    ///     where the <c>Build.cs</c> script is located.
+    ///   </para>
+    ///   <para>
+    ///     By default this is where the <see cref="BuildDir" /> will be located.
+    ///   </para>
+    /// </param>
     public static Conf CsApp(string projectId,
                              Option<string> projectDir = default(Option<string>),
                              Option<string> baseDir = default(Option<string>))
@@ -493,6 +607,31 @@ namespace Bud.V1 {
 
     public static Key<NuGetPackageDownloader> PackageDownloader = nameof(PackageDownloader);
 
+    /// <param name="projectId">see <see cref="ProjectId" />.</param>
+    /// <param name="projectDir">
+    ///   This is the directory in which all sources of this project will live.
+    ///   <para>
+    ///     If none given, the <see cref="ProjectDir" /> will be <see cref="BaseDir" /> appended with the
+    ///     <see cref="ProjectId" />.
+    ///   </para>
+    ///   <para>
+    ///     If the given path is relative, then the absolute <see cref="ProjectDir" /> will
+    ///     be resolved from the <see cref="BaseDir" />. Note that the <paramref name="projectDir" />
+    ///     can be empty.
+    ///   </para>
+    ///   <para>
+    ///     If the given path is absolute, the absolute path will be taken verbatim.
+    ///   </para>
+    /// </param>
+    /// <param name="baseDir">
+    ///   <para>
+    ///     The directory under which all projects should live. By default this is the directory
+    ///     where the <c>Build.cs</c> script is located.
+    ///   </para>
+    ///   <para>
+    ///     By default this is where the <see cref="BuildDir" /> will be located.
+    ///   </para>
+    /// </param>
     public static Conf PackageReferencesProject(string projectId,
                                                 Option<string> projectDir = default(Option<string>),
                                                 Option<string> baseDir = default(Option<string>))
