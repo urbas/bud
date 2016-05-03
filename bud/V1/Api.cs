@@ -43,7 +43,9 @@ namespace Bud.V1 {
       }
       return Conf.Group(projectId, confs)
                  .Init(BaseDir, c => c.TryGet(".."/BaseDir)
-                                      .GetOrElse(Directory.GetCurrentDirectory));
+                                      .GetOrElse(() => {
+                                        throw new Exception("Could not determine the base directory.");
+                                      }));
     }
 
     public static Conf Projects(params IConfBuilder[] confs)

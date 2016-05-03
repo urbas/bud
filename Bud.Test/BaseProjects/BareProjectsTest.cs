@@ -1,7 +1,7 @@
+using Bud.Configuration;
 using Bud.IO;
 using Bud.V1;
 using NUnit.Framework;
-using static System.IO.Directory;
 using static NUnit.Framework.Assert;
 using static System.IO.Path;
 using static Bud.V1.Api;
@@ -9,14 +9,18 @@ using static Bud.V1.Api;
 namespace Bud.BaseProjects {
   public class BareProjectsTest {
     [Test]
+    public void BaseDir_is_not_set_by_default()
+      => Throws<ConfAccessException>(() => BareProject("A").Get(BaseDir));
+
+    [Test]
     public void Set_ProjectDir()
-      => AreEqual(Combine(GetCurrentDirectory(), "bar"),
-                  ProjectDir[BareProject("bar", "Foo")]);
+      => AreEqual(Combine("/foo", "bar"),
+                  ProjectDir[BareProject("bar", "Foo").Set(BaseDir, "/foo")]);
 
     [Test]
     public void Set_ProjectDir_from_ProjectId()
-      => AreEqual(Combine(GetCurrentDirectory(), "Foo"),
-                  ProjectDir[BareProject("Foo")]);
+      => AreEqual(Combine("/foo", "Foo"),
+                  ProjectDir[BareProject("Foo").Set(BaseDir, "/foo")]);
 
     [Test]
     public void Set_ProjectId()
@@ -24,17 +28,12 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void BuildDir_is_within_the_base_build_directory()
-      => AreEqual(Combine(GetCurrentDirectory(), "build", "projects", "A"),
-                  BareProject("A").Get(BuildDir));
+      => AreEqual(Combine("/foo/bar", "build", "A"),
+                  BareProject("A").Set(BaseDir, "/foo/bar").Get(BuildDir));
 
     [Test]
     public void Dependencies_should_be_initially_empty()
       => IsEmpty(Dependencies[BuildProject("bar", "Foo")]);
-
-    [Test]
-    public void BaseDir_is_set_to_the_current_working_directory()
-      => AreEqual(GetCurrentDirectory(),
-                  BaseDir[BareProject("A")]);
 
     [Test]
     public void ProjectDir_must_be_relative_to_BaseDir() {
@@ -51,16 +50,7 @@ namespace Bud.BaseProjects {
       using (var tmpDir = new TemporaryDirectory()) {
         AreEqual(tmpDir.Path,
                  BareProject(tmpDir.Path, "Foo")
-                   .Get(ProjectDir));
-      }
-    }
-
-    [Test]
-    public void ProjectDir_must_be_unchanged_if_absolute_and_BaseDir_set() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        AreEqual(tmpDir.Path,
-                 BareProject(tmpDir.Path, "Foo")
-                   .Set(BaseDir, tmpDir.Path)
+                   .Set(BaseDir, "/foo")
                    .Get(ProjectDir));
       }
     }
@@ -76,9 +66,9 @@ namespace Bud.BaseProjects {
     }
 
     [Test]
-    public void ProjectDir_is_current_directory_when_empty()
-      => AreEqual(GetCurrentDirectory(),
-                  ProjectDir[BareProject("", "Foo")]);
+    public void ProjectDir_is_BaseDir_when_empty()
+      => AreEqual("/foo",
+                  ProjectDir[BareProject("", "Foo").Set(BaseDir, "/foo")]);
 
     [Test]
     public void ProjectDir_equals_to_BaseDir_when_empty() {
