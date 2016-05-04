@@ -13,7 +13,6 @@ using NUnit.Framework;
 using static System.IO.Directory;
 using static System.IO.Path;
 using static System.Reactive.Linq.Observable;
-using static Bud.BaseProjects.BuildProjects;
 using static Bud.V1.Api;
 using static NUnit.Framework.Assert;
 
@@ -21,17 +20,17 @@ namespace Bud.BaseProjects {
   public class BuildProjectsTest {
     [Test]
     public void DependenciesInput_must_be_empty_when_no_dependencies_given() {
-      var projects = Api.BuildProject("aDir", "A");
+      var projects = BuildProject("A", "foo");
       AreEqual(new[] {Enumerable.Empty<string>()},
                projects.Get(DependenciesOutput).ToList().Wait());
     }
 
     [Test]
     public void DependenciesInput_must_contain_output_from_dependencies() {
-      var projects = Projects(Api.BuildProject("aDir", "A")
-                                 .Set(Output, Return(new[] {"a"})),
-                              Api.BuildProject("bDir", "B")
-                                 .Add(Dependencies, "../A"));
+      var projects = Projects(BuildProject("A", "foo")
+                                .Set(Output, Return(new[] {"a"})),
+                              BuildProject("B", "boo")
+                                .Add(Dependencies, "../A"));
       AreEqual(new[] {"a"},
                projects.Get("B"/DependenciesOutput).Wait());
     }
@@ -40,12 +39,12 @@ namespace Bud.BaseProjects {
     [Test]
     public void DependenciesInput_reobserved_when_dependencies_change() {
       var testScheduler = new TestScheduler();
-      var projects = Projects(Api.BuildProject("aDir", "A")
-                                 .Set(BuildPipelineScheduler, testScheduler)
-                                 .Set(Output, ChangingOutput(testScheduler)),
-                              Api.BuildProject("bDir", "B")
-                                 .Set(BuildPipelineScheduler, testScheduler)
-                                 .Add(Dependencies, "../A"));
+      var projects = Projects(BuildProject("A", "foo")
+                                .Set(BuildPipelineScheduler, testScheduler)
+                                .Set(Output, ChangingOutput(testScheduler)),
+                              BuildProject("B", "boo")
+                                .Set(BuildPipelineScheduler, testScheduler)
+                                .Add(Dependencies, "../A"));
       var bInput = projects.Get("B"/DependenciesOutput).GetEnumerator();
       testScheduler.AdvanceBy(TimeSpan.FromSeconds(5).Ticks);
       IsTrue(bInput.MoveNext());
@@ -57,33 +56,40 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void Sources_should_be_initially_empty()
-      => IsEmpty(Sources[Api.BuildProject("bar", "Foo")].Take(1).Wait());
+      => IsEmpty(BuildProject("A", "", "/foo").Get(Sources).Take(1).Wait());
+
+    [Test]
+    public void Input_should_initially_observe_a_single_empty_inout()
+      => AreEqual(new[] {Enumerable.Empty<string>()},
+                  BuildProject("A", "", "/foo").Get(Input).ToList().Wait());
 
     [Test]
     public void Sources_should_contain_added_files() {
-      var project = SourcesSupport.AddSourceFile("A")
-                                  .AddSourceFile(_ => "B");
+      var project = BuildProjects.SourcesSupport
+                                 .AddSourceFile("A")
+                                 .AddSourceFile(_ => "B");
       That(Sources[project].Take(1).Wait(),
            Is.EquivalentTo(new[] {"A", "B"}));
     }
 
     [Test]
     public void Sources_should_be_excluded_by_the_exclusion_filter() {
-      var project = SourcesSupport.AddSourceFile("A")
-                                  .AddSourceFile(_ => "B")
-                                  .Add(SourceExcludeFilters, sourceFile => string.Equals("B", sourceFile));
+      var project = BuildProjects.SourcesSupport
+                                 .AddSourceFile("A")
+                                 .AddSourceFile(_ => "B")
+                                 .Add(SourceExcludeFilters, sourceFile => string.Equals("B", sourceFile));
       That(Sources[project].Take(1).Wait(),
            Is.EquivalentTo(new[] {"A"}));
     }
 
     [Test]
     public void Sources_should_contain_files_from_added_directories() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var fileA = tempDir.CreateEmptyFile("A", "A.cs");
-        var fileB = tempDir.CreateEmptyFile("B", "B.cs");
-        var twoDirsProject = Api.BuildProject(tempDir.Path, "foo")
-                                .AddSources("A")
-                                .AddSources("B");
+      using (var tmpDir = new TemporaryDirectory()) {
+        var fileA = tmpDir.CreateEmptyFile("A", "A.cs");
+        var fileB = tmpDir.CreateEmptyFile("B", "B.cs");
+        var twoDirsProject = BuildProject("A", "", tmpDir.Path)
+          .AddSources("A")
+          .AddSources("B");
         That(Sources[twoDirsProject].Take(1).Wait(),
              Is.EquivalentTo(new[] {fileA, fileB}));
       }
@@ -91,23 +97,19 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void Sources_should_not_include_files_in_the_target_folder() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var project = Api.BuildProject(tempDir.Path, "foo").AddSources(fileFilter: "*.cs");
-        tempDir.CreateEmptyFile(BuildDir[project], "A.cs");
+      using (var tmpDir = new TemporaryDirectory()) {
+        var project = BuildProject("A", "", tmpDir.Path)
+          .AddSources(fileFilter: "*.cs");
+        tmpDir.CreateEmptyFile(BuildDir[project], "A.cs");
         var files = Sources[project].Take(1).Wait();
         IsEmpty(files);
       }
     }
 
     [Test]
-    public void Input_should_initially_observe_a_single_empty_inout()
-      => AreEqual(new[] {Enumerable.Empty<string>()},
-                  Input[Api.BuildProject("bar", "Foo")].ToList().Wait());
-
-    [Test]
     public void Input_contains_the_added_file() {
-      var buildProject = Api.BuildProject("foo", "Foo")
-                            .Add(SourceIncludes, c => FilesObservatory[c].WatchFiles("foo/bar"));
+      var buildProject = BuildProject("A", "", "/a")
+        .Add(SourceIncludes, c => FilesObservatory[c].WatchFiles("foo/bar"));
       AreEqual(new[] {"foo/bar"},
                Input[buildProject].Take(1).Wait());
     }
@@ -118,10 +120,10 @@ namespace Bud.BaseProjects {
       var expectedOutputFiles = new[] {"foo"};
       fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<IEnumerable<string>>>()))
                    .Returns(Return(expectedOutputFiles));
-      var actualOutputFiles = Api.BuildProject("FooDir", "Foo")
-                                 .Add(SourceProcessors, fileProcessor.Object)
-                                 .Get(ProcessedSources)
-                                 .Wait();
+      var actualOutputFiles = BuildProject("A", "", "/a")
+        .Add(SourceProcessors, fileProcessor.Object)
+        .Get(ProcessedSources)
+        .Wait();
       fileProcessor.VerifyAll();
       AreEqual(expectedOutputFiles, actualOutputFiles);
     }
@@ -130,26 +132,26 @@ namespace Bud.BaseProjects {
     public void Source_processors_must_be_invoked_on_the_build_pipeline_thread() {
       int inputThreadId = 0;
       var fileProcessor = new ThreadIdRecordingInputProcessor();
-      Api.BuildProject("fooDir", "A")
-         .Add(SourceIncludes, new FileWatcher(Enumerable.Empty<string>(), Create<string>(observer => {
-           Task.Run(() => {
-             inputThreadId = Thread.CurrentThread.ManagedThreadId;
-             observer.OnNext("A.cs");
-             observer.OnCompleted();
-           });
-           return new CompositeDisposable();
-         })))
-         .Add(SourceProcessors, fileProcessor)
-         .Get(ProcessedSources).Wait();
+      BuildProject("A", "", "/a")
+        .Add(SourceIncludes, new FileWatcher(Enumerable.Empty<string>(), Create<string>(observer => {
+          Task.Run(() => {
+            inputThreadId = Thread.CurrentThread.ManagedThreadId;
+            observer.OnNext("A.cs");
+            observer.OnCompleted();
+          });
+          return new CompositeDisposable();
+        })))
+        .Add(SourceProcessors, fileProcessor)
+        .Get(ProcessedSources).Wait();
       AreNotEqual(0, fileProcessor.InvocationThreadId);
       AreNotEqual(inputThreadId, fileProcessor.InvocationThreadId);
     }
 
     [Test]
     public void Default_input_contains_processed_sources() {
-      var projects = Api.BuildProject("bDir", "B")
-                        .Add(SourceIncludes, new FileWatcher("b"))
-                        .Add(SourceProcessors, new FooAppenderInputProcessor());
+      var projects = BuildProject("A", "", "/a")
+        .Add(SourceIncludes, new FileWatcher("b"))
+        .Add(SourceProcessors, new FooAppenderInputProcessor());
       AreEqual(new[] {"bfoo"},
                projects.Get(Input).Wait());
     }
@@ -157,46 +159,16 @@ namespace Bud.BaseProjects {
     [Test]
     public void Clean_deletes_non_empty_target_folders() {
       using (var tmpDir = new TemporaryDirectory()) {
-        tmpDir.CreateEmptyFile(".bud", "foo.txt");
-        tmpDir.CreateEmptyFile(".bud", "dir", "bar.txt");
-        Api.BuildProject(Combine(tmpDir.Path), "A").Get(Clean);
-        IsFalse(Exists(Combine(tmpDir.Path, "build")));
+        tmpDir.CreateEmptyFile("build", "A", "foo", "foo.txt");
+        BuildProject("A", "", tmpDir.Path).Get(Clean);
+        IsFalse(Exists(Combine(tmpDir.Path, "build", "A")));
       }
     }
 
     [Test]
     public void Clean_does_nothing_when_the_target_folder_does_not_exist() {
       using (var tmpDir = new TemporaryDirectory()) {
-        Api.BuildProject(Combine(tmpDir.Path), "A").Get(Clean);
-        IsFalse(Exists(Combine(tmpDir.Path, "target")));
-      }
-    }
-
-    [Test]
-    [Category("IntegrationTest")]
-    public void DistributionZip_contains_Output() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        var project = Api.BuildProject(tmpDir.Path, "A")
-                         .Add(Output, tmpDir.CreateEmptyFile("A.txt"));
-        var distZip = project.Get(DistributionArchive).Take(1).Wait();
-        AreEqual(Combine(BuildDir[project], "dist-zip", "A.zip"),
-                 distZip);
-        ZipTestUtils.IsInZip(distZip, "A.txt");
-      }
-    }
-
-    [Test]
-    [Category("IntegrationTest")]
-    public void DistributionZip_contains_Output_of_Dependencies() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        var projects = Projects(
-          Api.BuildProject(tmpDir.Path, "A")
-             .Clear(Output).Add(Output, tmpDir.CreateEmptyFile("A.dll")),
-          Api.BuildProject(tmpDir.Path, "B")
-             .Add(Dependencies, "../A")
-             .Clear(Output));
-        var distZip = projects.Get("B"/DistributionArchive).Take(1).Wait();
-        ZipTestUtils.IsInZip(distZip, "A.dll");
+        BuildProject("A", "", tmpDir.Path).Get(Clean);
       }
     }
 

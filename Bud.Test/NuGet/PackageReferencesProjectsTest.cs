@@ -106,7 +106,8 @@ namespace Bud.NuGet {
     }
 
     private static Conf TestProject(string baseDir)
-      => PackageReferencesProject(baseDir, "A");
+      => PackageReferencesProject(baseDir, "A")
+      .Set(BaseDir, baseDir);
 
     private static Mock<IAssemblyResolver> MockPackageResolver(string packageConfigFile,
                                                                IEnumerable<string> assemblies) {
@@ -121,7 +122,7 @@ namespace Bud.NuGet {
 
     private static Mock<NuGetPackageDownloader> MockDownloader(IEnumerable<PackageReference> packageReferences, TemporaryDirectory tmpDir) {
       var downloader = new Mock<NuGetPackageDownloader>(MockBehavior.Strict);
-      var packagesCacheDir = Combine(tmpDir.Path, "cache");
+      var packagesCacheDir = Combine(tmpDir.Path, "build", "A", "cache");
       downloader.Setup(d => d.DownloadPackages(packageReferences, packagesCacheDir))
                 .Returns(true);
       return downloader;
@@ -129,11 +130,12 @@ namespace Bud.NuGet {
 
     private static Mock<IAssemblyResolver> MockResolver(IEnumerable<PackageReference> packageReferences, IEnumerable<string> resolvedAssemblies, TemporaryDirectory tmpDir) {
       var resolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
-      var projectDir = tmpDir.Path;
-      var packagesCacheDir = Combine(projectDir, "cache");
+      var baseDir = tmpDir.Path;
+      var buildDir = Combine(baseDir, "build", "A");
+      var packagesCacheDir = Combine(buildDir, "cache");
       resolver.Setup(r => r.FindAssembly(packageReferences,
                                          packagesCacheDir,
-                                         projectDir))
+                                         buildDir))
               .Returns(resolvedAssemblies);
       return resolver;
     }

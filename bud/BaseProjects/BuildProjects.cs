@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Bud.Dist;
 using Bud.IO;
@@ -23,11 +22,11 @@ namespace Bud.BaseProjects {
 
     internal static readonly Conf SourcesSupport
       = BareProjects.BuildSchedulingSupport
-        .InitEmpty(SourceIncludes)
-        .InitEmpty(SourceExcludeFilters)
-        .Init(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
-        .Init(FilesObservatory, new LocalFilesObservatory())
-        .Init(Sources, DefaultSources);
+                    .InitEmpty(SourceIncludes)
+                    .InitEmpty(SourceExcludeFilters)
+                    .Init(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
+                    .Init(FilesObservatory, new LocalFilesObservatory())
+                    .Init(Sources, DefaultSources);
 
     internal static readonly Conf SourceProcessorsSupport
       = SourcesSupport
@@ -45,8 +44,10 @@ namespace Bud.BaseProjects {
       .ExcludeSourceDir(c => BuildDir[c])
       .Init(DependenciesOutput, GatherOutputsFromDependencies);
 
-    internal static Conf BuildProject(string projectDir, string projectId)
-      => BareProject(projectDir, projectId)
+    internal static Conf BuildProject(string projectId,
+                                      Option<string> projectDir = default(Option<string>),
+                                      Option<string> baseDir = default(Option<string>))
+      => BareProject(projectId, projectDir, baseDir)
         .Add(BuildProjectSettings);
 
     internal static Conf AddSourcesImpl(Conf c,
