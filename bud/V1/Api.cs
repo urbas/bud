@@ -217,7 +217,7 @@ namespace Bud.V1 {
     public static Conf NuGetPublishingProject(string projectId,
                                               Option<string> projectDir = default(Option<string>),
                                               Option<string> baseDir = default(Option<string>))
-      => Basic.BareProject(projectId, projectDir, baseDir)
+      => Basic.Project(projectId, projectDir, baseDir)
         .Add(NuGetPublishing.NuGetPublishingSupport);
 
     #endregion

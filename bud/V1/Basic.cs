@@ -108,17 +108,16 @@ namespace Bud.V1 {
     ///   </para>
     /// </param>
     /// <remarks>
-    ///   This method delegates to <see cref="BareProject" />
+    ///   This method delegates to <see cref="Project" />
     ///   it uses <paramref name="projectId" /> as both the project dir and
     ///   project ID.
     /// </remarks>
-    public static Conf BareProject(string projectId,
-                                   Option<string> projectDir = default(Option<string>),
-                                   Option<string> baseDir = default(Option<string>))
-      => Project(projectId, baseDir)
+    public static Conf Project(string projectId,
+                               Option<string> projectDir = default(Option<string>),
+                               Option<string> baseDir = default(Option<string>))
+      => BareProject(projectId, baseDir)
         .Add(BuildSchedulingSupport)
         .InitEmpty(Dependencies)
-        .Init(ProjectId, projectId)
         .Init(ProjectDir, c => GetProjectDir(c, projectDir))
         .Init(ProjectVersion, DefaultVersion)
         .Init(BuildDir, DefaultBuildDir)
@@ -140,37 +139,43 @@ namespace Bud.V1 {
       => Path.Combine(BaseDir[c], BuildDirName, Path.GetDirectoryName(c.Key));
 
     /// <summary>
-    ///   Creates a grouping of configurations. This group will have the address of
-    ///   <c>projectId/...</c>. You can add projects into projects. For example,
-    ///   the code
-    ///   <code>
+    ///   <para>
+    ///     A bare project contains only the <see cref="ProjectId" /> and <see cref="BaseDir" /> configurations.
+    ///   </para>
+    ///   <para>
+    ///     A project is a grouping of configurations. Configurations in this project will have the path of
+    ///     <c>projectId/{conf key}</c>. You can add projects into projects. For example,
+    ///     the code
+    ///     <code>
     /// Project("A")
     ///   .Set(Foo, 42)
     ///   .Add(Project("B")
     ///          .Set(Foo, 9001))
     /// </code>
-    ///   would create configurations <c>A/Foo</c> and <c>A/B/Foo</c>.
+    ///     would create configurations <c>A/Foo</c> and <c>A/B/Foo</c>.
+    ///   </para>
     /// </summary>
-    /// <param name="projectId">see <see cref="Basic.ProjectId" />.</param>
+    /// <param name="projectId">see <see cref="ProjectId" />.</param>
     /// <param name="baseDir">
     ///   <para>
     ///     The directory under which all projects should live. By default this is the directory
     ///     where the <c>Build.cs</c> script is located.
     ///   </para>
     ///   <para>
-    ///     By default this is where the <see cref="Basic.BuildDir" /> will be located.
+    ///     By default this is where the <see cref="BuildDir" /> will be located.
     ///   </para>
     /// </param>
     /// <returns>a bag of configurations.</returns>
-    public static Conf Project(string projectId,
-                               Option<string> baseDir = default(Option<string>)) {
-      if (String.IsNullOrEmpty(projectId)) {
+    public static Conf BareProject(string projectId,
+                                   Option<string> baseDir = default(Option<string>)) {
+      if (string.IsNullOrEmpty(projectId)) {
         throw new ArgumentNullException(nameof(projectId), "A project's ID must not be null or empty.");
       }
       if (projectId.Contains("/")) {
         throw new ArgumentException($"Project ID '{projectId}' is invalid. It must not contain the character '/'.", nameof(projectId));
       }
       return Conf.Group(projectId)
+                 .Init(ProjectId, projectId)
                  .Init(BaseDir, c => baseDir.OrElse(() => c.TryGet(".."/BaseDir))
                                             .GetOrElse(() => {
                                               throw new Exception("Could not determine the base directory.");

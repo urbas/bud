@@ -118,7 +118,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseProjects\BareProjectsTest.cs" />
+    <Compile Include="BaseProjects\BasicTest.cs" />
     <Compile Include="BaseProjects\BuildProjectsTest.cs" />
     <Compile Include="BaseProjects\ZipTestUtils.cs" />
     <Compile Include="Benchmarks\BenchmarkResultsTest.cs" />

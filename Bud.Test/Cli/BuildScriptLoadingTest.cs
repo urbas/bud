@@ -26,6 +26,6 @@ namespace Bud.Cli {
       }
     }
 
-    private static Conf BuildConf { get; } = Projects(BareProject("A"));
+    private static Conf BuildConf { get; } = Projects(Project("A"));
   }
 }

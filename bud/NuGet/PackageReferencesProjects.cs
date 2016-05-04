@@ -32,7 +32,7 @@ namespace Bud.NuGet {
     internal static Conf CreatePackageReferencesProject(string projectId,
                                                         Option<string> projectDir = default(Option<string>),
                                                         Option<string> baseDir = default(Option<string>))
-      => Basic.BareProject(projectId, projectDir, baseDir)
+      => Basic.Project(projectId, projectDir, baseDir)
         .Add(PackageReferencesProjectSettings);
 
     internal static IObservable<IImmutableSet<string>> ResolveAssemblies(IConf c)

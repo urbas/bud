@@ -47,7 +47,7 @@ namespace Bud.BaseProjects {
     internal static Conf BuildProject(string projectId,
                                       Option<string> projectDir = default(Option<string>),
                                       Option<string> baseDir = default(Option<string>))
-      => Basic.BareProject(projectId, projectDir, baseDir)
+      => Basic.Project(projectId, projectDir, baseDir)
         .Add(BuildProjectSettings);
 
     internal static Conf AddSourcesImpl(Conf c,
