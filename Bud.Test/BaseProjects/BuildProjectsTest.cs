@@ -20,16 +20,16 @@ namespace Bud.BaseProjects {
   public class BuildProjectsTest {
     [Test]
     public void DependenciesInput_must_be_empty_when_no_dependencies_given() {
-      var projects = BuildProject("aDir", "A");
+      var projects = BuildProject("A", "foo");
       AreEqual(new[] {Enumerable.Empty<string>()},
                projects.Get(DependenciesOutput).ToList().Wait());
     }
 
     [Test]
     public void DependenciesInput_must_contain_output_from_dependencies() {
-      var projects = Projects(BuildProject("aDir", "A")
+      var projects = Projects(BuildProject("A", "foo")
                                 .Set(Output, Return(new[] {"a"})),
-                              BuildProject("bDir", "B")
+                              BuildProject("B", "boo")
                                 .Add(Dependencies, "../A"));
       AreEqual(new[] {"a"},
                projects.Get("B"/DependenciesOutput).Wait());
@@ -39,10 +39,10 @@ namespace Bud.BaseProjects {
     [Test]
     public void DependenciesInput_reobserved_when_dependencies_change() {
       var testScheduler = new TestScheduler();
-      var projects = Projects(BuildProject("aDir", "A")
+      var projects = Projects(BuildProject("A", "foo")
                                 .Set(BuildPipelineScheduler, testScheduler)
                                 .Set(Output, ChangingOutput(testScheduler)),
-                              BuildProject("bDir", "B")
+                              BuildProject("B", "boo")
                                 .Set(BuildPipelineScheduler, testScheduler)
                                 .Add(Dependencies, "../A"));
       var bInput = projects.Get("B"/DependenciesOutput).GetEnumerator();
@@ -56,12 +56,12 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void Sources_should_be_initially_empty()
-      => IsEmpty(Sources[ProjectA("/foo")].Take(1).Wait());
+      => IsEmpty(BuildProject("A", "", "/foo").Get(Sources).Take(1).Wait());
 
     [Test]
     public void Input_should_initially_observe_a_single_empty_inout()
       => AreEqual(new[] {Enumerable.Empty<string>()},
-                  Input[ProjectA("/foo")].ToList().Wait());
+                  BuildProject("A", "", "/foo").Get(Input).ToList().Wait());
 
     [Test]
     public void Sources_should_contain_added_files() {
@@ -87,7 +87,7 @@ namespace Bud.BaseProjects {
       using (var tmpDir = new TemporaryDirectory()) {
         var fileA = tmpDir.CreateEmptyFile("A", "A.cs");
         var fileB = tmpDir.CreateEmptyFile("B", "B.cs");
-        var twoDirsProject = ProjectA(tmpDir.Path)
+        var twoDirsProject = BuildProject("A", "", tmpDir.Path)
           .AddSources("A")
           .AddSources("B");
         That(Sources[twoDirsProject].Take(1).Wait(),
@@ -98,7 +98,8 @@ namespace Bud.BaseProjects {
     [Test]
     public void Sources_should_not_include_files_in_the_target_folder() {
       using (var tmpDir = new TemporaryDirectory()) {
-        var project = ProjectA(tmpDir.Path).AddSources(fileFilter: "*.cs");
+        var project = BuildProject("A", "", tmpDir.Path)
+          .AddSources(fileFilter: "*.cs");
         tmpDir.CreateEmptyFile(BuildDir[project], "A.cs");
         var files = Sources[project].Take(1).Wait();
         IsEmpty(files);
@@ -107,7 +108,7 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void Input_contains_the_added_file() {
-      var buildProject = ProjectA("/a")
+      var buildProject = BuildProject("A", "", "/a")
         .Add(SourceIncludes, c => FilesObservatory[c].WatchFiles("foo/bar"));
       AreEqual(new[] {"foo/bar"},
                Input[buildProject].Take(1).Wait());
@@ -119,7 +120,7 @@ namespace Bud.BaseProjects {
       var expectedOutputFiles = new[] {"foo"};
       fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<IEnumerable<string>>>()))
                    .Returns(Return(expectedOutputFiles));
-      var actualOutputFiles = ProjectA("/a")
+      var actualOutputFiles = BuildProject("A", "", "/a")
         .Add(SourceProcessors, fileProcessor.Object)
         .Get(ProcessedSources)
         .Wait();
@@ -131,7 +132,7 @@ namespace Bud.BaseProjects {
     public void Source_processors_must_be_invoked_on_the_build_pipeline_thread() {
       int inputThreadId = 0;
       var fileProcessor = new ThreadIdRecordingInputProcessor();
-      ProjectA("/a")
+      BuildProject("A", "", "/a")
         .Add(SourceIncludes, new FileWatcher(Enumerable.Empty<string>(), Create<string>(observer => {
           Task.Run(() => {
             inputThreadId = Thread.CurrentThread.ManagedThreadId;
@@ -148,7 +149,7 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void Default_input_contains_processed_sources() {
-      var projects = ProjectA("/a")
+      var projects = BuildProject("A", "", "/a")
         .Add(SourceIncludes, new FileWatcher("b"))
         .Add(SourceProcessors, new FooAppenderInputProcessor());
       AreEqual(new[] {"bfoo"},
@@ -159,7 +160,7 @@ namespace Bud.BaseProjects {
     public void Clean_deletes_non_empty_target_folders() {
       using (var tmpDir = new TemporaryDirectory()) {
         tmpDir.CreateEmptyFile("build", "A", "foo", "foo.txt");
-        ProjectA(tmpDir.Path).Get(Clean);
+        BuildProject("A", "", tmpDir.Path).Get(Clean);
         IsFalse(Exists(Combine(tmpDir.Path, "build", "A")));
       }
     }
@@ -167,7 +168,7 @@ namespace Bud.BaseProjects {
     [Test]
     public void Clean_does_nothing_when_the_target_folder_does_not_exist() {
       using (var tmpDir = new TemporaryDirectory()) {
-        ProjectA(tmpDir.Path).Get(Clean);
+        BuildProject("A", "", tmpDir.Path).Get(Clean);
       }
     }
 
@@ -189,7 +190,5 @@ namespace Bud.BaseProjects {
         return sources;
       }
     }
-
-    private static Conf ProjectA(string baseDir) => BuildProject("", "A").Set(BaseDir, baseDir);
   }
 }

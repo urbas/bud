@@ -1,6 +1,5 @@
 using System;
 using Bud.Configuration;
-using Bud.IO;
 using NUnit.Framework;
 using static Bud.V1.Api;
 using static NUnit.Framework.Assert;
@@ -35,7 +34,7 @@ namespace Bud.V1 {
     public void BaseDir_overrides_the_inherited_one()
       => AreEqual("/bar",
                   Projects(Project("A", "/bar"))
-        .Set(BaseDir, "/foo")
-        .Get("A" / BaseDir));
+                    .Set(BaseDir, "/foo")
+                    .Get("A"/BaseDir));
   }
 }
