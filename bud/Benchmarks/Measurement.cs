@@ -42,7 +42,7 @@ namespace Bud.Benchmarks {
                                       Action<int> postEachRun = null,
                                       Action preRun = null,
                                       Action postRun = null) {
-      var samples = Benchmarks.Samples.None;
+      var samples = ImmutableList<ImmutableDictionary<string, object>>.Empty;
       preRun?.Invoke();
       for (int i = 1; i <= sampleCount; i++) {
         preEachRun?.Invoke(i);

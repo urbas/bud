@@ -6,6 +6,7 @@ using Bud.Benchmarks;
 using Bud.Cli;
 using Bud.Util;
 using Bud.V1;
+using static Bud.Benchmarks.Measurement;
 using static Bud.V1.Api;
 
 public class BudBuild : IBuild {
@@ -69,71 +70,71 @@ internal static class BudBenchmarks {
       MeasureWarmProjectCompilationOneDependentFileChanged(budExe, cloneDir));
 
   private static Measurement MeasureColdBuildScriptLoad(string budExe, string projectDir)
-    => Measurement.MeasureAndLog("cold load build script",
-                        SampleCount,
-                        i => RunBud(budExe, projectDir),
-                        postEachRun: i => ResetRepo(projectDir));
+    => MeasureAndLog("cold load build script",
+                     SampleCount,
+                     i => RunBud(budExe, projectDir),
+                     postEachRun: i => ResetRepo(projectDir));
 
   private static Measurement MeasureWarmBuildScriptLoad(string budExe, string projectDir)
-    => Measurement.MeasureAndLog("warm load build script",
-                        SampleCount,
-                        preRun: () => RunBud(budExe, projectDir),
-                        run: i => RunBud(budExe, projectDir),
-                        postRun: () => ResetRepo(projectDir));
+    => MeasureAndLog("warm load build script",
+                     SampleCount,
+                     preRun: () => RunBud(budExe, projectDir),
+                     run: i => RunBud(budExe, projectDir),
+                     postRun: () => ResetRepo(projectDir));
 
   private static Measurement MeasureColdProjectCompilation(string budExe, string projectDir)
-    => Measurement.MeasureAndLog("cold compile Bud.Test",
-                        SampleCount,
-                        preRun: () => RunBud(budExe, projectDir),
-                        run: i => RunBud(budExe, projectDir, "Bud.Test/Compile"),
-                        postEachRun: i => RunBud(budExe, projectDir, "Bud/Clean Bud.Test/Clean"),
-                        postRun: () => ResetRepo(projectDir));
+    => MeasureAndLog("cold compile Bud.Test",
+                     SampleCount,
+                     preRun: () => RunBud(budExe, projectDir),
+                     run: i => RunBud(budExe, projectDir, "Bud.Test/Compile"),
+                     postEachRun: i => RunBud(budExe, projectDir, "Bud/Clean Bud.Test/Clean"),
+                     postRun: () => ResetRepo(projectDir));
 
   private static Measurement MeasureWarmProjectCompilation(string budExe, string projectDir)
-    => Measurement.MeasureAndLog("warm compile Bud.Test",
-                        SampleCount,
-                        preRun: () => RunBud(budExe, projectDir, "Bud.Test/Compile"),
-                        run: i => RunBud(budExe, projectDir, "Bud.Test/Compile"),
-                        postRun: () => ResetRepo(projectDir));
+    => MeasureAndLog("warm compile Bud.Test",
+                     SampleCount,
+                     preRun: () => RunBud(budExe, projectDir, "Bud.Test/Compile"),
+                     run: i => RunBud(budExe, projectDir, "Bud.Test/Compile"),
+                     postRun: () => ResetRepo(projectDir));
 
   private static Measurement MeasureWarmProjectCompilationOneFileTouched(string budExe, string projectDir) {
     var fileToTouch = Path.Combine(projectDir, "Bud.Test", "V1", "KeysTest.cs");
-    return Measurement.MeasureAndLog("warm compile Bud.Test (one touched file in Bud.Test)",
-                            SampleCount,
-                            preRun: () => RunBud(budExe, projectDir, "Bud.Test/Compile"),
-                            preEachRun: i => File.SetLastWriteTimeUtc(fileToTouch, DateTime.UtcNow),
-                            run: i => RunBud(budExe, projectDir, "Bud.Test/Compile"),
-                            postRun: () => ResetRepo(projectDir));
+    return MeasureAndLog("warm compile Bud.Test (one touched file in Bud.Test)",
+                         SampleCount,
+                         preRun: () => RunBud(budExe, projectDir, "Bud.Test/Compile"),
+                         preEachRun: i => File.SetLastWriteTimeUtc(fileToTouch, DateTime.UtcNow),
+                         run: i => RunBud(budExe, projectDir, "Bud.Test/Compile"),
+                         postRun: () => ResetRepo(projectDir));
   }
 
   private static Measurement MeasureWarmProjectCompilationOneFileChanged(string budExe, string projectDir) {
     var fileToChange = Path.Combine(projectDir, "Bud.Test", "V1", "KeysTest.cs");
-    return Measurement.MeasureAndLog("warm compile Bud.Test (one changed file in Bud.Test)",
-                            SampleCount,
-                            preRun: () => RunBud(budExe, projectDir, "Bud.Test/Compile"),
-                            preEachRun: i => File.AppendAllText(fileToChange, "\n// Just a comment\n"),
-                            run: i => RunBud(budExe, projectDir, "Bud.Test/Compile"),
-                            postRun: () => ResetRepo(projectDir));
+    return MeasureAndLog("warm compile Bud.Test (one changed file in Bud.Test)",
+                         SampleCount,
+                         preRun: () => RunBud(budExe, projectDir, "Bud.Test/Compile"),
+                         preEachRun: i => File.AppendAllText(fileToChange, "\n// Just a comment\n"),
+                         run: i => RunBud(budExe, projectDir, "Bud.Test/Compile"),
+                         postRun: () => ResetRepo(projectDir));
   }
 
   private static Measurement MeasureWarmProjectCompilationOneDependentFileTouched(string budExe, string projectDir) {
     var fileToTouch = Path.Combine(projectDir, "bud", "V1", "Keys.cs");
-    return Measurement.MeasureAndLog("warm compile Bud.Test (one touched file in bud)",
-                            SampleCount,
-                            preRun: () => RunBud(budExe, projectDir, "Bud.Test/Compile"),
-                            preEachRun: i => File.SetLastWriteTimeUtc(fileToTouch, DateTime.UtcNow),
-                            run: i => RunBud(budExe, projectDir, "Bud.Test/Compile"),
-                            postRun: () => ResetRepo(projectDir));
+    return MeasureAndLog("warm compile Bud.Test (one touched file in bud)",
+                         SampleCount,
+                         preRun: () => RunBud(budExe, projectDir, "Bud.Test/Compile"),
+                         preEachRun: i => File.SetLastWriteTimeUtc(fileToTouch, DateTime.UtcNow),
+                         run: i => RunBud(budExe, projectDir, "Bud.Test/Compile"),
+                         postRun: () => ResetRepo(projectDir));
   }
 
   private static Measurement MeasureWarmProjectCompilationOneDependentFileChanged(string budExe, string projectDir) {
     var fileToChange = Path.Combine(projectDir, "bud", "V1", "Keys.cs");
-    return Measurement.MeasureAndLog("warm compile Bud.Test (one changed file in Bud.Test)",
-                            SampleCount,
-                            preRun: () => RunBud(budExe, projectDir, "Bud.Test/Compile"),
-                            preEachRun: i => File.AppendAllText(fileToChange, "\n// Just a comment\n"),
-                            run: i => RunBud(budExe, projectDir, "Bud.Test/Compile"),
-                            postRun: () => ResetRepo(projectDir));
+    return MeasureAndLog("warm compile Bud.Test (one changed file in Bud.Test)",
+                         SampleCount,
+                         preRun: () => RunBud(budExe, projectDir, "Bud.Test/Compile"),
+                         preEachRun: i => File.AppendAllText(fileToChange, "\n// Just a comment\n"),
+                         run: i => RunBud(budExe, projectDir, "Bud.Test/Compile"),
+                         postRun: () => ResetRepo(projectDir));
   }
 
   private static ImmutableDictionary<string, object>
