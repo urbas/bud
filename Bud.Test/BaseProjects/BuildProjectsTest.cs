@@ -27,10 +27,10 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void DependenciesInput_must_contain_output_from_dependencies() {
-      var projects = Projects(BuildProject("A", "foo")
+      var projects = Basic.Projects(BuildProject("A", "foo")
                                 .Set(Output, Return(new[] {"a"})),
                               BuildProject("B", "boo")
-                                .Add(Dependencies, "../A"));
+                                .Add(Basic.Dependencies, "../A"));
       AreEqual(new[] {"a"},
                projects.Get("B"/DependenciesOutput).Wait());
     }
@@ -39,12 +39,12 @@ namespace Bud.BaseProjects {
     [Test]
     public void DependenciesInput_reobserved_when_dependencies_change() {
       var testScheduler = new TestScheduler();
-      var projects = Projects(BuildProject("A", "foo")
-                                .Set(BuildPipelineScheduler, testScheduler)
+      var projects = Basic.Projects(BuildProject("A", "foo")
+                                .Set(Basic.BuildPipelineScheduler, testScheduler)
                                 .Set(Output, ChangingOutput(testScheduler)),
                               BuildProject("B", "boo")
-                                .Set(BuildPipelineScheduler, testScheduler)
-                                .Add(Dependencies, "../A"));
+                                .Set(Basic.BuildPipelineScheduler, testScheduler)
+                                .Add(Basic.Dependencies, "../A"));
       var bInput = projects.Get("B"/DependenciesOutput).GetEnumerator();
       testScheduler.AdvanceBy(TimeSpan.FromSeconds(5).Ticks);
       IsTrue(bInput.MoveNext());
@@ -100,7 +100,7 @@ namespace Bud.BaseProjects {
       using (var tmpDir = new TemporaryDirectory()) {
         var project = BuildProject("A", "", tmpDir.Path)
           .AddSources(fileFilter: "*.cs");
-        tmpDir.CreateEmptyFile(BuildDir[project], "A.cs");
+        tmpDir.CreateEmptyFile(Basic.BuildDir[project], "A.cs");
         var files = Sources[project].Take(1).Wait();
         IsEmpty(files);
       }
@@ -160,7 +160,7 @@ namespace Bud.BaseProjects {
     public void Clean_deletes_non_empty_target_folders() {
       using (var tmpDir = new TemporaryDirectory()) {
         tmpDir.CreateEmptyFile("build", "A", "foo", "foo.txt");
-        BuildProject("A", "", tmpDir.Path).Get(Clean);
+        BuildProject("A", "", tmpDir.Path).Get(Basic.Clean);
         IsFalse(Exists(Combine(tmpDir.Path, "build", "A")));
       }
     }
@@ -168,7 +168,7 @@ namespace Bud.BaseProjects {
     [Test]
     public void Clean_does_nothing_when_the_target_folder_does_not_exist() {
       using (var tmpDir = new TemporaryDirectory()) {
-        BuildProject("A", "", tmpDir.Path).Get(Clean);
+        BuildProject("A", "", tmpDir.Path).Get(Basic.Clean);
       }
     }
 

@@ -15,7 +15,7 @@ namespace Bud.NuGet {
     internal static Conf NuGetPublishingSupport
       = Conf.Empty
             .Init(PackageMetadata, DefaultPackageMetadata)
-            .Init(PackageOutputDir, c => Combine(BuildDir[c], PackageOutputDirName))
+            .Init(PackageOutputDir, c => Combine(Basic.BuildDir[c], PackageOutputDirName))
             .Init(ProjectUrl, None<string>())
             .Init(Publish, DefaultPublish)
             .Init(PublishUrl, None<string>())
@@ -27,7 +27,7 @@ namespace Bud.NuGet {
 
     private static NuGetPackageMetadata DefaultPackageMetadata(IConf c)
       => new NuGetPackageMetadata(Environment.UserName,
-                                  ProjectId[c],
+                                  Basic.ProjectId[c],
                                   ExtractOptionalFields(c));
 
     private static IImmutableDictionary<string, string> ExtractOptionalFields(IConf c) {
@@ -52,9 +52,9 @@ namespace Bud.NuGet {
                                IEnumerable<PackageReference> referencedPackages) {
       return Packager[c].Pack(
         PackageOutputDir[c],
-        BaseDir[c],
-        ProjectId[c],
-        ProjectVersion[c],
+        Basic.BaseDir[c],
+        Basic.ProjectId[c],
+        Basic.ProjectVersion[c],
         packageFiles,
         PackageDependencies(c).Concat(referencedPackages.Select(r => new PackageDependency(r.Id, r.Version.ToString()))),
         PackageMetadata[c]);
@@ -75,10 +75,10 @@ namespace Bud.NuGet {
       => new PackageFile(file, $"content/{GetFileName(file)}");
 
     private static IEnumerable<PackageDependency> PackageDependencies(IConf c)
-      => Dependencies[c].Select(dependency => ToPackageDependency(c, dependency));
+      => Basic.Dependencies[c].Select(dependency => ToPackageDependency(c, dependency));
 
     private static PackageDependency ToPackageDependency(IConf c, string dependency)
-      => new PackageDependency(c.Get(dependency/ProjectId),
-                               c.Get(dependency/ProjectVersion));
+      => new PackageDependency(c.Get(dependency/Basic.ProjectId),
+                               c.Get(dependency/Basic.ProjectVersion));
   }
 }

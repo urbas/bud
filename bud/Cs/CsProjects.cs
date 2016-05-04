@@ -36,8 +36,8 @@ namespace Bud.Cs {
                                          warningLevel: 1))
       .Add(AssemblyReferences, c => (PackagesSubProjectId/ResolvedAssemblies)[c])
       .Add(AssemblyReferences, WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("mscorlib", new Version(0, 0)).Value)
-      .Set(PackagesSubProjectId/ProjectDir, c => Combine(ProjectDir[c], "packages"))
-      .Set(PackagesSubProjectId/PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
+      .Set(PackagesSubProjectId/Basic.ProjectDir, c => Combine(Basic.ProjectDir[c], "packages"))
+      .Set(PackagesSubProjectId/PackagesConfigFile, c => Combine(Basic.ProjectDir[c], "packages.config"))
       .Init(ReferencedPackages, c => (PackagesSubProjectId/ReferencedPackages)[c])
       .Set(PackageFiles, PackageLibDlls)
       .Add(FilesToDistribute, AssembliesPackagedPaths)
@@ -68,7 +68,7 @@ namespace Bud.Cs {
 
     internal static Conf EmbedResourceImpl(Conf conf, string path, string nameInAssembly)
       => conf.Add(EmbeddedResources, c => {
-        var resourceFile = IsPathRooted(path) ? path : Combine(ProjectDir[c], path);
+        var resourceFile = IsPathRooted(path) ? path : Combine(Basic.ProjectDir[c], path);
         return ToResourceDescriptor(resourceFile, nameInAssembly);
       });
 
@@ -76,7 +76,7 @@ namespace Bud.Cs {
       => Compile[c].Select(output => output.AssemblyPath);
 
     private static string DefaultAssemblyName(IConf c)
-      => ProjectId[c] + CsCompilationOptions[c].OutputKind.ToExtension();
+      => Basic.ProjectId[c] + CsCompilationOptions[c].OutputKind.ToExtension();
 
     private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
       => Input[conf]
@@ -100,7 +100,7 @@ namespace Bud.Cs {
       => new ResourceDescription(nameInAssembly, () => File.OpenRead(resourceFile), true);
 
     private static IObservable<IEnumerable<CompileOutput>> ObserveDependencies(IConf c)
-      => Dependencies[c].Gather(dependency => c.TryGet(dependency/Compile))
+      => Basic.Dependencies[c].Gather(dependency => c.TryGet(dependency/Compile))
                         .Combined();
 
     private static IEnumerable<PackageFile> ToPackageFiles(IEnumerable<string> dlls)
@@ -113,7 +113,7 @@ namespace Bud.Cs {
       => new[] {
         "obj",
         "bin",
-        (PackagesSubProjectId/ProjectDir)[c]
+        (PackagesSubProjectId/Basic.ProjectDir)[c]
       };
   }
 }

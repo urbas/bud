@@ -11,11 +11,11 @@ using static Bud.V1.Api;
 
 public class BudBuild : IBuild {
   public Conf Init()
-    => Projects(CsApp("bud")
-                  .Set(ProjectVersion, "0.5.2")
+    => Basic.Projects(CsApp("bud")
+                  .Set(Basic.ProjectVersion, "0.5.2")
                   .Set(ProjectUrl, "https://github.com/urbas/bud"),
                 CsLib("Bud.Test")
-                  .Add(Dependencies, "../bud"))
+                  .Add(Basic.Dependencies, "../bud"))
       .Init("benchmark", BudBenchmarks.Benchmark);
 }
 
@@ -45,12 +45,12 @@ internal static class BudBenchmarks {
   private static string CloneProjectToBuild(IConf c, string benchmarksDir) {
     var cloneDir = Path.Combine(benchmarksDir, "bud-repo");
     const string revisionToBuild = "33e7262924b1eee21b521533c09d019d93a9b080";
-    CopyRepo(BaseDir[c], cloneDir, revisionToBuild);
+    CopyRepo(Basic.BaseDir[c], cloneDir, revisionToBuild);
     return cloneDir;
   }
 
   private static string CreateBenchmarksDir(IConf c) {
-    var benchmarksDir = Path.Combine(BaseDir[c], BuildDirName, "benchmarks");
+    var benchmarksDir = Path.Combine(Basic.BaseDir[c], Basic.BuildDirName, "benchmarks");
     if (Directory.Exists(benchmarksDir)) {
       Directory.Delete(benchmarksDir, true);
     }

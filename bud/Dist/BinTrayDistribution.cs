@@ -13,11 +13,11 @@ namespace Bud.Dist {
   public class BinTrayDistribution {
     public static IObservable<bool> Distribute(IConf c)
       => Distribute(DistributionArchive[c],
-                    ProjectId[c],
-                    ProjectId[c],
+                    Basic.ProjectId[c],
+                    Basic.ProjectId[c],
                     Environment.UserName,
-                    ProjectVersion[c],
-                    BuildDir[c],
+                    Basic.ProjectVersion[c],
+                    Basic.BuildDir[c],
                     PackageMetadata[c]);
 
     public static IObservable<bool> Distribute(IObservable<string> observedArchive, string repositoryId, string packadeId, string username, string packageVersion, string buildDir, NuGetPackageMetadata packageMetadata)

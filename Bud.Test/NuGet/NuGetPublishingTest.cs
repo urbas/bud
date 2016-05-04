@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Immutable;
-using System.IO;
 using System.Reactive.Linq;
 using Bud.IO;
 using Bud.V1;
@@ -12,6 +11,7 @@ using static System.IO.Path;
 using static Bud.NuGet.NuGetPublishing;
 using static Bud.Util.Option;
 using static Bud.V1.Api;
+using static Bud.V1.Basic;
 using static NUnit.Framework.Assert;
 
 namespace Bud.NuGet {
@@ -22,7 +22,7 @@ namespace Bud.NuGet {
       const string package = "B.nupkg";
       const string fileToPackage = "B.txt";
 
-      var projectA = BareProject("A", baseDir:"/foo")
+      var projectA = BareProject("A", baseDir: "/foo")
         .Set(ProjectVersion, "1.2.3");
       var project = BareProject("B", baseDir: "/foo")
         .Clear(Output).Add(Output, fileToPackage)
@@ -76,7 +76,7 @@ namespace Bud.NuGet {
       var packager = new Mock<IPublisher>(MockBehavior.Strict);
       const string package = "Foo.nupkg";
 
-      var project = BareProject("fooDir", "Foo")
+      var project = BareProject("A", baseDir: "/foo")
         .Add(NuGetPublishingSupport)
         .Set(Publisher, packager.Object)
         .Set(Package, Observable.Return(package))
@@ -94,35 +94,35 @@ namespace Bud.NuGet {
 
     [Test]
     public void Default_packager_is_the_NuGet_CLI_implementation()
-      => That(BareProject("fooDir", "Foo")
+      => That(BareProject("A", baseDir: "/foo")
                 .Add(NuGetPublishingSupport)
                 .Get(Packager),
               Is.InstanceOf<NuGetPackager>());
 
     [Test]
     public void Default_publisher_is_the_NuGet_CLI_implementation()
-      => That(BareProject("fooDir", "Foo")
+      => That(BareProject("A", baseDir: "/foo")
                 .Add(NuGetPublishingSupport)
                 .Get(Publisher),
               Is.InstanceOf<NuGetPublisher>());
 
     [Test]
     public void Default_PublishApiKey_is_set_to_None()
-      => That(BareProject("fooDir", "Foo")
+      => That(BareProject("A", baseDir: "/foo")
                 .Add(NuGetPublishingSupport)
                 .Get(PublishApiKey),
               Is.EqualTo(None<string>()));
 
     [Test]
     public void Default_PackageMetadata_has_no_ProjectUrl()
-      => That(BareProject("fooDir", "Foo")
+      => That(BareProject("A", baseDir: "/foo")
                 .Add(NuGetPublishingSupport)
                 .Get(PackageMetadata).OptionalFields,
               Does.Not.Contains("projectUrl"));
 
     [Test]
     public void Default_PackageMetadata_has_the_provided_ProjectUrl()
-      => That(BareProject("fooDir", "Foo")
+      => That(BareProject("A", baseDir: "/foo")
                 .Add(NuGetPublishingSupport)
                 .Set(ProjectUrl, "some url")
                 .Get(PackageMetadata).OptionalFields["projectUrl"],

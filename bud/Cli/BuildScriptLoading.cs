@@ -6,7 +6,7 @@ using Bud.V1;
 namespace Bud.Cli {
   public static class BuildScriptLoading {
     public static IConf LoadBuildDefinition(Conf buildConf, string baseDir)
-      => buildConf.Init(Api.BaseDir, baseDir)
+      => buildConf.Init(Basic.BaseDir, baseDir)
                   .ToCompiled();
 
     public static IConf LoadBuildDefinition(string assemblyPath, string baseDir)

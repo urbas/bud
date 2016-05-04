@@ -74,7 +74,7 @@ namespace Bud.Cs {
       var cSharpCompiler = new Mock<Func<CompileInput, CompileOutput>>(MockBehavior.Strict);
       cSharpCompiler.Setup(self => self(CompileInputTestUtils.ToCompileInput(null, EmptyCompileOutput(42), null)))
                     .Returns(EmptyCompileOutput());
-      var projectA = Projects(ProjectAOutputsFooDll(42),
+      var projectA = Basic.Projects(ProjectAOutputsFooDll(42),
                               ProjectWithDependencies("B", "../A")
                                 .Set(Compiler, cSharpCompiler.Object));
       projectA.Get("B"/Compile).Take(1).Wait();
@@ -109,7 +109,7 @@ namespace Bud.Cs {
     [Test]
     public void Referenced_packages_project_must_reside_in_the_packages_folder()
       => AreEqual(Combine("/foo", "A", "packages"),
-                  CsLib("A", baseDir:"/foo").Get("Packages"/ProjectDir));
+                  CsLib("A", baseDir:"/foo").Get("Packages"/Basic.ProjectDir));
 
     [Test]
     public void Packages_config_file_must_be_read_from_the_ProjectDir()
@@ -146,16 +146,16 @@ namespace Bud.Cs {
     [Test]
     public void Package_must_contain_the_dll_of_the_CsLibrary_project() {
       var packager = new Mock<IPackager>(MockBehavior.Strict);
-      var projects = Projects(CsLib("A", baseDir:"/foo")
-                                .Set(ProjectVersion, "4.2.0"),
+      var projects = Basic.Projects(CsLib("A", baseDir:"/foo")
+                                .Set(Basic.ProjectVersion, "4.2.0"),
                               CsLib("B", baseDir: "/foo")
                                 .Clear(Output).Add(Output, "B.dll")
                                 .Set(Packager, packager.Object)
-                                .Add(Dependencies, "../A"));
+                                .Add(Basic.Dependencies, "../A"));
       packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
                                  "/foo",
                                  "B",
-                                 DefaultVersion,
+                                 Basic.DefaultVersion,
                                  new[] {new PackageFile("B.dll", "lib/B.dll")},
                                  new[] {new PackageDependency("A", "4.2.0")},
                                  It.IsAny<NuGetPackageMetadata>()))
@@ -167,7 +167,7 @@ namespace Bud.Cs {
     [Test]
     public void Package_must_contain_references_to_own_packages() {
       var packager = new Mock<IPackager>(MockBehavior.Strict);
-      var projects = Projects(CsLib("B", baseDir: "/foo")
+      var projects = Basic.Projects(CsLib("B", baseDir: "/foo")
                                 .Clear(Output).Add(Output, "B.dll")
                                 .Set(Packager, packager.Object)
                                 .Clear("Packages"/ReferencedPackages)
@@ -175,7 +175,7 @@ namespace Bud.Cs {
       packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
                                  "/foo",
                                  "B",
-                                 DefaultVersion,
+                                 Basic.DefaultVersion,
                                  new[] {new PackageFile("B.dll", "lib/B.dll")},
                                  new[] {new PackageDependency("Foo", "2.4.1")},
                                  It.IsAny<NuGetPackageMetadata>()))
@@ -232,7 +232,7 @@ namespace Bud.Cs {
     private static Conf ProjectWithDependencies(string projectId,
                                                 params string[] dependencies)
       => EmptyCSharpProject(projectId)
-        .Add(Dependencies, dependencies);
+        .Add(Basic.Dependencies, dependencies);
 
     private static Conf EmptyCSharpProject(string projectId)
       => CsLib(projectId, projectId, "/foo")
@@ -268,7 +268,7 @@ namespace Bud.Cs {
       ProjectAWithUpdatingSources(IScheduler testScheduler,
                                   Func<CompileInput, CompileOutput> compiler)
       => CsLib("A", baseDir: "/foo")
-        .Set(BuildPipelineScheduler, testScheduler)
+        .Set(Basic.BuildPipelineScheduler, testScheduler)
         .Clear(SourceIncludes)
         .Add(SourceIncludes, FileADelayedUpdates(testScheduler))
         .Clear(AssemblyReferences)

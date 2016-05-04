@@ -86,7 +86,7 @@ namespace Bud.NuGet {
           .ToCompiled();
         dir.CreateFile(
           "4D-31-2B-41-83-A6-87-D8-FC-8C-92-C7-F3-CE-60-E9\nMoo.dll\nZoo.dll",
-          project.Get("A"/BuildDir), "resolved_assemblies");
+          project.Get("A"/Basic.BuildDir), "resolved_assemblies");
 
         ("A"/ResolvedAssemblies)[project].Take(1).Wait();
 
@@ -126,6 +126,6 @@ namespace Bud.NuGet {
     }
 
     private static IEnumerable<string> ReadResolvedAssembliesCache(IConf project)
-      => ReadAllLines(Combine(("A"/BuildDir)[project], "resolved_assemblies")).Skip(1);
+      => ReadAllLines(Combine(("A"/Basic.BuildDir)[project], "resolved_assemblies")).Skip(1);
   }
 }

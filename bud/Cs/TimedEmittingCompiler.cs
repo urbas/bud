@@ -25,7 +25,7 @@ namespace Bud.Cs {
     public static Func<CompileInput, CompileOutput> Create(IConf conf)
       => new TimedEmittingCompiler(
         new RoslynCsCompiler(EmbeddedResources[conf],
-                             ProjectId[conf],
+                             Basic.ProjectId[conf],
                              CsCompilationOptions[conf]),
         GetOutputAssemblyPath(conf))
         .Compile;
@@ -74,6 +74,6 @@ namespace Bud.Cs {
     }
 
     private static string GetOutputAssemblyPath(IConf conf)
-      => Path.Combine(BuildDir[conf], AssemblyName[conf]);
+      => Path.Combine(Basic.BuildDir[conf], AssemblyName[conf]);
   }
 }

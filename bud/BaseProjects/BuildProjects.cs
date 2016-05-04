@@ -21,7 +21,7 @@ namespace Bud.BaseProjects {
             .Init(Output, c => Build[c]);
 
     internal static readonly Conf SourcesSupport
-      = BareProjects.BuildSchedulingSupport
+      = Basic.BuildSchedulingSupport
                     .InitEmpty(SourceIncludes)
                     .InitEmpty(SourceExcludeFilters)
                     .Init(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300))
@@ -41,13 +41,13 @@ namespace Bud.BaseProjects {
       .Set(DistributionArchivePath, DefaultDistributionZipPath)
       .Add(FilesToDistribute, DistributeOutputAndDependencies)
       .Add(Input, c => ProcessedSources[c])
-      .ExcludeSourceDir(c => BuildDir[c])
+      .ExcludeSourceDir(c => Basic.BuildDir[c])
       .Init(DependenciesOutput, GatherOutputsFromDependencies);
 
     internal static Conf BuildProject(string projectId,
                                       Option<string> projectDir = default(Option<string>),
                                       Option<string> baseDir = default(Option<string>))
-      => BareProject(projectId, projectDir, baseDir)
+      => Basic.BareProject(projectId, projectDir, baseDir)
         .Add(BuildProjectSettings);
 
     internal static Conf AddSourcesImpl(Conf c,
@@ -56,8 +56,8 @@ namespace Bud.BaseProjects {
                                         bool includeSubdirs)
       => c.Add(SourceIncludes, conf => {
         var sourceDir = subDir == null ?
-                          ProjectDir[conf] :
-                          Combine(ProjectDir[conf], subDir);
+                          Basic.ProjectDir[conf] :
+                          Combine(Basic.ProjectDir[conf], subDir);
         return FilesObservatory[conf]
           .WatchDir(sourceDir, fileFilter, includeSubdirs);
       });
@@ -65,7 +65,7 @@ namespace Bud.BaseProjects {
     internal static Conf AddSourceFilesImpl(Conf c,
                                             string[] relativeFilePaths)
       => c.Add(SourceIncludes, conf => {
-        var projectDir = ProjectDir[conf];
+        var projectDir = Basic.ProjectDir[conf];
         var absolutePaths = relativeFilePaths
           .Select(relativeFilePath => Combine(projectDir,
                                               relativeFilePath));
@@ -76,7 +76,7 @@ namespace Bud.BaseProjects {
       ExcludeSourceDirsImpl(Conf c,
                             Func<IConf, IEnumerable<string>> subDirs)
       => c.Add(SourceExcludeFilters, conf => {
-        var projectDir = ProjectDir[conf];
+        var projectDir = Basic.ProjectDir[conf];
         var dirs = subDirs(conf)
           .Select(s => IsPathRooted(s) ? s : Combine(projectDir, s));
         return InAnyDirFilter(dirs);
@@ -88,20 +88,20 @@ namespace Bud.BaseProjects {
         .Select(files => files.Select(file => new PackageFile(file, GetFileName(file))));
 
     private static string DefaultDistributionZipPath(IConf c)
-      => Combine(BuildDir[c], "dist-zip", ProjectId[c] + ".zip");
+      => Combine(Basic.BuildDir[c], "dist-zip", Basic.ProjectId[c] + ".zip");
 
     private static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
       => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c],
-                                   BuildPipelineScheduler[c]);
+                                   Basic.BuildPipelineScheduler[c]);
 
     private static IObservable<IEnumerable<string>> GatherOutputsFromDependencies(IConf c)
-      => Dependencies[c]
+      => Basic.Dependencies[c]
         .Gather(dependency => c.TryGet(dependency/Output))
         .Combined();
 
     private static IObservable<IImmutableList<string>> DefaultSources(IConf c)
       => SourceIncludes[c]
-        .ToObservable(SourceFilter(c)).ObserveOn(BuildPipelineScheduler[c])
+        .ToObservable(SourceFilter(c)).ObserveOn(Basic.BuildPipelineScheduler[c])
         .Calmed(c).Select(ImmutableList.ToImmutableList);
 
     private static Func<string, bool> SourceFilter(IConf c) {

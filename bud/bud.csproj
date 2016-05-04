@@ -112,7 +112,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseProjects\BareProjects.cs" />
     <Compile Include="BaseProjects\BuildProjects.cs" />
     <Compile Include="Benchmarks\BenchmarkResults.cs" />
     <Compile Include="Benchmarks\Samples.cs" />
@@ -156,6 +155,7 @@
     <Compile Include="Reactive\TaskResults.cs" />
     <Compile Include="Util\Option.cs" />
     <Compile Include="V1\Api.cs" />
+    <Compile Include="V1\Basic.cs" />
     <Compile Include="V1\Conf.cs" />
     <Compile Include="V1\ConfExtensions.cs" />
     <Compile Include="V1\EnumerableConfApi.cs" />

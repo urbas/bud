@@ -21,7 +21,7 @@ namespace Bud.NuGet {
       .Init(AssemblyResolver, new NuGetAssemblyResolver())
       .Init(PackageDownloader, new NuGetPackageDownloader())
       .Init(ReferencedPackages, ReadReferencedPackagesFromSources)
-      .Init(PackagesConfigFile, c => Combine(ProjectDir[c], "packages.config"))
+      .Init(PackagesConfigFile, c => Combine(Basic.ProjectDir[c], "packages.config"))
       .Init(ResolvedAssemblies, ResolveAssemblies);
 
     private static IObservable<IImmutableList<PackageReference>>
@@ -32,12 +32,12 @@ namespace Bud.NuGet {
     internal static Conf CreatePackageReferencesProject(string projectId,
                                                         Option<string> projectDir = default(Option<string>),
                                                         Option<string> baseDir = default(Option<string>))
-      => BareProject(projectId, projectDir, baseDir)
+      => Basic.BareProject(projectId, projectDir, baseDir)
         .Add(PackageReferencesProjectSettings);
 
     internal static IObservable<IImmutableSet<string>> ResolveAssemblies(IConf c)
       => ReferencedPackages[c].Select(packageReferences => {
-        var buildDir = BuildDir[c];
+        var buildDir = Basic.BuildDir[c];
         var resolvedAssembliesFile = Combine(buildDir, "resolved_assemblies");
         CreateDirectory(buildDir);
         var hash = PackageReference.GetHash(packageReferences);
@@ -49,7 +49,7 @@ namespace Bud.NuGet {
       });
 
     private static IEnumerable<string> DownloadAndResolvePackages(IConf c, IReadOnlyCollection<PackageReference> packageReferences) {
-      var packagesDir = Combine(BuildDir[c], "cache");
+      var packagesDir = Combine(Basic.BuildDir[c], "cache");
       CreateDirectory(packagesDir);
       if (packageReferences.Count == 0) {
         return Enumerable.Empty<string>();
@@ -58,7 +58,7 @@ namespace Bud.NuGet {
         throw new Exception($"Could not download packages: {string.Join(", ", packageReferences)}");
       }
       return AssemblyResolver[c]
-        .FindAssembly(packageReferences, packagesDir, BuildDir[c]);
+        .FindAssembly(packageReferences, packagesDir, Basic.BuildDir[c]);
     }
   }
 }
