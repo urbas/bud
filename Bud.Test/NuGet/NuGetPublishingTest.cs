@@ -22,9 +22,9 @@ namespace Bud.NuGet {
       const string package = "B.nupkg";
       const string fileToPackage = "B.txt";
 
-      var projectA = BareProject("a", "A")
+      var projectA = BareProject("A", baseDir:"/foo")
         .Set(ProjectVersion, "1.2.3");
-      var project = BareProject("b", "B")
+      var project = BareProject("B", baseDir: "/foo")
         .Clear(Output).Add(Output, fileToPackage)
         .Add(Dependencies, "../A")
         .InitEmpty(ReferencedPackages)
@@ -34,7 +34,7 @@ namespace Bud.NuGet {
       var projects = Projects(projectA, project);
 
       packager.Setup(self => self.Pack(Combine(BuildDir[project], PackageOutputDirName),
-                                       Directory.GetCurrentDirectory(),
+                                       "/foo",
                                        "B",
                                        DefaultVersion,
                                        new[] {new PackageFile(fileToPackage, "content/B.txt")},
@@ -49,9 +49,9 @@ namespace Bud.NuGet {
     [Test]
     [Category("IntegrationTest")]
     public void Simplest_NuGet_publishing_project() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        var project = NuGetPublishingProject(tmpDir.Path, "Foo")
-          .Set(PublishUrl, tmpDir.CreateDir("repo"));
+      using (var dir = new TemporaryDirectory()) {
+        var project = NuGetPublishingProject("Foo", baseDir: dir.Path)
+          .Set(PublishUrl, dir.CreateDir("repo"));
         AreEqual(new[] {false},
                  Publish[project].ToEnumerable());
       }
@@ -60,10 +60,10 @@ namespace Bud.NuGet {
     [Test]
     [Category("IntegrationTest")]
     public void NuGet_publishing_some_content() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        var repoDir = tmpDir.CreateDir("repo");
-        var someFile = tmpDir.CreateFile("some content", "A.txt");
-        var project = NuGetPublishingProject(tmpDir.Path, "Foo")
+      using (var dir = new TemporaryDirectory()) {
+        var repoDir = dir.CreateDir("repo");
+        var someFile = dir.CreateFile("some content", "A.txt");
+        var project = NuGetPublishingProject("A", baseDir: dir.Path)
           .Add(PackageFiles, new PackageFile(someFile, "content/A.txt"))
           .Set(PublishUrl, repoDir);
         AreEqual(new[] {true},
