@@ -21,38 +21,34 @@ using Contains = NUnit.Framework.Contains;
 namespace Bud.Cs {
   public class CsProjectsTest {
     [Test]
-    public void Assembly_name_must_use_the_project_id() {
-      using (var tempDir = new TemporaryDirectory()) {
-        AreEqual("Foo.dll",
-                 CsLib(tempDir.Path, "Foo").Get(AssemblyName));
-      }
-    }
+    public void Assembly_name_must_use_the_project_id()
+      => AreEqual("A.dll", CsLib("A", "/foo").Get(AssemblyName));
 
     [Test]
     public void CSharp_sources_must_be_listed() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var cSharpProject = CsLib(tempDir.Path, "Foo");
-        var sourceFile = tempDir.CreateEmptyFile("TestMainClass.cs");
-        That(Sources[cSharpProject].Take(1).Wait(),
+      using (var dir = new TemporaryDirectory()) {
+        var projectA = CsLib("A", baseDir:dir.Path);
+        var sourceFile = dir.CreateEmptyFile("A", "TestMainClass.cs");
+        That(Sources[projectA].Take(1).Wait(),
              Contains.Item(sourceFile));
       }
     }
 
     [Test]
     public void CSharp_sources_in_nested_directories_must_be_listed() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var cSharpProject = CsLib(tempDir.Path, "Foo");
-        var sourceFile = tempDir.CreateEmptyFile("Bud", "TestMainClass.cs");
-        That(Sources[cSharpProject].Take(1).Wait(),
+      using (var dir = new TemporaryDirectory()) {
+        var projectA = CsLib("A", baseDir: dir.Path);
+        var sourceFile = dir.CreateEmptyFile("A", "B", "TestMainClass.cs");
+        That(Sources[projectA].Take(1).Wait(),
              Contains.Item(sourceFile));
       }
     }
 
     [Test]
     public void Non_csharp_files_must_not_be_listed() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var cSharpProject = CsLib(tempDir.Path, "Foo");
-        var textFile = tempDir.CreateEmptyFile("Bud", "TextFile.txt");
+      using (var dir = new TemporaryDirectory()) {
+        var cSharpProject = CsLib("A", baseDir: dir.Path);
+        var textFile = dir.CreateEmptyFile("A", "TextFile.txt");
         That(Sources[cSharpProject].Take(1).Wait(),
              Is.Not.Contains(textFile));
       }
@@ -61,12 +57,13 @@ namespace Bud.Cs {
     [Test]
     public void Compiler_is_invoked_with_sources_and_assembly_references() {
       var cSharpCompiler = new Mock<Func<CompileInput, CompileOutput>>(MockBehavior.Strict);
-      var projectA = CsLib("foo", "A")
+      var projectA = CsLib("A", baseDir: "/foo")
         .Set(Compiler, cSharpCompiler.Object)
-        .Clear(Input).Add(Input, "A.cs")
-        .Add(AssemblyReferences, "A.dll");
+        .Clear(Input)
+        .Add(Input, "A.cs")
+        .Add(AssemblyReferences, "B.dll");
       var assemblyReferences = projectA.Get(AssemblyReferences).ToEnumerable().First();
-      cSharpCompiler.Setup(self => self(new CompileInput(new [] {"A.cs"}, Enumerable.Empty<CompileOutput>(), assemblyReferences)))
+      cSharpCompiler.Setup(self => self(new CompileInput(new[] {"A.cs"}, Enumerable.Empty<CompileOutput>(), assemblyReferences)))
                     .Returns(EmptyCompileOutput());
       Compile[projectA].Take(1).Wait();
       cSharpCompiler.VerifyAll();
@@ -97,12 +94,12 @@ namespace Bud.Cs {
 
     [Test]
     public void Mscorlib_must_be_in_the_list_of_assembly_references()
-      => That(CsLib("Foo").Get(AssemblyReferences).ToEnumerable().First(),
+      => That(CsLib("A", baseDir: "/foo").Get(AssemblyReferences).ToEnumerable().First(),
               Has.Some.Contains("mscorlib.dll"));
 
     [Test]
     public void Referenced_packages_must_be_added_to_the_list_of_assembly_references() {
-      var project = CsLib("Foo")
+      var project = CsLib("A", baseDir: "/foo")
         .Clear("Packages"/ResolvedAssemblies)
         .Add("Packages"/ResolvedAssemblies, "Bar.dll");
       That(AssemblyReferences[project].ToEnumerable().First(),
@@ -111,52 +108,52 @@ namespace Bud.Cs {
 
     [Test]
     public void Referenced_packages_project_must_reside_in_the_packages_folder()
-      => AreEqual(Combine(Directory.GetCurrentDirectory(), "Foo", "packages"),
-                  CsLib("Foo").Get("Packages"/ProjectDir));
+      => AreEqual(Combine("/foo", "A", "packages"),
+                  CsLib("A", baseDir:"/foo").Get("Packages"/ProjectDir));
 
     [Test]
-    public void Packages_config_file_must_be_read_from_the_root()
-      => AreEqual(Combine(Directory.GetCurrentDirectory(), "Foo", "packages.config"),
-                  CsLib("Foo").Get("Packages"/PackagesConfigFile));
+    public void Packages_config_file_must_be_read_from_the_ProjectDir()
+      => AreEqual(Combine("/foo", "A", "packages.config"),
+                  CsLib("A", baseDir: "/foo").Get("Packages"/PackagesConfigFile));
 
     [Test]
     public void CSharp_files_in_the_packages_folder_must_not_be_listed() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var csFile = tempDir.CreateEmptyFile("packages", "A.cs");
-        That(Sources[CsLib(tempDir.Path, "Foo")].Take(1).Wait(),
-             Is.Not.Contains(csFile));
+      using (var dir = new TemporaryDirectory()) {
+        var csFile = dir.CreateEmptyFile("A", "packages", "A.cs");
+        That(Sources[CsLib("A", baseDir: dir.Path)].Take(1).Wait(),
+             Does.Not.Contain(csFile));
       }
     }
 
     [Test]
     public void CSharp_files_in_the_obj_folder_must_not_be_listed() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var csFile = tempDir.CreateEmptyFile("obj", "A.cs");
-        That(Sources[CsLib(tempDir.Path, "Foo")].Take(1).Wait(),
-             Is.Not.Contains(csFile));
+      using (var dir = new TemporaryDirectory()) {
+        var csFile = dir.CreateEmptyFile("A", "obj", "A.cs");
+        That(Sources[CsLib("A", baseDir: dir.Path)].Take(1).Wait(),
+             Does.Not.Contain(csFile));
       }
     }
 
     [Test]
     public void CSharp_files_in_the_bin_folder_must_not_be_listed() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var csFile = tempDir.CreateEmptyFile("bin", "A.cs");
-        That(Sources[CsLib(tempDir.Path, "Foo")].Take(1).Wait(),
-             Is.Not.Contains(csFile));
+      using (var dir = new TemporaryDirectory()) {
+        var csFile = dir.CreateEmptyFile("A", "bin", "A.cs");
+        That(Sources[CsLib("A", baseDir: dir.Path)].Take(1).Wait(),
+             Does.Not.Contain(csFile));
       }
     }
 
     [Test]
     public void Package_must_contain_the_dll_of_the_CsLibrary_project() {
       var packager = new Mock<IPackager>(MockBehavior.Strict);
-      var projects = Projects(CsLib("aDir", "A")
+      var projects = Projects(CsLib("A", baseDir:"/foo")
                                 .Set(ProjectVersion, "4.2.0"),
-                              CsLib("bDir", "B")
+                              CsLib("B", baseDir: "/foo")
                                 .Clear(Output).Add(Output, "B.dll")
                                 .Set(Packager, packager.Object)
                                 .Add(Dependencies, "../A"));
       packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
-                                 Directory.GetCurrentDirectory(),
+                                 "/foo",
                                  "B",
                                  DefaultVersion,
                                  new[] {new PackageFile("B.dll", "lib/B.dll")},
@@ -170,13 +167,13 @@ namespace Bud.Cs {
     [Test]
     public void Package_must_contain_references_to_own_packages() {
       var packager = new Mock<IPackager>(MockBehavior.Strict);
-      var projects = Projects(CsLib("bDir", "B")
+      var projects = Projects(CsLib("B", baseDir: "/foo")
                                 .Clear(Output).Add(Output, "B.dll")
                                 .Set(Packager, packager.Object)
                                 .Clear("Packages"/ReferencedPackages)
                                 .Add("Packages"/ReferencedPackages, new PackageReference("Foo", NuGetVersion.Parse("2.4.1"), NuGetFramework.Parse("net35"))));
       packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
-                                 Directory.GetCurrentDirectory(),
+                                 "/foo",
                                  "B",
                                  DefaultVersion,
                                  new[] {new PackageFile("B.dll", "lib/B.dll")},
@@ -194,10 +191,10 @@ namespace Bud.Cs {
     [Test]
     [Category("IntegrationTest")]
     public void DistributionZip_contains_assembly_references() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        var distZip = CsApp(tmpDir.Path, "A")
+      using (var dir = new TemporaryDirectory()) {
+        var distZip = CsApp("A", baseDir: dir.Path)
           .Clear(Output)
-          .Add(AssemblyReferences, tmpDir.CreateEmptyFile("AssRef.dll"))
+          .Add(AssemblyReferences, dir.CreateEmptyFile("AssRef.dll"))
           .Get(DistributionArchive).Take(1).Wait();
         ZipTestUtils.IsInZip(distZip, "AssRef.dll");
       }
@@ -206,10 +203,10 @@ namespace Bud.Cs {
     [Test]
     [Category("IntegrationTest")]
     public void DistributionZip_does_not_contain_framework_assembly_references() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        var project = CsApp(tmpDir.Path, "A")
+      using (var dir = new TemporaryDirectory()) {
+        var project = CsApp("A", baseDir: dir.Path)
           .Clear(Output)
-          .Add(AssemblyReferences, tmpDir.CreateEmptyFile("System.Runtime.dll"));
+          .Add(AssemblyReferences, dir.CreateEmptyFile("System.Runtime.dll"));
         var distZip = project.Get(DistributionArchive).Take(1).Wait();
         ZipTestUtils.IsNotInZip(distZip, "System.Runtime.dll");
       }
@@ -218,11 +215,11 @@ namespace Bud.Cs {
     [Test]
     [Category("IntegrationTest")]
     public void Projects_must_reference_the_mscorlib_assembly() {
-      using (var tmpDir = new TemporaryDirectory()) {
-        tmpDir.CreateFile(
+      using (var dir = new TemporaryDirectory()) {
+        dir.CreateFile(
           "public class App {public static void Main(string[] args) => System.Console.WriteLine(\"Hello World!\");}",
-          "App.cs");
-        var project = CsProjects.CsLib(tmpDir.Path, "Foo");
+          "A", "App.cs");
+        var project = CsProjects.CsLib("A", baseDir: dir.Path);
         var compileOutput = project.Get(Compile).Take(1).Wait();
         IsTrue(compileOutput.Success);
       }
@@ -238,7 +235,7 @@ namespace Bud.Cs {
         .Add(Dependencies, dependencies);
 
     private static Conf EmptyCSharpProject(string projectId)
-      => CsLib(projectId, projectId)
+      => CsLib(projectId, projectId, "/foo")
         .Clear(SourceIncludes)
         .Clear(AssemblyReferences);
 
@@ -270,7 +267,7 @@ namespace Bud.Cs {
     private static Conf
       ProjectAWithUpdatingSources(IScheduler testScheduler,
                                   Func<CompileInput, CompileOutput> compiler)
-      => CsLib("a", "A")
+      => CsLib("A", baseDir: "/foo")
         .Set(BuildPipelineScheduler, testScheduler)
         .Clear(SourceIncludes)
         .Add(SourceIncludes, FileADelayedUpdates(testScheduler))
