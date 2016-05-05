@@ -61,7 +61,7 @@ namespace Bud.NuGet {
     }
 
     private static IObservable<IEnumerable<PackageFile>> DefaultPackageFiles(IConf c)
-      => c.TryGet(Output)
+      => c.TryGet(Builds.Output)
           .GetOrElse(Observable.Return(Empty<string>()))
           .Select(files => files.Select(ToContentFiles));
 

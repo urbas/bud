@@ -1,37 +1,34 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Bud.IO;
-using Bud.V1;
 using Microsoft.Reactive.Testing;
 using Moq;
 using NUnit.Framework;
-using static System.IO.Directory;
-using static System.IO.Path;
-using static System.Reactive.Linq.Observable;
-using static Bud.V1.Api;
-using static NUnit.Framework.Assert;
+using static Bud.V1.Builds;
 
-namespace Bud.BaseProjects {
-  public class BuildProjectsTest {
+namespace Bud.V1 {
+  public class BuildsTest {
     [Test]
     public void DependenciesInput_must_be_empty_when_no_dependencies_given() {
       var projects = BuildProject("A", "foo");
-      AreEqual(new[] {Enumerable.Empty<string>()},
+      Assert.AreEqual(new[] {Enumerable.Empty<string>()},
                projects.Get(DependenciesOutput).ToList().Wait());
     }
 
     [Test]
     public void DependenciesInput_must_contain_output_from_dependencies() {
       var projects = Basic.Projects(BuildProject("A", "foo")
-                                .Set(Output, Return(new[] {"a"})),
+                                .Set(Output, Observable.Return(new[] {"a"})),
                               BuildProject("B", "boo")
                                 .Add(Basic.Dependencies, "../A"));
-      AreEqual(new[] {"a"},
+      Assert.AreEqual(new[] {"a"},
                projects.Get("B"/DependenciesOutput).Wait());
     }
 
@@ -47,38 +44,38 @@ namespace Bud.BaseProjects {
                                 .Add(Basic.Dependencies, "../A"));
       var bInput = projects.Get("B"/DependenciesOutput).GetEnumerator();
       testScheduler.AdvanceBy(TimeSpan.FromSeconds(5).Ticks);
-      IsTrue(bInput.MoveNext());
-      AreEqual(new[] {"foo"}, bInput.Current);
-      IsTrue(bInput.MoveNext());
-      AreEqual(new[] {"bar"}, bInput.Current);
-      IsFalse(bInput.MoveNext());
+      Assert.IsTrue(bInput.MoveNext());
+      Assert.AreEqual(new[] {"foo"}, bInput.Current);
+      Assert.IsTrue(bInput.MoveNext());
+      Assert.AreEqual(new[] {"bar"}, bInput.Current);
+      Assert.IsFalse(bInput.MoveNext());
     }
 
     [Test]
     public void Sources_should_be_initially_empty()
-      => IsEmpty(BuildProject("A", "", "/foo").Get(Sources).Take(1).Wait());
+      => Assert.IsEmpty(BuildProject("A", "", "/foo").Get(Sources).Take(1).Wait());
 
     [Test]
     public void Input_should_initially_observe_a_single_empty_inout()
-      => AreEqual(new[] {Enumerable.Empty<string>()},
+      => Assert.AreEqual(new[] {Enumerable.Empty<string>()},
                   BuildProject("A", "", "/foo").Get(Input).ToList().Wait());
 
     [Test]
     public void Sources_should_contain_added_files() {
-      var project = BuildProjects.SourcesSupport
+      var project = SourcesSupport
                                  .AddSourceFile("A")
                                  .AddSourceFile(_ => "B");
-      That(Sources[project].Take(1).Wait(),
+      Assert.That(Sources[project].Take(1).Wait(),
            Is.EquivalentTo(new[] {"A", "B"}));
     }
 
     [Test]
     public void Sources_should_be_excluded_by_the_exclusion_filter() {
-      var project = BuildProjects.SourcesSupport
+      var project = SourcesSupport
                                  .AddSourceFile("A")
                                  .AddSourceFile(_ => "B")
                                  .Add(SourceExcludeFilters, sourceFile => string.Equals("B", sourceFile));
-      That(Sources[project].Take(1).Wait(),
+      Assert.That(Sources[project].Take(1).Wait(),
            Is.EquivalentTo(new[] {"A"}));
     }
 
@@ -90,7 +87,7 @@ namespace Bud.BaseProjects {
         var twoDirsProject = BuildProject("A", "", tmpDir.Path)
           .AddSources("A")
           .AddSources("B");
-        That(Sources[twoDirsProject].Take(1).Wait(),
+        Assert.That(Sources[twoDirsProject].Take(1).Wait(),
              Is.EquivalentTo(new[] {fileA, fileB}));
       }
     }
@@ -102,7 +99,7 @@ namespace Bud.BaseProjects {
           .AddSources(fileFilter: "*.cs");
         tmpDir.CreateEmptyFile(Basic.BuildDir[project], "A.cs");
         var files = Sources[project].Take(1).Wait();
-        IsEmpty(files);
+        Assert.IsEmpty(files);
       }
     }
 
@@ -110,7 +107,7 @@ namespace Bud.BaseProjects {
     public void Input_contains_the_added_file() {
       var buildProject = BuildProject("A", "", "/a")
         .Add(SourceIncludes, c => FilesObservatory[c].WatchFiles("foo/bar"));
-      AreEqual(new[] {"foo/bar"},
+      Assert.AreEqual(new[] {"foo/bar"},
                Input[buildProject].Take(1).Wait());
     }
 
@@ -119,13 +116,13 @@ namespace Bud.BaseProjects {
       var fileProcessor = new Mock<IInputProcessor>(MockBehavior.Strict);
       var expectedOutputFiles = new[] {"foo"};
       fileProcessor.Setup(self => self.Process(It.IsAny<IObservable<IEnumerable<string>>>()))
-                   .Returns(Return(expectedOutputFiles));
+                   .Returns(Observable.Return(expectedOutputFiles));
       var actualOutputFiles = BuildProject("A", "", "/a")
         .Add(SourceProcessors, fileProcessor.Object)
         .Get(ProcessedSources)
         .Wait();
       fileProcessor.VerifyAll();
-      AreEqual(expectedOutputFiles, actualOutputFiles);
+      Assert.AreEqual(expectedOutputFiles, actualOutputFiles);
     }
 
     [Test]
@@ -133,7 +130,7 @@ namespace Bud.BaseProjects {
       int inputThreadId = 0;
       var fileProcessor = new ThreadIdRecordingInputProcessor();
       BuildProject("A", "", "/a")
-        .Add(SourceIncludes, new FileWatcher(Enumerable.Empty<string>(), Create<string>(observer => {
+        .Add(SourceIncludes, new FileWatcher(Enumerable.Empty<string>(), Observable.Create<string>(observer => {
           Task.Run(() => {
             inputThreadId = Thread.CurrentThread.ManagedThreadId;
             observer.OnNext("A.cs");
@@ -143,8 +140,8 @@ namespace Bud.BaseProjects {
         })))
         .Add(SourceProcessors, fileProcessor)
         .Get(ProcessedSources).Wait();
-      AreNotEqual(0, fileProcessor.InvocationThreadId);
-      AreNotEqual(inputThreadId, fileProcessor.InvocationThreadId);
+      Assert.AreNotEqual(0, fileProcessor.InvocationThreadId);
+      Assert.AreNotEqual(inputThreadId, fileProcessor.InvocationThreadId);
     }
 
     [Test]
@@ -152,7 +149,7 @@ namespace Bud.BaseProjects {
       var projects = BuildProject("A", "", "/a")
         .Add(SourceIncludes, new FileWatcher("b"))
         .Add(SourceProcessors, new FooAppenderInputProcessor());
-      AreEqual(new[] {"bfoo"},
+      Assert.AreEqual(new[] {"bfoo"},
                projects.Get(Input).Wait());
     }
 
@@ -161,7 +158,7 @@ namespace Bud.BaseProjects {
       using (var tmpDir = new TemporaryDirectory()) {
         tmpDir.CreateEmptyFile("build", "A", "foo", "foo.txt");
         BuildProject("A", "", tmpDir.Path).Get(Basic.Clean);
-        IsFalse(Exists(Combine(tmpDir.Path, "build", "A")));
+        Assert.IsFalse(Directory.Exists(Path.Combine(tmpDir.Path, "build", "A")));
       }
     }
 
@@ -173,8 +170,8 @@ namespace Bud.BaseProjects {
     }
 
     private static IObservable<string[]> ChangingOutput(IScheduler scheduler)
-      => Return(new[] {"foo"}).Delay(TimeSpan.FromSeconds(1), scheduler)
-                              .Concat(Return(new[] {"bar"})
+      => Observable.Return(new[] {"foo"}).Delay(TimeSpan.FromSeconds(1), scheduler)
+                              .Concat(Observable.Return(new[] {"bar"})
                                         .Delay(TimeSpan.FromSeconds(1), scheduler));
 
     private class FooAppenderInputProcessor : IInputProcessor {

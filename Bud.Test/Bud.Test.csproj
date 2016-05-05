@@ -118,8 +118,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseProjects\BasicTest.cs" />
-    <Compile Include="BaseProjects\BuildProjectsTest.cs" />
     <Compile Include="BaseProjects\ZipTestUtils.cs" />
     <Compile Include="Benchmarks\BenchmarkResultsTest.cs" />
     <Compile Include="Benchmarks\MeasurementTest.cs" />
@@ -134,7 +132,6 @@
     <Compile Include="Configuration\PerKeyConfTest.cs" />
     <Compile Include="Configuration\ConfDictionaryTest.cs" />
     <Compile Include="Cs\CompileInputTestUtils.cs" />
-    <Compile Include="Cs\CsProjectsTest.cs" />
     <Compile Include="Cs\RoslynCsCompilationTest.cs" />
     <Compile Include="Cs\TimedEmittingCompilerTest.cs" />
     <Compile Include="Dist\ProjectDistributionTest.cs" />
@@ -161,6 +158,9 @@
     <Compile Include="NuGet\PackageReferenceTest.cs" />
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolverTest.cs" />
     <Compile Include="NuGet\NuGetAssemblyResolverTest.cs" />
+    <Compile Include="V1\BasicTest.cs" />
+    <Compile Include="V1\BuildsTest.cs" />
+    <Compile Include="V1\CsTest.cs" />
     <Compile Include="V1\KeyTest.cs" />
     <EmbeddedResource Include="NuGet\SinglePackageTest\packages.config" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -170,7 +170,6 @@
     <Compile Include="Reactive\WaitingObservablesTest.cs" />
     <Compile Include="Util\OptionTest.cs" />
     <Compile Include="Util\StringsTest.cs" />
-    <Compile Include="V1\ApiTest.cs" />
     <Compile Include="V1\ConfTest.cs" />
     <Compile Include="V1\EnumerableConfApiTest.cs" />
     <Compile Include="V1\KeysTest.cs" />

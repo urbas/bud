@@ -25,7 +25,7 @@ namespace Bud.NuGet {
       var projectA = Project("A", baseDir: "/foo")
         .Set(ProjectVersion, "1.2.3");
       var project = Project("B", baseDir: "/foo")
-        .Clear(Output).Add(Output, fileToPackage)
+        .Clear(Builds.Output).Add(Builds.Output, fileToPackage)
         .Add(Dependencies, "../A")
         .InitEmpty(ReferencedPackages)
         .Add(ReferencedPackages, new PackageReference("C", NuGetVersion.Parse("4.5.7"), NuGetFramework.Parse("net35")))

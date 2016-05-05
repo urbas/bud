@@ -8,7 +8,7 @@ using Bud.Util;
 using Bud.V1;
 using static System.IO.Directory;
 using static System.IO.Path;
-using static Bud.BaseProjects.BuildProjects;
+using static Bud.V1.Builds;
 using static Bud.NuGet.NuGetPackageReferencesReader;
 using static Bud.V1.Api;
 

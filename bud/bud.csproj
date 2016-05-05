@@ -112,7 +112,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseProjects\BuildProjects.cs" />
     <Compile Include="Benchmarks\BenchmarkResults.cs" />
     <Compile Include="Benchmarks\Samples.cs" />
     <Compile Include="Benchmarks\Measurement.cs" />
@@ -122,7 +121,6 @@
     <Compile Include="Collections\DictionaryUtils.cs" />
     <Compile Include="Collections\ImmutableLists.cs" />
     <Compile Include="Configuration\ConfAccessException.cs" />
-    <Compile Include="Cs\CsProjects.cs" />
     <Compile Include="Cs\RoslynCsCompiler.cs" />
     <Compile Include="Dist\BinTrayDistribution.cs" />
     <Compile Include="Dist\ChocoDistribution.cs" />
@@ -156,8 +154,10 @@
     <Compile Include="Util\Option.cs" />
     <Compile Include="V1\Api.cs" />
     <Compile Include="V1\Basic.cs" />
+    <Compile Include="V1\Builds.cs" />
     <Compile Include="V1\Conf.cs" />
     <Compile Include="V1\ConfExtensions.cs" />
+    <Compile Include="V1\Cs.cs" />
     <Compile Include="V1\EnumerableConfApi.cs" />
     <Compile Include="V1\IBuild.cs" />
     <Compile Include="V1\IConf.cs" />
@@ -212,6 +212,7 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="BaseProjects\" />
     <Folder Include="Distribution\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -35,12 +35,12 @@ namespace Bud.Cli {
     public static CompileOutput CompileBuildScript(string baseDir, string buildScriptPath)
       => BuildScriptCompiler
         .Set(Basic.BaseDir, baseDir)
-        .TakeOne(Compile);
+        .TakeOne(V1.Cs.Compile);
 
     private static Conf BuildScriptCompiler { get; }
-      = CsLib("build")
-        .Add(AssemblyReferences, BudDependencies)
-        .Clear(SourceIncludes)
+      = V1.Cs.CsLib("build")
+        .Add(V1.Cs.AssemblyReferences, BudDependencies)
+        .Clear(Builds.SourceIncludes)
         .AddSourceFile(c => Path.Combine(Basic.BaseDir[c], "Build.cs"));
   }
 }

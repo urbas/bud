@@ -6,6 +6,7 @@ using System.Reactive.Linq;
 namespace Bud.IO {
   public class FileWatcher {
     /// <summary>
+    ///   A list of files.
     ///   This enumeration can be enumerated multiple times.
     /// </summary>
     public IEnumerable<string> Files { get; }

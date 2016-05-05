@@ -1,17 +1,16 @@
 using System;
+using System.IO;
 using Bud.Configuration;
-using Bud.V1;
 using NUnit.Framework;
-using static NUnit.Framework.Assert;
-using static System.IO.Path;
 using static Bud.V1.Basic;
+using static NUnit.Framework.Assert;
 
-namespace Bud.BaseProjects {
+namespace Bud.V1 {
   public class BasicTest {
     [Test]
     public void Nested_projects_must_inherit_BaseDir()
       => AreEqual("/foo",
-                  Projects(BareProject("A")).Set(BaseDir, "/foo").Get("A" / BaseDir));
+                  Projects(BareProject("A")).Set(BaseDir, "/foo").Get("A"/BaseDir));
 
     [Test]
     public void ProjectId_cannot_be_null_or_empty()
@@ -37,7 +36,7 @@ namespace Bud.BaseProjects {
       => AreEqual("/bar",
                   Projects(BareProject("A", "/bar"))
                     .Set(BaseDir, "/foo")
-                    .Get("A" / BaseDir));
+                    .Get("A"/BaseDir));
 
     [Test]
     public void Set_ProjectId()
@@ -45,17 +44,17 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void Set_ProjectDir()
-      => AreEqual(Combine("/foo", "bar"),
+      => AreEqual(Path.Combine("/foo", "bar"),
                   Project("A", "bar", "/foo").Get(ProjectDir));
 
     [Test]
     public void Set_ProjectDir_from_ProjectId()
-      => AreEqual(Combine("/foo", "A"),
+      => AreEqual(Path.Combine("/foo", "A"),
                   Project("A", baseDir: "/foo").Get(ProjectDir));
 
     [Test]
     public void ProjectDir_must_be_relative_to_BaseDir()
-      => AreEqual(Combine("/bar", "foo"),
+      => AreEqual(Path.Combine("/bar", "foo"),
                   Project("A", "foo", "/bar").Get(ProjectDir));
 
     [Test]
@@ -74,7 +73,7 @@ namespace Bud.BaseProjects {
 
     [Test]
     public void BuildDir_is_within_BaseDir()
-      => AreEqual(Combine("/foo", "build", "A"),
+      => AreEqual(Path.Combine("/foo", "build", "A"),
                   Project("A", baseDir: "/foo").Get(BuildDir));
 
     [Test]

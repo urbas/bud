@@ -8,14 +8,16 @@ using Bud.Util;
 using Bud.V1;
 using static Bud.Benchmarks.Measurement;
 using static Bud.V1.Api;
+using static Bud.V1.Basic;
+using static Bud.V1.Cs;
 
 public class BudBuild : IBuild {
   public Conf Init()
-    => Basic.Projects(CsApp("bud")
-                  .Set(Basic.ProjectVersion, "0.5.2")
+    => Projects(CsApp("bud")
+                  .Set(ProjectVersion, "0.5.2")
                   .Set(ProjectUrl, "https://github.com/urbas/bud"),
                 CsLib("Bud.Test")
-                  .Add(Basic.Dependencies, "../bud"))
+                  .Add(Dependencies, "../bud"))
       .Init("benchmark", BudBenchmarks.Benchmark);
 }
 
@@ -45,12 +47,12 @@ internal static class BudBenchmarks {
   private static string CloneProjectToBuild(IConf c, string benchmarksDir) {
     var cloneDir = Path.Combine(benchmarksDir, "bud-repo");
     const string revisionToBuild = "33e7262924b1eee21b521533c09d019d93a9b080";
-    CopyRepo(Basic.BaseDir[c], cloneDir, revisionToBuild);
+    CopyRepo(BaseDir[c], cloneDir, revisionToBuild);
     return cloneDir;
   }
 
   private static string CreateBenchmarksDir(IConf c) {
-    var benchmarksDir = Path.Combine(Basic.BaseDir[c], Basic.BuildDirName, "benchmarks");
+    var benchmarksDir = Path.Combine(BaseDir[c], BuildDirName, "benchmarks");
     if (Directory.Exists(benchmarksDir)) {
       Directory.Delete(benchmarksDir, true);
     }

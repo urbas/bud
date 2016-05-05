@@ -49,7 +49,9 @@ namespace Bud.Cli {
     private CompileOutput ValidBuildScript() {
       tmpDir.CreateFile(
         "using Bud.V1;\n" +
+        "using static Bud.V1.Cs;\n" +
         "using static Bud.V1.Api;\n" +
+        "using static Bud.V1.Basic;\n" +
         "\n" +
         "public class SampleBuild : IBuild {\n" +
         "  public Conf Init()\n" +
