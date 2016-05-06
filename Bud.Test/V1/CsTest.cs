@@ -150,9 +150,9 @@ namespace Bud.V1 {
                                 .Set(ProjectVersion, "4.2.0"),
                               CsLib("B", baseDir: "/foo")
                                 .Clear(Output).Add(Output, "B.dll")
-                                .Set(Packager, packager.Object)
+                                .Set(NuGetPublishing.Packager, packager.Object)
                                 .Add(Dependencies, "../A"));
-      packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
+      packager.Setup(s => s.Pack(projects.Get("B"/NuGetPublishing.PackageOutputDir),
                                  "/foo",
                                  "B",
                                  DefaultVersion,
@@ -160,7 +160,7 @@ namespace Bud.V1 {
                                  new[] {new PackageDependency("A", "4.2.0")},
                                  It.IsAny<NuGetPackageMetadata>()))
               .Returns("B.nupkg");
-      projects.Get("B"/Package).Take(1).Wait();
+      projects.Get("B"/NuGetPublishing.Package).Take(1).Wait();
       packager.VerifyAll();
     }
 
@@ -169,10 +169,10 @@ namespace Bud.V1 {
       var packager = new Mock<IPackager>(MockBehavior.Strict);
       var projects = Projects(CsLib("B", baseDir: "/foo")
                                 .Clear(Output).Add(Output, "B.dll")
-                                .Set(Packager, packager.Object)
+                                .Set(NuGetPublishing.Packager, packager.Object)
                                 .Clear("Packages"/ReferencedPackages)
                                 .Add("Packages"/ReferencedPackages, new PackageReference("Foo", NuGetVersion.Parse("2.4.1"), NuGetFramework.Parse("net35"))));
-      packager.Setup(s => s.Pack(projects.Get("B"/PackageOutputDir),
+      packager.Setup(s => s.Pack(projects.Get("B"/NuGetPublishing.PackageOutputDir),
                                  "/foo",
                                  "B",
                                  DefaultVersion,
@@ -180,7 +180,7 @@ namespace Bud.V1 {
                                  new[] {new PackageDependency("Foo", "2.4.1")},
                                  It.IsAny<NuGetPackageMetadata>()))
               .Returns("B.nupkg");
-      projects.Get("B"/Package).Take(1).Wait();
+      projects.Get("B"/NuGetPublishing.Package).Take(1).Wait();
       packager.VerifyAll();
     }
 

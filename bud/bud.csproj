@@ -140,7 +140,6 @@
     <Compile Include="NuGet\NuGetPackager.cs" />
     <Compile Include="NuGet\NuGetPackageReferencesReader.cs" />
     <Compile Include="NuGet\NuGetPublisher.cs" />
-    <Compile Include="NuGet\NuGetPublishing.cs" />
     <Compile Include="NuGet\NuGetPushArgsBuilder.cs" />
     <Compile Include="NuGet\PackageDependency.cs" />
     <Compile Include="NuGet\NuGetPackageMetadata.cs" />
@@ -203,6 +202,7 @@
     <Compile Include="Reactive\WaitingObservables.cs" />
     <Compile Include="Util\Strings.cs" />
     <Compile Include="..\Build.cs" />
+    <Compile Include="V1\NuGetPublishing.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

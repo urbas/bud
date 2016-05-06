@@ -18,7 +18,7 @@ namespace Bud.Dist {
                     Environment.UserName,
                     Basic.ProjectVersion[c],
                     Basic.BuildDir[c],
-                    PackageMetadata[c]);
+                    V1.NuGetPublishing.PackageMetadata[c]);
 
     public static IObservable<bool> Distribute(IObservable<string> observedArchive, string repositoryId, string packadeId, string username, string packageVersion, string buildDir, NuGetPackageMetadata packageMetadata)
       => observedArchive.Select(

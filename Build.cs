@@ -15,7 +15,7 @@ public class BudBuild : IBuild {
   public Conf Init()
     => Projects(CsApp("bud")
                   .Set(ProjectVersion, "0.5.2")
-                  .Set(ProjectUrl, "https://github.com/urbas/bud"),
+                  .Set(Bud.V1.NuGetPublishing.ProjectUrl, "https://github.com/urbas/bud"),
                 CsLib("Bud.Test")
                   .Add(Dependencies, "../bud"))
       .Init("benchmark", BudBenchmarks.Benchmark);

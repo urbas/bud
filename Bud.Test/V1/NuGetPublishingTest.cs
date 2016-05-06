@@ -1,20 +1,20 @@
 using System;
 using System.Collections.Immutable;
+using System.IO;
 using System.Reactive.Linq;
 using Bud.IO;
-using Bud.V1;
+using Bud.NuGet;
+using Bud.Util;
 using Moq;
 using NuGet.Frameworks;
 using NuGet.Versioning;
 using NUnit.Framework;
-using static System.IO.Path;
-using static Bud.NuGet.NuGetPublishing;
-using static Bud.Util.Option;
 using static Bud.V1.Api;
 using static Bud.V1.Basic;
-using static NUnit.Framework.Assert;
+using static Bud.V1.Builds;
+using static Bud.V1.NuGetPublishing;
 
-namespace Bud.NuGet {
+namespace Bud.V1 {
   public class NuGetPublishingTest {
     [Test]
     public void Invokes_the_packager_with_the_right_parameters() {
@@ -25,15 +25,15 @@ namespace Bud.NuGet {
       var projectA = Project("A", baseDir: "/foo")
         .Set(ProjectVersion, "1.2.3");
       var project = Project("B", baseDir: "/foo")
-        .Clear(Builds.Output).Add(Builds.Output, fileToPackage)
+        .Clear(Output).Add(Output, fileToPackage)
         .Add(Dependencies, "../A")
         .InitEmpty(ReferencedPackages)
         .Add(ReferencedPackages, new PackageReference("C", NuGetVersion.Parse("4.5.7"), NuGetFramework.Parse("net35")))
-        .Add(NuGetPublishingSupport)
+        .Add(NuGetPublishingSupportImpl)
         .Set(Packager, packager.Object);
       var projects = Projects(projectA, project);
 
-      packager.Setup(self => self.Pack(Combine(BuildDir[project], PackageOutputDirName),
+      packager.Setup(self => self.Pack(Path.Combine(BuildDir[project], PackageOutputDirName),
                                        "/foo",
                                        "B",
                                        DefaultVersion,
@@ -42,7 +42,7 @@ namespace Bud.NuGet {
                                        new NuGetPackageMetadata(Environment.UserName, "B", ImmutableDictionary<string, string>.Empty)))
               .Returns(package);
 
-      AreEqual(package, projects.Get("B"/Package).Take(1).Wait());
+      Assert.AreEqual(package, projects.Get("B"/Package).Take(1).Wait());
       packager.VerifyAll();
     }
 
@@ -52,7 +52,7 @@ namespace Bud.NuGet {
       using (var dir = new TemporaryDirectory()) {
         var project = NuGetPublishingProject("Foo", baseDir: dir.Path)
           .Set(PublishUrl, dir.CreateDir("repo"));
-        AreEqual(new[] {false},
+        Assert.AreEqual(new[] {false},
                  Publish[project].ToEnumerable());
       }
     }
@@ -66,7 +66,7 @@ namespace Bud.NuGet {
         var project = NuGetPublishingProject("A", baseDir: dir.Path)
           .Add(PackageFiles, new PackageFile(someFile, "content/A.txt"))
           .Set(PublishUrl, repoDir);
-        AreEqual(new[] {true},
+        Assert.AreEqual(new[] {true},
                  Publish[project].ToEnumerable());
       }
     }
@@ -77,7 +77,7 @@ namespace Bud.NuGet {
       const string package = "Foo.nupkg";
 
       var project = Project("A", baseDir: "/foo")
-        .Add(NuGetPublishingSupport)
+        .Add(NuGetPublishingSupportImpl)
         .Set(Publisher, packager.Object)
         .Set(Package, Observable.Return(package))
         .Set(PublishUrl, "publish url")
@@ -88,42 +88,42 @@ namespace Bud.NuGet {
                                           "publish api key"))
               .Returns(true);
 
-      AreEqual(new[] {true}, project.Get(Publish).ToEnumerable());
+      Assert.AreEqual(new[] {true}, project.Get(Publish).ToEnumerable());
       packager.VerifyAll();
     }
 
     [Test]
     public void Default_packager_is_the_NuGet_CLI_implementation()
-      => That(Project("A", baseDir: "/foo")
-                .Add(NuGetPublishingSupport)
+      => Assert.That(Project("A", baseDir: "/foo")
+                .Add(NuGetPublishingSupportImpl)
                 .Get(Packager),
               Is.InstanceOf<NuGetPackager>());
 
     [Test]
     public void Default_publisher_is_the_NuGet_CLI_implementation()
-      => That(Project("A", baseDir: "/foo")
-                .Add(NuGetPublishingSupport)
+      => Assert.That(Project("A", baseDir: "/foo")
+                .Add(NuGetPublishingSupportImpl)
                 .Get(Publisher),
               Is.InstanceOf<NuGetPublisher>());
 
     [Test]
     public void Default_PublishApiKey_is_set_to_None()
-      => That(Project("A", baseDir: "/foo")
-                .Add(NuGetPublishingSupport)
+      => Assert.That(Project("A", baseDir: "/foo")
+                .Add(NuGetPublishingSupportImpl)
                 .Get(PublishApiKey),
-              Is.EqualTo(None<string>()));
+              Is.EqualTo(Option.None<string>()));
 
     [Test]
     public void Default_PackageMetadata_has_no_ProjectUrl()
-      => That(Project("A", baseDir: "/foo")
-                .Add(NuGetPublishingSupport)
+      => Assert.That(Project("A", baseDir: "/foo")
+                .Add(NuGetPublishingSupportImpl)
                 .Get(PackageMetadata).OptionalFields,
-              Does.Not.Contains("projectUrl"));
+              Does.Not.Contain("projectUrl"));
 
     [Test]
     public void Default_PackageMetadata_has_the_provided_ProjectUrl()
-      => That(Project("A", baseDir: "/foo")
-                .Add(NuGetPublishingSupport)
+      => Assert.That(Project("A", baseDir: "/foo")
+                .Add(NuGetPublishingSupportImpl)
                 .Set(ProjectUrl, "some url")
                 .Get(PackageMetadata).OptionalFields["projectUrl"],
               Is.EqualTo("some url"));

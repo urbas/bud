@@ -32,7 +32,7 @@ namespace Bud.V1 {
     public static readonly Key<IImmutableList<ResourceDescription>> EmbeddedResources = nameof(EmbeddedResources);
 
     private static readonly Conf CsProjectSetting = NuGetPublishing
-      .NuGetPublishingSupport
+      .NuGetPublishingSupportImpl
       .AddSources(fileFilter: "*.cs")
       .Init(Compile, DefaultCSharpCompilation)
       .Add(Build, DefaultBuild)
@@ -48,7 +48,7 @@ namespace Bud.V1 {
       .Set(PackagesSubProjectId/ProjectDir, c => Path.Combine(ProjectDir[c], "packages"))
       .Set(PackagesSubProjectId/PackagesConfigFile, c => Path.Combine(ProjectDir[c], "packages.config"))
       .Init(ReferencedPackages, c => (PackagesSubProjectId/ReferencedPackages)[c])
-      .Set(PackageFiles, PackageLibDlls)
+      .Set(NuGetPublishing.PackageFiles, PackageLibDlls)
       .Add(FilesToDistribute, AssembliesPackagedPaths)
       .ExcludeSourceDirs(DefaultExcludedSourceDirs);
 
