@@ -8,7 +8,6 @@ using Bud.V1;
 using Microsoft.CodeAnalysis;
 using static System.IO.File;
 using static Bud.IO.FileUtils;
-using static Bud.V1.Api;
 
 namespace Bud.Cs {
   public class TimedEmittingCompiler {

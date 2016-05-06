@@ -1,32 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using Bud.Cs;
+using System.IO;
+using System.IO.Compression;
+using System.Reactive.Linq;
+using Bud.Dist;
 using Bud.IO;
-using Bud.NuGet;
-using Bud.Util;
 
 namespace Bud.V1 {
-  /// <summary>
-  ///   Defines the core concepts of every build in Bud.
-  ///   <para>
-  ///     Every build has an ID and a directory.
-  ///   </para>
-  ///   <para>
-  ///     In addition, every build has three observable streams: input, build, and output.
-  ///     The input is piped (unmodified) through to the build and then frurther
-  ///     through to output.
-  ///   </para>
-  ///   <para>
-  ///     The build is defined entirely through keys defined in this class. For example,
-  ///     the input, build, and output are defined with keys <see cref="Builds.Input" />,
-  ///     <see cref="Builds.Build" />, and <see cref="Conf.Out" />. One can customise these through
-  ///     the <see cref="Conf" /> API (such as the <see cref="Conf.Modify{T}" /> method).
-  ///   </para>
-  /// </summary>
-  public static class Api {
-    #region Distribution Support
-
+  public static class BinTrayPublishing {
     /// <summary>
     ///   Returns a list of files to package. These file will end up in
     ///   the archive at <see cref="DistributionArchivePath" /> produced by
@@ -64,8 +46,39 @@ namespace Bud.V1 {
     ///     in the produced ZIP archive.
     ///   </para>
     /// </summary>
-    public static Conf DistributionSupport => Dist.ProjectDistribution.DistributionSupport;
+    public static Conf DistributionSupport = Conf
+      .Empty
+      .InitEmpty(FilesToDistribute)
+      .Init(DistributionArchive, CreateDistZip)
+      .Init(Distribute, BinTrayDistribution.Distribute);
 
-    #endregion
+    private static IObservable<string> CreateDistZip(IConf c)
+      => FilesToDistribute[c]
+        .Select(files => CreateDistZip(c, files));
+
+    private static string CreateDistZip(IConf c, IEnumerable<PackageFile> allFiles) {
+      var distZipPath = DistributionArchivePath[c];
+      Console.WriteLine($"Creating the distribution package at '{distZipPath}'...");
+      Directory.CreateDirectory(Path.GetDirectoryName(distZipPath));
+      using (var distZipStream = File.Open(distZipPath, FileMode.Create, FileAccess.Write)) {
+        using (var distZip = new ZipArchive(distZipStream, ZipArchiveMode.Create)) {
+          foreach (var file in allFiles) {
+            AddToZip(distZip, file);
+          }
+        }
+      }
+      Console.WriteLine($"Created the distribution package at '{distZipPath}'.");
+      return distZipPath;
+    }
+
+    private static void AddToZip(ZipArchive distZip, PackageFile path) {
+      var entry = distZip.CreateEntry(path.PathInPackage,
+                                      CompressionLevel.Optimal);
+      using (var entryStream = entry.Open()) {
+        using (var entryFile = File.OpenRead(path.FileToPackage)) {
+          entryFile.CopyTo(entryStream);
+        }
+      }
+    }
   }
 }

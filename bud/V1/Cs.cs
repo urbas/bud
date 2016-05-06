@@ -5,13 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using Bud.Cs;
+using Bud.Dist;
 using Bud.IO;
 using Bud.NuGet;
 using Bud.Reactive;
 using Bud.Util;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using static Bud.V1.Api;
 using static Bud.V1.Basic;
 using static Bud.V1.Builds;
 
@@ -49,7 +49,6 @@ namespace Bud.V1 {
       .Set(PackagesSubProjectId/NuGetReferences.PackagesConfigFile, c => Path.Combine(ProjectDir[c], "packages.config"))
       .Init(NuGetReferences.ReferencedPackages, c => (PackagesSubProjectId/NuGetReferences.ReferencedPackages)[c])
       .Set(NuGetPublishing.PackageFiles, PackageLibDlls)
-      .Add(FilesToDistribute, AssembliesPackagedPaths)
       .ExcludeSourceDirs(DefaultExcludedSourceDirs);
 
     /// <summary>

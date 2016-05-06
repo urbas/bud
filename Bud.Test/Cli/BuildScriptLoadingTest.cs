@@ -2,7 +2,6 @@ using Bud.IO;
 using Bud.V1;
 using NUnit.Framework;
 using static Bud.Cli.BuildScriptLoading;
-using static Bud.V1.Api;
 using static Bud.V1.Basic;
 using static NUnit.Framework.Assert;
 

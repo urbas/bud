@@ -9,7 +9,6 @@ using Moq;
 using NuGet.Frameworks;
 using NuGet.Versioning;
 using NUnit.Framework;
-using static Bud.V1.Api;
 using static Bud.V1.Basic;
 using static Bud.V1.Builds;
 using static Bud.V1.NuGetPublishing;

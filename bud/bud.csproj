@@ -124,7 +124,6 @@
     <Compile Include="Cs\RoslynCsCompiler.cs" />
     <Compile Include="Dist\BinTrayDistribution.cs" />
     <Compile Include="Dist\ChocoDistribution.cs" />
-    <Compile Include="Dist\ProjectDistribution.cs" />
     <Compile Include="IO\HashBasedCaching.cs" />
     <Compile Include="IO\PackageFile.cs" />
     <Compile Include="IO\ValueUpdater.cs" />
@@ -150,8 +149,8 @@
     <Compile Include="Reactive\ObservableResults.cs" />
     <Compile Include="Reactive\TaskResults.cs" />
     <Compile Include="Util\Option.cs" />
-    <Compile Include="V1\Api.cs" />
     <Compile Include="V1\Basic.cs" />
+    <Compile Include="V1\BinTrayPublishing.cs" />
     <Compile Include="V1\Builds.cs" />
     <Compile Include="V1\Conf.cs" />
     <Compile Include="V1\ConfExtensions.cs" />

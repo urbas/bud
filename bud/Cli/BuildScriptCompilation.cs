@@ -12,7 +12,6 @@ using Bud.V1;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
-using static Bud.V1.Api;
 
 namespace Bud.Cli {
   public static class BuildScriptCompilation {

@@ -4,10 +4,10 @@ using System.IO;
 using System.Reactive.Linq;
 using Bud.Benchmarks;
 using Bud.Cli;
+using Bud.Dist;
 using Bud.Util;
 using Bud.V1;
 using static Bud.Benchmarks.Measurement;
-using static Bud.V1.Api;
 using static Bud.V1.Basic;
 using static Bud.V1.Cs;
 
@@ -148,7 +148,7 @@ internal static class BudBenchmarks {
   ///   required libraries are in the same folder).
   /// </returns>
   private static string CreateBudExe(IConf c, string benchmarksDir) {
-    var filesToDist = c.Get("bud"/FilesToDistribute).Take(1).Wait();
+    var filesToDist = c.Get("bud"/BinTrayPublishing.FilesToDistribute).Take(1).Wait();
     var budExeDir = Path.Combine(benchmarksDir, "bud-exe");
     foreach (var packageFile in filesToDist) {
       var path = Path.Combine(budExeDir, packageFile.PathInPackage);

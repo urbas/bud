@@ -7,12 +7,11 @@ using System.Text;
 using Bud.NuGet;
 using Bud.Util;
 using Bud.V1;
-using static Bud.V1.Api;
 
 namespace Bud.Dist {
   public class BinTrayDistribution {
     public static IObservable<bool> Distribute(IConf c)
-      => Distribute(DistributionArchive[c],
+      => Distribute(BinTrayPublishing.DistributionArchive[c],
                     Basic.ProjectId[c],
                     Basic.ProjectId[c],
                     Environment.UserName,

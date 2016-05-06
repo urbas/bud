@@ -106,11 +106,8 @@ namespace Bud.V1 {
         .InitEmpty(SourceProcessors)
         .Init(ProcessedSources, DefaultProcessSources);
 
-    private static readonly Conf BuildProjectSettings = Conf
-      .Empty
-      .Add(BuildSupport)
+    private static readonly Conf BuildProjectSettings = BuildSupport
       .Add(SourceProcessorsSupport)
-      .Add(ProjectDistribution.DistributionSupport)
       .Add(Input, c => ProcessedSources[c])
       .ExcludeSourceDir(c => Basic.BuildDir[c])
       .Init(DependenciesOutput, GatherOutputsFromDependencies);

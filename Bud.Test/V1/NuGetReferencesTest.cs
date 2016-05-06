@@ -7,20 +7,21 @@ using Bud.IO;
 using Bud.NuGet;
 using Moq;
 using NUnit.Framework;
+using static Bud.V1.NuGetReferences;
 
 namespace Bud.V1 {
-  public class PackageReferencesProjectsTest {
+  public class NuGetReferencesTest {
     [Test]
     public void Packages_config_file_is_in_ProjectDir_by_default()
-      => Assert.That(NuGetReferences.PackageReferencesProject("A", baseDir: "/foo").Get(NuGetReferences.PackagesConfigFile),
-              Is.EqualTo(Path.Combine("/foo", "A", "packages.config")));
+      => Assert.That(PackageReferencesProject("A", baseDir: "/foo").Get(PackagesConfigFile),
+                     Is.EqualTo(Path.Combine("/foo", "A", "packages.config")));
 
     [Test]
     public void Assemblies_is_initially_empty()
-      => Assert.That(NuGetReferences.PackageReferencesProject("A", baseDir: "fooDir")
-                .Get(NuGetReferences.ResolvedAssemblies)
-                .Take(1).ToEnumerable(),
-              Has.Exactly(1).Empty);
+      => Assert.That(PackageReferencesProject("A", baseDir: "fooDir")
+                       .Get(ResolvedAssemblies)
+                       .Take(1).ToEnumerable(),
+                     Has.Exactly(1).Empty);
 
     [Test]
     [Category("IntegrationTest")]
@@ -29,14 +30,14 @@ namespace Bud.V1 {
         PackageConfigTestUtils.CreatePackagesConfigFile(dir);
         var resolvedAssemblies = ImmutableList.Create("Foo.dll", "Bar.dll");
         var resolver = MockResolver(new[] {PackageConfigTestUtils.FooReference}, resolvedAssemblies, dir);
-        var project = NuGetReferences.PackageReferencesProject("A", ".", dir.Path)
-          .Set(NuGetReferences.AssemblyResolver, resolver.Object)
+        var project = PackageReferencesProject("A", ".", dir.Path)
+          .Set(AssemblyResolver, resolver.Object)
           .ToCompiled();
 
-        ("A"/NuGetReferences.ResolvedAssemblies)[project].Take(1).Wait();
+        ("A"/ResolvedAssemblies)[project].Take(1).Wait();
 
         Assert.That(ReadResolvedAssembliesCache(project),
-             Is.EquivalentTo(resolvedAssemblies));
+                    Is.EquivalentTo(resolvedAssemblies));
       }
     }
 
@@ -45,11 +46,11 @@ namespace Bud.V1 {
     public void PackageDownloader_is_not_invoked_when_given_no_package_references() {
       using (var tmpDir = new TemporaryDirectory()) {
         var downloader = new Mock<NuGetPackageDownloader>(MockBehavior.Strict);
-        var project = NuGetReferences.PackageReferencesProject("A", baseDir: tmpDir.Path)
-          .Clear(NuGetReferences.ReferencedPackages)
-          .Set(NuGetReferences.PackageDownloader, downloader.Object);
+        var project = PackageReferencesProject("A", baseDir: tmpDir.Path)
+          .Clear(ReferencedPackages)
+          .Set(PackageDownloader, downloader.Object);
 
-        NuGetReferences.ResolvedAssemblies[project].Take(1).Wait();
+        ResolvedAssemblies[project].Take(1).Wait();
       }
     }
 
@@ -60,11 +61,11 @@ namespace Bud.V1 {
         var expectedAssemblies = ImmutableList.Create("Foo.dll");
         var downloader = MockDownloader(new[] {PackageConfigTestUtils.FooReference}, dir);
         var resolver = MockResolver(new[] {PackageConfigTestUtils.FooReference}, expectedAssemblies, dir);
-        var project = NuGetReferences.PackageReferencesProject("A", ".", dir.Path)
-          .Set(NuGetReferences.PackageDownloader, downloader.Object)
-          .Set(NuGetReferences.AssemblyResolver, resolver.Object);
+        var project = PackageReferencesProject("A", ".", dir.Path)
+          .Set(PackageDownloader, downloader.Object)
+          .Set(AssemblyResolver, resolver.Object);
 
-        var actualAssemblies = NuGetReferences.ResolvedAssemblies[project].Take(1).ToEnumerable();
+        var actualAssemblies = ResolvedAssemblies[project].Take(1).ToEnumerable();
 
         Assert.That(actualAssemblies, Has.Exactly(1).EqualTo(expectedAssemblies));
         resolver.VerifyAll();
@@ -77,17 +78,17 @@ namespace Bud.V1 {
       using (var dir = new TemporaryDirectory()) {
         PackageConfigTestUtils.CreatePackagesConfigFile(dir);
         var resolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
-        var project = NuGetReferences.PackageReferencesProject("A", ".", dir.Path)
-          .Set(NuGetReferences.AssemblyResolver, resolver.Object)
+        var project = PackageReferencesProject("A", ".", dir.Path)
+          .Set(AssemblyResolver, resolver.Object)
           .ToCompiled();
         dir.CreateFile(
           "4D-31-2B-41-83-A6-87-D8-FC-8C-92-C7-F3-CE-60-E9\nMoo.dll\nZoo.dll",
           project.Get("A"/Basic.BuildDir), "resolved_assemblies");
 
-        ("A"/NuGetReferences.ResolvedAssemblies)[project].Take(1).Wait();
+        ("A"/ResolvedAssemblies)[project].Take(1).Wait();
 
         Assert.That(ReadResolvedAssembliesCache(project),
-             Is.EquivalentTo(new[] {"Moo.dll", "Zoo.dll"}));
+                    Is.EquivalentTo(new[] {"Moo.dll", "Zoo.dll"}));
       }
     }
 
@@ -95,9 +96,9 @@ namespace Bud.V1 {
     public void ReferencedPackages_lists_package_references_read_from() {
       using (var dir = new TemporaryDirectory()) {
         PackageConfigTestUtils.CreatePackagesConfigFile(dir);
-        var project = NuGetReferences.PackageReferencesProject("A", ".", dir.Path);
-        Assert.That(project.Get(NuGetReferences.ReferencedPackages).Take(1).Wait(),
-             Is.EqualTo(new[] {PackageConfigTestUtils.FooReference}));
+        var project = PackageReferencesProject("A", ".", dir.Path);
+        Assert.That(project.Get(ReferencedPackages).Take(1).Wait(),
+                    Is.EqualTo(new[] {PackageConfigTestUtils.FooReference}));
       }
     }
 
