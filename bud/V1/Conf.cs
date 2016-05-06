@@ -11,25 +11,23 @@ namespace Bud.V1 {
       new Conf(ImmutableList<ScopedConfBuilder>.Empty, ImmutableList<string>.Empty);
 
     /// <summary>
-    ///   The accumulated list of configurations. A value of a particular
-    ///   configuration is obtained by applying configuration builders
-    ///   one by one into a dictionary. Latter configuration builders
-    ///   in this list can values created by configuration builders
+    ///   Configuration builders are applied one by one on a dictionary (see <see cref="ConfDirectory"/>).
+    ///   Configuration builders can modify or override configurations defined by configuration builders
     ///   that came before them.
     ///   <para>
-    ///     Configuration builders come in three forms:
+    ///     There are three types of configuration builders:
     ///   </para>
     ///   <para>
-    ///     - initialisation (see <see cref="InitConf{T}" />), which initialises
-    ///     the value of a configuration if the configuration has not yet been set,
+    ///     - initializers (see <see cref="InitConf{T}" />), which initialise
+    ///     the value of a configuration only if the configuration has not yet been set,
     ///   </para>
     ///   <para>
-    ///     - overridding (see <see cref="SetConf{T}" />), which sets the
-    ///     value of a configuration regardless of whether the configuration was set, and
+    ///     - setters (see <see cref="SetConf{T}" />), which set the
+    ///     value of a configuration regardless of whether the configuration was already set or not; and
     ///   </para>
     ///   <para>
-    ///     - modification (see <see cref="ModifyConf{T}" />), which uses the previous
-    ///     value of a configuration to build the new value (useful for growing lists).
+    ///     - modifiers (see <see cref="ModifyConf{T}" />), which use the previous
+    ///     value of a configuration to set the new value (useful for growing lists).
     ///   </para>
     /// </summary>
     private IImmutableList<ScopedConfBuilder> ScopedConfBuilders { get; }

@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using Bud.Dist;
 using Bud.IO;
 using Bud.Reactive;
 using Bud.Util;
