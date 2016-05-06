@@ -144,7 +144,6 @@
     <Compile Include="NuGet\PackageDependency.cs" />
     <Compile Include="NuGet\NuGetPackageMetadata.cs" />
     <Compile Include="NuGet\PackageReference.cs" />
-    <Compile Include="NuGet\PackageReferencesProjects.cs" />
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolver.cs" />
     <Compile Include="NuGet\IAssemblyResolver.cs" />
     <Compile Include="NuGet\NuGetAssemblyResolver.cs" />
@@ -203,6 +202,7 @@
     <Compile Include="Util\Strings.cs" />
     <Compile Include="..\Build.cs" />
     <Compile Include="V1\NuGetPublishing.cs" />
+    <Compile Include="V1\NuGetReferences.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -27,9 +27,9 @@ namespace Bud.V1 {
       var project = Project("B", baseDir: "/foo")
         .Clear(Output).Add(Output, fileToPackage)
         .Add(Dependencies, "../A")
-        .InitEmpty(ReferencedPackages)
-        .Add(ReferencedPackages, new PackageReference("C", NuGetVersion.Parse("4.5.7"), NuGetFramework.Parse("net35")))
-        .Add(NuGetPublishingSupportImpl)
+        .InitEmpty(NuGetReferences.ReferencedPackages)
+        .Add(NuGetReferences.ReferencedPackages, new PackageReference("C", NuGetVersion.Parse("4.5.7"), NuGetFramework.Parse("net35")))
+        .Add(NuGetPublishingConf)
         .Set(Packager, packager.Object);
       var projects = Projects(projectA, project);
 
@@ -77,7 +77,7 @@ namespace Bud.V1 {
       const string package = "Foo.nupkg";
 
       var project = Project("A", baseDir: "/foo")
-        .Add(NuGetPublishingSupportImpl)
+        .Add(NuGetPublishingConf)
         .Set(Publisher, packager.Object)
         .Set(Package, Observable.Return(package))
         .Set(PublishUrl, "publish url")
@@ -95,35 +95,35 @@ namespace Bud.V1 {
     [Test]
     public void Default_packager_is_the_NuGet_CLI_implementation()
       => Assert.That(Project("A", baseDir: "/foo")
-                .Add(NuGetPublishingSupportImpl)
+                .Add(NuGetPublishingConf)
                 .Get(Packager),
               Is.InstanceOf<NuGetPackager>());
 
     [Test]
     public void Default_publisher_is_the_NuGet_CLI_implementation()
       => Assert.That(Project("A", baseDir: "/foo")
-                .Add(NuGetPublishingSupportImpl)
+                .Add(NuGetPublishingConf)
                 .Get(Publisher),
               Is.InstanceOf<NuGetPublisher>());
 
     [Test]
     public void Default_PublishApiKey_is_set_to_None()
       => Assert.That(Project("A", baseDir: "/foo")
-                .Add(NuGetPublishingSupportImpl)
+                .Add(NuGetPublishingConf)
                 .Get(PublishApiKey),
               Is.EqualTo(Option.None<string>()));
 
     [Test]
     public void Default_PackageMetadata_has_no_ProjectUrl()
       => Assert.That(Project("A", baseDir: "/foo")
-                .Add(NuGetPublishingSupportImpl)
+                .Add(NuGetPublishingConf)
                 .Get(PackageMetadata).OptionalFields,
               Does.Not.Contain("projectUrl"));
 
     [Test]
     public void Default_PackageMetadata_has_the_provided_ProjectUrl()
       => Assert.That(Project("A", baseDir: "/foo")
-                .Add(NuGetPublishingSupportImpl)
+                .Add(NuGetPublishingConf)
                 .Set(ProjectUrl, "some url")
                 .Get(PackageMetadata).OptionalFields["projectUrl"],
               Is.EqualTo("some url"));

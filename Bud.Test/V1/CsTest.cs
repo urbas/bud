@@ -100,8 +100,8 @@ namespace Bud.V1 {
     [Test]
     public void Referenced_packages_must_be_added_to_the_list_of_assembly_references() {
       var project = CsLib("A", baseDir: "/foo")
-        .Clear("Packages"/ResolvedAssemblies)
-        .Add("Packages"/ResolvedAssemblies, "Bar.dll");
+        .Clear("Packages"/NuGetReferences.ResolvedAssemblies)
+        .Add("Packages"/NuGetReferences.ResolvedAssemblies, "Bar.dll");
       Assert.That(AssemblyReferences[project].ToEnumerable().First(),
                   Has.Some.EqualTo("Bar.dll"));
     }
@@ -114,7 +114,7 @@ namespace Bud.V1 {
     [Test]
     public void Packages_config_file_must_be_read_from_the_ProjectDir()
       => Assert.AreEqual(Path.Combine("/foo", "A", "packages.config"),
-                         CsLib("A", baseDir: "/foo").Get("Packages"/PackagesConfigFile));
+                         CsLib("A", baseDir: "/foo").Get("Packages"/NuGetReferences.PackagesConfigFile));
 
     [Test]
     public void CSharp_files_in_the_packages_folder_must_not_be_listed() {
@@ -170,8 +170,8 @@ namespace Bud.V1 {
       var projects = Projects(CsLib("B", baseDir: "/foo")
                                 .Clear(Output).Add(Output, "B.dll")
                                 .Set(NuGetPublishing.Packager, packager.Object)
-                                .Clear("Packages"/ReferencedPackages)
-                                .Add("Packages"/ReferencedPackages, new PackageReference("Foo", NuGetVersion.Parse("2.4.1"), NuGetFramework.Parse("net35"))));
+                                .Clear("Packages"/NuGetReferences.ReferencedPackages)
+                                .Add("Packages"/NuGetReferences.ReferencedPackages, new PackageReference("Foo", NuGetVersion.Parse("2.4.1"), NuGetFramework.Parse("net35"))));
       packager.Setup(s => s.Pack(projects.Get("B"/NuGetPublishing.PackageOutputDir),
                                  "/foo",
                                  "B",

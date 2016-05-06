@@ -32,7 +32,7 @@ namespace Bud.V1 {
     public static readonly Key<IImmutableList<ResourceDescription>> EmbeddedResources = nameof(EmbeddedResources);
 
     private static readonly Conf CsProjectSetting = NuGetPublishing
-      .NuGetPublishingSupportImpl
+      .NuGetPublishingConf
       .AddSources(fileFilter: "*.cs")
       .Init(Compile, DefaultCSharpCompilation)
       .Add(Build, DefaultBuild)
@@ -43,11 +43,11 @@ namespace Bud.V1 {
       .Init(CsCompilationOptions,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary,
                                          warningLevel: 1))
-      .Add(AssemblyReferences, c => (PackagesSubProjectId/ResolvedAssemblies)[c])
+      .Add(AssemblyReferences, c => (PackagesSubProjectId/NuGetReferences.ResolvedAssemblies)[c])
       .Add(AssemblyReferences, WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("mscorlib", new Version(0, 0)).Value)
       .Set(PackagesSubProjectId/ProjectDir, c => Path.Combine(ProjectDir[c], "packages"))
-      .Set(PackagesSubProjectId/PackagesConfigFile, c => Path.Combine(ProjectDir[c], "packages.config"))
-      .Init(ReferencedPackages, c => (PackagesSubProjectId/ReferencedPackages)[c])
+      .Set(PackagesSubProjectId/NuGetReferences.PackagesConfigFile, c => Path.Combine(ProjectDir[c], "packages.config"))
+      .Init(NuGetReferences.ReferencedPackages, c => (PackagesSubProjectId/NuGetReferences.ReferencedPackages)[c])
       .Set(NuGetPublishing.PackageFiles, PackageLibDlls)
       .Add(FilesToDistribute, AssembliesPackagedPaths)
       .ExcludeSourceDirs(DefaultExcludedSourceDirs);
@@ -86,7 +86,7 @@ namespace Bud.V1 {
                              Option<string> projectDir = default(Option<string>),
                              Option<string> baseDir = default(Option<string>))
       => BuildProject(projectId, projectDir, baseDir)
-               .Add(PackageReferencesProject(PackagesSubProjectId, projectDir, baseDir))
+               .Add(NuGetReferences.PackageReferencesProject(PackagesSubProjectId, projectDir, baseDir))
                .Add(CsProjectSetting);
 
     /// <summary>

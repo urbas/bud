@@ -50,14 +50,13 @@ namespace Bud.Cli {
       tmpDir.CreateFile(
         "using Bud.V1;\n" +
         "using static Bud.V1.Cs;\n" +
-        "using static Bud.V1.Api;\n" +
         "using static Bud.V1.Basic;\n" +
         "\n" +
         "public class SampleBuild : IBuild {\n" +
         "  public Conf Init()\n" +
         "    => Projects(CsApp(\"bud\")\n" +
         "                  .Set(ProjectVersion, \"0.5.0-pre-3\")\n" +
-        "                  .Modify(PackageMetadata, (c, metadata) => metadata.WithField(\"projectUrl\", \"https://github.com/urbas/bud\")),\n" +
+        "                  .Set(NuGetPublishing.ProjectUrl, \"https://github.com/urbas/bud\"),\n" +
         "                CsLib(\"Bud.Test\")\n" +
         "                  .Add(Dependencies, \"../bud\"));\n" +
         "}",

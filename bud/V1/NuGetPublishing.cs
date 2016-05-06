@@ -60,7 +60,7 @@ namespace Bud.V1 {
     public static Key<IObservable<IEnumerable<PackageFile>>> PackageFiles = nameof(PackageFiles);
     public static Key<NuGetPackageMetadata> PackageMetadata = nameof(PackageMetadata);
 
-    internal static Conf NuGetPublishingSupportImpl
+    internal static Conf NuGetPublishingConf
       = Conf.Empty
             .Init(PackageMetadata, DefaultPackageMetadata)
             .Init(PackageOutputDir, c => Path.Combine(BuildDir[c], PackageOutputDirName))
@@ -102,7 +102,7 @@ namespace Bud.V1 {
                                               Option<string> projectDir = default(Option<string>),
                                               Option<string> baseDir = default(Option<string>))
       => Project(projectId, projectDir, baseDir)
-        .Add(NuGetPublishingSupportImpl);
+        .Add(NuGetPublishingConf);
 
     private static NuGetPackageMetadata DefaultPackageMetadata(IConf c)
       => new NuGetPackageMetadata(Environment.UserName,
@@ -123,7 +123,7 @@ namespace Bud.V1 {
                                        (packageFiles, referencedPackages) => Pack(c, packageFiles, referencedPackages));
 
     private static IObservable<IImmutableList<PackageReference>> GetReferencedPackages(IConf c)
-      => c.TryGet(Api.ReferencedPackages)
+      => c.TryGet(NuGetReferences.ReferencedPackages)
           .GetOrElse(Observable.Return(ImmutableList<PackageReference>.Empty));
 
     private static string Pack(IConf c,
