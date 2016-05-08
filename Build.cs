@@ -148,15 +148,16 @@ internal static class BudBenchmarks {
   ///   required libraries are in the same folder).
   /// </returns>
   private static string CreateBudExe(IConf c, string benchmarksDir) {
-    var filesToDist = c.Get("bud"/BinTrayPublishing.FilesToDistribute).Take(1).Wait();
-    var budExeDir = Path.Combine(benchmarksDir, "bud-exe");
-    foreach (var packageFile in filesToDist) {
-      var path = Path.Combine(budExeDir, packageFile.PathInPackage);
-      var dir = Path.GetDirectoryName(path);
-      Directory.CreateDirectory(dir);
-      File.Copy(packageFile.FileToPackage, path);
-    }
-    return Path.Combine(budExeDir, "bud");
+    // TODO: Reimplement..
+//    var filesToDist = c.Get("bud"/BinTrayPublishing.FilesToDistribute).Take(1).Wait();
+//    var budExeDir = Path.Combine(benchmarksDir, "bud-exe");
+//    foreach (var packageFile in filesToDist) {
+//      var path = Path.Combine(budExeDir, packageFile.PathInPackage);
+//      var dir = Path.GetDirectoryName(path);
+//      Directory.CreateDirectory(dir);
+//      File.Copy(packageFile.FileToPackage, path);
+//    }
+    return Path.Combine("/foo", "bud");
   }
 
   private static void CopyRepo(string originalRepoDir, string cloneDir, string revision) {

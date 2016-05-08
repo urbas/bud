@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Bud.Configuration;
+using Bud.IO;
 using NUnit.Framework;
 using static Bud.V1.Basic;
 using static NUnit.Framework.Assert;
@@ -23,7 +24,11 @@ namespace Bud.V1 {
               Does.Contain("Project ID 'A/B' is invalid. It must not contain the character '/'."));
 
     [Test]
-    public void Project_throws_when_no_base_directory_is_given()
+    public void ProjectId_is_set()
+      => AreEqual("A", BareProject("A", "/foo").Get(ProjectId));
+
+    [Test]
+    public void BaseDir_throws_when_no_base_directory_is_given()
       => Throws<ConfAccessException>(() => BareProject("Foo").Get(BaseDir));
 
     [Test]
@@ -39,8 +44,34 @@ namespace Bud.V1 {
                     .Get("A"/BaseDir));
 
     [Test]
-    public void Set_ProjectId()
-      => AreEqual("A", BareProject("A", "/foo").Get(ProjectId));
+    public void BuildDir_is_within_BaseDir()
+      => AreEqual(Path.Combine("/foo", "build", "A"),
+                  BareProject("A", baseDir: "/foo").Get(BuildDir));
+
+    [Test]
+    public void Clean_does_nothing_when_the_target_folder_does_not_exist() {
+      using (var dir = new TemporaryDirectory()) {
+        BareProject("A", dir.Path).Get(Clean);
+      }
+    }
+
+    [Test]
+    public void Clean_deletes_non_empty_target_folders() {
+      using (var dir = new TemporaryDirectory()) {
+        dir.CreateEmptyFile("build", "A", "foo", "foo.txt");
+        BareProject("A", dir.Path).Get(Clean);
+        That(Path.Combine(dir.Path, "build", "A"), Does.Not.Exist);
+      }
+    }
+
+    [Test]
+    public void ProjectVersion_is_initially_default()
+      => AreEqual("0.0.1",
+                  BareProject("A", "/foo").Get(ProjectVersion));
+
+    [Test]
+    public void Dependencies_should_be_initially_empty()
+      => IsEmpty(BareProject("A").Get(Dependencies));
 
     [Test]
     public void Set_ProjectDir()
@@ -66,23 +97,5 @@ namespace Bud.V1 {
     public void ProjectDir_is_BaseDir_when_empty()
       => AreEqual("/foo",
                   Project("A", "", "/foo").Get(ProjectDir));
-
-    [Test]
-    public void BaseDir_is_not_set_by_default()
-      => Throws<ConfAccessException>(() => Project("A").Get(BaseDir));
-
-    [Test]
-    public void BuildDir_is_within_BaseDir()
-      => AreEqual(Path.Combine("/foo", "build", "A"),
-                  Project("A", baseDir: "/foo").Get(BuildDir));
-
-    [Test]
-    public void ProjectVersion_is_initially_default()
-      => AreEqual("0.0.1",
-                  Project("A", "", "/foo").Get(ProjectVersion));
-
-    [Test]
-    public void Dependencies_should_be_initially_empty()
-      => IsEmpty(Project("A").Get(Dependencies));
   }
 }

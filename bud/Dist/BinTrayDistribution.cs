@@ -2,45 +2,28 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Reactive.Linq;
 using System.Text;
-using Bud.NuGet;
-using Bud.Util;
-using Bud.V1;
 
 namespace Bud.Dist {
   public class BinTrayDistribution {
-    public static IObservable<bool> Distribute(IConf c)
-      => Distribute(BinTrayPublishing.DistributionArchive[c],
-                    Basic.ProjectId[c],
-                    Basic.ProjectId[c],
-                    Environment.UserName,
-                    Basic.ProjectVersion[c],
-                    Basic.BuildDir[c],
-                    V1.NuGetPublishing.PackageMetadata[c]);
+    public static string PushToBintray(string package,
+                                       string repositoryId,
+                                       string packageId,
+                                       string packageVersion,
+                                       string username)
+      => PushToBintray(() => File.OpenRead(package),
+                       repositoryId,
+                       packageId,
+                       packageVersion,
+                       username,
+                       Path.GetExtension(package));
 
-    public static IObservable<bool> Distribute(IObservable<string> observedArchive, string repositoryId, string packadeId, string username, string packageVersion, string buildDir, NuGetPackageMetadata packageMetadata)
-      => observedArchive.Select(
-        archive => PushToBintray(archive, repositoryId, packadeId, packageVersion, username, "zip")
-                     .Map(archiveUrl => ChocoDistribution.PushToChoco(repositoryId, packadeId, packageVersion, archiveUrl, username, buildDir, packageMetadata))
-                     .GetOrElse(false));
-
-    public static Option<string> PushToBintray(string package,
-                                               string repositoryId,
-                                               string packageId,
-                                               string packageVersion,
-                                               string username,
-                                               string fileExtension) {
-      Func<Stream> contentFetcher = () => File.OpenRead(package);
-      return PushToBintray(contentFetcher, repositoryId, packageId, packageVersion, username, fileExtension);
-    }
-
-    public static Option<string> PushToBintray(Func<Stream> contentFetcher,
-                                               string repositoryId,
-                                               string packageId,
-                                               string packageVersion,
-                                               string username,
-                                               string fileExtension) {
+    public static string PushToBintray(Func<Stream> contentFetcher,
+                                       string repositoryId,
+                                       string packageId,
+                                       string packageVersion,
+                                       string username,
+                                       string fileExtension) {
       var packagePublishUrl = BintrayPublishPackageUrl(packageId, repositoryId, username, packageVersion, fileExtension);
       var apiKey = LoadBintrayApiKey(username);
       Console.WriteLine("Starting to upload to bintray...");
@@ -61,9 +44,10 @@ namespace Bud.Dist {
               var responseContentTask = response.Content.ReadAsStringAsync();
               responseContentTask.Wait();
               Console.WriteLine($"Upload to bintray response body: {responseContentTask.Result}");
-              return uploadSuccess ?
-                       BintrayArchiveDownloadUrl(repositoryId, packageId, username, packageVersion, fileExtension) :
-                       Option.None<string>();
+              if (!uploadSuccess) {
+                throw new Exception($"Could not upload the package '{packageId}' to '{packagePublishUrl}'.");
+              }
+              return BintrayArchiveDownloadUrl(repositoryId, packageId, username, packageVersion, fileExtension);
             }
           }
         }
@@ -77,7 +61,7 @@ namespace Bud.Dist {
                                                     string fileExtension)
       => "https://dl.bintray.com/" +
          $"{username}/{repositoryId}/" +
-         $"{packageId}-{packageVersion}.{fileExtension}";
+         PackageFileName(packageId, packageVersion, fileExtension);
 
     private static string BintrayPublishPackageUrl(string packageId,
                                                    string repositoryId,
@@ -86,7 +70,12 @@ namespace Bud.Dist {
                                                    string fileExtension)
       => "https://api.bintray.com/" +
          $"content/{username}/{repositoryId}/{packageId}/" +
-         $"{packageVersion}/{packageId}-{packageVersion}.{fileExtension}?publish=1";
+         $"{packageVersion}/{PackageFileName(packageId, packageVersion, fileExtension)}?publish=1";
+
+    private static string PackageFileName(string packageId,
+                                          string packageVersion,
+                                          string fileExtension)
+      => $"{packageId}-{packageVersion}{fileExtension}";
 
     private static string LoadBintrayApiKey(string username) {
       var apiKeyFile = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),

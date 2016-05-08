@@ -128,7 +128,8 @@ namespace Bud.V1 {
                  .Init(BaseDir, c => baseDir.OrElse(() => c.TryGet(".."/BaseDir))
                                             .GetOrElse(() => {
                                               throw new Exception("Could not determine the base directory.");
-                                            }));
+                                            }))
+                 .Add(BareProjectSettings);
     }
 
     /// <summary>
@@ -181,8 +182,7 @@ namespace Bud.V1 {
                                Option<string> projectDir = default(Option<string>),
                                Option<string> baseDir = default(Option<string>))
       => BareProject(projectId, baseDir)
-        .Init(ProjectDir, c => GetProjectDir(c, projectDir))
-        .Add(BareProjectSettings);
+        .Init(ProjectDir, c => GetProjectDir(c, projectDir));
 
     private static string GetProjectDir(IConf c, Option<string> projectDir)
       => projectDir.Map(dir => Path.Combine(BaseDir[c], dir))

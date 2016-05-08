@@ -8,7 +8,6 @@ using System.Reactive.Linq;
 using Bud.IO;
 using Bud.Util;
 using static Bud.V1.Basic;
-using static Bud.V1.Builds;
 
 namespace Bud.V1 {
   public class Zipping {
@@ -28,10 +27,14 @@ namespace Bud.V1 {
     /// </summary>
     public static Key<IObservable<string>> Zip = nameof(Zip);
 
-    public static Conf ZipProject(string projectId,
-                                  Option<string> projectDir = default(Option<string>),
-                                  Option<string> baseDir = default(Option<string>))
-      => Project(projectId, projectDir, baseDir)
+    /// <summary>
+    /// </summary>
+    /// <param name="projectId">the project's identifier.</param>
+    /// <param name="baseDir">the base directory in which this project will place all its build artifacts.</param>
+    /// <returns>the configured project.</returns>
+    public static Conf Project(string projectId,
+                               Option<string> baseDir = default(Option<string>))
+      => BareProject(projectId, baseDir)
         .Init(ZipPath, c => Path.Combine(BuildDir[c], $"{ProjectId[c]}.zip"))
         .Init(Zip, DefaultZipping)
         .InitEmpty(FilesToZip);
@@ -42,7 +45,8 @@ namespace Bud.V1 {
       return FilesToZip[c].Select(filesToZip => CreateZipArchive(zipPath, filesToZip));
     }
 
-    public static string CreateZipArchive(string zipPath, IEnumerable<PackageFile> filesToPackage) {
+    public static string CreateZipArchive(string zipPath,
+                                          IEnumerable<PackageFile> filesToPackage) {
       Directory.CreateDirectory(Path.GetDirectoryName(zipPath));
       using (var distZipStream = File.Open(zipPath, FileMode.Create, FileAccess.Write)) {
         using (var distZip = new ZipArchive(distZipStream, ZipArchiveMode.Create)) {

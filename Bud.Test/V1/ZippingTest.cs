@@ -31,6 +31,6 @@ namespace Bud.V1 {
       }
     }
 
-    private static Conf ZipProjectA(string baseDir) => ZipProject("A", baseDir: baseDir);
+    private static Conf ZipProjectA(string baseDir) => Project("A", baseDir: baseDir);
   }
 }

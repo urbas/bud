@@ -1,67 +1,78 @@
 using System;
-using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.IO;
-using System.IO.Compression;
 using System.Reactive.Linq;
-using Bud.Dist;
-using Bud.IO;
+using Bud.Util;
+using static Bud.Dist.BinTrayDistribution;
+using static Bud.V1.Basic;
 
 namespace Bud.V1 {
   public static class BinTrayPublishing {
     /// <summary>
-    ///   A list of files to package. These file will end up in
-    ///   the archive at <see cref="DistributionArchivePath" /> produced by
-    ///   <see cref="DistributionArchive" />.
+    ///   The file to be pushed to a BinTray generic repository.
     /// </summary>
-    public static readonly Key<IObservable<IImmutableList<PackageFile>>> FilesToDistribute = nameof(FilesToDistribute);
+    public static readonly Key<IObservable<string>> PackageFile = nameof(PackageFile);
 
     /// <summary>
-    ///   The path where <see cref="DistributionArchive" /> should place the archive.
+    ///   Pushes the <see cref="PackageFile" /> to a generic BinTray repository.
     /// </summary>
-    public static readonly Key<string> DistributionArchivePath = nameof(DistributionArchivePath);
+    public static readonly Key<IObservable<string>> Push = nameof(Push);
 
     /// <summary>
-    ///   Creates an archive that contains all that is needed for the
-    ///   distribution of the project. It returns the path to the created
-    ///   archive.
+    ///   The ID of the generic BinTray repository to which you want to push the <see cref="PackageFile" />.
     /// </summary>
-    public static readonly Key<IObservable<string>> DistributionArchive = nameof(DistributionArchive);
+    public static readonly Key<string> RepositoryId = nameof(RepositoryId);
 
     /// <summary>
-    ///   Pushes the project to a distribution channel. The default implementation places
-    ///   the <see cref="DistributionArchive" /> into BinTray, uploads a Chocolatey
-    ///   package to the Chocolatey page, and returns <c>true</c> if the operation
-    ///   succeeded.
+    ///   The ID of the package to be pushed to the generic BinTray repository.
     /// </summary>
-    public static readonly Key<IObservable<bool>> Distribute = nameof(Distribute);
+    public static readonly Key<string> PackageId = nameof(PackageId);
 
     /// <summary>
-    ///   Provides the <see cref="DistributionArchive" /> task, which produces
-    ///   a distributable archive. The default implementation of the distribution
-    ///   produces a ZIP archive in the <see cref="DistributionArchivePath" />. This path
-    ///   is not set by default, you have to set it to the desired value.
-    ///   <para>
-    ///     Add files to the <see cref="FilesToDistribute" /> list in order to include them
-    ///     in the produced ZIP archive.
-    ///   </para>
+    ///   The version of the package to be pushed to the generic BinTray repository.
     /// </summary>
-    public static Conf DistributionSupport = Conf
-      .Empty
-      .InitEmpty(FilesToDistribute)
-      .Init(DistributionArchive, CreateDistZip)
-      .Init(Distribute, BinTrayDistribution.Distribute);
+    public static readonly Key<string> PackageVersion = nameof(PackageVersion);
 
-    private static IObservable<string> CreateDistZip(IConf c)
-      => FilesToDistribute[c]
-        .Select(files => CreateDistZip(c, files));
+    /// <summary>
+    ///   The username to use when uploading to the generic BinTray repository.
+    /// </summary>
+    public static readonly Key<string> Username = nameof(Username);
 
-    private static string CreateDistZip(IConf c, IEnumerable<PackageFile> allFiles) {
-      var distZipPath = DistributionArchivePath[c];
-      Console.WriteLine($"Creating the distribution package at '{distZipPath}'...");
-      Zipping.CreateZipArchive(distZipPath, allFiles);
-      Console.WriteLine($"Created the distribution package at '{distZipPath}'.");
-      return distZipPath;
+    /// <summary>
+    ///   This project pushes the <see cref="PackageFile" /> to a generic BinTray repository.
+    ///   <see cref="PackageFile" /> will be pushed evry time it changes.
+    /// </summary>
+    /// <param name="projectId">the project's identifier.</param>
+    /// <param name="packageFile">see <see cref="PackageFile" />.</param>
+    /// <param name="repositoryId">see <see cref="RepositoryId" />.</param>
+    /// <param name="packageId">see <see cref="PackageId" />.</param>
+    /// <param name="packageVersion">see <see cref="PackageVersion" />.</param>
+    /// <param name="username">see <see cref="Username" />.</param>
+    /// <param name="baseDir">the base directory in which this project will place all its build artifacts.</param>
+    /// <returns>the configured project.</returns>
+    public static Conf Project(string projectId,
+                               Func<IConf, IObservable<string>> packageFile,
+                               Func<IConf, string> repositoryId,
+                               Func<IConf, string> packageId,
+                               Func<IConf, string> packageVersion,
+                               Func<IConf, string> username,
+                               Option<string> baseDir = default(Option<string>))
+      => BareProject(projectId, baseDir)
+        .Init(PackageFile, packageFile)
+        .Init(RepositoryId, repositoryId)
+        .Init(PackageId, packageId)
+        .Init(PackageVersion, PackageVersion)
+        .Init(Username, username)
+        .Init(Push, PushToGenericRepo);
+
+    private static IObservable<string> PushToGenericRepo(IConf c) {
+      var repositoryId = RepositoryId[c];
+      string packageId = PackageId[c];
+      string packageVersion = PackageVersion[c];
+      string username = Username[c];
+      return PackageFile[c].Select(file => PushToBintray(file,
+                                                         repositoryId,
+                                                         packageId,
+                                                         packageVersion,
+                                                         username));
     }
   }
 }
