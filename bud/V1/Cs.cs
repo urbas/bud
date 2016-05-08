@@ -48,7 +48,10 @@ namespace Bud.V1 {
       .Set(PackagesSubProjectId/NuGetReferences.PackagesConfigFile, c => Path.Combine(ProjectDir[c], "packages.config"))
       .Init(NuGetReferences.ReferencedPackages, c => (PackagesSubProjectId/NuGetReferences.ReferencedPackages)[c])
       .Set(NuGetPublishing.PackageFiles, PackageLibDlls)
-      .ExcludeSourceDirs(DefaultExcludedSourceDirs);
+      .ExcludeSourceDirs(DefaultExcludedSourceDirs)
+      .Add(Zipping.Project("dist-zip"))
+      .Add("dist-zip"/Zipping.FilesToZip, c => Compile[c].Select(compileOutput => new PackageFile(compileOutput.AssemblyPath, AssemblyName[c])))
+      .Add("dist-zip"/Zipping.FilesToZip, AssembliesPackagedPaths);
 
     /// <summary>
     ///   Configures a C# library project named <paramref name="projectId" /> and placed in the
@@ -84,8 +87,8 @@ namespace Bud.V1 {
                              Option<string> projectDir = default(Option<string>),
                              Option<string> baseDir = default(Option<string>))
       => BuildProject(projectId, projectDir, baseDir)
-               .Add(NuGetReferences.PackageReferencesProject(PackagesSubProjectId, projectDir, baseDir))
-               .Add(CsProjectSetting);
+        .Add(NuGetReferences.PackageReferencesProject(PackagesSubProjectId, projectDir, baseDir))
+        .Add(CsProjectSetting);
 
     /// <summary>
     ///   Similar to <see cref="CsLib" /> but produces a console application instead
@@ -129,7 +132,7 @@ namespace Bud.V1 {
       });
 
     private static IObservable<IImmutableList<PackageFile>> AssembliesPackagedPaths(IConf c)
-      => AssemblyReferences[c].Select<IImmutableList<string>, IEnumerable<PackageFile>>(PackageAssemblies)
+      => AssemblyReferences[c].Select(PackageAssemblies)
                               .Select(ImmutableList.ToImmutableList);
 
     private static IEnumerable<PackageFile> PackageAssemblies(IImmutableList<string> files)
@@ -167,7 +170,7 @@ namespace Bud.V1 {
 
     private static IObservable<IEnumerable<CompileOutput>> ObserveDependencies(IConf c)
       => Dependencies[c].Gather(dependency => c.TryGet(dependency/Compile))
-                              .Combined();
+                        .Combined();
 
     private static IEnumerable<PackageFile> ToPackageFiles(IEnumerable<string> dlls)
       => dlls.Select(dll => new PackageFile(dll, $"lib/{Path.GetFileName(dll)}"));

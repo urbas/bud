@@ -39,7 +39,6 @@ namespace Bud.V1 {
 
     private static IObservable<string> DefaultZipping(IConf c) {
       var zipPath = ZipPath[c];
-      CreateZipArchive(zipPath, Enumerable.Empty<PackageFile>());
       return FilesToZip[c].Select(filesToZip => CreateZipArchive(zipPath, filesToZip));
     }
 
@@ -65,14 +64,5 @@ namespace Bud.V1 {
         }
       }
     }
-
-    private static IImmutableList<PackageFile> ToPackageFiles(IEnumerable<string> absoluteFilePaths,
-                                                              Uri projectDir)
-      => absoluteFilePaths
-        .Select(file => ToPackageFile(projectDir, file))
-        .ToImmutableList();
-
-    private static PackageFile ToPackageFile(Uri baseDir, string file)
-      => new PackageFile(file, baseDir.MakeRelativeUri(new Uri(file)).ToString());
   }
 }

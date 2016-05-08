@@ -219,7 +219,7 @@ namespace Bud.V1 {
 
     #endregion
 
-    #region IObservable<IImmutableList<T>>
+    #region IObservable<IImmutableSet<T>>
 
     private readonly Key<IObservable<IImmutableSet<int>>> observedImmutableSetKey = nameof(observedImmutableSetKey);
 
