@@ -15,6 +15,22 @@ namespace Bud.IO {
       }
     }
 
+    public static void IsInZip(string zipFile, string pathInZip, string originalFile) {
+      using (var zipStream = File.OpenRead(zipFile)) {
+        using (var zipArchive = new ZipArchive(zipStream)) {
+          var zipEntry = zipArchive.GetEntry(pathInZip);
+          IsNotNull(zipEntry, $"The file '{pathInZip}' was not present in '{zipFile}'.");
+          using (var zipEntryStream = zipEntry.Open()) {
+            var memoryStream = new MemoryStream();
+            zipEntryStream.CopyTo(memoryStream);
+            using (var originalFileStream = File.OpenRead(originalFile)) {
+              AreEqual(originalFileStream, memoryStream);
+            }
+          }
+        }
+      }
+    }
+
     public static void IsNotInZip(string zipFile, string zipEntry) {
       using (var zipStream = File.OpenRead(zipFile)) {
         using (var zipArchive = new ZipArchive(zipStream)) {

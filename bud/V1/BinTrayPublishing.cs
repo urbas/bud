@@ -10,7 +10,7 @@ using Bud.IO;
 namespace Bud.V1 {
   public static class BinTrayPublishing {
     /// <summary>
-    ///   Returns a list of files to package. These file will end up in
+    ///   A list of files to package. These file will end up in
     ///   the archive at <see cref="DistributionArchivePath" /> produced by
     ///   <see cref="DistributionArchive" />.
     /// </summary>
@@ -59,26 +59,9 @@ namespace Bud.V1 {
     private static string CreateDistZip(IConf c, IEnumerable<PackageFile> allFiles) {
       var distZipPath = DistributionArchivePath[c];
       Console.WriteLine($"Creating the distribution package at '{distZipPath}'...");
-      Directory.CreateDirectory(Path.GetDirectoryName(distZipPath));
-      using (var distZipStream = File.Open(distZipPath, FileMode.Create, FileAccess.Write)) {
-        using (var distZip = new ZipArchive(distZipStream, ZipArchiveMode.Create)) {
-          foreach (var file in allFiles) {
-            AddToZip(distZip, file);
-          }
-        }
-      }
+      Zipping.CreateZipArchive(distZipPath, allFiles);
       Console.WriteLine($"Created the distribution package at '{distZipPath}'.");
       return distZipPath;
-    }
-
-    private static void AddToZip(ZipArchive distZip, PackageFile path) {
-      var entry = distZip.CreateEntry(path.PathInPackage,
-                                      CompressionLevel.Optimal);
-      using (var entryStream = entry.Open()) {
-        using (var entryFile = File.OpenRead(path.FileToPackage)) {
-          entryFile.CopyTo(entryStream);
-        }
-      }
     }
   }
 }

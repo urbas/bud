@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using Bud.IO;
 using Bud.Reactive;
 using Bud.Util;
+using static Bud.V1.Basic;
 
 namespace Bud.V1 {
   public static class Builds {
@@ -94,11 +95,11 @@ namespace Bud.V1 {
             .InitEmpty(Build).Init(Output, c => Build[c]);
 
     internal static readonly Conf SourcesSupport
-      = Basic.BuildSchedulingSupport
-             .InitEmpty(SourceIncludes)
-             .InitEmpty(SourceExcludeFilters)
-             .Init(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300)).Init(FilesObservatory, new LocalFilesObservatory())
-             .Init(Sources, DefaultSources);
+      = BuildSchedulingSupport
+        .InitEmpty(SourceIncludes)
+        .InitEmpty(SourceExcludeFilters)
+        .Init(WatchedFilesCalmingPeriod, TimeSpan.FromMilliseconds(300)).Init(FilesObservatory, new LocalFilesObservatory())
+        .Init(Sources, DefaultSources);
 
     private static readonly Conf SourceProcessorsSupport
       = SourcesSupport
@@ -108,7 +109,7 @@ namespace Bud.V1 {
     private static readonly Conf BuildProjectSettings = BuildSupport
       .Add(SourceProcessorsSupport)
       .Add(Input, c => ProcessedSources[c])
-      .ExcludeSourceDir(c => Basic.BuildDir[c])
+      .ExcludeSourceDir(c => BuildDir[c])
       .Init(DependenciesOutput, GatherOutputsFromDependencies);
 
     /// <param name="projectId">see <see cref="Basic.ProjectId" />.</param>
@@ -139,8 +140,8 @@ namespace Bud.V1 {
     public static Conf BuildProject(string projectId,
                                     Option<string> projectDir = default(Option<string>),
                                     Option<string> baseDir = default(Option<string>))
-      => Basic.Project(projectId, projectDir, baseDir)
-              .Add(BuildProjectSettings);
+      => Project(projectId, projectDir, baseDir)
+        .Add(BuildProjectSettings);
 
     /// <summary>
     ///   Adds an individual source file to the project.
@@ -166,8 +167,8 @@ namespace Bud.V1 {
     public static Conf AddSources(this Conf c, string subDir = null, string fileFilter = "*", bool includeSubdirs = true)
       => c.Add(SourceIncludes, conf => {
         var sourceDir = subDir == null ?
-                          Basic.ProjectDir[conf] :
-                          Path.Combine(Basic.ProjectDir[conf], subDir);
+                          ProjectDir[conf] :
+                          Path.Combine(ProjectDir[conf], subDir);
         return FilesObservatory[conf].WatchDir(sourceDir, fileFilter, includeSubdirs);
       });
 
@@ -176,7 +177,7 @@ namespace Bud.V1 {
     /// </summary>
     public static Conf AddSourceFiles(this Conf c, params string[] relativeFilePaths)
       => c.Add(SourceIncludes, conf => {
-        var projectDir = Basic.ProjectDir[conf];
+        var projectDir = ProjectDir[conf];
         var absolutePaths = relativeFilePaths
           .Select(relativeFilePath => Path.Combine(projectDir,
                                                    relativeFilePath));
@@ -200,7 +201,7 @@ namespace Bud.V1 {
     /// </summary>
     public static Conf ExcludeSourceDirs(this Conf c, Func<IConf, IEnumerable<string>> subDirs)
       => c.Add(SourceExcludeFilters, conf => {
-        var projectDir = Basic.ProjectDir[conf];
+        var projectDir = ProjectDir[conf];
         var dirs = subDirs(conf)
           .Select(s => Path.IsPathRooted(s) ? s : Path.Combine(projectDir, s));
         return PathUtils.InAnyDirFilter(dirs);
@@ -208,15 +209,15 @@ namespace Bud.V1 {
 
     private static IObservable<T> Calmed<T>(this IObservable<T> observable, IConf c)
       => observable.CalmAfterFirst(WatchedFilesCalmingPeriod[c],
-                                   Basic.BuildPipelineScheduler[c]);
+                                   BuildPipelineScheduler[c]);
 
     private static IObservable<IEnumerable<string>> GatherOutputsFromDependencies(IConf c)
-      => Basic.Dependencies[c]
+      => Dependencies[c]
         .Gather(dependency => c.TryGet(dependency/Output))
         .Combined();
 
     private static IObservable<IImmutableList<string>> DefaultSources(IConf c)
-      => SourceIncludes[c].ToObservable(SourceFilter(c)).ObserveOn(Basic.BuildPipelineScheduler[c])
+      => SourceIncludes[c].ToObservable(SourceFilter(c)).ObserveOn(BuildPipelineScheduler[c])
                           .Calmed(c).Select(ImmutableList.ToImmutableList);
 
     private static Func<string, bool> SourceFilter(IConf c) {
