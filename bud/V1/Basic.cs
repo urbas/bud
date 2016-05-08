@@ -89,16 +89,21 @@ namespace Bud.V1 {
 
     /// <summary>
     ///   <para>
-    ///     A bare project contains only the <see cref="ProjectId" /> and <see cref="BaseDir" /> configurations.
+    ///     This is a minimal Bud project. A bare project does not have any sources. It provides tha
+    ///     bare minimum to be able to produce build outputs.
+    ///   </para>
+    ///   <para>
+    ///     All build output of this project will end up in <see cref="BuildDir" />. You can invoke
+    ///     <see cref="Clean"/> to delete <see cref="BuildDir"/>.
     ///   </para>
     ///   <para>
     ///     A project is a grouping of configurations. Configurations in this project will have the path of
     ///     <c>projectId/{conf key}</c>. You can add projects into projects. For example,
     ///     the code
     ///     <code>
-    /// Project("A")
+    /// BareProject("A")
     ///   .Set(Foo, 42)
-    ///   .Add(Project("B")
+    ///   .Add(BareProject("B")
     ///          .Set(Foo, 9001))
     /// </code>
     ///     would create configurations <c>A/Foo</c> and <c>A/B/Foo</c>.
@@ -115,6 +120,10 @@ namespace Bud.V1 {
     ///   </para>
     /// </param>
     /// <returns>a bag of configurations.</returns>
+    /// <remarks>
+    ///   the difference between this kind of projects and <see cref="Project" /> is that
+    ///   this project does not need a <see cref="ProjectDir" />.
+    /// </remarks>
     public static Conf BareProject(string projectId,
                                    Option<string> baseDir = default(Option<string>)) {
       if (string.IsNullOrEmpty(projectId)) {
@@ -174,9 +183,8 @@ namespace Bud.V1 {
     ///   </para>
     /// </param>
     /// <remarks>
-    ///   This method delegates to <see cref="Project" />
-    ///   it uses <paramref name="projectId" /> as both the project dir and
-    ///   project ID.
+    ///   The difference between <see cref="BareProject" /> and this project is that this
+    ///   project also requires a project directory.
     /// </remarks>
     public static Conf Project(string projectId,
                                Option<string> projectDir = default(Option<string>),
