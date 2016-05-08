@@ -16,6 +16,8 @@ namespace Bud.V1 {
 
     /// <summary>
     ///   Pushes the <see cref="PackageFile" /> to a generic BinTray repository.
+    ///   It produces an observable stream of URLs from which the pushed <see cref="PackageFile"/>
+    ///   can be downloaded (via HTTP get).
     /// </summary>
     public static readonly Key<IObservable<string>> Push = nameof(Push);
 

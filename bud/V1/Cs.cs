@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using Bud.Cs;
-using Bud.Dist;
 using Bud.IO;
 using Bud.NuGet;
 using Bud.Reactive;

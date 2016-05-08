@@ -4,7 +4,6 @@ using System.IO;
 using System.Reactive.Linq;
 using Bud.Benchmarks;
 using Bud.Cli;
-using Bud.Dist;
 using Bud.Util;
 using Bud.V1;
 using static Bud.Benchmarks.Measurement;

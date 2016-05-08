@@ -27,8 +27,6 @@ namespace Bud.V1 {
     /// </summary>
     public static Key<IObservable<string>> Zip = nameof(Zip);
 
-    /// <summary>
-    /// </summary>
     /// <param name="projectId">the project's identifier.</param>
     /// <param name="baseDir">the base directory in which this project will place all its build artifacts.</param>
     /// <returns>the configured project.</returns>

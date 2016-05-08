@@ -158,6 +158,7 @@
     <Compile Include="V1\BasicTest.cs" />
     <Compile Include="V1\BinTrayPublishingTest.cs" />
     <Compile Include="V1\BuildsTest.cs" />
+    <Compile Include="V1\ChocoPublishingTest.cs" />
     <Compile Include="V1\CsTest.cs" />
     <Compile Include="V1\KeyTest.cs" />
     <Compile Include="V1\NuGetPublishingTest.cs" />
