@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Bud.Dist;
 using Bud.Util;
+using Bud.V1;
 using Newtonsoft.Json;
 
 namespace Bud.Benchmarks {
@@ -38,7 +39,7 @@ namespace Bud.Benchmarks {
     /// <param name="username">the BinTray username to use when calling into BinTray's API.</param>
     /// <returns>the url from which the uploaded benchmark JSON can be downloaded.</returns>
     public Option<string> PushToBintray(string repositoryId, string packageId, string username)
-      => BinTrayDistribution.PushToBintray(
+      => BinTrayPublishing.PushToBintray(
         () => new MemoryStream(Encoding.UTF8.GetBytes((string) ToJson())),
         repositoryId,
         packageId,

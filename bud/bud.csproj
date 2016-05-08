@@ -122,7 +122,6 @@
     <Compile Include="Collections\ImmutableLists.cs" />
     <Compile Include="Configuration\ConfAccessException.cs" />
     <Compile Include="Cs\RoslynCsCompiler.cs" />
-    <Compile Include="Dist\BinTrayDistribution.cs" />
     <Compile Include="Dist\ChocoDistribution.cs" />
     <Compile Include="IO\HashBasedCaching.cs" />
     <Compile Include="IO\PackageFile.cs" />
