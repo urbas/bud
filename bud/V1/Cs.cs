@@ -147,12 +147,12 @@ namespace Bud.V1 {
     private static string DefaultAssemblyName(IConf c)
       => ProjectId[c] + CsCompilationOptions[c].OutputKind.ToExtension();
 
-    private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf conf)
-      => Input[conf]
-        .CombineLatest(ObserveDependencies(conf),
-                       AssemblyReferences[conf],
+    private static IObservable<CompileOutput> DefaultCSharpCompilation(IConf c)
+      => Input[c]
+        .CombineLatest(ObserveDependencies(c),
+                       AssemblyReferences[c],
                        CompileInput.Create)
-        .Select(Compiler[conf]).Do(PrintCompilationResult);
+        .Select(Compiler[c]).Do(PrintCompilationResult);
 
     private static void PrintCompilationResult(CompileOutput output) {
       if (output.Success) {
