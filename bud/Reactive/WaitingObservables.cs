@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -19,6 +20,16 @@ namespace Bud.Reactive {
       return shared.Window(CalmingWindows(shared, calmingPeriod, scheduler))
                    .SelectMany(o => o.Aggregate(None<T>(), (element, nextElement) => Some(nextElement)))
                    .Gather();
+    }
+
+    public static IObservable<IImmutableList<T>> CollectUntilCalm<T>(this IObservable<T> observable,
+                                                                     TimeSpan calmingPeriod,
+                                                                     IScheduler scheduler) {
+      var shared = observable.Publish().RefCount();
+      return shared.Window(CalmingWindows(shared, calmingPeriod, scheduler))
+                   .SelectMany(o => o.Aggregate(ImmutableList<T>.Empty,
+                                                (collectedSoFar, nextElement) => collectedSoFar.Add(nextElement)))
+                   .Where(list => !list.IsEmpty);
     }
 
     public static IObservable<T> CalmAfterFirst<T>(this IObservable<T> observableToThrottle,

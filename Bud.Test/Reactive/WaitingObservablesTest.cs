@@ -96,6 +96,38 @@ namespace Bud.Reactive {
       IsFalse(observable.MoveNext());
     }
 
+    [Test]
+    public void CollectUntilCalm_collects_single_elements_when_calming_period_too_short() {
+      var observable = ThreeBursts().CollectUntilCalm(FromTicks(1), scheduler).GetEnumerator();
+      scheduler.AdvanceBy(9001);
+      IsTrue(observable.MoveNext());
+      AreEqual(new [] {0}, observable.Current);
+      IsTrue(observable.MoveNext());
+      AreEqual(new [] {1}, observable.Current);
+      IsTrue(observable.MoveNext());
+      AreEqual(new [] {2}, observable.Current);
+      IsTrue(observable.MoveNext());
+      AreEqual(new [] {10}, observable.Current);
+      IsTrue(observable.MoveNext());
+      AreEqual(new [] {11}, observable.Current);
+      IsTrue(observable.MoveNext());
+      AreEqual(new [] {20}, observable.Current);
+      IsFalse(observable.MoveNext());
+    }
+
+    [Test]
+    public void CollectUntilCalm_collects_groups() {
+      var observable = ThreeBursts().CollectUntilCalm(FromTicks(50), scheduler).GetEnumerator();
+      scheduler.AdvanceBy(9001);
+      IsTrue(observable.MoveNext());
+      AreEqual(new [] {0, 1, 2}, observable.Current);
+      IsTrue(observable.MoveNext());
+      AreEqual(new [] {10, 11}, observable.Current);
+      IsTrue(observable.MoveNext());
+      AreEqual(new [] {20}, observable.Current);
+      IsFalse(observable.MoveNext());
+    }
+
     private IObservable<long> ThreeBursts()
       => tenTickInterval.Take(3)
                         .Merge(tenTickInterval.Select(l => l + 10).Take(2).Delay(FromTicks(100), scheduler))
