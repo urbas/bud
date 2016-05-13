@@ -13,10 +13,10 @@ namespace Bud.IO {
   public class LocalFilesObservatoryTest {
     [Test]
     public async Task Adding_a_file_should_result_in_a_push_notification() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var dir = new TemporaryDirectory()) {
         var disposingBarrier = new CountdownEvent(1);
-        var observedChanges = ObserveSingleFileChangeAsync(tempDir, disposingBarrier);
-        var file = tempDir.CreateEmptyFile("A", "A.txt");
+        var observedChanges = ObserveSingleFileChangeAsync(dir, disposingBarrier);
+        var file = dir.CreateEmptyFile("A", "A.txt");
         Assert.AreEqual(file, await observedChanges);
         disposingBarrier.Wait();
       }
@@ -24,10 +24,10 @@ namespace Bud.IO {
 
     [Test]
     public async Task Changing_a_file_should_result_in_a_push_notification() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var fileA = tempDir.CreateEmptyFile("A", "A.txt");
+      using (var dir = new TemporaryDirectory()) {
+        var fileA = dir.CreateEmptyFile("A", "A.txt");
         var disposingBarrier = new CountdownEvent(1);
-        var observedChanges = ObserveSingleFileChangeAsync(tempDir, disposingBarrier);
+        var observedChanges = ObserveSingleFileChangeAsync(dir, disposingBarrier);
         File.WriteAllText(fileA, "foo");
         Assert.AreEqual(fileA, await observedChanges);
         disposingBarrier.Wait();
@@ -36,10 +36,10 @@ namespace Bud.IO {
 
     [Test]
     public async Task Removing_a_file_should_result_in_a_push_notification() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var fileA = tempDir.CreateEmptyFile("A", "A.txt");
+      using (var dir = new TemporaryDirectory()) {
+        var fileA = dir.CreateEmptyFile("A", "A.txt");
         var disposingBarrier = new CountdownEvent(1);
-        var observedChanges = ObserveSingleFileChangeAsync(tempDir, disposingBarrier);
+        var observedChanges = ObserveSingleFileChangeAsync(dir, disposingBarrier);
         File.Delete(fileA);
         Assert.AreEqual(fileA, await observedChanges);
         disposingBarrier.Wait();
@@ -48,11 +48,11 @@ namespace Bud.IO {
 
     [Test]
     public async Task Moving_a_file_should_result_in_two_push_notifications() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var fileA = tempDir.CreateEmptyFile("A", "A.txt");
-        var fileB = Path.Combine(tempDir.Path, "B.txt");
+      using (var dir = new TemporaryDirectory()) {
+        var fileA = dir.CreateEmptyFile("A", "A.txt");
+        var fileB = Path.Combine(dir.Path, "B.txt");
         bool wasDisposed = false;
-        var changesTask = ObserveFileChanges(tempDir, 2, () => wasDisposed = true);
+        var changesTask = ObserveFileChanges(dir, 2, () => wasDisposed = true);
         File.Move(fileA, fileB);
         var changes = await changesTask;
         Assert.AreEqual(fileA, changes[0]);
@@ -63,11 +63,11 @@ namespace Bud.IO {
 
     [Test]
     public async Task Renaming_a_file_should_result_in_two_push_notifications() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var fileA = tempDir.CreateEmptyFile("A.txt");
-        var fileB = Path.Combine(tempDir.Path, "B.txt");
+      using (var dir = new TemporaryDirectory()) {
+        var fileA = dir.CreateEmptyFile("A.txt");
+        var fileB = Path.Combine(dir.Path, "B.txt");
         bool wasDisposed = false;
-        var changesTask = ObserveFileChanges(tempDir, 2, () => wasDisposed = true);
+        var changesTask = ObserveFileChanges(dir, 2, () => wasDisposed = true);
         File.Move(fileA, fileB);
         var changes = await changesTask;
         Assert.AreEqual(fileA, changes[0]);
@@ -78,11 +78,11 @@ namespace Bud.IO {
 
     [Test]
     public async Task Changing_multiple_files_must_produce_multiple_observations() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var fileA = tempDir.CreateEmptyFile("A.txt");
-        var fileB = tempDir.CreateEmptyFile("B", "B.txt");
+      using (var dir = new TemporaryDirectory()) {
+        var fileA = dir.CreateEmptyFile("A.txt");
+        var fileB = dir.CreateEmptyFile("B", "B.txt");
         bool wasDisposed = false;
-        var changesTask = ObserveFileChanges(tempDir, 6, () => wasDisposed = true);
+        var changesTask = ObserveFileChanges(dir, 6, () => wasDisposed = true);
         File.WriteAllText(fileA, "foo");
         File.WriteAllText(fileB, "moo");
         File.WriteAllText(fileA, "goo");
@@ -115,48 +115,88 @@ namespace Bud.IO {
 
     [Test]
     public void Observing_a_nonexisting_directory_should_fail() {
-      using (var tempDir = new TemporaryDirectory()) {
-        var dir = Path.Combine(tempDir.Path, "A");
+      using (var dir = new TemporaryDirectory()) {
+        var dirA = Path.Combine(dir.Path, "A");
         Assert.Throws<ArgumentException>(
-          () => ObserveFileSystem(dir, "*", true).Wait());
+          () => ObserveFileSystem(dirA, "*", true).Wait());
+      }
+    }
+
+    [Test]
+    public void Two_concurrent_subscribers_should_cause_only_one_subscription() {
+      using (var dir = new TemporaryDirectory()) {
+        int subscriptionCount = 0;
+        var fileA = dir.CreateEmptyFile("A", "A.txt");
+        var disposingBarrier = new CountdownEvent(1);
+        // NOTE: Two events are generated per every change to a file. This is why we have
+        // a countdown of two here.
+        var observationACountdown = new CountdownEvent(2);
+        var observationBCountdown = new CountdownEvent(2);
+        TaskTestUtils.InvokeAndWait(
+          waitCountdown => {
+            var observable_inner = ObserveFileSystem(dir.Path,
+                                                     fileFilter: "*.txt",
+                                                     includeSubdirectories: true,
+                                                     subscribedCallback: () => {
+                                                       waitCountdown.Signal();
+                                                       ++subscriptionCount;
+                                                     },
+                                                     disposedCallback: () => disposingBarrier.Signal());
+            Task.Run(() => observable_inner.Take(2)
+                                           .Do(_ => observationACountdown.Signal())
+                                           .Wait());
+            Task.Run(() => observable_inner.Take(2)
+                                           .Do(_ => observationBCountdown.Signal())
+                                           .Wait());
+          },
+          waitCountdown: 1);
+        File.WriteAllText(fileA, "foo");
+        observationACountdown.Wait();
+        observationBCountdown.Wait();
+        disposingBarrier.Wait();
+        Assert.AreEqual(1, subscriptionCount);
       }
     }
 
     private static Task<string> ObserveSingleFileChangeAsync(TemporaryDirectory tempDir,
                                                              CountdownEvent disposingBarrier)
-      => InvokeWithBarrierAsync(@event => Task.Run(() => {
-        return ObserveFileSystem(tempDir.Path, "*.txt", true, () => @event.Signal(), () => disposingBarrier.Signal())
-          .Take(1)
-          .Wait();
-      }), 1);
+      => TaskTestUtils.InvokeAndWait(
+        waitCountdown => Task.Run(() => {
+          return ObserveFileSystem(tempDir.Path,
+                                   fileFilter: "*.txt",
+                                   includeSubdirectories: true,
+                                   subscribedCallback: () => waitCountdown.Signal(),
+                                   disposedCallback: () => disposingBarrier.Signal())
+            .Take(1)
+            .Wait();
+        }),
+        waitCountdown: 1);
 
     private static Task<List<string>> ObserveFileChanges(TemporaryDirectory tempDir,
                                                          int expectedChangesCount,
                                                          Action disposedCallback)
-      => InvokeWithBarrierAsync(@event => Task.Run(() => {
-        return ObserveFileSystem(tempDir.Path, "*.txt", true, () => @event.Signal(), disposedCallback)
-          .Take(expectedChangesCount)
-          .ToEnumerable().ToList();
-      }), 1);
+      => TaskTestUtils.InvokeAndWait(
+        waitCountdown => Task.Run(
+          () => ObserveFileSystem(tempDir.Path,
+                                  fileFilter: "*.txt",
+                                  includeSubdirectories: true,
+                                  subscribedCallback: () => waitCountdown.Signal(),
+                                  disposedCallback: disposedCallback)
+                  .Take(expectedChangesCount)
+                  .ToEnumerable().ToList()),
+        waitCountdown: 1);
 
     private static Task<List<string>> ObserveMergedFileChanges(string dirA,
                                                                string dirB,
                                                                int expectedChangesCount,
                                                                CountdownEvent disposalBarrier)
-      => InvokeWithBarrierAsync(subscriptionBarrier => Task.Run(() => {
-        var observerA = ObserveFileSystem(dirA, "*", true, () => subscriptionBarrier.Signal(), () => disposalBarrier.Signal());
-        var observerB = ObserveFileSystem(dirB, "*", true, () => subscriptionBarrier.Signal(), () => disposalBarrier.Signal());
+      => TaskTestUtils.InvokeAndWait(waitCountdown => Task.Run(() => {
+        var observerA = ObserveFileSystem(dirA, "*", true, () => waitCountdown.Signal(), () => disposalBarrier.Signal());
+        var observerB = ObserveFileSystem(dirB, "*", true, () => waitCountdown.Signal(), () => disposalBarrier.Signal());
         return observerA.Merge(observerB)
                         .ObserveOn(new EventLoopScheduler())
                         .Take(expectedChangesCount)
                         .ToEnumerable().ToList();
-      }), 2);
-
-    private static T InvokeWithBarrierAsync<T>(Func<CountdownEvent, T> watchFunc, int barrierCount) {
-      var barrier = new CountdownEvent(barrierCount);
-      var observedChanges = watchFunc(barrier);
-      barrier.Wait();
-      return observedChanges;
-    }
+      }), waitCountdown: 2);
   }
 }
