@@ -134,20 +134,20 @@ namespace Bud.IO {
         var observationBCountdown = new CountdownEvent(2);
         TaskTestUtils.InvokeAndWait(
           waitCountdown => {
-            var observable_inner = ObserveFileSystem(dir.Path,
-                                                     fileFilter: "*.txt",
-                                                     includeSubdirectories: true,
-                                                     subscribedCallback: () => {
-                                                       waitCountdown.Signal();
-                                                       ++subscriptionCount;
-                                                     },
-                                                     disposedCallback: () => disposingBarrier.Signal());
-            Task.Run(() => observable_inner.Take(2)
-                                           .Do(_ => observationACountdown.Signal())
-                                           .Wait());
-            Task.Run(() => observable_inner.Take(2)
-                                           .Do(_ => observationBCountdown.Signal())
-                                           .Wait());
+            var observable = ObserveFileSystem(dir.Path,
+                                               fileFilter: "*.txt",
+                                               includeSubdirectories: true,
+                                               subscribedCallback: () => {
+                                                 waitCountdown.Signal();
+                                                 ++subscriptionCount;
+                                               },
+                                               disposedCallback: () => disposingBarrier.Signal());
+            Task.Run(() => observable.Take(2)
+                                     .Do(_ => observationACountdown.Signal())
+                                     .Wait());
+            Task.Run(() => observable.Take(2)
+                                     .Do(_ => observationBCountdown.Signal())
+                                     .Wait());
           },
           waitCountdown: 1);
         File.WriteAllText(fileA, "foo");
@@ -155,6 +155,45 @@ namespace Bud.IO {
         observationBCountdown.Wait();
         disposingBarrier.Wait();
         Assert.AreEqual(1, subscriptionCount);
+      }
+    }
+
+    [Test]
+    public void Observations_resume_after_first_disposal() {
+      using (var dir = new TemporaryDirectory()) {
+        var fileA = dir.CreateEmptyFile("A", "A.txt");
+        var dispose1Barrier = new CountdownEvent(1);
+        var dispose2Barrier = new CountdownEvent(2);
+        var subscription2Barrier = new CountdownEvent(2);
+        var fileObservatory = TaskTestUtils.InvokeAndWait(
+          waitCountdown => {
+            var observable = ObserveFileSystem(dir.Path,
+                                               fileFilter: "*.txt",
+                                               includeSubdirectories: true,
+                                               subscribedCallback: () => {
+                                                 if (!waitCountdown.IsSet) {
+                                                   waitCountdown.Signal();
+                                                 }
+                                                 subscription2Barrier.Signal();
+                                               },
+                                               disposedCallback: () => {
+                                                 if (!dispose1Barrier.IsSet) {
+                                                   dispose1Barrier.Signal();
+                                                 }
+                                                 dispose2Barrier.Signal();
+                                               });
+            Task.Run(() => observable.Take(2).Wait());
+            return observable;
+          },
+          waitCountdown: 1);
+        File.WriteAllText(fileA, "foo");
+        dispose1Barrier.Wait();
+        var observationCountdown = new CountdownEvent(2);
+        Task.Run(() => fileObservatory.Take(2).Do(_ => observationCountdown.Signal()).Wait());
+        subscription2Barrier.Wait();
+        File.WriteAllText(fileA, "bar");
+        observationCountdown.Wait();
+        dispose2Barrier.Wait();
       }
     }
 

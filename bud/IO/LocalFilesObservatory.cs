@@ -29,7 +29,6 @@ namespace Bud.IO {
                                                         Action subscribedCallback = null,
                                                         Action disposedCallback = null)
       => Observable.Create<string>(observer => {
-        Console.WriteLine($"Watching {dir}, filter: {fileFilter}");
         var compositeDisposable = new CompositeDisposable {
           new FileSystemObserver(dir, fileFilter, includeSubdirectories, observer),
           new CallbackDisposable(disposedCallback)
