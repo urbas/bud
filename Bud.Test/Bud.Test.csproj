@@ -134,6 +134,7 @@
     <Compile Include="Cs\CompileInputTestUtils.cs" />
     <Compile Include="Cs\RoslynCsCompilationTest.cs" />
     <Compile Include="Cs\TimedEmittingCompilerTest.cs" />
+    <Compile Include="IO\TaskTestUtils.cs" />
     <Compile Include="IO\HashBasedCachingTest.cs" />
     <Compile Include="IO\MemoryStreams.cs" />
     <Compile Include="IO\ValueUpdaterTest.cs" />

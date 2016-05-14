@@ -217,8 +217,10 @@ namespace Bud.V1 {
         .Combined();
 
     private static IObservable<IImmutableList<string>> DefaultSources(IConf c)
-      => SourceIncludes[c].ToObservable(SourceFilter(c)).ObserveOn(BuildPipelineScheduler[c])
-                          .Calmed(c).Select(ImmutableList.ToImmutableList);
+      => SourceIncludes[c].ToObservable(SourceFilter(c))
+                          .ObserveOn(BuildPipelineScheduler[c])
+                          .Calmed(c)
+                          .Select(ImmutableList.ToImmutableList);
 
     private static Func<string, bool> SourceFilter(IConf c) {
       var excludeFilters = SourceExcludeFilters[c];
