@@ -15,6 +15,11 @@ namespace Bud.IO {
     /// </returns>
     /// <remarks>
     ///   <para>
+    ///     Important: this observable will publish its elements on the file system watcher's thread.
+    ///     Please make sure you use <see cref="Observable.ObserveOn{TSource}(System.IObservable{TSource},System.Reactive.Concurrency.IScheduler)"/>
+    ///     and observe on an appropriate scheduler.
+    ///   </para>
+    ///   <para>
     ///     This function returns a cold observable. The observable will start watching the file system
     ///     upon subscription. It will stop watching the file system when all subscribers unsubscribe.
     ///   </para>
