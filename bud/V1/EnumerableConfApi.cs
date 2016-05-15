@@ -45,6 +45,9 @@ namespace Bud.V1 {
     public static Conf Add<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, IObservable<IEnumerable<T>> value)
       => conf.Add(key, _ => value);
 
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, Func<IConf, T> value)
+      => conf.Add(key, c => Observable.Return(value(c)));
+
     public static Conf Add<T>(this Conf conf, Key<IObservable<IEnumerable<T>>> key, Func<IConf, IObservable<T>> value)
       => conf.Add(key, c => value(c).Select(e => new[] { e }));
 
@@ -94,6 +97,9 @@ namespace Bud.V1 {
 
     public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, IObservable<IEnumerable<T>> value)
       => conf.Add(key, _ => value);
+
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, Func<IConf, T> value)
+      => conf.Add(key, c => Observable.Return(value(c)));
 
     public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableList<T>>> key, Func<IConf, IObservable<T>> value)
       => conf.Add(key, c => value(c).Select(ImmutableList.Create));
@@ -146,6 +152,9 @@ namespace Bud.V1 {
 
     public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, IObservable<IEnumerable<T>> value)
       => conf.Add(key, _ => value);
+
+    public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, Func<IConf, T> value)
+      => conf.Add(key, c => Observable.Return(value(c)));
 
     public static Conf Add<T>(this Conf conf, Key<IObservable<IImmutableSet<T>>> key, Func<IConf, IObservable<T>> value)
       => conf.Add(key, c => value(c).Select(v => new[] { v }));

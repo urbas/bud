@@ -80,6 +80,13 @@ namespace Bud.V1 {
                       .Get(observedEnumerableKey).Wait());
 
     [Test]
+    public void Add_adds_single_value_to_observed_enumerables()
+      => AreEqual(new[] {1, 42},
+                  Conf.Empty.Init(observedEnumerableKey, Observable.Return(new[] {1}))
+                      .Add(observedEnumerableKey, c => 42)
+                      .Get(observedEnumerableKey).Wait());
+
+    [Test]
     public void Add_adds_observed_value_to_observed_enumerables()
       => AreEqual(new[] {1, 2},
                   Conf.Empty.Init(observedEnumerableKey, Observable.Return(new[] {1}))
@@ -166,6 +173,13 @@ namespace Bud.V1 {
                       .Get(observedIImmutableListKey).Wait());
 
     [Test]
+    public void Add_adds_value_to_observed_immutable_lists()
+      => AreEqual(new[] { 1, 2 },
+                  Conf.Empty.Init(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
+                      .Add(observedIImmutableListKey, c => 2)
+                      .Get(observedIImmutableListKey).Wait());
+
+    [Test]
     public void Add_adds_observed_value_to_observed_immutable_lists()
       => AreEqual(new[] { 1, 2 },
                   Conf.Empty.Init(observedIImmutableListKey, Observable.Return(ImmutableList.Create(1)))
@@ -249,6 +263,13 @@ namespace Bud.V1 {
       => AreEqual(new[] { 1, 2, 3 },
                   Conf.Empty.Init(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
                       .Add(observedImmutableSetKey, 2, 3)
+                      .Get(observedImmutableSetKey).Wait());
+
+    [Test]
+    public void Add_adds_value_to_observed_immutable_sets()
+      => AreEqual(new[] { 1, 2 },
+                  Conf.Empty.Init(observedImmutableSetKey, Observable.Return(ImmutableHashSet.Create(1)))
+                      .Add(observedImmutableSetKey, c => 2)
                       .Get(observedImmutableSetKey).Wait());
 
     [Test]
