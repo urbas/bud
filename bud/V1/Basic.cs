@@ -31,10 +31,10 @@ namespace Bud.V1 {
 
     /// <summary>
     ///   By default the entire build pipeline (input, sources, build, and output) are
-    ///   scheduled on the same scheduler and the same thread (i.e.: the build pipeline
+    ///   observed on the same scheduler and the same thread (i.e.: the build pipeline
     ///   is single threaded). The build pipeline is also asynchronous. For example,
     ///   compilers can run each in their own thread and produce output when they finish.
-    ///   The output is collected in the build pipeline's thread.
+    ///   The output is observed in the build pipeline's thread.
     /// </summary>
     /// <remarks>
     ///   You should never need to override this outside of testing. In all honesty, this
@@ -78,10 +78,8 @@ namespace Bud.V1 {
     private static readonly Lazy<EventLoopScheduler> DefauBuildPipelineScheduler
       = new Lazy<EventLoopScheduler>(() => new EventLoopScheduler());
 
-    internal static readonly Conf BuildSchedulingSupport
-      = BuildPipelineScheduler.Init(_ => DefauBuildPipelineScheduler.Value);
-
-    private static readonly Conf BareProjectSettings = BuildSchedulingSupport
+    private static readonly Conf BareProjectSettings = BuildPipelineScheduler
+      .Init(_ => DefauBuildPipelineScheduler.Value)
       .InitEmpty(Dependencies)
       .Init(ProjectVersion, DefaultVersion)
       .Init(BuildDir, DefaultBuildDir)
