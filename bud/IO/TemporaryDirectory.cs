@@ -43,13 +43,13 @@ namespace Bud.IO {
       }
     }
 
-    public string CreateFilePath(params string[] targetPath)
+    public string CreatePath(params string[] targetPath)
       => targetPath.Length == 0 ?
            Combine(Path, Guid.NewGuid().ToString()) :
            Combine(new[] {Path}.Concat(targetPath).ToArray());
 
     private string CreateFilePathAndDir(string[] targetPath) {
-      var file = CreateFilePath(targetPath);
+      var file = CreatePath(targetPath);
       CreateDirectory(GetDirectoryName(file));
       return file;
     }

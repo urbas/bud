@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reactive.Concurrency;
@@ -24,31 +24,31 @@ namespace Bud.V1 {
       => Assert.AreEqual("A.dll", CsLib("A", "/foo").Get(AssemblyName));
 
     [Test]
-    public void CSharp_sources_must_be_listed() {
+    public void CSharp_sources_must_be_in_Input() {
       using (var dir = new TemporaryDirectory()) {
         var projectA = CsLib("A", baseDir: dir.Path);
         var sourceFile = dir.CreateEmptyFile("A", "TestMainClass.cs");
-        Assert.That(Sources[projectA].Take(1).Wait(),
+        Assert.That(Input[projectA].Take(1).Wait(),
                     Contains.Item(sourceFile));
       }
     }
 
     [Test]
-    public void CSharp_sources_in_nested_directories_must_be_listed() {
+    public void CSharp_sources_in_nested_directories_must_be_in_Input() {
       using (var dir = new TemporaryDirectory()) {
         var projectA = CsLib("A", baseDir: dir.Path);
         var sourceFile = dir.CreateEmptyFile("A", "B", "TestMainClass.cs");
-        Assert.That(Sources[projectA].Take(1).Wait(),
+        Assert.That(Input[projectA].Take(1).Wait(),
                     Contains.Item(sourceFile));
       }
     }
 
     [Test]
-    public void Non_csharp_files_must_not_be_listed() {
+    public void Non_csharp_files_must_not_be_in_Input() {
       using (var dir = new TemporaryDirectory()) {
         var cSharpProject = CsLib("A", baseDir: dir.Path);
         var textFile = dir.CreateEmptyFile("A", "TextFile.txt");
-        Assert.That(Sources[cSharpProject].Take(1).Wait(),
+        Assert.That(Input[cSharpProject].Take(1).Wait(),
                     Is.Not.Contains(textFile));
       }
     }
@@ -114,33 +114,6 @@ namespace Bud.V1 {
     public void Packages_config_file_must_be_read_from_the_ProjectDir()
       => Assert.AreEqual(Path.Combine("/foo", "A", "packages.config"),
                          CsLib("A", baseDir: "/foo").Get("Packages"/NuGetReferences.PackagesConfigFile));
-
-    [Test]
-    public void CSharp_files_in_the_packages_folder_must_not_be_listed() {
-      using (var dir = new TemporaryDirectory()) {
-        var csFile = dir.CreateEmptyFile("A", "packages", "A.cs");
-        Assert.That(Sources[CsLib("A", baseDir: dir.Path)].Take(1).Wait(),
-                    Does.Not.Contain(csFile));
-      }
-    }
-
-    [Test]
-    public void CSharp_files_in_the_obj_folder_must_not_be_listed() {
-      using (var dir = new TemporaryDirectory()) {
-        var csFile = dir.CreateEmptyFile("A", "obj", "A.cs");
-        Assert.That(Sources[CsLib("A", baseDir: dir.Path)].Take(1).Wait(),
-                    Does.Not.Contain(csFile));
-      }
-    }
-
-    [Test]
-    public void CSharp_files_in_the_bin_folder_must_not_be_listed() {
-      using (var dir = new TemporaryDirectory()) {
-        var csFile = dir.CreateEmptyFile("A", "bin", "A.cs");
-        Assert.That(Sources[CsLib("A", baseDir: dir.Path)].Take(1).Wait(),
-                    Does.Not.Contain(csFile));
-      }
-    }
 
     [Test]
     public void Package_must_contain_the_dll_of_the_CsLibrary_project() {
@@ -210,8 +183,8 @@ namespace Bud.V1 {
         .Add(Dependencies, dependencies);
 
     private static Conf EmptyCSharpProject(string projectId)
-      => CsLib(projectId, projectId, "/foo")
-        .Clear(SourceIncludes)
+      => CsLib(projectId, baseDir: "/foo")
+        .Clear(Input)
         .Clear(AssemblyReferences);
 
     private static CompileOutput EmptyCompileOutput(long timestamp = 0L)
@@ -229,23 +202,22 @@ namespace Bud.V1 {
       return compiler;
     }
 
-    private static FileWatcher FileADelayedUpdates(IScheduler testScheduler) {
-      var changes = Observable.Return("A.cs").Delay(TimeSpan.FromSeconds(1),
-                                                    testScheduler)
-                              .Concat(Observable.Return("A.cs")
-                                                .Delay(TimeSpan.FromSeconds(1),
-                                                       testScheduler));
-      IEnumerable<string> files = new[] {"A.cs"};
-      return new FileWatcher(files, changes);
-    }
+    private static IObservable<IImmutableList<string>>
+      FileADelayedUpdates(IScheduler testScheduler)
+      => Observable.Return("A.cs").Delay(TimeSpan.FromSeconds(1),
+                                         testScheduler)
+                   .Concat(Observable.Return("A.cs")
+                                     .Delay(TimeSpan.FromSeconds(1),
+                                            testScheduler))
+                   .Select(ImmutableList.Create);
 
     private static Conf
       ProjectAWithUpdatingSources(IScheduler testScheduler,
                                   Func<CompileInput, CompileOutput> compiler)
       => CsLib("A", baseDir: "/foo")
         .Set(BuildPipelineScheduler, testScheduler)
-        .Clear(SourceIncludes)
-        .Add(SourceIncludes, FileADelayedUpdates(testScheduler))
+        .Clear(Input)
+        .Add(Input, FileADelayedUpdates(testScheduler))
         .Clear(AssemblyReferences)
         .Set(Compiler, compiler);
   }

@@ -51,6 +51,10 @@
       <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="NuGet.Frameworks, Version=3.3.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\NuGet.Frameworks.3.3.0\lib\net45\NuGet.Frameworks.dll</HintPath>
       <Private>True</Private>
@@ -118,9 +122,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseProjects\ZipTestUtils.cs" />
     <Compile Include="Benchmarks\BenchmarkResultsTest.cs" />
     <Compile Include="Benchmarks\MeasurementTest.cs" />
+    <Compile Include="Build\Digest.cs" />
+    <Compile Include="Build\TimestampBuilderTest.cs" />
     <Compile Include="Cli\BuildScriptLoadingTest.cs" />
     <Compile Include="Cli\BuildScriptCompilationTest.cs" />
     <Compile Include="Cli\BuildToolTest.cs" />
@@ -144,7 +149,6 @@
     <Compile Include="IO\FileObservatoriesTest.cs" />
     <Compile Include="IO\PathUtilsTest.cs" />
     <Compile Include="IO\TimestampedTest.cs" />
-    <Compile Include="IO\FileWatchersTest.cs" />
     <Compile Include="IO\FileWatcherTest.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReferenceVersionAggregatorTest.cs" />
     <Compile Include="NuGet\NuGetPackageDownloaderTest.cs" />
@@ -156,6 +160,7 @@
     <Compile Include="NuGet\PackageReferenceTest.cs" />
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolverTest.cs" />
     <Compile Include="NuGet\NuGetAssemblyResolverTest.cs" />
+    <Compile Include="Util\ZipTestUtils.cs" />
     <Compile Include="V1\BasicTest.cs" />
     <Compile Include="V1\BinTrayPublishingTest.cs" />
     <Compile Include="V1\BuildsTest.cs" />
@@ -192,9 +197,7 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Dist\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -12,6 +12,9 @@ using Bud.V1;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
+using static Bud.V1.Basic;
+using static Bud.V1.Builds;
+using static Bud.V1.Cs;
 
 namespace Bud.Cli {
   public static class BuildScriptCompilation {
@@ -33,13 +36,13 @@ namespace Bud.Cli {
 
     public static CompileOutput CompileBuildScript(string baseDir, string buildScriptPath)
       => BuildScriptCompiler
-        .Set(Basic.BaseDir, baseDir)
-        .TakeOne(V1.Cs.Compile);
+        .Set(BaseDir, baseDir)
+        .TakeOne(Compile);
 
     private static Conf BuildScriptCompiler { get; }
-      = V1.Cs.CsLib("build")
-        .Add(V1.Cs.AssemblyReferences, BudDependencies)
-        .Clear(Builds.SourceIncludes)
-        .AddSourceFile(c => Path.Combine(Basic.BaseDir[c], "Build.cs"));
+      = CsLib("build")
+        .Add(AssemblyReferences, BudDependencies)
+        .Clear(Input)
+        .Add(Input, c => Path.Combine(BaseDir[c], "Build.cs"));
   }
 }

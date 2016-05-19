@@ -66,7 +66,7 @@ namespace Bud.V1 {
     public static readonly Key<string> BuildDir = nameof(BuildDir);
 
     /// <summary>
-    ///   By default, deletes the entire <see cref="BuildDir" />
+    ///   Deletes the entire <see cref="BuildDir" />.
     /// </summary>
     public static readonly Key<Unit> Clean = nameof(Clean);
 

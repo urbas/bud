@@ -32,9 +32,13 @@ namespace Bud.V1 {
 
     private static readonly Conf CsProjectSetting = NuGetPublishing
       .NuGetPublishingConf
-      .AddSources(fileFilter: "*.cs")
+      // TODO: Adds all csharp files under ProjectDir.
+      //      .AddSources(fileFilter: "*.cs")
+//      .Add(Input, c => Directory.EnumerateFiles(ProjectDir[c],
+//                                                "*.cs",
+//                                                SearchOption.AllDirectories))
       .Init(Compile, DefaultCSharpCompilation)
-      .Add(Build, DefaultBuild)
+      .Add(Output, DefaultBuild)
       .Init(AssemblyName, DefaultAssemblyName)
       .InitEmpty(AssemblyReferences)
       .InitEmpty(EmbeddedResources)
@@ -48,7 +52,9 @@ namespace Bud.V1 {
       .Set(PackagesSubProjectId/NuGetReferences.PackagesConfigFile, c => Path.Combine(ProjectDir[c], "packages.config"))
       .Init(NuGetReferences.ReferencedPackages, c => (PackagesSubProjectId/NuGetReferences.ReferencedPackages)[c])
       .Set(NuGetPublishing.PackageFiles, PackageLibDlls)
-      .ExcludeSourceDirs(DefaultExcludedSourceDirs)
+      // TODO: Exclude VisualStudio's './bin' and './obj' folders. I suggest we don't do this here but
+      // explicitly in the build configuration.
+      //      .ExcludeSourceDirs(DefaultExcludedSourceDirs)
       .Add(Zipping.Project("dist-zip"))
       .Add("dist-zip"/Zipping.FilesToZip, c => Compile[c].Select(compileOutput => new PackageFile(compileOutput.AssemblyPath, AssemblyName[c])))
       .Add("dist-zip"/Zipping.FilesToZip, AssembliesPackagedPaths);
@@ -58,12 +64,12 @@ namespace Bud.V1 {
     ///   directory with the same name. The project's directory will be placed  in the current
     ///   working directory.
     /// </summary>
-    /// <param name="projectId">see <see cref="Basic.ProjectId" />.</param>
+    /// <param name="projectId">see <see cref="ProjectId" />.</param>
     /// <param name="projectDir">
     ///   This is the directory in which all sources of this project will live.
     ///   <para>
     ///     If none given, the <see cref="Basic.ProjectDir" /> will be <see cref="Basic.BaseDir" /> appended with the
-    ///     <see cref="Basic.ProjectId" />.
+    ///     <see cref="ProjectId" />.
     ///   </para>
     ///   <para>
     ///     If the given path is relative, then the absolute <see cref="Basic.ProjectDir" /> will
@@ -94,12 +100,12 @@ namespace Bud.V1 {
     ///   Similar to <see cref="CsLib" /> but produces a console application instead
     ///   of a library.
     /// </summary>
-    /// <param name="projectId">see <see cref="Basic.ProjectId" />.</param>
+    /// <param name="projectId">see <see cref="ProjectId" />.</param>
     /// <param name="projectDir">
     ///   This is the directory in which all sources of this project will live.
     ///   <para>
     ///     If none given, the <see cref="Basic.ProjectDir" /> will be <see cref="Basic.BaseDir" /> appended with the
-    ///     <see cref="Basic.ProjectId" />.
+    ///     <see cref="ProjectId" />.
     ///   </para>
     ///   <para>
     ///     If the given path is relative, then the absolute <see cref="Basic.ProjectDir" /> will
@@ -177,12 +183,5 @@ namespace Bud.V1 {
 
     private static IObservable<IEnumerable<PackageFile>> PackageLibDlls(IConf c)
       => Output[c].Select(ToPackageFiles);
-
-    private static IEnumerable<string> DefaultExcludedSourceDirs(IConf c)
-      => new[] {
-        "obj",
-        "bin",
-        (PackagesSubProjectId/ProjectDir)[c]
-      };
   }
 }

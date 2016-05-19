@@ -29,7 +29,7 @@ namespace Bud.NuGet {
     [Test]
     public void Publish_returns_false_on_failure() {
       using (var tmpDir = new TemporaryDirectory()) {
-        var package = tmpDir.CreateFilePath(OutputPackageName);
+        var package = tmpDir.CreatePath(OutputPackageName);
         var repository = tmpDir.CreateDir("repository");
         IsFalse(publisher.Publish(package, $"file://{repository}", None<string>()));
         That(Path.Combine(repository, OutputPackageName),

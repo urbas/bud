@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.IO;
-using System.Reactive.Linq;
 using Bud.Benchmarks;
 using Bud.Cli;
 using Bud.Util;
@@ -9,15 +8,16 @@ using Bud.V1;
 using static Bud.Benchmarks.Measurement;
 using static Bud.V1.Basic;
 using static Bud.V1.Cs;
+using static Bud.V1.NuGetPublishing;
 
 public class BudBuild : IBuild {
   public Conf Init()
     => Projects(CsApp("bud")
                   .Set(ProjectVersion, "0.5.2")
-                  .Set(Bud.V1.NuGetPublishing.ProjectUrl, "https://github.com/urbas/bud"),
+                  .Set(ProjectUrl, "https://github.com/urbas/bud"),
                 CsLib("Bud.Test")
                   .Add(Dependencies, "../bud"))
-      .Init("benchmark", BudBenchmarks.Benchmark);
+      .Set("benchmark", BudBenchmarks.Benchmark);
 }
 
 internal static class BudBenchmarks {

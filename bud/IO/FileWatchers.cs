@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 
 namespace Bud.IO {
   public static class FileWatchers {
-    public static IObservable<IEnumerable<string>>
-      ToObservable(this FileWatcher watcher)
+    public static IObservable<IEnumerable<string>> ToObservable(this FileWatcher watcher,
+      EventLoopScheduler scheduler)
       => ToObservable(watcher.Files, watcher.Changes);
 
     public static IObservable<IEnumerable<string>> ToObservable(this FileWatcher watcher,

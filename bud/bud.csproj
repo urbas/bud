@@ -115,6 +115,8 @@
     <Compile Include="Benchmarks\BenchmarkResults.cs" />
     <Compile Include="Benchmarks\Samples.cs" />
     <Compile Include="Benchmarks\Measurement.cs" />
+    <Compile Include="Build\IBuilder.cs" />
+    <Compile Include="Build\TimestampBuilder.cs" />
     <Compile Include="Cli\BuildScriptCompilation.cs" />
     <Compile Include="Cli\BuildScriptLoading.cs" />
     <Compile Include="Cli\Exec.cs" />
@@ -210,11 +212,7 @@
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
     <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="BaseProjects\" />
-    <Folder Include="Distribution\" />
-    <Folder Include="Dist\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

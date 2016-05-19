@@ -34,20 +34,21 @@ namespace Bud.V1 {
 
     public static Key<NuGetPackageDownloader> PackageDownloader = nameof(PackageDownloader);
 
-    private static readonly Conf NuGetReferencesConf = SourcesSupport
-      .AddSourceFile(c => PackagesConfigFile[c])
+    private static readonly Conf NuGetReferencesConfs = Conf
+      .Empty
+      .Add(Input, c => PackagesConfigFile[c])
       .Init(AssemblyResolver, new NuGetAssemblyResolver())
       .Init(PackageDownloader, new NuGetPackageDownloader())
       .Init(ReferencedPackages, ReadReferencedPackagesFromSources)
       .Init(PackagesConfigFile, c => Path.Combine(ProjectDir[c], "packages.config"))
       .Init(ResolvedAssemblies, ResolveAssemblies);
 
-    /// <param name="projectId">see <see cref="Basic.ProjectId" />.</param>
+    /// <param name="projectId">see <see cref="ProjectId" />.</param>
     /// <param name="projectDir">
     ///   This is the directory in which all sources of this project will live.
     ///   <para>
     ///     If none given, the <see cref="Basic.ProjectDir" /> will be <see cref="Basic.BaseDir" /> appended with the
-    ///     <see cref="Basic.ProjectId" />.
+    ///     <see cref="ProjectId" />.
     ///   </para>
     ///   <para>
     ///     If the given path is relative, then the absolute <see cref="Basic.ProjectDir" /> will
@@ -70,12 +71,12 @@ namespace Bud.V1 {
     public static Conf PackageReferencesProject(string projectId,
                                                 Option<string> projectDir = default(Option<string>),
                                                 Option<string> baseDir = default(Option<string>))
-      => Project(projectId, projectDir, baseDir)
-        .Add(NuGetReferencesConf);
+      => BuildProject(projectId, projectDir, baseDir)
+        .Add(NuGetReferencesConfs);
 
     private static IObservable<IImmutableList<PackageReference>> ReadReferencedPackagesFromSources(IConf c)
-      => Sources[c].Select(NuGetPackageReferencesReader.LoadReferences)
-                   .Select(ImmutableList.ToImmutableList);
+      => Input[c].Select(NuGetPackageReferencesReader.LoadReferences)
+                 .Select(ImmutableList.ToImmutableList);
 
     private static IObservable<IImmutableSet<string>> ResolveAssemblies(IConf c)
       => ReferencedPackages[c].Select(packageReferences => {

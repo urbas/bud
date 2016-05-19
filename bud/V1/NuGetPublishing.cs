@@ -60,6 +60,7 @@ namespace Bud.V1 {
     public static Key<IObservable<IEnumerable<PackageFile>>> PackageFiles = nameof(PackageFiles);
     public static Key<NuGetPackageMetadata> PackageMetadata = nameof(PackageMetadata);
 
+    // TODO: Replace outside usages of this with the project.
     internal static Conf NuGetPublishingConf
       = Conf.Empty
             .Init(PackageMetadata, DefaultPackageMetadata)
@@ -73,12 +74,12 @@ namespace Bud.V1 {
             .Init(Package, DefaultPackage)
             .Init(PackageFiles, DefaultPackageFiles);
 
-    /// <param name="projectId">see <see cref="Basic.ProjectId" />.</param>
+    /// <param name="projectId">see <see cref="ProjectId" />.</param>
     /// <param name="projectDir">
     ///   This is the directory in which all sources of this project will live.
     ///   <para>
     ///     If none given, the <see cref="Basic.ProjectDir" /> will be <see cref="Basic.BaseDir" /> appended with the
-    ///     <see cref="Basic.ProjectId" />.
+    ///     <see cref="ProjectId" />.
     ///   </para>
     ///   <para>
     ///     If the given path is relative, then the absolute <see cref="Basic.ProjectDir" /> will
@@ -140,7 +141,7 @@ namespace Bud.V1 {
 
     private static IObservable<IEnumerable<PackageFile>> DefaultPackageFiles(IConf c)
       => c.TryGet(Builds.Output)
-          .GetOrElse(Observable.Return(Enumerable.Empty<string>()))
+          .GetOrElse(Observable.Return(ImmutableList<string>.Empty))
           .Select(files => files.Select(ToContentFiles));
 
     private static IObservable<bool> DefaultPublish(IConf c)

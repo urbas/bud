@@ -1,5 +1,6 @@
 using System.Reactive.Linq;
 using Bud.IO;
+using Bud.Util;
 using NUnit.Framework;
 using static System.IO.Path;
 using static Bud.V1.Zipping;
