@@ -27,7 +27,7 @@ namespace Bud.Building {
     }
 
     /// <summary>
-    ///   Similar to <see cref="Build(IOutputGenerator,string,IImmutableList{string})" /> except
+    ///   Similar to <see cref="Build(Bud.Building.IOutputGenerator,string,IImmutableList{string})" /> except
     ///   you can provide your own <paramref name="inputHashFile" />.
     /// </summary>
     /// <param name="outputGenerator"></param>

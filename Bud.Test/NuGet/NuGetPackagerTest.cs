@@ -44,7 +44,7 @@ namespace Bud.NuGet {
         });
 
         using (var fileStream = OpenRead(package)) {
-          var packageReader = new PackageReader(fileStream);
+          var packageReader = new PackageArchiveReader(fileStream);
           var nuspecReader = new NuspecReader(packageReader.GetNuspec());
           var metadata = nuspecReader.GetMetadata().ToDictionary(pair => pair.Key, pair => pair.Value);
           AssertLibFilePresent(packageReader);
@@ -71,7 +71,7 @@ namespace Bud.NuGet {
         });
 
         using (var fileStream = OpenRead(package)) {
-          var packageReader = new PackageReader(fileStream);
+          var packageReader = new PackageArchiveReader(fileStream);
           IsEmpty(packageReader.GetLibItems());
         }
         That(package, Does.Exist);
@@ -119,7 +119,7 @@ namespace Bud.NuGet {
       That(metadata, Is.EquivalentTo(allFields));
     }
 
-    private static void AssertLibFilePresent(PackageReader packageReader) {
+    private static void AssertLibFilePresent(PackageArchiveReader packageReader) {
       var libGroup = packageReader.GetLibItems().Single();
       AreEqual(NuGetFramework.Parse("net40"),
                libGroup.TargetFramework);
@@ -127,7 +127,7 @@ namespace Bud.NuGet {
                libGroup.Items);
     }
 
-    private static void AssertContentGroupPresent(PackageReader packageReader) {
+    private static void AssertContentGroupPresent(PackageArchiveReader packageReader) {
       var contentGroup = packageReader.GetContentItems().Single();
       AreEqual(NuGetFramework.AnyFramework,
                contentGroup.TargetFramework);

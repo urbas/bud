@@ -49,7 +49,7 @@ namespace Bud.NuGet {
                                                  string packageId,
                                                  NuGetVersion packageVersion,
                                                  NuGetFramework targetFramework) {
-      var nupkg = new PackageReader(fileStream, false);
+      var nupkg = new PackageArchiveReader(fileStream, false);
       var packageAssemblies = FindAssemblies(nupkg, packagesCacheDir, targetFramework, packageId, packageVersion);
       if (packageAssemblies.Count > 0) {
         assemblies.AddRange(packageAssemblies);
