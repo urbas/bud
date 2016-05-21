@@ -24,3 +24,6 @@ bin/
 
 # IntelliJ IDEA
 .idea/
+
+# NUnit
+TestResult.xml

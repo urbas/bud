@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5C4A4844-8C66-454A-B246-985E0DBDAE3A}</ProjectGuid>
+    <ProjectGuid>{E5E245ED-633E-4589-90C2-A69EEDD96B72}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Bud</RootNamespace>
@@ -43,16 +43,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.Web.XmlTransform, Version=2.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Web.Xdt.2.1.1\lib\net40\Microsoft.Web.XmlTransform.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Moq, Version=4.2.1510.2205, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NuGet.Common, Version=3.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -77,10 +69,6 @@
     </Reference>
     <Reference Include="NuGet.Packaging.Core.Types, Version=3.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\NuGet.Packaging.Core.Types.3.4.3\lib\net45\NuGet.Packaging.Core.Types.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NuGet.Repositories, Version=3.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\NuGet.Repositories.3.4.3\lib\net45\NuGet.Repositories.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NuGet.Versioning, Version=3.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -128,31 +116,31 @@
   <ItemGroup>
     <Compile Include="Benchmarks\BenchmarkResultsTest.cs" />
     <Compile Include="Benchmarks\MeasurementTest.cs" />
-    <Compile Include="Cli\BuildScriptLoadingTest.cs" />
     <Compile Include="Cli\BuildScriptCompilationTest.cs" />
+    <Compile Include="Cli\BuildScriptLoadingTest.cs" />
     <Compile Include="Cli\BuildToolTest.cs" />
     <Compile Include="Collections\DictionaryUtilsTest.cs" />
     <Compile Include="Collections\EnumerableUtilsTest.cs" />
     <Compile Include="Collections\ImmutableListsTest.cs" />
     <Compile Include="Configuration\ConfCacheTest.cs" />
-    <Compile Include="Configuration\RootConfTest.cs" />
-    <Compile Include="Configuration\PerKeyConfTest.cs" />
     <Compile Include="Configuration\ConfDictionaryTest.cs" />
+    <Compile Include="Configuration\PerKeyConfTest.cs" />
+    <Compile Include="Configuration\RootConfTest.cs" />
     <Compile Include="Cs\CompileInputTestUtils.cs" />
     <Compile Include="Cs\RoslynCsCompilationTest.cs" />
     <Compile Include="Cs\TimedEmittingCompilerTest.cs" />
-    <Compile Include="IO\TaskTestUtils.cs" />
-    <Compile Include="IO\HashBasedCachingTest.cs" />
-    <Compile Include="IO\MemoryStreams.cs" />
-    <Compile Include="IO\ValueUpdaterTest.cs" />
     <Compile Include="IO\DiffTest.cs" />
-    <Compile Include="IO\FileUtilsTest.cs" />
-    <Compile Include="IO\LocalFilesObservatoryTest.cs" />
     <Compile Include="IO\FileObservatoriesTest.cs" />
-    <Compile Include="IO\PathUtilsTest.cs" />
-    <Compile Include="IO\TimestampedTest.cs" />
+    <Compile Include="IO\FileUtilsTest.cs" />
     <Compile Include="IO\FileWatcherTest.cs" />
+    <Compile Include="IO\HashBasedCachingTest.cs" />
+    <Compile Include="IO\LocalFilesObservatoryTest.cs" />
+    <Compile Include="IO\PathUtilsTest.cs" />
+    <Compile Include="IO\TaskTestUtils.cs" />
+    <Compile Include="IO\TimestampedTest.cs" />
+    <Compile Include="IO\ValueUpdaterTest.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReferenceVersionAggregatorTest.cs" />
+    <Compile Include="NuGet\NuGetAssemblyResolverTest.cs" />
     <Compile Include="NuGet\NuGetPackageDownloaderTest.cs" />
     <Compile Include="NuGet\NuGetPackageReferencesReaderTest.cs" />
     <Compile Include="NuGet\NuGetPackagerTest.cs" />
@@ -161,18 +149,6 @@
     <Compile Include="NuGet\PackageConfigTestUtils.cs" />
     <Compile Include="NuGet\PackageReferenceTest.cs" />
     <Compile Include="NuGet\WindowsFrameworkAssemblyResolverTest.cs" />
-    <Compile Include="NuGet\NuGetAssemblyResolverTest.cs" />
-    <Compile Include="Util\ZipTestUtils.cs" />
-    <Compile Include="V1\BasicTest.cs" />
-    <Compile Include="V1\BinTrayPublishingTest.cs" />
-    <Compile Include="V1\BuildsTest.cs" />
-    <Compile Include="V1\ChocoPublishingTest.cs" />
-    <Compile Include="V1\CsTest.cs" />
-    <Compile Include="V1\KeyTest.cs" />
-    <Compile Include="V1\NuGetPublishingTest.cs" />
-    <Compile Include="V1\NuGetReferencesTest.cs" />
-    <Compile Include="V1\ZippingTest.cs" />
-    <EmbeddedResource Include="NuGet\SinglePackageTest\packages.config" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reactive\ObservableResourcesTest.cs" />
     <Compile Include="Reactive\ObservableResultsTest.cs" />
@@ -180,14 +156,19 @@
     <Compile Include="Reactive\WaitingObservablesTest.cs" />
     <Compile Include="Util\OptionTest.cs" />
     <Compile Include="Util\StringsTest.cs" />
+    <Compile Include="Util\ZipTestUtils.cs" />
+    <Compile Include="V1\BasicTest.cs" />
+    <Compile Include="V1\BinTrayPublishingTest.cs" />
+    <Compile Include="V1\BuildsTest.cs" />
+    <Compile Include="V1\ChocoPublishingTest.cs" />
     <Compile Include="V1\ConfTest.cs" />
+    <Compile Include="V1\CsTest.cs" />
     <Compile Include="V1\EnumerableConfApiTest.cs" />
     <Compile Include="V1\KeysTest.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="app.config" />
-    <EmbeddedResource Include="packages.config" />
-    <EmbeddedResource Include="NuGet\Foo.Bar.1.2.3.nupkg" />
+    <Compile Include="V1\KeyTest.cs" />
+    <Compile Include="V1\NuGetPublishingTest.cs" />
+    <Compile Include="V1\NuGetReferencesTest.cs" />
+    <Compile Include="V1\ZippingTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bud.TempDir\Bud.TempDir.csproj">
@@ -200,12 +181,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
+    <EmbeddedResource Include="NuGet\SinglePackageTest\packages.config" />
+    <EmbeddedResource Include="NuGet\Foo.Bar.1.2.3.nupkg" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Building\" />
-    <Folder Include="Scripting\" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

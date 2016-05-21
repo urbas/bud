@@ -18,11 +18,14 @@ namespace Bud.V1 {
                      Is.EqualTo(Path.Combine("/foo", "A", "packages.config")));
 
     [Test]
-    public void Assemblies_is_initially_empty()
-      => Assert.That(PackageReferencesProject("A", baseDir: "fooDir")
-                       .Get(ResolvedAssemblies)
-                       .Take(1).ToEnumerable(),
-                     Has.Exactly(1).Empty);
+    public void Assemblies_is_initially_empty() {
+      using (var dir = new TemporaryDirectory()) {
+        Assert.That(PackageReferencesProject("A", baseDir: dir.Path)
+                      .Get(ResolvedAssemblies)
+                      .Take(1).ToEnumerable(),
+                    Has.Exactly(1).Empty);
+      }
+    }
 
     [Test]
     [Category("IntegrationTest")]
