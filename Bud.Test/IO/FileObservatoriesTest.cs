@@ -1,5 +1,6 @@
 using System.IO;
 using System.Linq;
+using Bud.TempDir;
 using NUnit.Framework;
 using static NUnit.Framework.Assert;
 

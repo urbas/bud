@@ -4,6 +4,7 @@ using System.IO;
 using System.Reactive.Linq;
 using Bud.IO;
 using Bud.NuGet;
+using Bud.TempDir;
 using Bud.Util;
 using Moq;
 using NuGet.Frameworks;

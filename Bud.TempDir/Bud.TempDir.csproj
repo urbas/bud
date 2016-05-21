@@ -7,8 +7,8 @@
     <ProjectGuid>{B8EFE565-1FDA-48CB-A7F3-B3627B747727}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bud.IO</RootNamespace>
-    <AssemblyName>Bud.IO</AssemblyName>
+    <RootNamespace>Bud.TempDir</RootNamespace>
+    <AssemblyName>Bud.TempDir</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

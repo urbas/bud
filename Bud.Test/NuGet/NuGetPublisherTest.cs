@@ -1,5 +1,6 @@
 using System.IO;
 using Bud.IO;
+using Bud.TempDir;
 using Moq;
 using NUnit.Framework;
 using static Bud.Util.Option;

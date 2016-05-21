@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Diagnostics;
 using System.Linq.Expressions;
 using Bud.IO;
+using Bud.TempDir;
 using Microsoft.CodeAnalysis;
 using Moq;
 using NUnit.Framework;

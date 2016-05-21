@@ -1,5 +1,6 @@
 using System.Reactive.Linq;
 using Bud.IO;
+using Bud.TempDir;
 using Bud.Util;
 using NUnit.Framework;
 using static System.IO.Path;

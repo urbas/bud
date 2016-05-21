@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Bud.IO;
+using Bud.TempDir;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NUnit.Framework;

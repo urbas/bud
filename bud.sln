@@ -11,7 +11,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.Building", "Bud.Buildin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.Building.Test", "Bud.Building.Test\Bud.Building.Test.csproj", "{569D3DDA-7694-4AB2-83A5-EC92EADD6002}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.IO", "Bud.IO\Bud.IO.csproj", "{B8EFE565-1FDA-48CB-A7F3-B3627B747727}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.TempDir", "Bud.TempDir\Bud.TempDir.csproj", "{B8EFE565-1FDA-48CB-A7F3-B3627B747727}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.TempDir.Test", "Bud.TempDir.Test\Bud.TempDir.Test.csproj", "{5144ABF8-C9AC-4034-8459-0BBB964AC712}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{B8EFE565-1FDA-48CB-A7F3-B3627B747727}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8EFE565-1FDA-48CB-A7F3-B3627B747727}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8EFE565-1FDA-48CB-A7F3-B3627B747727}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5144ABF8-C9AC-4034-8459-0BBB964AC712}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5144ABF8-C9AC-4034-8459-0BBB964AC712}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5144ABF8-C9AC-4034-8459-0BBB964AC712}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5144ABF8-C9AC-4034-8459-0BBB964AC712}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

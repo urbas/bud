@@ -7,6 +7,7 @@ using System.Reactive.Linq;
 using Bud.Cs;
 using Bud.IO;
 using Bud.NuGet;
+using Bud.TempDir;
 using Microsoft.CodeAnalysis;
 using Microsoft.Reactive.Testing;
 using Moq;

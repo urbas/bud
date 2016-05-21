@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Bud.Configuration;
 using Bud.IO;
+using Bud.TempDir;
 using NUnit.Framework;
 using static Bud.V1.Basic;
 using static NUnit.Framework.Assert;

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using Bud.IO;
 using Bud.NuGet;
+using Bud.TempDir;
 using Moq;
 using NUnit.Framework;
 using static Bud.V1.NuGetReferences;

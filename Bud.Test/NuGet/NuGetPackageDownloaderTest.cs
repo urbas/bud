@@ -1,7 +1,6 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Bud.IO;
+using Bud.TempDir;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Versioning;

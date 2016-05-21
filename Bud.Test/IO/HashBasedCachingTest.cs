@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Bud.TempDir;
 using Moq;
 using NUnit.Framework;
 using static System.IO.Path;

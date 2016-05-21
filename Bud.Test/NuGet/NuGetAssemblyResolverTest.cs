@@ -1,5 +1,6 @@
 using System.Linq;
 using Bud.IO;
+using Bud.TempDir;
 using NUnit.Framework;
 using static System.IO.Path;
 using static Bud.NuGet.NuGetPackageDownloader;

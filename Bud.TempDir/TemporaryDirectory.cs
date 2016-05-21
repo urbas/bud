@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using static System.IO.Directory;
-using static System.IO.Path;
 
-namespace Bud.IO {
+namespace Bud.TempDir {
   public class TemporaryDirectory : IDisposable {
     public TemporaryDirectory() {
       Path = CreateDirectoryInTempDir();
@@ -19,11 +17,11 @@ namespace Bud.IO {
       if (openedFiles.Count > 0) {
         throw new Exception($"Could not delete the temporary directory {Path}. There were some locked files: {string.Join(", ", openedFiles)}");
       }
-      Delete(Path, true);
+      Directory.Delete(Path, true);
     }
 
     public List<string> FindOpenedFiles()
-      => EnumerateFiles(Path, "*", SearchOption.AllDirectories).Where(IsFileLocked)
+      => Directory.EnumerateFiles(Path, "*", SearchOption.AllDirectories).Where(IsFileLocked)
                                                                .ToList();
 
     public override string ToString() => Path;
@@ -45,12 +43,12 @@ namespace Bud.IO {
 
     public string CreatePath(params string[] targetPath)
       => targetPath.Length == 0 ?
-           Combine(Path, Guid.NewGuid().ToString()) :
-           Combine(new[] {Path}.Concat(targetPath).ToArray());
+           System.IO.Path.Combine(Path, Guid.NewGuid().ToString()) :
+           System.IO.Path.Combine(new[] {Path}.Concat(targetPath).ToArray());
 
     private string CreateFilePathAndDir(string[] targetPath) {
       var file = CreatePath(targetPath);
-      CreateDirectory(GetDirectoryName(file));
+      Directory.CreateDirectory(System.IO.Path.GetDirectoryName(file));
       return file;
     }
 
@@ -63,18 +61,18 @@ namespace Bud.IO {
     }
 
     public string CreateDir(params string[] subDirPath) {
-      var newDir = Combine(new[] {Path}.Concat(subDirPath).ToArray());
-      CreateDirectory(newDir);
+      var newDir = System.IO.Path.Combine(new[] {Path}.Concat(subDirPath).ToArray());
+      Directory.CreateDirectory(newDir);
       return newDir;
     }
 
     private static string CreateDirectoryInTempDir() {
-      string baseDir = GetTempPath();
+      string baseDir = System.IO.Path.GetTempPath();
       string tempDir;
       do {
-        tempDir = Combine(baseDir, Guid.NewGuid().ToString());
-      } while (Exists(tempDir));
-      CreateDirectory(tempDir);
+        tempDir = System.IO.Path.Combine(baseDir, Guid.NewGuid().ToString());
+      } while (Directory.Exists(tempDir));
+      Directory.CreateDirectory(tempDir);
       return tempDir;
     }
 

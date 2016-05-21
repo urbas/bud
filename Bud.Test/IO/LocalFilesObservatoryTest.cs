@@ -6,6 +6,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Bud.TempDir;
 using NUnit.Framework;
 using static Bud.IO.LocalFilesObservatory;
 

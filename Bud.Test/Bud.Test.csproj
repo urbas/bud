@@ -190,9 +190,9 @@
     <EmbeddedResource Include="NuGet\Foo.Bar.1.2.3.nupkg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Bud.IO\Bud.IO.csproj">
+    <ProjectReference Include="..\Bud.TempDir\Bud.TempDir.csproj">
       <Project>{b8efe565-1fda-48cb-a7f3-b3627b747727}</Project>
-      <Name>Bud.IO</Name>
+      <Name>Bud.TempDir</Name>
     </ProjectReference>
     <ProjectReference Include="..\bud\bud.csproj">
       <Project>{5d2c752c-65d5-4148-918a-ab11f8344e68}</Project>
