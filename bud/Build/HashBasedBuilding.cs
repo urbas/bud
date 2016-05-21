@@ -13,6 +13,11 @@ namespace Bud.Build {
     /// <param name="outputGenerator">this function actually produces the output.</param>
     /// <param name="output">the path of the expected output.</param>
     /// <param name="input">the files from which the <paramref name="outputGenerator"/> should generate the output.</param>
+    /// <remarks>
+    ///   Note that the order of input files is significant. Different order of input files will produce
+    ///   a different hash. If your <paramref name="outputGenerator"/> is order-invariant, we suggest you
+    ///   order the input before invoking this function.
+    /// </remarks>
     public static void Build(IOutputGenerator outputGenerator,
                              string output,
                              IImmutableList<string> input) {
