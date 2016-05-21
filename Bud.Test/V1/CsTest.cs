@@ -25,6 +25,7 @@ namespace Bud.V1 {
       => Assert.AreEqual("A.dll", CsLib("A", "/foo").Get(AssemblyName));
 
     [Test]
+    [Ignore("Needs reimplementation")]
     public void CSharp_sources_must_be_in_Input() {
       using (var dir = new TemporaryDirectory()) {
         var projectA = CsLib("A", baseDir: dir.Path);
@@ -35,6 +36,7 @@ namespace Bud.V1 {
     }
 
     [Test]
+    [Ignore("Needs reimplementation")]
     public void CSharp_sources_in_nested_directories_must_be_in_Input() {
       using (var dir = new TemporaryDirectory()) {
         var projectA = CsLib("A", baseDir: dir.Path);
@@ -82,6 +84,7 @@ namespace Bud.V1 {
     }
 
     [Test]
+    [Ignore("Needs reimplementation")]
     public void Compiler_reinvoked_when_input_changes() {
       var testScheduler = new TestScheduler();
       var compiler = NoOpCompiler();
