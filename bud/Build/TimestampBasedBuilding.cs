@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 
 namespace Bud.Build {
-  public class TimestampBuilder {
+  public class TimestampBasedBuilding {
     /// <summary>
     ///   Builds a single file with the given list of inputs.
     /// </summary>
@@ -17,7 +17,7 @@ namespace Bud.Build {
     /// </remarks>
     public static void Build(IOutputGenerator outputGenerator,
                              string output,
-                             IImmutableList<string> inputFiles = null) {
+                             IImmutableList<string> inputFiles) {
       inputFiles = inputFiles ?? ImmutableList<string>.Empty;
       if (!File.Exists(output) || AnyFileNewer(inputFiles, output)) {
         outputGenerator.Generate(output, inputFiles);

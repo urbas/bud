@@ -16,24 +16,23 @@ namespace Bud.Build {
       Timestamp = timestamp;
     }
 
-    public static void CreateDigestsJson(string path, IImmutableList<string> inputFiles) {
-      var digestsJsonContent = DigestsJsonContent(inputFiles);
-      File.WriteAllText(path, digestsJsonContent);
-    }
+    public static void CreateDigestsJsonFile(string path, IImmutableList<string> inputFiles)
+      => File.WriteAllText(path, DigestsJson(inputFiles));
 
-    private static string DigestsJsonContent(IEnumerable<string> inputFiles) {
-      var digests = inputFiles.Aggregate(ImmutableDictionary<string, Digest>.Empty, AddFileDigest);
+    private static string DigestsJson(IEnumerable<string> inputFiles) {
+      var digests = inputFiles.Aggregate(ImmutableDictionary<string, Digest>.Empty,
+                                         AddFileDigest);
       return JsonConvert.SerializeObject(digests);
     }
 
-    private static ImmutableDictionary<string, Digest> AddFileDigest(ImmutableDictionary<string, Digest> digests,
-                                                                     string file)
+    private static ImmutableDictionary<string, Digest>
+      AddFileDigest(ImmutableDictionary<string, Digest> digests,
+                    string file)
       => digests.Add(Path.GetFileName(file),
                      new Digest(File.GetLastWriteTime(file), GetMd5Hash(file)));
 
     private static string GetMd5Hash(string file) {
-      using (var md5 = MD5.Create())
-      {
+      using (var md5 = MD5.Create()) {
         using (var stream = File.OpenRead(file)) {
           var computeHash = md5.ComputeHash(stream);
           return BitConverter.ToString(computeHash).Replace("-", "").ToLower();

@@ -6,13 +6,13 @@ using Moq;
 using NUnit.Framework;
 
 namespace Bud.Build {
-  public class TimestampBuilderTest {
+  public class TimestampBasedBuildingTest {
     private TemporaryDirectory dir;
-    private Mock<IOutputGenerator> worker;
+    private Mock<IOutputGenerator> outputGenerator;
 
     [SetUp]
     public void SetUp() {
-      worker = new Mock<IOutputGenerator>(MockBehavior.Strict);
+      outputGenerator = new Mock<IOutputGenerator>(MockBehavior.Strict);
       dir = new TemporaryDirectory();
     }
 
@@ -22,15 +22,15 @@ namespace Bud.Build {
     [Test]
     public void Build_creates_the_output_file() {
       var output = dir.CreatePath("a.out");
-      worker.Setup(self => self.Generate(output, ImmutableList<string>.Empty));
-      TimestampBuilder.Build(worker.Object, output);
-      worker.VerifyAll();
+      outputGenerator.Setup(self => self.Generate(output, ImmutableList<string>.Empty));
+      TimestampBasedBuilding.Build(outputGenerator.Object, output, ImmutableList<string>.Empty);
+      outputGenerator.VerifyAll();
     }
 
     [Test]
     public void Build_does_not_invoke_the_worker_when_output_already_exists() {
       var output = dir.CreateEmptyFile("a.out");
-      TimestampBuilder.Build(worker.Object, output);
+      TimestampBasedBuilding.Build(outputGenerator.Object, output, ImmutableList<string>.Empty);
     }
 
     [Test]
@@ -39,11 +39,11 @@ namespace Bud.Build {
       var fileA = dir.CreateFile("foo", "a");
       File.SetLastWriteTime(output, File.GetLastWriteTime(fileA) - TimeSpan.FromSeconds(1));
       var input = ImmutableList.Create(fileA);
-      worker.Setup(self => self.Generate(output, input));
+      outputGenerator.Setup(self => self.Generate(output, input));
 
-      TimestampBuilder.Build(worker.Object, output, input);
+      TimestampBasedBuilding.Build(outputGenerator.Object, output, input);
 
-      worker.VerifyAll();
+      outputGenerator.VerifyAll();
     }
 
     [Test]
@@ -52,7 +52,7 @@ namespace Bud.Build {
       var output = dir.CreateEmptyFile("a.out");
       File.SetLastWriteTime(fileA, File.GetLastWriteTime(output) - TimeSpan.FromSeconds(1));
       var inputFiles = ImmutableList.Create(fileA);
-      TimestampBuilder.Build(worker.Object, output, inputFiles);
+      TimestampBasedBuilding.Build(outputGenerator.Object, output, inputFiles);
     }
   }
 }
