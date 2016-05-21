@@ -115,7 +115,7 @@
     <Compile Include="Benchmarks\BenchmarkResults.cs" />
     <Compile Include="Benchmarks\Samples.cs" />
     <Compile Include="Benchmarks\Measurement.cs" />
-    <Compile Include="Build\IBuilder.cs" />
+    <Compile Include="Build\IOutputGenerator.cs" />
     <Compile Include="Build\TimestampBuilder.cs" />
     <Compile Include="Cli\BuildScriptCompilation.cs" />
     <Compile Include="Cli\BuildScriptLoading.cs" />

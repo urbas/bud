@@ -8,11 +8,11 @@ using NUnit.Framework;
 namespace Bud.Build {
   public class TimestampBuilderTest {
     private TemporaryDirectory dir;
-    private Mock<IBuilder> worker;
+    private Mock<IOutputGenerator> worker;
 
     [SetUp]
     public void SetUp() {
-      worker = new Mock<IBuilder>(MockBehavior.Strict);
+      worker = new Mock<IOutputGenerator>(MockBehavior.Strict);
       dir = new TemporaryDirectory();
     }
 
@@ -22,7 +22,7 @@ namespace Bud.Build {
     [Test]
     public void Build_creates_the_output_file() {
       var output = dir.CreatePath("a.out");
-      worker.Setup(self => self.Build(output, ImmutableList<string>.Empty));
+      worker.Setup(self => self.Generate(output, ImmutableList<string>.Empty));
       TimestampBuilder.Build(worker.Object, output);
       worker.VerifyAll();
     }
@@ -39,7 +39,7 @@ namespace Bud.Build {
       var fileA = dir.CreateFile("foo", "a");
       File.SetLastWriteTime(output, File.GetLastWriteTime(fileA) - TimeSpan.FromSeconds(1));
       var input = ImmutableList.Create(fileA);
-      worker.Setup(self => self.Build(output, input));
+      worker.Setup(self => self.Generate(output, input));
 
       TimestampBuilder.Build(worker.Object, output, input);
 
