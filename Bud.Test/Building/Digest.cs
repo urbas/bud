@@ -6,7 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using Newtonsoft.Json;
 
-namespace Bud.Build {
+namespace Bud.Building {
   public class Digest {
     public DateTime Timestamp { get; }
     public string Hash { get; }

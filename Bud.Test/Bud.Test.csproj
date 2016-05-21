@@ -124,10 +124,10 @@
   <ItemGroup>
     <Compile Include="Benchmarks\BenchmarkResultsTest.cs" />
     <Compile Include="Benchmarks\MeasurementTest.cs" />
-    <Compile Include="Build\Digest.cs" />
-    <Compile Include="Build\DigestGenerator.cs" />
-    <Compile Include="Build\HashBasedBuildingTest.cs" />
-    <Compile Include="Build\TimestampBasedBuildingTest.cs" />
+    <Compile Include="Building\Digest.cs" />
+    <Compile Include="Building\DigestGenerator.cs" />
+    <Compile Include="Building\HashBasedBuildingTest.cs" />
+    <Compile Include="Building\TimestampBasedBuildingTest.cs" />
     <Compile Include="Cli\BuildScriptLoadingTest.cs" />
     <Compile Include="Cli\BuildScriptCompilationTest.cs" />
     <Compile Include="Cli\BuildToolTest.cs" />

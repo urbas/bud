@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 
-namespace Bud.Build {
+namespace Bud.Building {
   public class TimestampBasedBuilding {
     /// <summary>
     ///   Builds a single file with the given list of inputs.

@@ -5,7 +5,7 @@ using Bud.IO;
 using Moq;
 using NUnit.Framework;
 
-namespace Bud.Build {
+namespace Bud.Building {
   public class TimestampBasedBuildingTest {
     private TemporaryDirectory dir;
     private Mock<IOutputGenerator> outputGenerator;

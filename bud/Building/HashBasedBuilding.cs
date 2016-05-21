@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 
-namespace Bud.Build {
+namespace Bud.Building {
   public class HashBasedBuilding {
     private static readonly byte[] DefaultSalt = new byte[0];
 

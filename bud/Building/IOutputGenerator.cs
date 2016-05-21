@@ -1,6 +1,6 @@
 using System.Collections.Immutable;
 
-namespace Bud.Build {
+namespace Bud.Building {
   public interface IOutputGenerator {
     /// <summary>
     ///   This function must produce the file <paramref name="output"/>.
