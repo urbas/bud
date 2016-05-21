@@ -54,5 +54,16 @@ namespace Bud.Build {
       HashBasedBuilding.Build(outputGenerator.Object, output, singleFile);
       outputGenerator.Verify(self => self.Generate(output, singleFile), Times.Exactly(2));
     }
+
+    [Test]
+    public void Build_invoked_when_salt_changes() {
+      var output = dir.CreatePath("a.out");
+      var inputHashFile = dir.CreatePath("a.out.input_hash");
+      var fileFoo = dir.CreateFile("foo", "foo");
+      var singleFile = ImmutableList.Create(fileFoo);
+      HashBasedBuilding.Build(outputGenerator.Object, output, singleFile, inputHashFile, new byte[] {0x00});
+      HashBasedBuilding.Build(outputGenerator.Object, output, singleFile, inputHashFile, new byte[] {0x01});
+      outputGenerator.Verify(self => self.Generate(output, singleFile), Times.Exactly(2));
+    }
   }
 }
