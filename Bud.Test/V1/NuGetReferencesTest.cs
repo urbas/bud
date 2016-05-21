@@ -3,7 +3,6 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using Bud.IO;
 using Bud.NuGet;
 using Bud.TempDir;
 using Moq;
