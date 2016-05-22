@@ -27,6 +27,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.Option.Test", "Bud.Opti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.RunScript", "Bud.RunScript\Bud.RunScript.csproj", "{05236F73-9AE4-4351-8378-29F96B6977C2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.Cache", "Bud.Cache\Bud.Cache.csproj", "{713F14ED-BAF2-4CE4-AFB3-ECADAC2B710B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.Cache.Test", "Bud.Cache.Test\Bud.Cache.Test.csproj", "{F212314A-CA0E-45D6-BFC7-134A43E5A96F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +85,14 @@ Global
 		{05236F73-9AE4-4351-8378-29F96B6977C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05236F73-9AE4-4351-8378-29F96B6977C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05236F73-9AE4-4351-8378-29F96B6977C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{713F14ED-BAF2-4CE4-AFB3-ECADAC2B710B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{713F14ED-BAF2-4CE4-AFB3-ECADAC2B710B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{713F14ED-BAF2-4CE4-AFB3-ECADAC2B710B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{713F14ED-BAF2-4CE4-AFB3-ECADAC2B710B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F212314A-CA0E-45D6-BFC7-134A43E5A96F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F212314A-CA0E-45D6-BFC7-134A43E5A96F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F212314A-CA0E-45D6-BFC7-134A43E5A96F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F212314A-CA0E-45D6-BFC7-134A43E5A96F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
