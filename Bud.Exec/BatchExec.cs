@@ -118,7 +118,7 @@ namespace Bud {
     private static void ProcessOnOutputDataReceived(object sender,
                                                     DataReceivedEventArgs outputLine) {
       if (outputLine.Data != null) {
-        Console.WriteLine(outputLine.Data);
+        Console.Write(outputLine.Data);
       }
     }
   }
