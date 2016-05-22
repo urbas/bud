@@ -62,7 +62,7 @@ namespace Bud.Building {
     }
 
     private static byte[] Digest(IEnumerable<string> files, byte[] salt) {
-      var digest = SHA256.Create();
+      var digest = MD5.Create();
       digest.Initialize();
       digest.TransformBlock(salt, 0, salt.Length, salt, 0);
       var buffer = new byte[1 << 15];
