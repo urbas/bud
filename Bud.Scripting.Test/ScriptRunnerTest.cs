@@ -6,6 +6,7 @@ namespace Bud.Scripting {
   public class ScriptRunnerTest {
     [Test]
     [Category("IntegrationTest")]
+    [Ignore("TODO")]
     public void RunScript_runs_the_script_in_the_current_directory() {
       using (var dir = new TemporaryDirectory()) {
         var outputDir = dir.CreateDir("output-dir");

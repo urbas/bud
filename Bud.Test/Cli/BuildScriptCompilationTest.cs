@@ -33,6 +33,7 @@ namespace Bud.Cli {
       => IsNotEmpty(InvalidBuildScript().Diagnostics);
 
     [Test]
+    [Ignore("needs reimplementation")]
     public void CompileBuildScript_places_the_Build_assembly_into_the_build_folder()
       => That(ValidBuildScript().AssemblyPath,
               Is.EqualTo(Combine(tmpDir.Path, "build", "build", "build.dll"))
