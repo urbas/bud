@@ -7,7 +7,7 @@
     <ProjectGuid>{7647A7D1-BB14-4A70-9B0A-551B051CC125}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bud.Exec</RootNamespace>
+    <RootNamespace>Bud</RootNamespace>
     <AssemblyName>Bud.Exec</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -40,7 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Exec.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
+      <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
+      <Name>Bud.Option</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace Bud.Scripting {
   public class ScriptRunnerTest {
     [Test]
-    [Ignore("not yet implemented")]
+    [Category("IntegrationTest")]
     public void RunScript_runs_the_script_in_the_current_directory() {
       using (var dir = new TemporaryDirectory()) {
         var outputDir = dir.CreateDir("output-dir");

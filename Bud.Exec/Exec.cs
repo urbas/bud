@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 
-namespace Bud.Cli {
+namespace Bud {
   public static class Exec {
     public static string
       GetOutput(string executablePath,
