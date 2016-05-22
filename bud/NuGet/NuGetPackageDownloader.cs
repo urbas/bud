@@ -12,7 +12,7 @@ namespace Bud.NuGet {
                                           string outputDir) {
       var packagesConfigFile = Combine(outputDir, "packages.config");
       CreatePackagesConfigFile(packageReferences, Combine(outputDir, "packages.config"));
-      return Exec.Run("nuget", $"restore {packagesConfigFile} -PackagesDirectory {outputDir}") == 0;
+      return BatchExec.Run("nuget", $"restore {packagesConfigFile} -PackagesDirectory {outputDir}") == 0;
     }
 
     public static void CreatePackagesConfigFile(IEnumerable<PackageReference> packageReferences,

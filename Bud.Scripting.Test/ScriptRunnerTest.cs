@@ -13,7 +13,7 @@ namespace Bud.Scripting {
         var fooExpected = dir.CreateFile("42 1337", "output-dir", "foo.expected");
         var script = dir.CreateFileFromResource("Bud.Scripting.TestScripts.CreateFooFile.cs",
                                                 "CreateFooFile.cs");
-        ScriptRunner.Run(script, outputDir, new [] {"1337"});
+        ScriptRunner.Run(script, "1337", outputDir);
         FileAssert.AreEqual(fooExpected, Path.Combine(outputDir, "foo"));
       }
     }

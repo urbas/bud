@@ -15,7 +15,7 @@ namespace Bud.NuGet {
       var nuspecFile = Combine(outputDir, $"{packageId}.nuspec");
       CreateDirectory(outputDir);
       CreateNuspecFile(nuspecFile, packageId, version, packageDependencies, packageMetadata, files);
-      Exec.Run("nuget", $"pack {nuspecFile} " +
+      BatchExec.Run("nuget", $"pack {nuspecFile} " +
                         $"-OutputDirectory {outputDir} " +
                         $"-BasePath {baseDir} " +
                         "-NonInteractive" +

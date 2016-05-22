@@ -78,7 +78,7 @@ namespace Bud.V1 {
       Console.WriteLine($"Starting to push to chocolatey ...");
       // TODO: use nuget instead. Read the ApiKey from somewhere.
       //      var success = NuGetExecutable.Instance.Run($"push {distPackage} -source https://chocolatey.org/ -NonInteractive");
-      var success = Exec.Run("cpush", distPackage) == 0;
+      var success = BatchExec.Run("cpush", distPackage) == 0;
       Console.WriteLine($"Push to chocolatey success: {success}");
       // TODO: Return the actual URL
       return "FOO BAR!";

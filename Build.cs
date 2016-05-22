@@ -27,7 +27,7 @@ internal static class BudBenchmarks {
     var benchmarksDir = CreateBenchmarksDir(c);
     var cloneDir = CloneProjectToBuild(c, benchmarksDir);
     var budExe = CreateBudExe(c, benchmarksDir);
-    var revisionBeingBenchmarked = Exec.GetOutput("git", "rev-parse HEAD").Trim();
+    var revisionBeingBenchmarked = BatchExec.GetOutputOrThrow("git", "rev-parse HEAD").Trim();
     var benchmarkResults = new BenchmarkResults(revisionBeingBenchmarked,
                                                 Environment.MachineName,
                                                 TakeMeasurements(budExe, cloneDir));
@@ -140,7 +140,7 @@ internal static class BudBenchmarks {
 
   private static ImmutableDictionary<string, object>
     RunBud(string budExe, string cloneDir, Option<string> buildCommand = default(Option<string>))
-    => Samples.ToSample(Exec.RunCheckedQuietly(budExe, buildCommand.GetOrElse(""), cloneDir));
+    => Samples.ToSample(BatchExec.RunQuietlyThrow(budExe, buildCommand.GetOrElse(""), cloneDir));
 
   /// <returns>
   ///   path to Bud's executable which is runnable as-is (all
@@ -160,12 +160,12 @@ internal static class BudBenchmarks {
   }
 
   private static void CopyRepo(string originalRepoDir, string cloneDir, string revision) {
-    Exec.RunCheckedQuietly("git", $"clone -q -s -n {originalRepoDir} {cloneDir}");
-    Exec.RunCheckedQuietly("git", $"-C {cloneDir} checkout -q --detach -f {revision}");
+    BatchExec.RunQuietlyThrow("git", $"clone -q -s -n {originalRepoDir} {cloneDir}");
+    BatchExec.RunQuietlyThrow("git", $"-C {cloneDir} checkout -q --detach -f {revision}");
   }
 
   private static void ResetRepo(string repoDir) {
-    Exec.RunCheckedQuietly("git", $"-C {repoDir} reset --hard HEAD");
-    Exec.RunCheckedQuietly("git", $"-C {repoDir} clean -q -fdx .");
+    BatchExec.RunQuietlyThrow("git", $"-C {repoDir} reset --hard HEAD");
+    BatchExec.RunQuietlyThrow("git", $"-C {repoDir} clean -q -fdx .");
   }
 }

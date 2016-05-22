@@ -35,7 +35,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ScriptBuilder.cs" />
     <Compile Include="ScriptRunner.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bud.Exec\Bud.Exec.csproj">
+      <Project>{7647a7d1-bb14-4a70-9b0a-551b051cc125}</Project>
+      <Name>Bud.Exec</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
+      <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
+      <Name>Bud.Option</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

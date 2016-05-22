@@ -62,7 +62,7 @@ namespace Bud.NuGet {
 
     private static NuGetv3LocalRepository CreatePackageIndex(string packagesCacheDir, string scratchDir) {
       var packagesV3Dir = Path.Combine(scratchDir, "index");
-      Exec.Run("nuget", $"init {packagesCacheDir} {packagesV3Dir}");
+      BatchExec.Run("nuget", $"init {packagesCacheDir} {packagesV3Dir}");
       return new NuGetv3LocalRepository(packagesV3Dir, true);
     }
 
