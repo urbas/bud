@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Bud.TempDir;
 using NUnit.Framework;
 
@@ -14,6 +15,16 @@ namespace Bud.Scripting {
                                                 "CreateFooFile.cs");
         ScriptRunner.Run(script, "1337", outputDir);
         FileAssert.AreEqual(fooExpected, Path.Combine(outputDir, "foo"));
+      }
+    }
+
+    [Test]
+    public void RunScript_shows_an_informative_exception_message_on_compiler_error() {
+      using (var dir = new TemporaryDirectory()) {
+        var script = dir.CreateFileFromResource("Bud.Scripting.TestScripts.UnknownId.cs",
+                                                "UnknownId.cs");
+        var exception = Assert.Throws<Exception>(() => ScriptRunner.Run(script, "", dir.Path));
+        Assert.That(exception.Message, Contains.Substring("Blargh"));
       }
     }
   }

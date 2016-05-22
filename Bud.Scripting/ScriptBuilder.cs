@@ -1,10 +1,14 @@
 using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
+using Bud.Building;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace Bud.Scripting {
-  public class ScriptBuilder {
+  public class ScriptBuilder : IOutputGenerator {
     /// <param name="scriptPath">
     ///   the path of the C# script file to build.
     /// </param>
@@ -13,18 +17,22 @@ namespace Bud.Scripting {
     ///   The executable can be run as is (using any working directory).
     /// </returns>
     public static string Build(string scriptPath) {
-      var script = SyntaxFactory.ParseSyntaxTree(File.ReadAllText(scriptPath), path: scriptPath);
-      var scriptCompilation = CSharpCompilation.Create("Bud.Script",
-                                                       new[] {script},
-                                                       new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location),},
-                                                       new CSharpCompilationOptions(OutputKind.ConsoleApplication));
       var outputDir = Path.GetDirectoryName(scriptPath);
       var outputExecutable = Path.Combine(outputDir, "bud.script.exe");
-      var emitResult = scriptCompilation.Emit(outputExecutable);
-      if (emitResult.Success) {
-        return outputExecutable;
+      HashBasedBuilding.Build(new ScriptBuilder(), outputExecutable, ImmutableList.Create(scriptPath));
+      return outputExecutable;
+    }
+
+    public void Generate(string output, IImmutableList<string> inputFiles) {
+      var syntaxTrees = inputFiles.Select(script => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(script), path: script));
+      var scriptCompilation = CSharpCompilation.Create("Bud.Script",
+                                                       syntaxTrees,
+                                                       new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)},
+                                                       new CSharpCompilationOptions(OutputKind.ConsoleApplication));
+      var emitResult = scriptCompilation.Emit(output);
+      if (!emitResult.Success) {
+        throw new Exception($"Compilation errpr: {string.Join("\n", emitResult.Diagnostics)}");
       }
-      throw new Exception($"Could not compile script '{scriptPath}'. Errors: {string.Join("\n", emitResult.Diagnostics)}");
     }
   }
 }

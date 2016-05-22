@@ -57,6 +57,10 @@
     <Compile Include="ScriptRunner.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Bud.Building\Bud.Building.csproj">
+      <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
+      <Name>Bud.Building</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Bud.Exec\Bud.Exec.csproj">
       <Project>{7647a7d1-bb14-4a70-9b0a-551b051cc125}</Project>
       <Name>Bud.Exec</Name>
