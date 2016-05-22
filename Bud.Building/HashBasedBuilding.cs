@@ -27,7 +27,7 @@ namespace Bud.Building {
     }
 
     /// <summary>
-    ///   Similar to <see cref="Build(Bud.Building.IOutputGenerator,string,IImmutableList{string})" /> except
+    ///   Similar to <see cref="Build(IOutputGenerator,string,IImmutableList{string})" /> except
     ///   you can provide your own <paramref name="inputHashFile" />.
     /// </summary>
     /// <param name="outputGenerator"></param>
@@ -62,21 +62,21 @@ namespace Bud.Building {
     }
 
     private static byte[] Digest(IEnumerable<string> files, byte[] salt) {
-      var sha256 = SHA256.Create();
-      sha256.Initialize();
-      sha256.TransformBlock(salt, 0, salt.Length, salt, 0);
+      var digest = SHA256.Create();
+      digest.Initialize();
+      digest.TransformBlock(salt, 0, salt.Length, salt, 0);
       var buffer = new byte[1 << 15];
       foreach (var file in files) {
         using (var fileStream = File.OpenRead(file)) {
           int readBytes;
           do {
             readBytes = fileStream.Read(buffer, 0, buffer.Length);
-            sha256.TransformBlock(buffer, 0, readBytes, buffer, 0);
+            digest.TransformBlock(buffer, 0, readBytes, buffer, 0);
           } while (readBytes == buffer.Length);
         }
       }
-      sha256.TransformFinalBlock(buffer, 0, 0);
-      return sha256.Hash;
+      digest.TransformFinalBlock(buffer, 0, 0);
+      return digest.Hash;
     }
   }
 }
