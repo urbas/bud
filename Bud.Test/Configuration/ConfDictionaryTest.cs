@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using NUnit.Framework;
-using static Bud.Util.Option;
 using static NUnit.Framework.Assert;
+using static Bud.Option;
 
 namespace Bud.Configuration {
   public class ConfDictionaryTest {

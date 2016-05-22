@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using Bud.Util;
 using Bud.V1;
-using static Bud.Util.Option;
+using static Bud.Option;
 
 namespace Bud.Configuration {
   /// <summary>

@@ -2,8 +2,8 @@ using System.IO;
 using Bud.TempDir;
 using Moq;
 using NUnit.Framework;
-using static Bud.Util.Option;
 using static NUnit.Framework.Assert;
+using static Bud.Option;
 
 namespace Bud.NuGet {
   [Category("IntegrationTest")]

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Bud.Configuration;
-using Bud.Util;
 
 namespace Bud.V1 {
   public class Conf : IConfBuilder {

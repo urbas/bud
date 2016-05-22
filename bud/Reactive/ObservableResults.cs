@@ -5,8 +5,7 @@ using System.Linq;
 using System.Reactive.Linq;
 using System.Reflection;
 using Bud.Collections;
-using Bud.Util;
-using static Bud.Util.Option;
+using static Bud.Option;
 
 namespace Bud.Reactive {
   public class ObservableResults {

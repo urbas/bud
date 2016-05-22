@@ -1,5 +1,3 @@
-using Bud.Util;
-
 namespace Bud.NuGet {
   public class NuGetPublisher : IPublisher {
     public NuGetExecutable NuGetExecutable { get; }

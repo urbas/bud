@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Bud.Util;
 using static System.IO.File;
-using static Bud.Util.Option;
+using static Bud.Option;
 
 namespace Bud.IO {
   public class HashBasedCaching {

@@ -3,7 +3,6 @@ using System.Collections.Immutable;
 using System.Reactive.Linq;
 using Bud.Collections;
 using Bud.Reactive;
-using Bud.Util;
 using static Bud.V1.Basic;
 
 namespace Bud.V1 {

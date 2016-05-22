@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Bud.Util;
-using static Bud.Util.Option;
+using static Bud.Option;
 
 namespace Bud.Collections {
   public static class EnumerableUtils {

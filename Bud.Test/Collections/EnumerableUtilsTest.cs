@@ -3,8 +3,8 @@ using System.Collections.Immutable;
 using System.Linq;
 using NUnit.Framework;
 using static Bud.Collections.EnumerableUtils;
-using static Bud.Util.Option;
 using static NUnit.Framework.Assert;
+using static Bud.Option;
 
 namespace Bud.Collections {
   public class EnumerableUtilsTest {

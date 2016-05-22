@@ -4,14 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Bud.Cli;
-using Bud.Util;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Repositories;
 using NuGet.Versioning;
 using static Bud.NuGet.FrameworkAssemblyReferencesAggregator;
 using static Bud.NuGet.WindowsFrameworkAssemblyResolver;
-using static Bud.Util.Option;
+using static Bud.Option;
 
 namespace Bud.NuGet {
   public class NuGetAssemblyResolver : IAssemblyResolver {

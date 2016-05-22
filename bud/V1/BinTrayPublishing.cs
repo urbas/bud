@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Http;
 using System.Reactive.Linq;
 using System.Text;
-using Bud.Util;
 using static Bud.V1.Basic;
 
 namespace Bud.V1 {

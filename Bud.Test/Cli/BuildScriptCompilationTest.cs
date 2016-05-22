@@ -1,6 +1,5 @@
 using System.IO;
 using Bud.Cs;
-using Bud.IO;
 using Bud.TempDir;
 using NUnit.Framework;
 using static System.IO.Path;

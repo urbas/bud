@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reactive.Linq;
-using static Bud.Util.Option;
 
-namespace Bud.Util {
+namespace Bud {
   public struct Option<T> {
     public T Value { get; }
     public bool HasValue { get; }
@@ -23,7 +21,7 @@ namespace Bud.Util {
     public Option<T> OrElse(Func<Option<T>> defaultValue) => HasValue ? this : defaultValue();
 
     public Option<TResult> Map<TResult>(Func<T, TResult> mapFunc)
-      => HasValue ? mapFunc(Value) : None<TResult>();
+      => HasValue ? mapFunc(Value) : Option.None<TResult>();
 
     public bool Equals(Option<T> other)
       => HasValue == other.HasValue
@@ -62,14 +60,6 @@ namespace Bud.Util {
                    .Select(optional => optional.Value);
 
     public static IEnumerable<TResult> Gather<TSource, TResult>(this IEnumerable<TSource> enumerable,
-                                                                Func<TSource, Option<TResult>> selector)
-      => enumerable.Select(selector).Gather();
-
-    public static IObservable<T> Gather<T>(this IObservable<Option<T>> enumerable)
-      => enumerable.Where(optional => optional.HasValue)
-                   .Select(optional => optional.Value);
-
-    public static IObservable<TResult> Gather<TSource, TResult>(this IObservable<TSource> enumerable,
                                                                 Func<TSource, Option<TResult>> selector)
       => enumerable.Select(selector).Gather();
   }

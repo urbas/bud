@@ -1,8 +1,7 @@
 using System;
 using System.Reactive;
 using System.Threading.Tasks;
-using Bud.Util;
-using static Bud.Util.Option;
+using static Bud.Option;
 
 namespace Bud.Reactive {
   public class TaskResults {

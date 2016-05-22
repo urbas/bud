@@ -5,7 +5,6 @@ using System.Reactive.Linq;
 using Bud.Cli;
 using Bud.IO;
 using Bud.NuGet;
-using Bud.Util;
 using static Bud.V1.Basic;
 
 namespace Bud.V1 {

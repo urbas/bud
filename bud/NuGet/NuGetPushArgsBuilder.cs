@@ -1,5 +1,4 @@
 using System.Text;
-using Bud.Util;
 
 namespace Bud.NuGet {
   public class NuGetPushArgsBuilder {

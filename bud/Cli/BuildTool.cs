@@ -3,13 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Bud.Cs;
 using Bud.Reactive;
-using Bud.Util;
 using Bud.V1;
 using static System.IO.Directory;
 using static System.IO.Path;
 using static Bud.Cli.BuildScriptCompilation;
 using static Bud.Cli.BuildScriptLoading;
-using static Bud.Util.Option;
+using static Bud.Option;
 
 namespace Bud.Cli {
   public class BuildTool {

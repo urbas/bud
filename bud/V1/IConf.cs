@@ -1,5 +1,3 @@
-using Bud.Util;
-
 namespace Bud.V1 {
   /// <summary>
   ///   This is interface provides a bag of key-to-configuration pairs.
@@ -16,7 +14,7 @@ namespace Bud.V1 {
     ///   If the configuration at the given key is defined, then
     ///   this function returns the value of the configuration. If the
     ///   configuration is not defined, this method returns
-    ///   <see cref="Option.None{T}" />
+    ///   <see cref="Bud.Option.None{T}" />
     /// </returns>
     /// <remarks>
     /// </remarks>

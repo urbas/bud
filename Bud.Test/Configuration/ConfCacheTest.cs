@@ -3,8 +3,7 @@ using System.Threading.Tasks;
 using Bud.V1;
 using Moq;
 using NUnit.Framework;
-using Bud.Util;
-using static Bud.Util.Option;
+using static Bud.Option;
 
 namespace Bud.Configuration {
   public class ConfCacheTest {

@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using Bud.Util;
 using Microsoft.Win32;
 using static System.IO.File;
 using static System.IO.Path;
-using static Bud.Util.Option;
+using static Bud.Option;
 
 namespace Bud.NuGet {
   public class WindowsFrameworkAssemblyResolver {

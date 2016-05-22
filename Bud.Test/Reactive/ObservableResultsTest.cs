@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Reactive.Linq;
 using NUnit.Framework;
-using static Bud.Util.Option;
 using static NUnit.Framework.Assert;
+using static Bud.Option;
 
 namespace Bud.Reactive {
   public class ObservableResultsTest {

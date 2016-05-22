@@ -5,8 +5,8 @@ using Moq;
 using NUnit.Framework;
 using static System.Threading.Tasks.Task;
 using static Bud.Reactive.TaskResults;
-using static Bud.Util.Option;
 using static NUnit.Framework.Assert;
+using static Bud.Option;
 
 namespace Bud.Reactive {
   public class TaskResultsTest {

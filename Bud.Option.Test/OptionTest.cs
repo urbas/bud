@@ -1,11 +1,10 @@
 using System;
-using System.Reactive.Linq;
 using Moq;
 using NUnit.Framework;
-using static Bud.Util.Option;
 using static NUnit.Framework.Assert;
+using static Bud.Option;
 
-namespace Bud.Util {
+namespace Bud {
   public class OptionTest {
     [Test]
     public void Equals_returns_false_when_comparing_none_with_some()
@@ -107,18 +106,6 @@ namespace Bud.Util {
     public void Gather_filters_and_selects()
       => AreEqual(new[] {"1", "3"},
                   new[] {1, 2, 3, 4}.Gather(number => number%2 == 1 ? Some(number.ToString()) : None<string>()));
-
-    [Test]
-    public void Gather_discards_none_observations()
-      => AreEqual(new[] {1, 2},
-                  new[] {None<int>(), Some(1), None<int>(), Some(2)}.ToObservable()
-                                                                    .Gather().ToList().Wait());
-
-    [Test]
-    public void Gather_selects_and_filters_observed_values()
-      => AreEqual(new[] {"1", "3"},
-                  new[] {1, 2, 3, 4}.ToObservable()
-                                    .Gather(number => number%2 == 1 ? Some(number.ToString()) : None<string>()).ToList().Wait());
 
     [Test]
     public void Flatten_returns_none_when_given_a_nested_none()

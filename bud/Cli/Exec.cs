@@ -1,6 +1,5 @@
 using System;
 using System.Diagnostics;
-using Bud.Util;
 
 namespace Bud.Cli {
   public static class Exec {

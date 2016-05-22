@@ -1,6 +1,6 @@
 using NUnit.Framework;
-using static Bud.Util.Option;
 using static NUnit.Framework.Assert;
+using static Bud.Option;
 
 namespace Bud.NuGet {
   public class NuGetPushCliArgsBuilderTest {

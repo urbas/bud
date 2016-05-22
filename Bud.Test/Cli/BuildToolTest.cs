@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 using Bud.V1;
 using NUnit.Framework;
 using static Bud.Cli.BuildTool;
-using static Bud.Util.Option;
 using static NUnit.Framework.Assert;
+using static Bud.Option;
 
 namespace Bud.Cli {
   public class BuildToolTest {

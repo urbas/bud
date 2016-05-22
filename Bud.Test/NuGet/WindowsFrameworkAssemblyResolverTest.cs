@@ -4,8 +4,8 @@ using NuGet.Frameworks;
 using NUnit.Framework;
 using static System.IO.Path;
 using static Bud.NuGet.WindowsFrameworkAssemblyResolver;
-using static Bud.Util.Option;
 using static NUnit.Framework.Assert;
+using static Bud.Option;
 
 namespace Bud.NuGet {
   [Category("WindowsSpecific")]
