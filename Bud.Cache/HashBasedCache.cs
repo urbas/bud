@@ -7,6 +7,13 @@ namespace Bud.Cache {
   ///   A simple file-system cache. Every entry in this cache is a directory. The name of the directory
   ///   is a hex string. This hex string is a unique identifier of the content. It is suggeste(cryptographic digest)
   /// </summary>
+  /// <remarks>
+  ///   This cache allows concurrent writes.
+  ///   However, there is no mechanism in place to prevent multiple content calculations.
+  ///   Two or more producers can start to produce content at the same time.
+  ///   The content will be taken only from the first to finish.
+  ///   This means that content from all producers but the first will be discarded.
+  /// </remarks>
   public class HashBasedCache {
     public string Path { get; }
 
