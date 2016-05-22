@@ -5,6 +5,7 @@ using NUnit.Framework;
 using static NUnit.Framework.Assert;
 
 namespace Bud.IO {
+  [Category("AppVeyorIgnore")]
   public class FileObservatoriesTest {
     private readonly NoOpFilesObservatory noFileChanges = new NoOpFilesObservatory();
 

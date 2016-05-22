@@ -6,6 +6,7 @@ using static Bud.V1.ChocoPublishing;
 using static NUnit.Framework.Assert;
 
 namespace Bud.V1 {
+  [Category("AppVeyorIgnore")]
   public class ChocoPublishingTest {
     [Test]
     public void Initial_configuration() {

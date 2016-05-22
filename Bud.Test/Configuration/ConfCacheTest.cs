@@ -6,6 +6,7 @@ using NUnit.Framework;
 using static Bud.Option;
 
 namespace Bud.Configuration {
+  [Category("AppVeyorIgnore")]
   public class ConfCacheTest {
     private Mock<Func<Key<int>, Option<int>>> intFunc;
     private Mock<Func<Key<object>, Option<object>>> objectFunc;

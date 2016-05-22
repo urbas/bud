@@ -3,6 +3,7 @@ using static Bud.Benchmarks.Measurement;
 using static Bud.Benchmarks.Samples;
 
 namespace Bud.Benchmarks {
+  [Category("AppVeyorIgnore")]
   public class MeasurementTest {
     [Test]
     public void Measure_invokes_the_run_callback_twice() {

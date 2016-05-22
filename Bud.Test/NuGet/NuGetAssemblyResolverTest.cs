@@ -8,6 +8,7 @@ using static NUnit.Framework.Assert;
 
 namespace Bud.NuGet {
   [Category("IntegrationTest")]
+  [Category("AppVeyorIgnore")]
   public class NuGetAssemblyResolverTest {
     private TemporaryDirectory tmpDir;
     private string packagesDir;

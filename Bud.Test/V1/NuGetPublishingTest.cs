@@ -14,6 +14,7 @@ using static Bud.V1.Builds;
 using static Bud.V1.NuGetPublishing;
 
 namespace Bud.V1 {
+  [Category("AppVeyorIgnore")]
   public class NuGetPublishingTest {
     [Test]
     public void Invokes_the_packager_with_the_right_parameters() {

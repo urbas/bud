@@ -13,6 +13,7 @@ using static Bud.V1.Builds;
 using static NUnit.Framework.Assert;
 
 namespace Bud.V1 {
+  [Category("AppVeyorIgnore")]
   public class BuildsTest {
     [Test]
     public void Input_should_be_initially_empty()

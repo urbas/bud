@@ -6,6 +6,7 @@ using static Bud.V1.Basic;
 using static NUnit.Framework.Assert;
 
 namespace Bud.Cli {
+  [Category("AppVeyorIgnore")]
   public class BuildScriptLoadingTest {
     [Test]
     public void LoadBuildDefinition_initializes_the_BaseDir() {

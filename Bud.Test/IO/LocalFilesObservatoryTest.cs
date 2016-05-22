@@ -11,6 +11,7 @@ using NUnit.Framework;
 using static Bud.IO.LocalFilesObservatory;
 
 namespace Bud.IO {
+  [Category("AppVeyorIgnore")]
   public class LocalFilesObservatoryTest {
     [Test]
     public async Task Adding_a_file_should_result_in_a_push_notification() {

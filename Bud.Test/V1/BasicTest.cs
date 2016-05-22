@@ -7,6 +7,7 @@ using static Bud.V1.Basic;
 using static NUnit.Framework.Assert;
 
 namespace Bud.V1 {
+  [Category("AppVeyorIgnore")]
   public class BasicTest {
     [Test]
     public void Nested_projects_must_inherit_BaseDir()

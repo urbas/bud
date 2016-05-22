@@ -7,6 +7,7 @@ using static Bud.Option;
 
 namespace Bud.NuGet {
   [Category("IntegrationTest")]
+  [Category("AppVeyorIgnore")]
   public class NuGetPublisherTest {
     private const string OutputPackageName = "Foo.Bar.1.2.3.nupkg";
     private IPublisher publisher;

@@ -4,6 +4,7 @@ using NUnit.Framework;
 namespace Bud.Benchmarks {
   public class BenchmarkResultsTest {
     [Test]
+    [Category("AppVeyorIgnore")]
     public void FromJson_deserializes_what_ToJson_serializes() {
       var sampleFoo = ImmutableDictionary<string, object>.Empty.Add("sam", 42L);
       var measurementFoo = new Measurement("foo", ImmutableList.Create(sampleFoo));

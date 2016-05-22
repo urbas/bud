@@ -8,6 +8,7 @@ using static System.Linq.Enumerable;
 
 namespace Bud.Cs {
   [Category("IntegrationTest")]
+  [Category("AppVeyorIgnore")]
   public class RoslynCsCompilationTest {
     [Test]
     public void Fails_to_compile_when_core_assembly_references_are_missing() {

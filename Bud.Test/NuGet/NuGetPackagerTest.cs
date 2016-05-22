@@ -11,6 +11,7 @@ using static NUnit.Framework.Assert;
 
 namespace Bud.NuGet {
   [Category("IntegrationTest")]
+  [Category("AppVeyorIgnore")]
   public class NuGetPackagerTest {
     private IPackager packager;
     private const string Authors = "Zar McFoobar";

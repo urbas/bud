@@ -9,6 +9,7 @@ using Contains = NUnit.Framework.Contains;
 
 namespace Bud.Cli {
   [Category("IntegrationTest")]
+  [Category("AppVeyorIgnore")]
   public class BuildScriptCompilationTest {
     private TemporaryDirectory tmpDir;
 

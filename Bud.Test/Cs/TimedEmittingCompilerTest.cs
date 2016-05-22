@@ -14,6 +14,7 @@ using static Bud.IO.FileUtils;
 using static NUnit.Framework.Assert;
 
 namespace Bud.Cs {
+  [Category("AppVeyorIgnore")]
   public class TimedEmittingCompilerTest {
     private Mock<ICompiler> underlyingCompiler;
 

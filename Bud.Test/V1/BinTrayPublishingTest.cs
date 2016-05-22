@@ -4,6 +4,7 @@ using static Bud.V1.BinTrayPublishing;
 using static NUnit.Framework.Assert;
 
 namespace Bud.V1 {
+  [Category("AppVeyorIgnore")]
   public class BinTrayPublishingTest {
     [Test]
     public void Initial_configuration() {

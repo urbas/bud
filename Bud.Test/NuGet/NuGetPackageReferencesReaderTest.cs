@@ -5,6 +5,7 @@ using static Bud.IO.MemoryStreams;
 
 namespace Bud.NuGet {
   [Category("IntegrationTest")]
+  [Category("AppVeyorIgnore")]
   public class NuGetPackageReferencesReaderTest {
     [Test]
     public void Load_returns_a_list_of_package_references() {

@@ -8,6 +8,7 @@ using static NUnit.Framework.Assert;
 using static Bud.Option;
 
 namespace Bud.Cli {
+  [Category("AppVeyorIgnore")]
   public class BuildToolTest {
     [Test]
     public void ExecuteCommand_returns_None_for_undefined_keys()

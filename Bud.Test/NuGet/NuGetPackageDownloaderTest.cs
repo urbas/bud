@@ -12,6 +12,7 @@ using static NUnit.Framework.Assert;
 
 namespace Bud.NuGet {
   [Category("IntegrationTest")]
+  [Category("AppVeyorIgnore")]
   public class NuGetPackageDownloaderTest {
     private TemporaryDirectory tmpDir;
 
