@@ -19,6 +19,7 @@ using static Bud.V1.Builds;
 using static Bud.V1.Cs;
 
 namespace Bud.V1 {
+  [Category("AppVeyorIgnore")]
   public class CsTest {
     [Test]
     public void Assembly_name_must_use_the_project_id()

@@ -10,6 +10,7 @@ using NUnit.Framework;
 using static Bud.V1.NuGetReferences;
 
 namespace Bud.V1 {
+  [Category("AppVeyorIgnore")]
   public class NuGetReferencesTest {
     [Test]
     public void Packages_config_file_is_in_ProjectDir_by_default()
