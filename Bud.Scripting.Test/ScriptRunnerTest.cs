@@ -16,17 +16,5 @@ namespace Bud.Scripting {
         FileAssert.AreEqual(fooExpected, Path.Combine(outputDir, "foo"));
       }
     }
-
-    [Test]
-    public void Main_runs_Build_cs_script() {
-      using (var dir = new TemporaryDirectory()) {
-        var outputDir = dir.CreateDir("output-dir");
-        var fooExpected = dir.CreateFile("42 1337", "output-dir", "foo.expected");
-        var script = dir.CreateFileFromResource("Bud.Scripting.TestScripts.CreateFooFile.cs",
-                                                "CreateFooFile.cs");
-        ScriptRunner.Run(script, "1337", outputDir);
-        FileAssert.AreEqual(fooExpected, Path.Combine(outputDir, "foo"));
-      }
-    }
   }
 }
