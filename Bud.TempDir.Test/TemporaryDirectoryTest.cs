@@ -21,13 +21,16 @@ namespace Bud.TempDir {
     }
 
     [Test]
-    public void Lists_locked_files_when_failing_to_delete_directory() {
+    public void Exception_message_lists_locked_files_when_failing_to_delete_directory() {
       var dir = new TemporaryDirectory();
       var fileA = dir.CreateEmptyFile("a");
+      var fileB = dir.CreateEmptyFile("b");
       using (var _ = File.OpenRead(fileA)) {
         var ex = Assert.Throws<Exception>(() => dir.Dispose());
         Assert.That(ex.Message,
-          Contains.Substring(fileA));
+                    Contains.Substring(fileA)
+                            .And
+                            .Not.Contains(fileB));
       }
       dir.Dispose();
       Assert.That(dir.Path, Does.Not.Exist);
