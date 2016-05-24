@@ -1,7 +1,7 @@
 using System.Collections.Immutable;
 
 namespace Bud.Building {
-  public interface IDirectoryContentGenerator {
+  public interface IDirContentGenerator {
     /// <summary>
     ///   This function should create files in the given <paramref name="outputDir" />.
     /// </summary>

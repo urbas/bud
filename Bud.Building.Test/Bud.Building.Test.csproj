@@ -50,7 +50,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CachedHashBasedBuilderTest.cs" />
+    <Compile Include="CachingHashBasedBuilderTest.cs" />
     <Compile Include="Digest.cs" />
     <Compile Include="DigestGenerator.cs" />
     <Compile Include="HashBasedBuilderTest.cs" />

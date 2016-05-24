@@ -38,10 +38,10 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CachedHashBasedBuilder.cs" />
+    <Compile Include="CachingHashBasedBuilder.cs" />
     <Compile Include="Hasher.cs" />
     <Compile Include="HashBasedBuilder.cs" />
-    <Compile Include="IDirectoryContentGenerator.cs" />
+    <Compile Include="IDirContentGenerator.cs" />
     <Compile Include="IFileGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TimestampBasedBuilder.cs" />
