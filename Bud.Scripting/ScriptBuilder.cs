@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 
 namespace Bud.Scripting {
-  public class ScriptBuilder : IOutputGenerator {
+  public class ScriptBuilder : IFileGenerator {
     /// <param name="scriptPath">
     ///   the path of the C# script file to build.
     /// </param>
@@ -18,17 +18,17 @@ namespace Bud.Scripting {
     public static string Build(string scriptPath) {
       var outputDir = Path.GetDirectoryName(scriptPath);
       var outputExecutable = Path.Combine(outputDir, "bud.script.exe");
-      HashBasedBuilding.Build(new ScriptBuilder(), outputExecutable, ImmutableList.Create(scriptPath));
+      HashBasedBuilder.Build(new ScriptBuilder(), outputExecutable, ImmutableList.Create(scriptPath));
       return outputExecutable;
     }
 
-    public void Generate(string output, IImmutableList<string> inputFiles) {
+    public void Generate(string outputFile, IImmutableList<string> inputFiles) {
       var syntaxTrees = inputFiles.Select(script => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(script), path: script));
       var scriptCompilation = CSharpCompilation.Create("Bud.Script",
                                                        syntaxTrees,
                                                        new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)},
                                                        new CSharpCompilationOptions(OutputKind.ConsoleApplication));
-      var emitResult = scriptCompilation.Emit(output);
+      var emitResult = scriptCompilation.Emit(outputFile);
       if (!emitResult.Success) {
         throw new Exception($"Compilation errpr: {string.Join("\n", emitResult.Diagnostics)}");
       }

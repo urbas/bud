@@ -5,7 +5,8 @@ using static System.IO.Path;
 namespace Bud.Cache {
   /// <summary>
   ///   A simple file-system cache. Every entry in this cache is a directory. The name of the directory
-  ///   is a hex string. This hex string is a unique identifier of the content. It is suggeste(cryptographic digest)
+  ///   is a hex string. This hex string is a unique identifier of the content.
+  ///   It is suggested you use a cryptographic digest of the input that was used to create the content.
   /// </summary>
   /// <remarks>
   ///   This cache allows concurrent writes.

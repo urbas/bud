@@ -36,8 +36,8 @@ namespace Bud.Cache.Test {
         var hash = new byte[] {0x13};
         var cache = new HashBasedCache(dir.Path);
         var contentProducer = new Mock<Action<string>>();
-        cache.Get(hash, contentProducer.Object);
-        cache.Get(hash, contentProducer.Object);
+        Assert.AreEqual(cache.Get(hash, contentProducer.Object),
+                        cache.Get(hash, contentProducer.Object));
         contentProducer.Verify(self => self(It.IsAny<string>()), Times.Once);
       }
     }

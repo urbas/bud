@@ -6,13 +6,13 @@ using Moq;
 using NUnit.Framework;
 
 namespace Bud.Building {
-  public class TimestampBasedBuildingTest {
+  public class TimestampBasedBuilderTest {
     private TemporaryDirectory dir;
-    private Mock<IOutputGenerator> outputGenerator;
+    private Mock<IFileGenerator> outputGenerator;
 
     [SetUp]
     public void SetUp() {
-      outputGenerator = new Mock<IOutputGenerator>(MockBehavior.Strict);
+      outputGenerator = new Mock<IFileGenerator>(MockBehavior.Strict);
       dir = new TemporaryDirectory();
     }
 
@@ -23,14 +23,14 @@ namespace Bud.Building {
     public void Build_creates_the_output_file() {
       var output = dir.CreatePath("a.out");
       outputGenerator.Setup(self => self.Generate(output, ImmutableList<string>.Empty));
-      TimestampBasedBuilding.Build(outputGenerator.Object, output, ImmutableList<string>.Empty);
+      TimestampBasedBuilder.Build(outputGenerator.Object, output, ImmutableList<string>.Empty);
       outputGenerator.VerifyAll();
     }
 
     [Test]
     public void Build_does_not_invoke_the_worker_when_output_already_exists() {
       var output = dir.CreateEmptyFile("a.out");
-      TimestampBasedBuilding.Build(outputGenerator.Object, output, ImmutableList<string>.Empty);
+      TimestampBasedBuilder.Build(outputGenerator.Object, output, ImmutableList<string>.Empty);
     }
 
     [Test]
@@ -41,7 +41,7 @@ namespace Bud.Building {
       var input = ImmutableList.Create(fileA);
       outputGenerator.Setup(self => self.Generate(output, input));
 
-      TimestampBasedBuilding.Build(outputGenerator.Object, output, input);
+      TimestampBasedBuilder.Build(outputGenerator.Object, output, input);
 
       outputGenerator.VerifyAll();
     }
@@ -52,7 +52,7 @@ namespace Bud.Building {
       var output = dir.CreateEmptyFile("a.out");
       File.SetLastWriteTime(fileA, File.GetLastWriteTime(output) - TimeSpan.FromSeconds(1));
       var inputFiles = ImmutableList.Create(fileA);
-      TimestampBasedBuilding.Build(outputGenerator.Object, output, inputFiles);
+      TimestampBasedBuilder.Build(outputGenerator.Object, output, inputFiles);
     }
   }
 }

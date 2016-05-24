@@ -38,13 +38,22 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HashBasedBuilding.cs" />
-    <Compile Include="IOutputGenerator.cs" />
+    <Compile Include="CachedHashBasedBuilder.cs" />
+    <Compile Include="Hasher.cs" />
+    <Compile Include="HashBasedBuilder.cs" />
+    <Compile Include="IDirectoryContentGenerator.cs" />
+    <Compile Include="IFileGenerator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TimestampBasedBuilding.cs" />
+    <Compile Include="TimestampBasedBuilder.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bud.Cache\Bud.Cache.csproj">
+      <Project>{713f14ed-baf2-4ce4-afb3-ecadac2b710b}</Project>
+      <Name>Bud.Cache</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
