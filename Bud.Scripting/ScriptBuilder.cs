@@ -43,7 +43,7 @@ namespace Bud.Scripting {
                                                        new CSharpCompilationOptions(OutputKind.ConsoleApplication));
       var emitResult = scriptCompilation.Emit(outputScript);
       if (!emitResult.Success) {
-        throw new Exception($"Compilation errpr: {string.Join("\n", emitResult.Diagnostics)}");
+        throw new Exception($"Compilation error: {string.Join("\n", emitResult.Diagnostics)}");
       }
     }
   }

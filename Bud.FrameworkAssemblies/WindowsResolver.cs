@@ -12,11 +12,11 @@ namespace Bud.FrameworkAssemblies {
   public class WindowsResolver {
     public static readonly string OldFrameworkPath
       = Combine(GetFolderPath(SpecialFolder.Windows),
-                     "Microsoft.NET", "Framework");
+                "Microsoft.NET", "Framework");
 
     public static readonly string Net3PlusFrameworkPath
       = Combine(GetFolderPath(SpecialFolder.ProgramFilesX86),
-                     "Reference Assemblies", "Microsoft", "Framework");
+                "Reference Assemblies", "Microsoft", "Framework");
 
     public static readonly string Net4PlusFrameworkPath
       = Combine(Net3PlusFrameworkPath, ".NETFramework");

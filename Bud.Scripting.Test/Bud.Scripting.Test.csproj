@@ -40,6 +40,9 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Reflection.Metadata">
+      <HintPath>..\packages\System.Reflection.Metadata.1.2.0\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
