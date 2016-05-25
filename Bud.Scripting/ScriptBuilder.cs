@@ -28,6 +28,8 @@ namespace Bud.Scripting {
 
     public void Generate(string outputDir, IImmutableList<string> inputFiles) {
       var outputScript = Path.Combine(outputDir, "script.exe");
+      var scriptContents = inputFiles.Select(File.ReadAllText).ToList();
+      var references = scriptContents.Select(ScriptReferences.Parse);
       var syntaxTrees = inputFiles.Select(script => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(script), path: script));
       var scriptCompilation = CSharpCompilation.Create("Bud.Script",
                                                        syntaxTrees,
