@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using Bud.Cs;
+using Bud.FrameworkAssemblies;
 using Bud.IO;
 using Bud.NuGet;
 using Bud.Reactive;
@@ -46,7 +47,7 @@ namespace Bud.V1 {
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary,
                                          warningLevel: 1))
       .Add(AssemblyReferences, c => (PackagesSubProjectId/NuGetReferences.ResolvedAssemblies)[c])
-      .Add(AssemblyReferences, WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("mscorlib", new Version(0, 0)).Value)
+      .Add(AssemblyReferences, WindowsResolver.ResolveFrameworkAssembly("mscorlib", new Version(0, 0)).Value)
       .Set(PackagesSubProjectId/ProjectDir, c => Path.Combine(ProjectDir[c], "packages"))
       .Set(PackagesSubProjectId/NuGetReferences.PackagesConfigFile, c => Path.Combine(ProjectDir[c], "packages.config"))
       .Init(NuGetReferences.ReferencedPackages, c => (PackagesSubProjectId/NuGetReferences.ReferencedPackages)[c])
@@ -143,7 +144,7 @@ namespace Bud.V1 {
     private static IEnumerable<PackageFile> PackageAssemblies(IImmutableList<string> files)
       => from assemblyPath in files
          let assemblyFileName = Path.GetFileName(assemblyPath)
-         where !WindowsFrameworkAssemblyResolver.IsFrameworkAssembly(assemblyFileName)
+         where !WindowsResolver.IsFrameworkAssembly(assemblyFileName)
          select new PackageFile(assemblyPath, assemblyFileName);
 
     private static IObservable<string> DefaultBuild(IConf c)

@@ -114,7 +114,6 @@
     <Compile Include="IO\IValueStore.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReference.cs" />
     <Compile Include="NuGet\FrameworkAssemblyReferencesAggregator.cs" />
-    <Compile Include="NuGet\FrameworkDir.cs" />
     <Compile Include="NuGet\IPackager.cs" />
     <Compile Include="NuGet\IPublisher.cs" />
     <Compile Include="NuGet\NuGetExecutable.cs" />
@@ -126,7 +125,6 @@
     <Compile Include="NuGet\PackageDependency.cs" />
     <Compile Include="NuGet\NuGetPackageMetadata.cs" />
     <Compile Include="NuGet\PackageReference.cs" />
-    <Compile Include="NuGet\WindowsFrameworkAssemblyResolver.cs" />
     <Compile Include="NuGet\IAssemblyResolver.cs" />
     <Compile Include="NuGet\NuGetAssemblyResolver.cs" />
     <Compile Include="Reactive\ObservableOptions.cs" />
@@ -202,6 +200,10 @@
     <ProjectReference Include="..\Bud.Exec\Bud.Exec.csproj">
       <Project>{7647a7d1-bb14-4a70-9b0a-551b051cc125}</Project>
       <Name>Bud.Exec</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bud.FrameworkAssemblies\Bud.FrameworkAssemblies.csproj">
+      <Project>{a4d2b43f-f24a-480a-b743-ebe0186b0d21}</Project>
+      <Name>Bud.FrameworkAssemblies</Name>
     </ProjectReference>
     <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
       <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>

@@ -4,19 +4,19 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
-using static System.IO.File;
+using static System.Environment;
 using static System.IO.Path;
-using static Bud.Option;
+using Version = System.Version;
 
-namespace Bud.NuGet {
-  public class WindowsFrameworkAssemblyResolver {
+namespace Bud.FrameworkAssemblies {
+  public class WindowsResolver {
     public static readonly string OldFrameworkPath
-      = Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows),
-                "Microsoft.NET", "Framework");
+      = Combine(GetFolderPath(SpecialFolder.Windows),
+                     "Microsoft.NET", "Framework");
 
     public static readonly string Net3PlusFrameworkPath
-      = Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
-                "Reference Assemblies", "Microsoft", "Framework");
+      = Combine(GetFolderPath(SpecialFolder.ProgramFilesX86),
+                     "Reference Assemblies", "Microsoft", "Framework");
 
     public static readonly string Net4PlusFrameworkPath
       = Combine(Net3PlusFrameworkPath, ".NETFramework");
@@ -28,13 +28,12 @@ namespace Bud.NuGet {
       var dllName = assemblyName + ".dll";
       var foundDll = FrameworkDirs
         .Where(frameworkDir => version >= frameworkDir.Version)
-        .Select(frameworkDir => Combine(frameworkDir.Dir, dllName))
-        .FirstOrDefault(Exists);
-      return foundDll ?? None<string>();
+        .Select(frameworkDir => Combine(frameworkDir.Dir, dllName)).FirstOrDefault(File.Exists);
+      return foundDll ?? Option.None<string>();
     }
 
     public static bool IsFrameworkAssembly(string dll)
-      => FrameworkDirs.Any(f => Exists(Combine(f.Dir, dll)));
+      => FrameworkDirs.Any(f => File.Exists(Combine(f.Dir, dll)));
 
     public static ImmutableSortedSet<FrameworkDir> FrameworkDirs
       => FrameworkDirsLazy.FrameworkDirsCache;

@@ -131,7 +131,6 @@
     <Compile Include="NuGet\NuGetPushCliArgsBuilderTest.cs" />
     <Compile Include="NuGet\PackageConfigTestUtils.cs" />
     <Compile Include="NuGet\PackageReferenceTest.cs" />
-    <Compile Include="NuGet\WindowsFrameworkAssemblyResolverTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reactive\ObservableOptionsTest.cs" />
     <Compile Include="Reactive\ObservableResourcesTest.cs" />
@@ -154,6 +153,10 @@
     <Compile Include="V1\ZippingTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Bud.FrameworkAssemblies\Bud.FrameworkAssemblies.csproj">
+      <Project>{a4d2b43f-f24a-480a-b743-ebe0186b0d21}</Project>
+      <Name>Bud.FrameworkAssemblies</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
       <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
       <Name>Bud.Option</Name>

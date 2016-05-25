@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9A731D93-1960-4847-8259-64BA42D6026A}</ProjectGuid>
+    <ProjectGuid>{A4D2B43F-F24A-480A-B743-EBE0186B0D21}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bud.Scripting</RootNamespace>
-    <AssemblyName>Bud.Scripting.Test</AssemblyName>
+    <RootNamespace>Bud.FrameworkAssemblies</RootNamespace>
+    <AssemblyName>Bud.FrameworkAssemblies</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,10 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Collections.Immutable.1.1.37\lib\dotnet\System.Collections.Immutable.dll</HintPath>
@@ -42,21 +38,14 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FrameworkDir.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScriptReferencesTest.cs" />
-    <Compile Include="ScriptRunnerTest.cs" />
-    <EmbeddedResource Include="TestScripts\UsingLinqWithReference.cs" />
-    <EmbeddedResource Include="TestScripts\UsingLinqWithoutReference.cs" />
-    <EmbeddedResource Include="TestScripts\CreateFooFile.cs" />
+    <Compile Include="WindowsResolver.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Bud.Scripting\Bud.Scripting.csproj">
-      <Project>{f1cc850c-4c10-4d2c-8267-0c7ef196cb38}</Project>
-      <Name>Bud.Scripting</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.TempDir\Bud.TempDir.csproj">
-      <Project>{b8efe565-1fda-48cb-a7f3-b3627b747727}</Project>
-      <Name>Bud.TempDir</Name>
+    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
+      <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
+      <Name>Bud.Option</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

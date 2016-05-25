@@ -1,6 +1,6 @@
 using System;
 
-namespace Bud.NuGet {
+namespace Bud.FrameworkAssemblies {
   public struct FrameworkDir {
     public Version Version { get; }
     public string Dir { get; }

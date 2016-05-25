@@ -9,7 +9,7 @@ using NuGet.Packaging;
 using NuGet.Repositories;
 using NuGet.Versioning;
 using static Bud.NuGet.FrameworkAssemblyReferencesAggregator;
-using static Bud.NuGet.WindowsFrameworkAssemblyResolver;
+using static Bud.FrameworkAssemblies.WindowsResolver;
 using static Bud.Option;
 
 namespace Bud.NuGet {

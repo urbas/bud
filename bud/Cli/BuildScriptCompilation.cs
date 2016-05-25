@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using Bud.Cs;
+using Bud.FrameworkAssemblies;
 using Bud.NuGet;
 using Bud.V1;
 using Microsoft.CodeAnalysis;
@@ -30,9 +31,9 @@ namespace Bud.Cli {
       typeof(ZipArchive).Assembly.Location,
       typeof(CompressionLevel).Assembly.Location,
       typeof(JsonSerializer).Assembly.Location,
-      WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.Net.Http", Version.Parse("4.6.0.0")).Value,
-      WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.Runtime", Version.Parse("4.6.0.0")).Value,
-      WindowsFrameworkAssemblyResolver.ResolveFrameworkAssembly("System.IO", Version.Parse("4.6.0.0")).Value);
+      WindowsResolver.ResolveFrameworkAssembly("System.Net.Http", Version.Parse("4.6.0.0")).Value,
+      WindowsResolver.ResolveFrameworkAssembly("System.Runtime", Version.Parse("4.6.0.0")).Value,
+      WindowsResolver.ResolveFrameworkAssembly("System.IO", Version.Parse("4.6.0.0")).Value);
 
     public static CompileOutput CompileBuildScript(string baseDir, string buildScriptPath)
       => BuildScriptCompiler
