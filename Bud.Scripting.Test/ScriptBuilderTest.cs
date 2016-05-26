@@ -4,7 +4,6 @@ using Bud.TempDir;
 using NUnit.Framework;
 
 namespace Bud.Scripting {
-  [Category("IntegrationTest")]
   public class ScriptBuilderTest {
     [Test]
     public void Generate_throws_when_unknown_reference_specified() {
