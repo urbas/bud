@@ -32,8 +32,7 @@ namespace Bud.Scripting {
       var scriptContents = inputFiles.Select(File.ReadAllText).ToList();
       var references = scriptContents.Select(ScriptReferences.Parse)
                                      .SelectMany(refs => refs)
-                                     .Select(assemblyName => WindowsResolver.ResolveFrameworkAssembly(assemblyName, Version.Parse("4.6.0.0")))
-                                     .Gather()
+                                     .Select(ResolveAssembly)
                                      .Select(path => MetadataReference.CreateFromFile(path))
                                      .ToImmutableList();
       var syntaxTrees = inputFiles.Select(script => SyntaxFactory.ParseSyntaxTree(File.ReadAllText(script), path: script));
@@ -45,6 +44,14 @@ namespace Bud.Scripting {
       if (!emitResult.Success) {
         throw new Exception($"Compilation error: {string.Join("\n", emitResult.Diagnostics)}");
       }
+    }
+
+    private string ResolveAssembly(string assemblyName) {
+      var assembly = WindowsResolver.ResolveFrameworkAssembly(assemblyName, Version.Parse("4.6.0.0"));
+      if (assembly.HasValue) {
+        return assembly.Value;
+      }
+      throw new Exception($"Could not resolve the reference '{assemblyName}'.");
     }
   }
 }
