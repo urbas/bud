@@ -46,12 +46,14 @@ namespace Bud.Scripting {
       }
     }
 
-    private string ResolveAssembly(string assemblyName) {
-      var assembly = WindowsResolver.ResolveFrameworkAssembly(assemblyName, Version.Parse("4.6.0.0"));
+    private static string ResolveAssembly(string assemblyName) {
+      var assembly = WindowsResolver.ResolveFrameworkAssembly(assemblyName, FrameworkAssembliesVersion);
       if (assembly.HasValue) {
         return assembly.Value;
       }
       throw new Exception($"Could not resolve the reference '{assemblyName}'.");
     }
+
+    private static readonly Version FrameworkAssembliesVersion = Version.Parse("4.6.0.0");
   }
 }

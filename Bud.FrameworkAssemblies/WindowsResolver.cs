@@ -28,7 +28,8 @@ namespace Bud.FrameworkAssemblies {
       var dllName = assemblyName + ".dll";
       var foundDll = FrameworkDirs
         .Where(frameworkDir => version >= frameworkDir.Version)
-        .Select(frameworkDir => Combine(frameworkDir.Dir, dllName)).FirstOrDefault(File.Exists);
+        .Select(frameworkDir => Combine(frameworkDir.Dir, dllName))
+        .FirstOrDefault(File.Exists);
       return foundDll ?? Option.None<string>();
     }
 
@@ -60,7 +61,8 @@ namespace Bud.FrameworkAssemblies {
 
         AddAssemblyFoldersEx(list);
 
-        return list.ToImmutableSortedSet(new FrameworkDirComparer());
+        return list.Where(dir => Directory.Exists(dir.Dir))
+                   .ToImmutableSortedSet(new FrameworkDirComparer());
       }
 
       private static void AddAssemblyFoldersEx(ICollection<FrameworkDir> list) {
