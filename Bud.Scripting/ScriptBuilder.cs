@@ -51,18 +51,6 @@ namespace Bud.Scripting {
         .Select(r => MetadataReference.CreateFromFile(r.Path.Value))
                                  .Concat(new[] { MetadataReference.CreateFromFile(typeof(object).Assembly.Location) })
                                  .ToImmutableList();
-//      var references = scriptContents.Select(ScriptReferences.Parse)
-//                                     .SelectMany(refs => refs)
-//                                     .ToImmutableHashSet();
-//      var availableCustomReferences = AvailableReferences.Get();
-//      var customAssemblyPaths = references.Select(reference => availableCustomReferences.Get(reference)).Gather().ToList();
-//      var customAssemblies = customAssemblyPaths.Select(path => MetadataReference.CreateFromFile(path));
-//      var assemblies = references.Except(availableCustomReferences.Keys)
-//                                 .Select(ResolveAssembly)
-//                                 .Select(path => MetadataReference.CreateFromFile(path))
-//                                 .Concat(new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)})
-//                                 .Concat(customAssemblies)
-//                                 .ToImmutableList();
       var errors = Compiler.Compile(inputFiles, assemblies, outputScript);
       if (errors.Any()) {
         throw new Exception($"Compilation error: {string.Join("\n", errors)}");
