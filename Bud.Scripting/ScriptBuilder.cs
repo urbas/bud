@@ -10,10 +10,10 @@ using Microsoft.CodeAnalysis;
 
 namespace Bud.Scripting {
   public class ScriptBuilder : IDirContentGenerator {
-    public IReadOnlyDictionary<string, string> AvailableReferences { get; }
+    public IAssemblyReferences AvailableReferences { get; }
     public ICSharpScriptCompiler Compiler { get; set; }
 
-    public ScriptBuilder(IReadOnlyDictionary<string, string> availableReferences,
+    public ScriptBuilder(IAssemblyReferences availableReferences,
                          ICSharpScriptCompiler compiler) {
       AvailableReferences = availableReferences;
       Compiler = compiler;
@@ -30,7 +30,7 @@ namespace Bud.Scripting {
     ///   The executable can be run as is (using any working directory).
     /// </returns>
     public static string Build(string scriptPath,
-                               IReadOnlyDictionary<string, string> availableReferences) {
+                               IAssemblyReferences availableReferences) {
       var thisScriptCache = Path.Combine(Path.GetTempPath(), "Bud", "cache", "scripts", Path.GetFileName(Path.GetDirectoryName(scriptPath)));
       Directory.CreateDirectory(thisScriptCache);
       var scriptBuilder = new ScriptBuilder(availableReferences,
@@ -48,9 +48,10 @@ namespace Bud.Scripting {
       var references = scriptContents.Select(ScriptReferences.Parse)
                                      .SelectMany(refs => refs)
                                      .ToImmutableHashSet();
-      var customAssemblyPaths = references.Select(reference => AvailableReferences.Get(reference)).Gather().ToList();
+      var availableCustomReferences = AvailableReferences.Get();
+      var customAssemblyPaths = references.Select(reference => availableCustomReferences.Get(reference)).Gather().ToList();
       var customAssemblies = customAssemblyPaths.Select(path => MetadataReference.CreateFromFile(path));
-      var assemblies = references.Except(AvailableReferences.Keys)
+      var assemblies = references.Except(availableCustomReferences.Keys)
                                  .Select(ResolveAssembly)
                                  .Select(path => MetadataReference.CreateFromFile(path))
                                  .Concat(new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)})

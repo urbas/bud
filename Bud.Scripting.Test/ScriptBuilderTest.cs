@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.Linq;
 using Bud.TempDir;
 using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.Emit;
 using NUnit.Framework;
 
 namespace Bud.Scripting {
@@ -16,8 +13,8 @@ namespace Bud.Scripting {
       using (var dir = new TemporaryDirectory()) {
         var script = dir.CreateFile(@"//!reference INVALIDREFERENCE
 public class A {public static void Main(){}}", "Build.cs");
-        var exception = Assert.Throws<Exception>(() => new ScriptBuilder(ImmutableDictionary<string, string>.Empty,
-           new TestCSharpScriptCompiler()).Generate(dir.Path, ImmutableList.Create(script)));
+        var exception = Assert.Throws<Exception>(() => new ScriptBuilder(new TestAssemblyReferences(),
+                                                                         new TestCSharpScriptCompiler()).Generate(dir.Path, ImmutableList.Create(script)));
         Assert.That(exception.Message,
                     Does.Contain("INVALIDREFERENCE"));
       }
@@ -32,7 +29,7 @@ public class A {public static void Main(){}}", "Build.cs");
 
         var references = ImmutableDictionary<string, string>.Empty.Add("A", assemblyA);
 
-        new ScriptBuilder(references, new TestCSharpScriptCompiler())
+        new ScriptBuilder(new TestAssemblyReferences(references), new TestCSharpScriptCompiler())
           .Generate(outputDir, ImmutableList.Create(script));
 
         FileAssert.AreEqual(assemblyA,
@@ -41,8 +38,17 @@ public class A {public static void Main(){}}", "Build.cs");
     }
   }
 
+  public class TestAssemblyReferences : IAssemblyReferences {
+    private readonly IReadOnlyDictionary<string, string> references;
+
+    public TestAssemblyReferences(IReadOnlyDictionary<string, string> references = null) {
+      this.references = references ?? ImmutableDictionary<string, string>.Empty;
+    }
+
+    public IReadOnlyDictionary<string, string> Get() => references;
+  }
+
   public class TestCSharpScriptCompiler : ICSharpScriptCompiler {
-    public IImmutableList<Diagnostic> Compile(IEnumerable<string> inputFiles, IEnumerable<MetadataReference> references, string outputExe)
-      => ImmutableList<Diagnostic>.Empty;
+    public IImmutableList<Diagnostic> Compile(IEnumerable<string> inputFiles, IEnumerable<MetadataReference> references, string outputExe) => ImmutableList<Diagnostic>.Empty;
   }
 }

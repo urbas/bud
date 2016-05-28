@@ -51,6 +51,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BudReferences.cs" />
+    <Compile Include="IAssemblyReferences.cs" />
     <Compile Include="ICSharpScriptCompiler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoslynCSharpScriptCompiler.cs" />
