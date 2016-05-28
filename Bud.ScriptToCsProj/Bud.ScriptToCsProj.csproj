@@ -4,17 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{F1CC850C-4C10-4D2C-8267-0C7EF196CB38}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{D5DD5466-BBA7-4B4A-B8E6-74B4B643C1CC}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bud.Scripting</RootNamespace>
-    <AssemblyName>Bud.Scripting</AssemblyName>
+    <RootNamespace>Bud.ScriptToCsProj</RootNamespace>
+    <AssemblyName>Bud.ScriptToCsProj</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp>
-    </NuGetPackageImportStamp>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -46,45 +47,41 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
-    <Reference Include="System.Reflection.Metadata">
+    <Reference Include="System.Reflection.Metadata, Version=1.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Reflection.Metadata.1.2.0\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
+      <Private>True</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BudReferences.cs" />
-    <Compile Include="IAssemblyReferences.cs" />
-    <Compile Include="ICSharpScriptCompiler.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Reference.cs" />
-    <Compile Include="RoslynCSharpScriptCompiler.cs" />
-    <Compile Include="ScriptBuilder.cs" />
-    <Compile Include="ScriptReferences.cs" />
-    <Compile Include="ScriptRunner.cs" />
+    <Compile Include="ScriptCsProj.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bud.Building\Bud.Building.csproj">
       <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
       <Name>Bud.Building</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Cache\Bud.Cache.csproj">
-      <Project>{713F14ED-BAF2-4CE4-AFB3-ECADAC2B710B}</Project>
-      <Name>Bud.Cache</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.Exec\Bud.Exec.csproj">
-      <Project>{7647a7d1-bb14-4a70-9b0a-551b051cc125}</Project>
-      <Name>Bud.Exec</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.FrameworkAssemblies\Bud.FrameworkAssemblies.csproj">
-      <Project>{a4d2b43f-f24a-480a-b743-ebe0186b0d21}</Project>
-      <Name>Bud.FrameworkAssemblies</Name>
+    <ProjectReference Include="..\Bud.CsProjTools\Bud.CsProjTools.csproj">
+      <Project>{c3af8877-8fde-4d6c-b5f8-51655e7fe63b}</Project>
+      <Name>Bud.CsProjTools</Name>
     </ProjectReference>
     <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
       <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
       <Name>Bud.Option</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Bud.Scripting\Bud.Scripting.csproj">
+      <Project>{f1cc850c-4c10-4d2c-8267-0c7ef196cb38}</Project>
+      <Name>Bud.Scripting</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
+    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

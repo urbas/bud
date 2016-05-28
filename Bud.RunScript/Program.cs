@@ -6,12 +6,12 @@ namespace Bud.RunScript {
   public class Program {
     public static void Main(string[] args) {
       try {
-        var exitCode = ScriptRunner.Run(Path.Combine(Directory.GetCurrentDirectory(), "Build.cs"),
+        var exitCode = ScriptRunner.Run(ScriptBuilder.GetDefaultScriptPath(),
                                         args,
                                         Directory.GetCurrentDirectory());
         Environment.Exit(exitCode);
       } catch (Exception e) {
-        Console.Error.WriteLine("An error occurred when trying to run the script. Error message:\n\n    " + e.Message);
+        Console.Error.WriteLine("An error occurred while trying to run the script. Error message:\n\n    " + e.Message);
         Environment.Exit(1);
       }
     }
