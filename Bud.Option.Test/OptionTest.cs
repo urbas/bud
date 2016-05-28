@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
 using static NUnit.Framework.Assert;
@@ -121,5 +122,13 @@ namespace Bud {
     public void Flatten_returns_none_when_given_a_nested_some_option()
       => AreEqual(Some(42),
                   Some(Some(42)).Flatten());
+
+    [Test]
+    public void Get_on_empty_dictionary_returns_None()
+      => AreEqual(None<int>(), new Dictionary<int, int>().Get(42));
+
+    [Test]
+    public void Get_on_existing_key_in_dictionary_returns_Some()
+      => AreEqual(Some(1), new Dictionary<int, int> { {42, 1} }.Get(42));
   }
 }
