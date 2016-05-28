@@ -51,7 +51,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ICSharpScriptCompiler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RoslynCSharpScriptCompiler.cs" />
     <Compile Include="ScriptBuilder.cs" />
     <Compile Include="ScriptReferences.cs" />
     <Compile Include="ScriptRunner.cs" />
