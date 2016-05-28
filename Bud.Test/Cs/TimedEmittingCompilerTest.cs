@@ -15,6 +15,7 @@ using static NUnit.Framework.Assert;
 
 namespace Bud.Cs {
   [Category("AppVeyorIgnore")]
+  [Ignore("TODO: Reimplement")]
   public class TimedEmittingCompilerTest {
     private Mock<ICompiler> underlyingCompiler;
 
