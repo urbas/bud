@@ -9,7 +9,7 @@ namespace Bud.ScriptToCsProj {
       var buildScriptReferences = ScriptBuilder.ExtractReferences(
         new[] {ScriptBuilder.GetDefaultScriptPath()}.Select(File.ReadAllText),
         new BudReferences().Get());
-      Console.Write(ScriptCsProj.BudScriptCsProj(buildScriptReferences));
+      Console.Write(ScriptCsProj.BudScriptCsProj(buildScriptReferences, Directory.GetCurrentDirectory()));
     }
   }
 }

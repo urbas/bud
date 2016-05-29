@@ -14,7 +14,7 @@ namespace Bud.ScriptToCsProj {
                     new Reference("Bud.Option", "Blah.dll"),
                     new Reference("System"),
                     new Reference("System.Core"),
-                  }));
+                  }, "/foo/bar"));
 
     public static string GetResourceContent(string embeddedResourceName) {
       var manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(embeddedResourceName);
