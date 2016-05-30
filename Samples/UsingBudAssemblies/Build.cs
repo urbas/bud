@@ -1,5 +1,3 @@
-// 2
-
 //!reference Bud.Option
 
 using Bud;
