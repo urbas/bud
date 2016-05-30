@@ -7,7 +7,7 @@ namespace Bud.Scripting {
     /// <param name="args">arguments that will be passed to the script's main method.</param>
     /// <param name="cwd">the working directory in which to run the script.</param>
     public static int Run(string scriptPath, string[] args, string cwd) {
-      var executable = ScriptBuilder.Build(scriptPath, new BudReferences());
+      var executable = ScriptBuilder.Build(scriptPath, new BudAssemblyPaths());
       return BatchExec.Run(executable, string.Join(" ", args), cwd);
     }
   }

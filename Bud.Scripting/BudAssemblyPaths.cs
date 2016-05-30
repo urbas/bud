@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 
 namespace Bud.Scripting {
-  public class BudReferences : IAssemblyReferences {
-    public IReadOnlyDictionary<string, string> Get() => LazyReferencesInitializer.BudReferences;
+  public class BudAssemblyPaths : IAssemblyPaths {
+    public IReadOnlyDictionary<string, string> Get()
+      => LazyReferencesInitializer.BudReferences;
+
+    public static Option<string> Get(string assemblyName)
+      => LazyReferencesInitializer.BudReferences.Get(assemblyName);
 
     private static KeyValuePair<string, string> ToAssemblyNamePath(Type typ) {
       var assembly = typ.Assembly;

@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.IO;
-using Bud.Cli;
 using static System.IO.Path;
 
 namespace Bud.NuGet {

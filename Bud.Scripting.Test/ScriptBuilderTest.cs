@@ -12,7 +12,7 @@ namespace Bud.Scripting {
       using (var dir = new TmpDir()) {
         var script = dir.CreateFile(@"//!reference INVALIDREFERENCE
 public class A {public static void Main(){}}", "Build.cs");
-        var exception = Assert.Throws<Exception>(() => new ScriptBuilder(new TestAssemblyReferences(),
+        var exception = Assert.Throws<Exception>(() => new ScriptBuilder(new TestAssemblyPaths(),
                                                                          new TestCSharpScriptCompiler()).Generate(dir.Path, ImmutableList.Create(script)));
         Assert.That(exception.Message,
                     Does.Contain("INVALIDREFERENCE"));
@@ -28,7 +28,7 @@ public class A {public static void Main(){}}", "Build.cs");
 
         var references = ImmutableDictionary<string, string>.Empty.Add("A", assemblyA);
 
-        new ScriptBuilder(new TestAssemblyReferences(references), new TestCSharpScriptCompiler())
+        new ScriptBuilder(new TestAssemblyPaths(references), new TestCSharpScriptCompiler())
           .Generate(Path.Combine(outputDir, "build-script.exe"), ImmutableList.Create(script));
 
         FileAssert.AreEqual(assemblyA,
@@ -37,10 +37,10 @@ public class A {public static void Main(){}}", "Build.cs");
     }
   }
 
-  public class TestAssemblyReferences : IAssemblyReferences {
+  public class TestAssemblyPaths : IAssemblyPaths {
     private readonly IReadOnlyDictionary<string, string> references;
 
-    public TestAssemblyReferences(IReadOnlyDictionary<string, string> references = null) {
+    public TestAssemblyPaths(IReadOnlyDictionary<string, string> references = null) {
       this.references = references ?? ImmutableDictionary<string, string>.Empty;
     }
 

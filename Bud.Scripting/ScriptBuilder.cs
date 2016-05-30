@@ -9,20 +9,20 @@ using Microsoft.CodeAnalysis;
 
 namespace Bud.Scripting {
   public class ScriptBuilder : IDirContentGenerator, IFileGenerator {
-    private static readonly Version FrameworkAssembliesVersion = Version.Parse("4.6.0.0");
-    public IAssemblyReferences AvailableReferences { get; }
+    private static readonly Version MaxVersion = new Version(int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue);
+    public IAssemblyPaths AssemblyPaths { get; }
     public ICSharpScriptCompiler Compiler { get; set; }
 
-    public ScriptBuilder(IAssemblyReferences availableReferences,
+    public ScriptBuilder(IAssemblyPaths assemblyPaths,
                          ICSharpScriptCompiler compiler) {
-      AvailableReferences = availableReferences;
+      AssemblyPaths = assemblyPaths;
       Compiler = compiler;
     }
 
     /// <param name="scriptPath">
     ///   the path of the C# script file to build.
     /// </param>
-    /// <param name="availableReferences">
+    /// <param name="assemblyPaths">
     ///   these references can be used in the build script in addition to framework references.
     /// </param>
     /// <returns>
@@ -30,61 +30,62 @@ namespace Bud.Scripting {
     ///   The executable can be run as is (using any working directory).
     /// </returns>
     public static string Build(string scriptPath,
-                               IAssemblyReferences availableReferences) {
-      var scriptBuilder = new ScriptBuilder(availableReferences,
+                               IAssemblyPaths assemblyPaths) {
+      var scriptBuilder = new ScriptBuilder(assemblyPaths,
                                             new RoslynCSharpScriptCompiler());
       var buildDir = Path.Combine(Path.GetDirectoryName(scriptPath), "build");
       Directory.CreateDirectory(buildDir);
-      string buildScript = Path.Combine(buildDir, "build-script.exe");
+      var buildScript = Path.Combine(buildDir, "build-script.exe");
       HashBasedBuilder.Build(scriptBuilder, buildScript, ImmutableList.Create(scriptPath));
       return buildScript;
     }
 
     public void Generate(string outputScriptExe, IImmutableList<string> inputFiles) {
+      var customAssemblyPaths = AssemblyPaths.Get();
       var outputDir = Path.GetDirectoryName(outputScriptExe);
       var scriptContents = inputFiles.Select(File.ReadAllText).ToList();
-      var customAssemblyReferences = ExtractReferences(scriptContents, AvailableReferences.Get()).ToList();
-      var assemblies = ResolveFrameworkReferences(customAssemblyReferences)
-        .Select(r => MetadataReference.CreateFromFile(r.Path.Value))
+      var references = ScriptReferences.Extract(scriptContents);
+      var frameworkAssemblies = new List<string>();
+      var customAssemblies = new List<string>();
+      foreach (var reference in references) {
+        var frameworkAssembly = WindowsResolver.ResolveFrameworkAssembly(reference, MaxVersion);
+        if (frameworkAssembly.HasValue) {
+          frameworkAssemblies.Add(frameworkAssembly.Value);
+          continue;
+        }
+        var customAssembly = customAssemblyPaths.Get(reference);
+        if (customAssembly.HasValue) {
+          customAssemblies.Add(customAssembly.Value);
+          continue;
+        }
+        throw new Exception($"Could not resolve the reference '{reference}'.");
+      }
+      var assemblies = frameworkAssemblies
+        .Concat(customAssemblies)
+        .Select(r => MetadataReference.CreateFromFile(r))
         .Concat(new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)})
         .ToImmutableList();
       var errors = Compiler.Compile(inputFiles, assemblies, outputScriptExe);
       if (errors.Any()) {
         throw new Exception($"Compilation error: {string.Join("\n", errors)}");
       }
-      CopyAssemblies(customAssemblyReferences, outputDir);
+      CopyAssemblies(customAssemblies, outputDir);
     }
 
-    public static IEnumerable<Reference> ExtractReferences(IEnumerable<string> scriptContents,
-                                                           IReadOnlyDictionary<string, string> availableReferences)
-      => scriptContents.Select(ScriptReferences.Parse)
-                       .SelectMany(refs => refs)
-                       .ToImmutableHashSet()
-                       .Select(r => new Reference(r, availableReferences.Get(r)));
-
-    public static string GetDefaultScriptPath()
+    public static string DefaultScriptPath
       => Path.Combine(Directory.GetCurrentDirectory(), "Build.cs");
 
-    private static void CopyAssemblies(IEnumerable<Reference> customAssemblyReferences, 
+    private static void CopyAssemblies(IEnumerable<string> paths,
                                        string outputDir) {
-      foreach (var path in customAssemblyReferences.Gather(r => r.Path)) {
+      foreach (var path in paths) {
         var destFileName = Path.Combine(outputDir, Path.GetFileName(path));
-        HashBasedBuilder.Build((output, input) => {
-          File.Delete(destFileName);
-          File.Copy(path, destFileName);
-        }, destFileName, ImmutableList.Create(path));
+        HashBasedBuilder.Build(CopyFirstFileTo, destFileName, ImmutableList.Create(path));
       }
     }
 
-    private static string ResolveAssembly(string assemblyName) {
-      var assembly = WindowsResolver.ResolveFrameworkAssembly(assemblyName, FrameworkAssembliesVersion);
-      if (assembly.HasValue) {
-        return assembly.Value;
-      }
-      throw new Exception($"Could not resolve the reference '{assemblyName}'.");
+    private static void CopyFirstFileTo(string output, IImmutableList<string> input) {
+      File.Delete(output);
+      File.Copy(input[0], output);
     }
-
-    private static IEnumerable<Reference> ResolveFrameworkReferences(IEnumerable<Reference> unresolvedReferences)
-      => unresolvedReferences.Select(r => r.Path.HasValue ? r : new Reference(r.AssemblyName, ResolveAssembly(r.AssemblyName)));
   }
 }

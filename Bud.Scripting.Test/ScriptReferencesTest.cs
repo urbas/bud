@@ -4,22 +4,26 @@ using static NUnit.Framework.Assert;
 namespace Bud.Scripting {
   public class ScriptReferencesTest {
     [Test]
-    public void Parse_returns_no_references_from_an_empty_string()
-      => IsEmpty(ScriptReferences.Parse(""));
+    public void Extract_returns_no_references_from_an_empty_string()
+      => IsEmpty(ScriptReferences.Extract(""));
 
     [Test]
-    public void Parse_returns_the_only_reference()
+    public void Extract_returns_the_only_reference()
       => AreEqual(new[] {"System.Linq"},
-                  ScriptReferences.Parse("//!reference System.Linq"));
+                  ScriptReferences.Extract("//!reference System.Linq"));
 
     [Test]
-    public void Parse_returns_no_references_if_reference_line_malformed()
-      => IsEmpty(ScriptReferences.Parse("// reference System.Linq"));
+    public void Extract_from_multiple_files()
+      => That(ScriptReferences.Extract(new[] {"//!reference Foo", "//!reference Bar"}),
+              Is.EquivalentTo(new[] {"Foo", "Bar"}));
 
     [Test]
-    public void Parse_returns_references_until_first_non_commented_non_empty_line()
-      => AreEqual(new[] {"Foo", "Bar", "Zar", "Moo"},
-                  ScriptReferences.Parse(@"//!reference Foo
+    public void Extract_returns_no_references_if_reference_line_malformed()
+      => IsEmpty(ScriptReferences.Extract("// reference System.Linq"));
+
+    [Test]
+    public void Extract_returns_references_until_first_non_commented_non_empty_line()
+      => That(ScriptReferences.Extract(@"//!reference Foo
 //!reference Bar
 // This one is still in:
 //!reference Zar
@@ -30,6 +34,7 @@ namespace Bud.Scripting {
 var
 
 // But not this one
-//!reference Goo"));
+//!reference Goo"),
+              Is.EquivalentTo(new[] {"Foo", "Bar", "Zar", "Moo"}));
   }
 }

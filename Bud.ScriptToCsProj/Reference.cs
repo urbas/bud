@@ -1,4 +1,4 @@
-namespace Bud.Scripting {
+namespace Bud.ScriptToCsProj {
   public struct Reference {
     public Reference(string assemblyName, Option<string> path = default(Option<string>)) {
       Path = path;

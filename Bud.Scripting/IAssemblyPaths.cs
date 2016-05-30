@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
 namespace Bud.Scripting {
-  public interface IAssemblyReferences {
+  public interface IAssemblyPaths {
     IReadOnlyDictionary<string, string> Get();
   }
 }

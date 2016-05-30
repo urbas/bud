@@ -6,7 +6,7 @@ namespace Bud.RunScript {
   public class Program {
     public static void Main(string[] args) {
       try {
-        var exitCode = ScriptRunner.Run(ScriptBuilder.GetDefaultScriptPath(),
+        var exitCode = ScriptRunner.Run(ScriptBuilder.DefaultScriptPath,
                                         args,
                                         Directory.GetCurrentDirectory());
         Environment.Exit(exitCode);

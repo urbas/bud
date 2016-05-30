@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Bud.CsProjTools;
-using Bud.Scripting;
 
 namespace Bud.ScriptToCsProj {
   public class ScriptCsProj {
