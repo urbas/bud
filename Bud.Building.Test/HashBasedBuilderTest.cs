@@ -63,8 +63,8 @@ namespace Bud.Building {
       var inputHashFile = dir.CreatePath("a.out.input_hash");
       var fileFoo = dir.CreateFile("foo", "foo");
       var singleFile = ImmutableList.Create(fileFoo);
-      HashBasedBuilder.Build(outputGenerator.Object, singleFile, inputHashFile, new byte[] {0x00}, output);
-      HashBasedBuilder.Build(outputGenerator.Object, singleFile, inputHashFile, new byte[] {0x01}, output);
+      HashBasedBuilder.Build(outputGenerator.Object, inputHashFile, new byte[] {0x00}, singleFile, output);
+      HashBasedBuilder.Build(outputGenerator.Object, inputHashFile, new byte[] {0x01}, singleFile, output);
       outputGenerator.Verify(self => self(singleFile, output), Times.Exactly(2));
     }
   }

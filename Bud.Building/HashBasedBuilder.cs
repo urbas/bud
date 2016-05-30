@@ -15,8 +15,7 @@ namespace Bud.Building {
     ///   this function actually produces the output.
     ///   The first parameter to the function is the input file and the second parameter is the output file.
     /// </param>
-    /// <param name="input">the files from which the <paramref name="filesBuilder" /> should generate the output.</param>
-    /// <param name="inputHashFile">
+    /// <param name="hashFile">
     ///   this file contains the has of all <paramref name="input" />
     ///   file combined. This file is updated each time <paramref name="output" /> is generated. If this
     ///   file does not exist, or if the content of this file does not match the hash
@@ -27,33 +26,36 @@ namespace Bud.Building {
     ///   use of this salt is as the hash of the generator. For example, the salt could be
     ///   the version of the generator and the parameters of the generator.
     /// </param>
+    /// <param name="input">the files from which the <paramref name="filesBuilder" /> should generate the output.</param>
     /// <param name="output">the path of the expected output.</param>
     /// <remarks>
     ///   Note that the order of input files is significant. Different order of input files will produce
     ///   a different hash. If your <paramref name="filesBuilder" /> is order-invariant, we suggest you
     ///   order the input before invoking this function.
     /// </remarks>
-    public static void Build(FilesBuilder filesBuilder, IImmutableList<string> input, string inputHashFile, byte[] salt, string output) {
+    public static void Build(FilesBuilder filesBuilder,
+                             string hashFile,
+                             byte[] salt,
+                             IImmutableList<string> input, string output) {
       var digest = Md5Hasher.Digest(input, salt);
       if (!File.Exists(output)) {
         filesBuilder(input, output);
-        File.WriteAllBytes(inputHashFile, digest);
+        File.WriteAllBytes(hashFile, digest);
       } else {
-        if (!File.Exists(inputHashFile) || !File.ReadAllBytes(inputHashFile).SequenceEqual(digest)) {
+        if (!File.Exists(hashFile) || !File.ReadAllBytes(hashFile).SequenceEqual(digest)) {
           filesBuilder(input, output);
-          File.WriteAllBytes(inputHashFile, digest);
+          File.WriteAllBytes(hashFile, digest);
         }
       }
     }
 
     public static void Build(FilesBuilder filesBuilder, IImmutableList<string> input, string output)
-      => Build(filesBuilder, input, output + ".input_hash", DefaultSalt, output);
+      => Build(filesBuilder, output + ".input_hash", DefaultSalt, input, output);
 
-    public static void Build(SingleFileBuilder fileBuilder, string input, string inputHashFile, byte[] salt, string output)
+    public static void Build(SingleFileBuilder fileBuilder, string hashFile, byte[] salt, string input, string output)
       => Build((inputFiles, outputFile) => fileBuilder(inputFiles.First(), outputFile),
-               ImmutableList.Create(input),
-               inputHashFile,
-               salt, output);
+               hashFile,
+               salt, ImmutableList.Create(input), output);
 
     public static void Build(SingleFileBuilder fileBuilder, string input, string output)
       => Build((inputFiles, outputFile) => fileBuilder(inputFiles.First(), outputFile),
@@ -67,6 +69,7 @@ namespace Bud.Building {
       FileGenerator = fileGenerator;
     }
 
-    public void Generate(string outputFile, IImmutableList<string> inputFiles) => FileGenerator(outputFile, inputFiles);
+    public void Generate(string outputFile, IImmutableList<string> inputFiles)
+      => FileGenerator(outputFile, inputFiles);
   }
 }

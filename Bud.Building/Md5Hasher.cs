@@ -13,13 +13,6 @@ namespace Bud.Building {
       return Finish(digest, buffer);
     }
 
-    public static byte[] Digest(string file, byte[] salt) {
-      var digest = Init(salt);
-      var buffer = CreateBuffer();
-      AddFile(file, buffer, digest);
-      return Finish(digest, buffer);
-    }
-
     private static byte[] Finish(HashAlgorithm digest, byte[] buffer) {
       digest.TransformFinalBlock(buffer, 0, 0);
       return digest.Hash;

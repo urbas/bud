@@ -38,9 +38,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CachingHashBasedBuilder.cs" />
     <Compile Include="FilesBuilder.cs" />
-    <Compile Include="DirFromFilesBuilder.cs" />
     <Compile Include="Md5Hasher.cs" />
     <Compile Include="HashBasedBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
