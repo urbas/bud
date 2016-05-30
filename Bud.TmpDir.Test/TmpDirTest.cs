@@ -54,7 +54,7 @@ namespace Bud {
     [Test]
     public void CreateFileFromResource_produces_the_file() {
       using (var dir = new TmpDir()) {
-        var fileFromResource = dir.CreateFileFromResource("Bud.TempDir.FooEmbeddedResource", "a");
+        var fileFromResource = dir.CreateFileFromResource("Bud.FooEmbeddedResource", "a");
         var expectedContent = dir.CreateFile("foo", "b");
         FileAssert.AreEqual(expectedContent, fileFromResource);
       }
