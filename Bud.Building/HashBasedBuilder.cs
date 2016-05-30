@@ -8,30 +8,14 @@ namespace Bud.Building {
     private static readonly byte[] DefaultSalt = new byte[0];
 
     /// <summary>
-    ///   Calculates the hash of <paramref name="input" /> files and invokes <paramref name="fileGenerator" />
+    ///   Calculates the hash of <paramref name="input" /> file and invokes <paramref name="filesBuilder" />
     ///   only if the hash is different from the one generated previously.
     /// </summary>
-    /// <param name="fileGenerator">this function actually produces the output.</param>
-    /// <param name="output">the path of the expected output.</param>
-    /// <param name="input">the files from which the <paramref name="fileGenerator" /> should generate the output.</param>
-    /// <remarks>
-    ///   Note that the order of input files is significant. Different order of input files will produce
-    ///   a different hash. If your <paramref name="fileGenerator" /> is order-invariant, we suggest you
-    ///   order the input before invoking this function.
-    /// </remarks>
-    public static void Build(IFileGenerator fileGenerator,
-                             string output,
-                             IImmutableList<string> input) {
-      Build(fileGenerator, output, input, output + ".input_hash", DefaultSalt);
-    }
-
-    /// <summary>
-    ///   Similar to <see cref="Build(IFileGenerator,string,IImmutableList{string})" /> except
-    ///   you can provide your own <paramref name="inputHashFile" />.
-    /// </summary>
-    /// <param name="fileGenerator"></param>
-    /// <param name="output"></param>
-    /// <param name="input"></param>
+    /// <param name="filesBuilder">
+    ///   this function actually produces the output.
+    ///   The first parameter to the function is the input file and the second parameter is the output file.
+    /// </param>
+    /// <param name="input">the files from which the <paramref name="filesBuilder" /> should generate the output.</param>
     /// <param name="inputHashFile">
     ///   this file contains the has of all <paramref name="input" />
     ///   file combined. This file is updated each time <paramref name="output" /> is generated. If this
@@ -43,43 +27,40 @@ namespace Bud.Building {
     ///   use of this salt is as the hash of the generator. For example, the salt could be
     ///   the version of the generator and the parameters of the generator.
     /// </param>
-    public static void Build(IFileGenerator fileGenerator,
-                             string output,
-                             IImmutableList<string> input,
-                             string inputHashFile,
-                             byte[] salt) {
-      var digest = Hasher.Md5(input, salt);
+    /// <param name="output">the path of the expected output.</param>
+    /// <remarks>
+    ///   Note that the order of input files is significant. Different order of input files will produce
+    ///   a different hash. If your <paramref name="filesBuilder" /> is order-invariant, we suggest you
+    ///   order the input before invoking this function.
+    /// </remarks>
+    public static void Build(FilesBuilder filesBuilder, IImmutableList<string> input, string inputHashFile, byte[] salt, string output) {
+      var digest = Md5Hasher.Digest(input, salt);
       if (!File.Exists(output)) {
-        fileGenerator.Generate(output, input);
+        filesBuilder(input, output);
         File.WriteAllBytes(inputHashFile, digest);
       } else {
         if (!File.Exists(inputHashFile) || !File.ReadAllBytes(inputHashFile).SequenceEqual(digest)) {
-          fileGenerator.Generate(output, input);
+          filesBuilder(input, output);
           File.WriteAllBytes(inputHashFile, digest);
         }
       }
     }
 
-    /// <summary>
-    ///   See <see cref="Build(IFileGenerator,string,IImmutableList{string})" />
-    /// </summary>
-    public static void Build(Action<string, IImmutableList<string>> fileGenerator,
-                             string output,
-                             IImmutableList<string> input)
-      => Build(new FuncFileGenerator(fileGenerator), output, input, output + ".input_hash", DefaultSalt);
+    public static void Build(FilesBuilder filesBuilder, IImmutableList<string> input, string output)
+      => Build(filesBuilder, input, output + ".input_hash", DefaultSalt, output);
 
-    /// <summary>
-    ///   See <see cref="Build(IFileGenerator,string,IImmutableList{string})" />
-    /// </summary>
-    public static void Build(Action<string, IImmutableList<string>> fileGenerator,
-                             string output,
-                             IImmutableList<string> input,
-                             string inputHashFile,
-                             byte[] salt)
-      => Build(new FuncFileGenerator(fileGenerator), output, input, inputHashFile, salt);
+    public static void Build(SingleFileBuilder fileBuilder, string input, string inputHashFile, byte[] salt, string output)
+      => Build((inputFiles, outputFile) => fileBuilder(inputFiles.First(), outputFile),
+               ImmutableList.Create(input),
+               inputHashFile,
+               salt, output);
+
+    public static void Build(SingleFileBuilder fileBuilder, string input, string output)
+      => Build((inputFiles, outputFile) => fileBuilder(inputFiles.First(), outputFile),
+               ImmutableList.Create(input), output);
   }
 
-  internal class FuncFileGenerator : IFileGenerator {
+  internal class FuncFileGenerator {
     public Action<string, IImmutableList<string>> FileGenerator { get; }
 
     public FuncFileGenerator(Action<string, IImmutableList<string>> fileGenerator) {

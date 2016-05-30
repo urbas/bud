@@ -16,8 +16,8 @@ namespace Bud.Building {
       Timestamp = timestamp;
     }
 
-    public static void CreateDigestsJsonFile(string path, IImmutableList<string> inputFiles)
-      => File.WriteAllText(path, DigestsJson(inputFiles));
+    public static void CreateDigestsJsonFile(IEnumerable<string> inputFiles, string outputFile)
+      => File.WriteAllText(outputFile, DigestsJson(inputFiles));
 
     private static string DigestsJson(IEnumerable<string> inputFiles) {
       var digests = inputFiles.Aggregate(ImmutableDictionary<string, Digest>.Empty,

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using Moq;
@@ -7,11 +8,13 @@ using NUnit.Framework;
 namespace Bud.Building {
   public class TimestampBasedBuilderTest {
     private TmpDir dir;
-    private Mock<IFileGenerator> outputGenerator;
+    private Mock<FilesBuilder> outputGenerator;
 
     [SetUp]
     public void SetUp() {
-      outputGenerator = new Mock<IFileGenerator>(MockBehavior.Strict);
+      outputGenerator = new Mock<FilesBuilder>(MockBehavior.Strict);
+      outputGenerator.Setup(s => s(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
+                     .Callback<IEnumerable<string>, string>(DigestGenerator.Generate);
       dir = new TmpDir();
     }
 
@@ -21,9 +24,8 @@ namespace Bud.Building {
     [Test]
     public void Build_creates_the_output_file() {
       var output = dir.CreatePath("a.out");
-      outputGenerator.Setup(self => self.Generate(output, ImmutableList<string>.Empty));
       TimestampBasedBuilder.Build(outputGenerator.Object, output, ImmutableList<string>.Empty);
-      outputGenerator.VerifyAll();
+      outputGenerator.Verify(self => self(ImmutableList<string>.Empty, output), Times.Once);
     }
 
     [Test]
@@ -38,11 +40,10 @@ namespace Bud.Building {
       var fileA = dir.CreateFile("foo", "a");
       File.SetLastWriteTime(output, File.GetLastWriteTime(fileA) - TimeSpan.FromSeconds(1));
       var input = ImmutableList.Create(fileA);
-      outputGenerator.Setup(self => self.Generate(output, input));
 
       TimestampBasedBuilder.Build(outputGenerator.Object, output, input);
 
-      outputGenerator.VerifyAll();
+      outputGenerator.Verify(self => self(input, output), Times.Once);
     }
 
     [Test]

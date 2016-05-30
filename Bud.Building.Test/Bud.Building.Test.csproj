@@ -58,7 +58,7 @@
     <Compile Include="Digest.cs" />
     <Compile Include="DigestGenerator.cs" />
     <Compile Include="HashBasedBuilderTest.cs" />
-    <Compile Include="HasherTest.cs" />
+    <Compile Include="Md5HasherTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TimestampBasedBuilderTest.cs" />
   </ItemGroup>

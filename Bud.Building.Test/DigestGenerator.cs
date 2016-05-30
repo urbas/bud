@@ -1,9 +1,8 @@
-using System.Collections.Immutable;
+using System.Collections.Generic;
 
 namespace Bud.Building {
-  public class DigestGenerator : IFileGenerator {
-    public virtual void Generate(string outputFile, IImmutableList<string> inputFiles) {
-      Digest.CreateDigestsJsonFile(outputFile, inputFiles);
-    }
+  public class DigestGenerator {
+    public static void Generate(IEnumerable<string> inputFiles, string outputFile)
+      => Digest.CreateDigestsJsonFile(inputFiles, outputFile);
   }
 }

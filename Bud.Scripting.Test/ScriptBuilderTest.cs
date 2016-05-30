@@ -12,8 +12,12 @@ namespace Bud.Scripting {
       using (var dir = new TmpDir()) {
         var script = dir.CreateFile(@"//!reference INVALIDREFERENCE
 public class A {public static void Main(){}}", "Build.cs");
-        var exception = Assert.Throws<Exception>(() => new ScriptBuilder(new TestAssemblyPaths(),
-                                                                         new TestCSharpScriptCompiler()).Generate(dir.Path, ImmutableList.Create(script)));
+        var exception = Assert.Throws<Exception>(() => {
+          ScriptBuilder.Generate(ImmutableList.Create(script),
+                                 ImmutableDictionary<string, string>.Empty,
+                                 new TestCSharpScriptCompiler(),
+                                 Path.Combine(dir.Path, "build-script.exe"));
+        });
         Assert.That(exception.Message,
                     Does.Contain("INVALIDREFERENCE"));
       }
@@ -26,10 +30,10 @@ public class A {public static void Main(){}}", "Build.cs");
         var assemblyA = dir.CreateFile("foo", "A.dll");
         var outputDir = dir.CreateDir("output");
 
-        var references = ImmutableDictionary<string, string>.Empty.Add("A", assemblyA);
-
-        new ScriptBuilder(new TestAssemblyPaths(references), new TestCSharpScriptCompiler())
-          .Generate(Path.Combine(outputDir, "build-script.exe"), ImmutableList.Create(script));
+        ScriptBuilder.Generate(ImmutableList.Create(script),
+                               ImmutableDictionary<string, string>.Empty.Add("A", assemblyA),
+                               new TestCSharpScriptCompiler(),
+                               Path.Combine(outputDir, "build-script.exe"));
 
         FileAssert.AreEqual(assemblyA,
                             Path.Combine(outputDir, "A.dll"));
