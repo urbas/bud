@@ -7,7 +7,6 @@ using System.Reactive.Linq;
 using Bud.Cs;
 using Bud.IO;
 using Bud.NuGet;
-using Bud.TempDir;
 using Microsoft.CodeAnalysis;
 using Microsoft.Reactive.Testing;
 using Moq;
@@ -29,7 +28,7 @@ namespace Bud.V1 {
     [Test]
     [Ignore("Needs reimplementation")]
     public void CSharp_sources_must_be_in_Input() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var projectA = CsLib("A", baseDir: dir.Path);
         var sourceFile = dir.CreateEmptyFile("A", "TestMainClass.cs");
         Assert.That(Input[projectA].Take(1).Wait(),
@@ -40,7 +39,7 @@ namespace Bud.V1 {
     [Test]
     [Ignore("Needs reimplementation")]
     public void CSharp_sources_in_nested_directories_must_be_in_Input() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var projectA = CsLib("A", baseDir: dir.Path);
         var sourceFile = dir.CreateEmptyFile("A", "B", "TestMainClass.cs");
         Assert.That(Input[projectA].Take(1).Wait(),
@@ -50,7 +49,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Non_csharp_files_must_not_be_in_Input() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var cSharpProject = CsLib("A", baseDir: dir.Path);
         var textFile = dir.CreateEmptyFile("A", "TextFile.txt");
         Assert.That(Input[cSharpProject].Take(1).Wait(),
@@ -169,7 +168,7 @@ namespace Bud.V1 {
     [Test]
     [Category("IntegrationTest")]
     public void Projects_must_reference_the_mscorlib_assembly() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         dir.CreateFile(
           "public class App {public static void Main(string[] args) => System.Console.WriteLine(\"Hello World!\");}",
           "A", "App.cs");

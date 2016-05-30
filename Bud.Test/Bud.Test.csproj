@@ -165,9 +165,9 @@
       <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
       <Name>Bud.Option</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.TempDir\Bud.TempDir.csproj">
+    <ProjectReference Include="..\Bud.TmpDir\Bud.TmpDir.csproj">
       <Project>{b8efe565-1fda-48cb-a7f3-b3627b747727}</Project>
-      <Name>Bud.TempDir</Name>
+      <Name>Bud.TmpDir</Name>
     </ProjectReference>
     <ProjectReference Include="..\bud\bud.csproj">
       <Project>{5d2c752c-65d5-4148-918a-ab11f8344e68}</Project>

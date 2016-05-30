@@ -1,18 +1,17 @@
 using System.Collections.Immutable;
 using System.IO;
-using Bud.TempDir;
 using Moq;
 using NUnit.Framework;
 
 namespace Bud.Building {
   public class HashBasedBuilderTest {
-    private TemporaryDirectory dir;
+    private TmpDir dir;
     private Mock<DigestGenerator> outputGenerator;
 
     [SetUp]
     public void SetUp() {
       outputGenerator = new Mock<DigestGenerator> {CallBase = true};
-      dir = new TemporaryDirectory();
+      dir = new TmpDir();
     }
 
     [TearDown]

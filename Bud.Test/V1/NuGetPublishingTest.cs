@@ -4,7 +4,6 @@ using System.IO;
 using System.Reactive.Linq;
 using Bud.IO;
 using Bud.NuGet;
-using Bud.TempDir;
 using Moq;
 using NuGet.Frameworks;
 using NuGet.Versioning;
@@ -49,7 +48,7 @@ namespace Bud.V1 {
     [Test]
     [Category("IntegrationTest")]
     public void Simplest_NuGet_publishing_project() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var project = NuGetPublishingProject("Foo", baseDir: dir.Path)
           .Set(PublishUrl, dir.CreateDir("repo"));
         Assert.AreEqual(new[] {false},
@@ -60,7 +59,7 @@ namespace Bud.V1 {
     [Test]
     [Category("IntegrationTest")]
     public void NuGet_publishing_some_content() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var repoDir = dir.CreateDir("repo");
         var someFile = dir.CreateFile("some content", "A.txt");
         var project = NuGetPublishingProject("A", baseDir: dir.Path)

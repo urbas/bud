@@ -2,11 +2,11 @@
 using System.IO;
 using NUnit.Framework;
 
-namespace Bud.TempDir {
-  public class TemporaryDirectoryTest {
+namespace Bud {
+  public class TmpDirTest {
     [Test]
     public void Creates_the_directory() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         Assert.That(dir.Path, Does.Exist);
       }
     }
@@ -14,7 +14,7 @@ namespace Bud.TempDir {
     [Test]
     public void Deletes_the_directory() {
       string path;
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         path = dir.Path;
       }
       Assert.That(path, Does.Not.Exist);
@@ -22,7 +22,7 @@ namespace Bud.TempDir {
 
     [Test]
     public void Exception_message_lists_locked_files_when_failing_to_delete_directory() {
-      var dir = new TemporaryDirectory();
+      var dir = new TmpDir();
       var fileA = dir.CreateEmptyFile("a");
       var fileB = dir.CreateEmptyFile("b");
       using (var _ = File.OpenRead(fileA)) {
@@ -38,14 +38,14 @@ namespace Bud.TempDir {
 
     [Test]
     public void ToString_returns_the_path() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         Assert.AreEqual(dir.Path, dir.ToString());
       }
     }
 
     [Test]
     public void CreateDir_creates_a_subdirectory() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         dir.CreateDir("a");
         DirectoryAssert.Exists(Path.Combine(dir.Path, "a"));
       }
@@ -53,7 +53,7 @@ namespace Bud.TempDir {
 
     [Test]
     public void CreateFileFromResource_produces_the_file() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var fileFromResource = dir.CreateFileFromResource("Bud.TempDir.FooEmbeddedResource", "a");
         var expectedContent = dir.CreateFile("foo", "b");
         FileAssert.AreEqual(expectedContent, fileFromResource);

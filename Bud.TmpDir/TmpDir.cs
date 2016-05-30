@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Bud.TempDir {
-  public class TemporaryDirectory : IDisposable {
-    public TemporaryDirectory() {
+namespace Bud {
+  public class TmpDir : IDisposable {
+    public TmpDir() {
       Path = CreateDirectoryInTempDir();
     }
 

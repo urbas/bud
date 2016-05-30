@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using Bud.TempDir;
 using NUnit.Framework;
 using static Bud.IO.FileUtils;
 using static NUnit.Framework.Assert;
@@ -10,7 +9,7 @@ namespace Bud.IO {
   public class FileUtilsTest {
     [Test]
     public void ToTimestampedFile_returns_a_timestamped_file_with_the_right_path_and_timestamp() {
-      using (var tmpDir = new TemporaryDirectory()) {
+      using (var tmpDir = new TmpDir()) {
         var fileA = tmpDir.CreateEmptyFile();
         var timestampedFile = ToTimestampedFile(fileA);
         AreEqual(fileA, timestampedFile.Value);
@@ -20,7 +19,7 @@ namespace Bud.IO {
 
     [Test]
     public void GetFileTimestamp_return_the_last_write_time_of_the_file() {
-      using (var tmpDir = new TemporaryDirectory()) {
+      using (var tmpDir = new TmpDir()) {
         var fileA = tmpDir.CreateEmptyFile();
         var timestampedFile = ToTimestampedFile(fileA);
         var fileTimestampNow = FileTimestampNow();
@@ -36,7 +35,7 @@ namespace Bud.IO {
 
     [Test]
     public void IsNewerThan_returns_false_when_a_reference_file_is_newer() {
-      using (var tmpDir = new TemporaryDirectory()) {
+      using (var tmpDir = new TmpDir()) {
         var fileA = tmpDir.CreateEmptyFile("A");
         File.SetLastWriteTime(fileA, DateTime.Now - TimeSpan.FromDays(2));
         var fileB = tmpDir.CreateEmptyFile("B");
@@ -47,7 +46,7 @@ namespace Bud.IO {
 
     [Test]
     public void IsNewerThan_returns_true_when_all_reference_files_are_older() {
-      using (var tmpDir = new TemporaryDirectory()) {
+      using (var tmpDir = new TmpDir()) {
         var fileB = tmpDir.CreateEmptyFile("B");
         File.SetLastWriteTime(fileB, DateTime.Now - TimeSpan.FromDays(3));
         var fileC = tmpDir.CreateEmptyFile("C");

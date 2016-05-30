@@ -1,7 +1,6 @@
 using System.Collections.Immutable;
 using System.IO;
 using Bud.Cache;
-using Bud.TempDir;
 using Moq;
 using NUnit.Framework;
 
@@ -9,13 +8,13 @@ namespace Bud.Building {
   public class CachingHashBasedBuilderTest {
     private static readonly byte[] Salt = {0x13};
     private Mock<IDirContentGenerator> generatorMock;
-    private TemporaryDirectory dir;
+    private TmpDir dir;
     private static readonly ImmutableList<string> EmptyInput = ImmutableList<string>.Empty;
 
     [SetUp]
     public void SetUp() {
       generatorMock = new Mock<IDirContentGenerator>();
-      dir = new TemporaryDirectory();
+      dir = new TmpDir();
     }
 
     [TearDown]

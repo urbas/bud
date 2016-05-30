@@ -1,4 +1,3 @@
-using Bud.TempDir;
 using NuGet.Frameworks;
 using NuGet.Versioning;
 using NUnit.Framework;
@@ -6,10 +5,10 @@ using NUnit.Framework;
 namespace Bud.NuGet {
   [Category("AppVeyorIgnore")]
   public static class PackageConfigTestUtils {
-    public static string CreatePackagesConfigFile(TemporaryDirectory tmpDir)
+    public static string CreatePackagesConfigFile(TmpDir tmpDir)
       => CreatePackagesConfigFile(tmpDir, "Bud.NuGet.SinglePackageTest.packages.config");
 
-    public static string CreatePackagesConfigFile(TemporaryDirectory tmpDir, string embeddedResourceName)
+    public static string CreatePackagesConfigFile(TmpDir tmpDir, string embeddedResourceName)
       => tmpDir.CreateFileFromResource(embeddedResourceName,
                                        tmpDir.Path,
                                        "packages.config");

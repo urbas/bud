@@ -6,7 +6,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Bud.TempDir;
 using NUnit.Framework;
 using static Bud.IO.LocalFilesObservatory;
 
@@ -15,7 +14,7 @@ namespace Bud.IO {
   public class LocalFilesObservatoryTest {
     [Test]
     public async Task Adding_a_file_should_result_in_a_push_notification() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var disposingBarrier = new CountdownEvent(1);
         var observedChanges = ObserveSingleFileChangeAsync(dir, disposingBarrier);
         var file = dir.CreateEmptyFile("A", "A.txt");
@@ -26,7 +25,7 @@ namespace Bud.IO {
 
     [Test]
     public async Task Changing_a_file_should_result_in_a_push_notification() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var fileA = dir.CreateEmptyFile("A", "A.txt");
         var disposingBarrier = new CountdownEvent(1);
         var observedChanges = ObserveSingleFileChangeAsync(dir, disposingBarrier);
@@ -38,7 +37,7 @@ namespace Bud.IO {
 
     [Test]
     public async Task Removing_a_file_should_result_in_a_push_notification() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var fileA = dir.CreateEmptyFile("A", "A.txt");
         var disposingBarrier = new CountdownEvent(1);
         var observedChanges = ObserveSingleFileChangeAsync(dir, disposingBarrier);
@@ -50,7 +49,7 @@ namespace Bud.IO {
 
     [Test]
     public async Task Moving_a_file_should_result_in_two_push_notifications() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var fileA = dir.CreateEmptyFile("A", "A.txt");
         var fileB = Path.Combine(dir.Path, "B.txt");
         bool wasDisposed = false;
@@ -65,7 +64,7 @@ namespace Bud.IO {
 
     [Test]
     public async Task Renaming_a_file_should_result_in_two_push_notifications() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var fileA = dir.CreateEmptyFile("A.txt");
         var fileB = Path.Combine(dir.Path, "B.txt");
         bool wasDisposed = false;
@@ -80,7 +79,7 @@ namespace Bud.IO {
 
     [Test]
     public async Task Changing_multiple_files_must_produce_multiple_observations() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var fileA = dir.CreateEmptyFile("A.txt");
         var fileB = dir.CreateEmptyFile("B", "B.txt");
         bool wasDisposed = false;
@@ -98,7 +97,7 @@ namespace Bud.IO {
     [Test]
     [Timeout(2000)]
     public async Task Merging_observers_should_produce_observations_when_only_one_produces_them() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var tempDir = new TmpDir()) {
         tempDir.CreateEmptyFile("A", "A.txt");
         var fileB = tempDir.CreateEmptyFile("B", "B.txt");
         var dirA = Path.Combine(tempDir.Path, "A");
@@ -117,7 +116,7 @@ namespace Bud.IO {
 
     [Test]
     public void Observing_a_nonexisting_directory_should_fail() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var dirA = Path.Combine(dir.Path, "A");
         Assert.Throws<ArgumentException>(
           () => ObserveFileSystem(dirA, "*", true).Wait());
@@ -126,7 +125,7 @@ namespace Bud.IO {
 
     [Test]
     public void Two_concurrent_subscribers_should_cause_only_one_subscription() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         int subscriptionCount = 0;
         var fileA = dir.CreateEmptyFile("A", "A.txt");
         var disposingBarrier = new CountdownEvent(1);
@@ -162,7 +161,7 @@ namespace Bud.IO {
 
     [Test]
     public void Observations_resume_after_first_disposal() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var fileA = dir.CreateEmptyFile("A", "A.txt");
         var dispose1Barrier = new CountdownEvent(1);
         var dispose2Barrier = new CountdownEvent(2);
@@ -199,7 +198,7 @@ namespace Bud.IO {
       }
     }
 
-    private static Task<string> ObserveSingleFileChangeAsync(TemporaryDirectory tempDir,
+    private static Task<string> ObserveSingleFileChangeAsync(TmpDir tempDir,
                                                              CountdownEvent disposingBarrier)
       => TaskTestUtils.InvokeAndWait(
         waitCountdown => Task.Run(() => {
@@ -213,7 +212,7 @@ namespace Bud.IO {
         }),
         waitCountdown: 1);
 
-    private static Task<List<string>> ObserveFileChanges(TemporaryDirectory tempDir,
+    private static Task<List<string>> ObserveFileChanges(TmpDir tempDir,
                                                          int expectedChangesCount,
                                                          Action disposedCallback)
       => TaskTestUtils.InvokeAndWait(

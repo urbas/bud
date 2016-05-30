@@ -1,19 +1,18 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.IO;
-using Bud.TempDir;
 using Moq;
 using NUnit.Framework;
 
 namespace Bud.Building {
   public class TimestampBasedBuilderTest {
-    private TemporaryDirectory dir;
+    private TmpDir dir;
     private Mock<IFileGenerator> outputGenerator;
 
     [SetUp]
     public void SetUp() {
       outputGenerator = new Mock<IFileGenerator>(MockBehavior.Strict);
-      dir = new TemporaryDirectory();
+      dir = new TmpDir();
     }
 
     [TearDown]

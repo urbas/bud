@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Bud.TempDir;
 using Moq;
 using NUnit.Framework;
 using static System.IO.Path;
@@ -8,12 +7,12 @@ using static NUnit.Framework.Assert;
 
 namespace Bud.IO {
   public class HashBasedCachingTest {
-    private TemporaryDirectory tmpDir;
+    private TmpDir tmpDir;
     private string cacheFile;
 
     [SetUp]
     public void SetUp() {
-      tmpDir = new TemporaryDirectory();
+      tmpDir = new TmpDir();
       cacheFile = Combine(tmpDir.Path, "some_lines");
     }
 

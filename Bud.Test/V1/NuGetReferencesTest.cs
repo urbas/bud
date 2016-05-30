@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using Bud.NuGet;
-using Bud.TempDir;
 using Moq;
 using NUnit.Framework;
 using static Bud.V1.NuGetReferences;
@@ -19,7 +18,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Assemblies_is_initially_empty() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         Assert.That(PackageReferencesProject("A", baseDir: dir.Path)
                       .Get(ResolvedAssemblies)
                       .Take(1).ToEnumerable(),
@@ -30,7 +29,7 @@ namespace Bud.V1 {
     [Test]
     [Category("IntegrationTest")]
     public void PackageDownloader_puts_assemblies_into_the_target_folder() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         PackageConfigTestUtils.CreatePackagesConfigFile(dir);
         var resolvedAssemblies = ImmutableList.Create("Foo.dll", "Bar.dll");
         var resolver = MockResolver(new[] {PackageConfigTestUtils.FooReference}, resolvedAssemblies, dir);
@@ -48,7 +47,7 @@ namespace Bud.V1 {
     [Test]
     [Category("IntegrationTest")]
     public void PackageDownloader_is_not_invoked_when_given_no_package_references() {
-      using (var tmpDir = new TemporaryDirectory()) {
+      using (var tmpDir = new TmpDir()) {
         var downloader = new Mock<NuGetPackageDownloader>(MockBehavior.Strict);
         var project = PackageReferencesProject("A", baseDir: tmpDir.Path)
           .Clear(ReferencedPackages)
@@ -60,7 +59,7 @@ namespace Bud.V1 {
 
     [Test]
     public void PackageDownloader_and_AssemblyResolver_are_invoked_with_a_list_of_package_references() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         PackageConfigTestUtils.CreatePackagesConfigFile(dir);
         var expectedAssemblies = ImmutableList.Create("Foo.dll");
         var downloader = MockDownloader(new[] {PackageConfigTestUtils.FooReference}, dir);
@@ -79,7 +78,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Assemblies_are_loaded_from_cache() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         PackageConfigTestUtils.CreatePackagesConfigFile(dir);
         var resolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
         var project = PackageReferencesProject("A", ".", dir.Path)
@@ -98,7 +97,7 @@ namespace Bud.V1 {
 
     [Test]
     public void ReferencedPackages_lists_package_references_read_from() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         PackageConfigTestUtils.CreatePackagesConfigFile(dir);
         var project = PackageReferencesProject("A", ".", dir.Path);
         Assert.That(project.Get(ReferencedPackages).Take(1).Wait(),
@@ -106,7 +105,7 @@ namespace Bud.V1 {
       }
     }
 
-    private static Mock<NuGetPackageDownloader> MockDownloader(IEnumerable<PackageReference> packageReferences, TemporaryDirectory tmpDir) {
+    private static Mock<NuGetPackageDownloader> MockDownloader(IEnumerable<PackageReference> packageReferences, TmpDir tmpDir) {
       var downloader = new Mock<NuGetPackageDownloader>(MockBehavior.Strict);
       var packagesCacheDir = Path.Combine(tmpDir.Path, "build", "A", "cache");
       downloader.Setup(d => d.DownloadPackages(packageReferences, packagesCacheDir))
@@ -114,7 +113,7 @@ namespace Bud.V1 {
       return downloader;
     }
 
-    private static Mock<IAssemblyResolver> MockResolver(IEnumerable<PackageReference> packageReferences, IEnumerable<string> resolvedAssemblies, TemporaryDirectory tmpDir) {
+    private static Mock<IAssemblyResolver> MockResolver(IEnumerable<PackageReference> packageReferences, IEnumerable<string> resolvedAssemblies, TmpDir tmpDir) {
       var resolver = new Mock<IAssemblyResolver>(MockBehavior.Strict);
       var baseDir = tmpDir.Path;
       var buildDir = Path.Combine(baseDir, "build", "A");

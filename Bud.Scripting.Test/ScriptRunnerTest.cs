@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Bud.TempDir;
 using NUnit.Framework;
 
 namespace Bud.Scripting {
@@ -8,7 +7,7 @@ namespace Bud.Scripting {
   public class ScriptRunnerTest {
     [Test]
     public void RunScript_runs_the_script_in_the_current_directory() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var outputDir = dir.CreateDir("output-dir");
         var fooExpected = dir.CreateFile("42 1337", "output-dir", "foo.expected");
         var script = dir.CreateFileFromResource("Bud.Scripting.TestScripts.CreateFooFile.cs",
@@ -20,7 +19,7 @@ namespace Bud.Scripting {
 
     [Test]
     public void RunScript_shows_an_informative_exception_message_on_compiler_error() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var script = dir.CreateFileFromResource("Bud.Scripting.TestScripts.UsingLinqWithoutReference.cs",
                                                 "UsingLinqWithoutReference.cs");
         var exception = Assert.Throws<Exception>(() => ScriptRunner.Run(script, new[] {""}, dir.Path));
@@ -30,7 +29,7 @@ namespace Bud.Scripting {
 
     [Test]
     public void RunScript_runs_the_script_when_reference_present() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var fooExpected = dir.CreateFile("FOO BAR", "foo.expected");
         var script = dir.CreateFileFromResource("Bud.Scripting.TestScripts.UsingLinqWithReference.cs",
                                                 "UsingLinqWithReference.cs");

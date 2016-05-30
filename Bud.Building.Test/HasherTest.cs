@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using Bud.TempDir;
 using NUnit.Framework;
 using static NUnit.Framework.Assert;
 
@@ -15,7 +14,7 @@ namespace Bud.Building {
 
     [Test]
     public void Md5_produces_a_different_digest_for_different_input() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         AreNotEqual(Hasher.Md5(ImmutableList<string>.Empty, Salt),
                     Hasher.Md5(ImmutableList.Create(dir.CreateFile("foo", "a")), Salt));
       }
@@ -23,7 +22,7 @@ namespace Bud.Building {
 
     [Test]
     public void Md5_produces_the_same_digest_for_same_input() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var emptyFile = dir.CreateEmptyFile("a");
         AreEqual(Hasher.Md5(ImmutableList.Create(emptyFile), Salt),
                  Hasher.Md5(ImmutableList.Create(emptyFile), Salt));

@@ -71,9 +71,9 @@
       <Project>{713f14ed-baf2-4ce4-afb3-ecadac2b710b}</Project>
       <Name>Bud.Cache</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.TempDir\Bud.TempDir.csproj">
+    <ProjectReference Include="..\Bud.TmpDir\Bud.TmpDir.csproj">
       <Project>{b8efe565-1fda-48cb-a7f3-b3627b747727}</Project>
-      <Name>Bud.TempDir</Name>
+      <Name>Bud.TmpDir</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

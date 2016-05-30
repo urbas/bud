@@ -1,6 +1,5 @@
 using System.IO;
 using Bud.Cs;
-using Bud.TempDir;
 using NUnit.Framework;
 using static System.IO.Path;
 using static Bud.Cli.BuildScriptCompilation;
@@ -11,10 +10,10 @@ namespace Bud.Cli {
   [Category("IntegrationTest")]
   [Category("AppVeyorIgnore")]
   public class BuildScriptCompilationTest {
-    private TemporaryDirectory tmpDir;
+    private TmpDir tmpDir;
 
     [SetUp]
-    public void SetUp() => tmpDir = new TemporaryDirectory();
+    public void SetUp() => tmpDir = new TmpDir();
 
     [TearDown]
     public void TearDown() => tmpDir.Dispose();

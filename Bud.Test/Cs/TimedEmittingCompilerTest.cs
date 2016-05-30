@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq.Expressions;
 using Bud.IO;
-using Bud.TempDir;
 using Microsoft.CodeAnalysis;
 using Moq;
 using NUnit.Framework;
@@ -24,7 +23,7 @@ namespace Bud.Cs {
 
     [Test]
     public void Do_not_invoke_underlying_compiler_when_ouput_dll_is_up_to_date() {
-      using (var tmpDir = new TemporaryDirectory()) {
+      using (var tmpDir = new TmpDir()) {
         var source = tmpDir.CreateEmptyFile("A.cs");
         tmpDir.CreateEmptyFile("Foo.dll");
         var compiler = CreateTimedEmittingCompiler(tmpDir.Path);
@@ -42,7 +41,7 @@ namespace Bud.Cs {
 
     [Test]
     public void Underlying_compiler_invoked_with_sources_assembly_references_and_dependencies() {
-      using (var tmpDir = new TemporaryDirectory()) {
+      using (var tmpDir = new TmpDir()) {
         var compiler = CreateTimedEmittingCompiler(tmpDir.Path);
         var sourceFile = tmpDir.CreateEmptyFile("A.cs");
         var dependency = FooDllCompileOutput();

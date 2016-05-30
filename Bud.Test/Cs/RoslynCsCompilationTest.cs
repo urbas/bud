@@ -1,5 +1,4 @@
 using System.IO;
-using Bud.TempDir;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
@@ -13,7 +12,7 @@ namespace Bud.Cs {
   public class RoslynCsCompilationTest {
     [Test]
     public void Fails_to_compile_when_core_assembly_references_are_missing() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var tempDir = new TmpDir()) {
         var compiler = AssemblyACompiler();
         var fileA = tempDir.CreateFile("public class A {}", "A.cs");
         var compilationOutput = compiler.Compile(new[] {fileA}, Empty<string>());
@@ -27,7 +26,7 @@ namespace Bud.Cs {
 
     [Test]
     public void Compiles_a_csharp_file() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var tempDir = new TmpDir()) {
         var compiler = AssemblyACompiler();
         var fileA = tempDir.CreateFile("public class A {}", "A.cs");
         var compilationOutput = compiler.Compile(new[] {fileA}, new[] {typeof(object).Assembly.Location});
@@ -41,7 +40,7 @@ namespace Bud.Cs {
 
     [Test]
     public void Fails_to_compile_when_the_csharp_file_contains_a_syntax_error() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var tempDir = new TmpDir()) {
         var compiler = AssemblyACompiler();
         var fileA = tempDir.CreateFile("public class", "A.cs");
         var compilationOutput = compiler.Compile(new[] {fileA}, new[] {typeof(object).Assembly.Location});
@@ -55,7 +54,7 @@ namespace Bud.Cs {
 
     [Test]
     public void Fails_and_then_succeeds_to_compile_when_source_file_changes() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var tempDir = new TmpDir()) {
         var compiler = AssemblyACompiler();
         var fileA = tempDir.CreateFile("public class", "A.cs");
         var outputPath = Path.Combine(tempDir.Path, "A.dll");
@@ -67,7 +66,7 @@ namespace Bud.Cs {
 
     [Test]
     public void Fails_and_then_succeeds_to_compile_when_System_Runtime_assembly_introduced() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var tempDir = new TmpDir()) {
         var fileA = tempDir.CreateFile("public class A {}", "A.cs");
         var compiler = AssemblyACompiler();
         var outputPath = Path.Combine(tempDir.Path, "A.dll");
@@ -80,7 +79,7 @@ namespace Bud.Cs {
 
     [Test]
     public void Fails_to_compile_when_dependency_is_missing() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var tempDir = new TmpDir()) {
         var emitResult = CompileAssemblyB_UsingClassA(tempDir);
         Assert.IsFalse(emitResult.Success);
       }
@@ -88,7 +87,7 @@ namespace Bud.Cs {
 
     [Test]
     public void Compiles_when_dependency_is_present() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var tempDir = new TmpDir()) {
         var assemblyA = CompileAssemblyA_WithPublicClassA(tempDir);
         var emitResult = CompileAssemblyB_UsingClassA(tempDir, assemblyA);
         Assert.IsTrue(emitResult.Success);
@@ -97,7 +96,7 @@ namespace Bud.Cs {
 
     [Test]
     public void Compiles_when_internals_of_dependency_are_used() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var tempDir = new TmpDir()) {
         var assemblyA = CompileAssemblyA_InternalsVisibleToB(tempDir);
         var emitResult = CompileAssemblyB_UsingInternalsOfA(tempDir, assemblyA);
         Assert.IsTrue(emitResult.Success);
@@ -110,7 +109,7 @@ namespace Bud.Cs {
     private static RoslynCsCompilation AssemblyBCompiler()
       => new RoslynCsCompilation("B", new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
-    private static string CompileAssemblyA_WithPublicClassA(TemporaryDirectory tempDir) {
+    private static string CompileAssemblyA_WithPublicClassA(TmpDir tempDir) {
       var classA = tempDir.CreateFile("public class A {}", "A.cs");
       var assemblyA = Path.Combine(tempDir.Path, "A.dll");
       AssemblyACompiler()
@@ -119,7 +118,7 @@ namespace Bud.Cs {
       return assemblyA;
     }
 
-    private static EmitResult CompileAssemblyB_UsingClassA(TemporaryDirectory tempDir) {
+    private static EmitResult CompileAssemblyB_UsingClassA(TmpDir tempDir) {
       var fileB = tempDir.CreateFile("public class B : A {}", "B.cs");
       var outputPath = Path.Combine(tempDir.Path, "B.dll");
       return AssemblyBCompiler()
@@ -127,7 +126,7 @@ namespace Bud.Cs {
         .Emit(outputPath);
     }
 
-    private static EmitResult CompileAssemblyB_UsingClassA(TemporaryDirectory tempDir, string assemblyA) {
+    private static EmitResult CompileAssemblyB_UsingClassA(TmpDir tempDir, string assemblyA) {
       var fileB = tempDir.CreateFile("public class B : A {}", "B.cs");
       var outputPath = Path.Combine(tempDir.Path, "B.dll");
       return AssemblyBCompiler()
@@ -135,14 +134,14 @@ namespace Bud.Cs {
         .Emit(outputPath);
     }
 
-    private static EmitResult CompileAssemblyB_UsingInternalsOfA(TemporaryDirectory tempDir, string assemblyA) {
+    private static EmitResult CompileAssemblyB_UsingInternalsOfA(TmpDir tempDir, string assemblyA) {
       var classB = tempDir.CreateFile("public class B {int I=>A.I;}", "B.cs");
       return AssemblyBCompiler()
         .Compile(new[] {classB}, new[] {typeof(object).Assembly.Location, assemblyA})
         .Emit(Path.Combine(tempDir.Path, "B.dll"));
     }
 
-    private static string CompileAssemblyA_InternalsVisibleToB(TemporaryDirectory tempDir) {
+    private static string CompileAssemblyA_InternalsVisibleToB(TmpDir tempDir) {
       var classA = tempDir.CreateFile("internal class A {internal const int I=42;}", "A.cs");
       var assemblyInfo = tempDir.CreateFile("using System.Runtime.CompilerServices;\n" +
                                             "[assembly: InternalsVisibleTo(\"B\")]", "AssemblyInfo.cs");

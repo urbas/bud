@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Bud.IO;
-using Bud.TempDir;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NUnit.Framework;
@@ -22,7 +21,7 @@ namespace Bud.NuGet {
 
     [Test]
     public void Creates_a_package() {
-      using (var tmpDir = new TemporaryDirectory()) {
+      using (var tmpDir = new TmpDir()) {
         tmpDir.CreateEmptyFile("A.txt");
         var dllFile = tmpDir.CreateEmptyFile("Foo.Bar.dll");
         var optionalFields = new Dictionary<string, string> {
@@ -59,7 +58,7 @@ namespace Bud.NuGet {
 
     [Test]
     public void Package_does_not_contain_files_from_a_previous_packaging() {
-      using (var tmpDir = new TemporaryDirectory()) {
+      using (var tmpDir = new TmpDir()) {
         var txtFile = tmpDir.CreateEmptyFile("A.txt");
         var dllFile = tmpDir.CreateEmptyFile("Foo.Bar.dll");
         var optionalFields = ImmutableDictionary<string, string>.Empty;
@@ -83,7 +82,7 @@ namespace Bud.NuGet {
     [Test]
     [Ignore("There's a bug in NuGet triggered by directories that are prefixed with a dot.")]
     public void Package_can_be_created_with_files_in_dot_prefixed_directories() {
-      using (var tmpDir = new TemporaryDirectory()) {
+      using (var tmpDir = new TmpDir()) {
         var dllFile = tmpDir.CreateEmptyFile(".Foo", "A.dll");
 
         var package = Pack(tmpDir,
@@ -95,14 +94,14 @@ namespace Bud.NuGet {
       }
     }
 
-    private string Pack(TemporaryDirectory baseDir, IImmutableDictionary<string, string> optionalFields, PackageFile[] packageFiles) {
+    private string Pack(TmpDir baseDir, IImmutableDictionary<string, string> optionalFields, PackageFile[] packageFiles) {
       var packageDependencies = new[] {
         new PackageDependency("Moo.Zar", "3.2.1")
       };
       return Pack(baseDir, optionalFields, packageFiles, packageDependencies);
     }
 
-    private string Pack(TemporaryDirectory baseDir, IImmutableDictionary<string, string> optionalFields, PackageFile[] packageFiles, PackageDependency[] packageDependencies)
+    private string Pack(TmpDir baseDir, IImmutableDictionary<string, string> optionalFields, PackageFile[] packageFiles, PackageDependency[] packageDependencies)
       => packager.Pack(baseDir.CreateDir("out"),
                        baseDir.Path,
                        "Foo.Bar",

@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Bud.Configuration;
-using Bud.TempDir;
 using NUnit.Framework;
 using static Bud.V1.Basic;
 using static NUnit.Framework.Assert;
@@ -51,14 +50,14 @@ namespace Bud.V1 {
 
     [Test]
     public void Clean_does_nothing_when_the_target_folder_does_not_exist() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         BareProject("A", dir.Path).Get(Clean);
       }
     }
 
     [Test]
     public void Clean_deletes_non_empty_target_folders() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         dir.CreateEmptyFile("build", "A", "foo", "foo.txt");
         BareProject("A", dir.Path).Get(Clean);
         That(Path.Combine(dir.Path, "build", "A"), Does.Not.Exist);

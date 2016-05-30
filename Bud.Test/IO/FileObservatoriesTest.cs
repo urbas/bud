@@ -1,6 +1,5 @@
 using System.IO;
 using System.Linq;
-using Bud.TempDir;
 using NUnit.Framework;
 using static NUnit.Framework.Assert;
 
@@ -11,7 +10,7 @@ namespace Bud.IO {
 
     [Test]
     public void List_files_in_the_folder() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var tempDir = new TmpDir()) {
         var fileA = tempDir.CreateEmptyFile("A", "A.txt");
         That(noFileChanges.WatchDir(tempDir.Path, "*.txt", true).Files,
              Is.EquivalentTo(new[] {fileA}));
@@ -20,7 +19,7 @@ namespace Bud.IO {
 
     [Test]
     public void Do_not_list_filtered_files() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var tempDir = new TmpDir()) {
         tempDir.CreateEmptyFile("A", "A.txt");
         IsEmpty(noFileChanges.WatchDir(tempDir.Path, "*.cs", true).Files);
       }
@@ -28,7 +27,7 @@ namespace Bud.IO {
 
     [Test]
     public void Do_not_list_in_subfolders() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var tempDir = new TmpDir()) {
         tempDir.CreateEmptyFile("A", "A.txt");
         IsEmpty(noFileChanges.WatchDir(tempDir.Path, "*.txt", false).Files);
       }
@@ -36,7 +35,7 @@ namespace Bud.IO {
 
     [Test]
     public void Throws_for_non_existing_folders() {
-      using (var tempDir = new TemporaryDirectory()) {
+      using (var tempDir = new TmpDir()) {
         Throws<DirectoryNotFoundException>(() => {
           noFileChanges.WatchDir(Path.Combine(tempDir.Path, "B"), "*.txt", true).Files.ToList();
         });

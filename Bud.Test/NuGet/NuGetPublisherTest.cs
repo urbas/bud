@@ -1,5 +1,4 @@
 using System.IO;
-using Bud.TempDir;
 using Moq;
 using NUnit.Framework;
 using static NUnit.Framework.Assert;
@@ -17,7 +16,7 @@ namespace Bud.NuGet {
 
     [Test]
     public void Publish_places_the_package_into_the_source_folder() {
-      using (var tmpDir = new TemporaryDirectory()) {
+      using (var tmpDir = new TmpDir()) {
         var package = tmpDir.CreateFileFromResource($"Bud.NuGet.{OutputPackageName}",
                                                     OutputPackageName);
         var repository = tmpDir.CreateDir("repository");
@@ -29,7 +28,7 @@ namespace Bud.NuGet {
 
     [Test]
     public void Publish_returns_false_on_failure() {
-      using (var tmpDir = new TemporaryDirectory()) {
+      using (var tmpDir = new TmpDir()) {
         var package = tmpDir.CreatePath(OutputPackageName);
         var repository = tmpDir.CreateDir("repository");
         IsFalse(publisher.Publish(package, $"file://{repository}", None<string>()));

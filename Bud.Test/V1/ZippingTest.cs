@@ -1,6 +1,5 @@
 using System.Reactive.Linq;
 using Bud.IO;
-using Bud.TempDir;
 using Bud.Util;
 using NUnit.Framework;
 using static System.IO.Path;
@@ -16,7 +15,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Zip_creates_the_zip_archive_at_ZipPath() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         That(ZipProjectA(dir.Path).Get(Zip).Take(1).Wait(),
              Does.Exist.And.EqualTo(ZipProjectA(dir.Path).Get(ZipPath)));
       }
@@ -24,7 +23,7 @@ namespace Bud.V1 {
 
     [Test]
     public void Zip_archive_contains__files_to_zip() {
-      using (var dir = new TemporaryDirectory()) {
+      using (var dir = new TmpDir()) {
         var fileA = dir.CreateFile("foo bar", "A", "foo", "a.txt");
         var project = ZipProjectA(dir.Path)
           .Add(FilesToZip, new PackageFile(fileA, "foo/a.txt"));

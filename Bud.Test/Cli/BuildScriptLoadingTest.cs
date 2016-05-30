@@ -1,4 +1,3 @@
-using Bud.TempDir;
 using Bud.V1;
 using NUnit.Framework;
 using static Bud.Cli.BuildScriptLoading;
@@ -10,7 +9,7 @@ namespace Bud.Cli {
   public class BuildScriptLoadingTest {
     [Test]
     public void LoadBuildDefinition_initializes_the_BaseDir() {
-      using (var baseDir = new TemporaryDirectory()) {
+      using (var baseDir = new TmpDir()) {
         var buildDefinition = LoadBuildDefinition(BuildConf, baseDir.Path);
         AreEqual(baseDir.Path,
                  buildDefinition.Get(BaseDir));
@@ -19,7 +18,7 @@ namespace Bud.Cli {
 
     [Test]
     public void LoadBuildDefinition_initializes_the_BaseDir_in_projects() {
-      using (var baseDir = new TemporaryDirectory()) {
+      using (var baseDir = new TmpDir()) {
         var buildDefinition = LoadBuildDefinition(BuildConf, baseDir.Path);
         AreEqual(baseDir.Path,
                  buildDefinition.Get("A"/BaseDir));

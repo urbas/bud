@@ -1,6 +1,5 @@
 using System.IO;
 using System.Linq;
-using Bud.TempDir;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Versioning;
@@ -14,10 +13,10 @@ namespace Bud.NuGet {
   [Category("IntegrationTest")]
   [Category("AppVeyorIgnore")]
   public class NuGetPackageDownloaderTest {
-    private TemporaryDirectory tmpDir;
+    private TmpDir tmpDir;
 
     [SetUp]
-    public void SetUp() => tmpDir = new TemporaryDirectory();
+    public void SetUp() => tmpDir = new TmpDir();
 
     [TearDown]
     public void TearDown() => tmpDir.Dispose();
@@ -47,7 +46,7 @@ namespace Bud.NuGet {
       IsFalse(InvokeNuGetRestore(wrongReferences, tmpDir.Path));
     }
 
-    private static string ReferencedDll(TemporaryDirectory tmpDir)
+    private static string ReferencedDll(TmpDir tmpDir)
       => Combine(tmpDir.Path,
                  "Urbas.Example.Foo.1.0.1/lib/net40/Urbas.Example.Foo.dll");
 
