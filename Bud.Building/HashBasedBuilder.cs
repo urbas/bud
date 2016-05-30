@@ -1,8 +1,7 @@
-using System.Collections.Generic;
+using System;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 
 namespace Bud.Building {
   public class HashBasedBuilder {
@@ -60,5 +59,33 @@ namespace Bud.Building {
         }
       }
     }
+
+    /// <summary>
+    ///   See <see cref="Build(IFileGenerator,string,IImmutableList{string})" />
+    /// </summary>
+    public static void Build(Action<string, IImmutableList<string>> fileGenerator,
+                             string output,
+                             IImmutableList<string> input)
+      => Build(new FuncFileGenerator(fileGenerator), output, input, output + ".input_hash", DefaultSalt);
+
+    /// <summary>
+    ///   See <see cref="Build(IFileGenerator,string,IImmutableList{string})" />
+    /// </summary>
+    public static void Build(Action<string, IImmutableList<string>> fileGenerator,
+                             string output,
+                             IImmutableList<string> input,
+                             string inputHashFile,
+                             byte[] salt)
+      => Build(new FuncFileGenerator(fileGenerator), output, input, inputHashFile, salt);
+  }
+
+  internal class FuncFileGenerator : IFileGenerator {
+    public Action<string, IImmutableList<string>> FileGenerator { get; }
+
+    public FuncFileGenerator(Action<string, IImmutableList<string>> fileGenerator) {
+      FileGenerator = fileGenerator;
+    }
+
+    public void Generate(string outputFile, IImmutableList<string> inputFiles) => FileGenerator(outputFile, inputFiles);
   }
 }

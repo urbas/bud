@@ -20,7 +20,7 @@ packages/
 # Build
 obj/
 bin/
-/build/
+build/
 
 # IntelliJ IDEA
 .idea/

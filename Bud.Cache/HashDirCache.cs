@@ -4,7 +4,7 @@ using static System.IO.Path;
 
 namespace Bud.Cache {
   /// <summary>
-  ///   A simple file-system cache. Every entry in this cache is a directory. The name of the directory
+  ///   This is a file-system cache. Every entry in this cache is a directory. The name of the directory
   ///   is a hex string. This hex string is a unique identifier of the content.
   ///   It is suggested you use a cryptographic digest of the input that was used to create the content.
   /// </summary>
@@ -15,11 +15,18 @@ namespace Bud.Cache {
   ///   The content will be taken only from the first to finish.
   ///   This means that content from all producers but the first will be discarded.
   /// </remarks>
-  public class HashBasedCache {
+  public class HashDirCache {
+    /// <summary>
+    ///   the directory in which this cache will create directories (entries
+    ///   in the cache).
+    /// </summary>
     public string Path { get; }
 
-    /// <param name="path">the directory in which this cache will store all data.</param>
-    public HashBasedCache(string path) {
+    /// <param name="path">
+    ///   the directory in which this cache will create directories (entries
+    ///   in the cache).
+    /// </param>
+    public HashDirCache(string path) {
       Path = path;
     }
 

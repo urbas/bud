@@ -24,7 +24,7 @@ namespace Bud.Building {
     ///   the directory that contains the output produced by <paramref name="dirContentGenerator" />.
     /// </returns>
     public static string Build(IDirContentGenerator dirContentGenerator,
-                               HashBasedCache cache,
+                               HashDirCache cache,
                                IImmutableList<string> input,
                                byte[] salt)
       => cache.Get(Hasher.Md5(input, salt),

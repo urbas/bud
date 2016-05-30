@@ -29,7 +29,7 @@ public class A {public static void Main(){}}", "Build.cs");
         var references = ImmutableDictionary<string, string>.Empty.Add("A", assemblyA);
 
         new ScriptBuilder(new TestAssemblyReferences(references), new TestCSharpScriptCompiler())
-          .Generate(outputDir, ImmutableList.Create(script));
+          .Generate(Path.Combine(outputDir, "build-script.exe"), ImmutableList.Create(script));
 
         FileAssert.AreEqual(assemblyA,
                             Path.Combine(outputDir, "A.dll"));

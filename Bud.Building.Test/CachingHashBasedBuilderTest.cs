@@ -22,22 +22,22 @@ namespace Bud.Building {
 
     [Test]
     public void Build_invokes_the_generator_when_cache_does_not_contain_the_output() {
-      CachingHashBasedBuilder.Build(generatorMock.Object, new HashBasedCache(dir.Path), EmptyInput, Salt);
+      CachingHashBasedBuilder.Build(generatorMock.Object, new HashDirCache(dir.Path), EmptyInput, Salt);
       generatorMock.Verify(self => self.Generate(It.IsAny<string>(), EmptyInput), Times.Once);
     }
 
     [Test]
     public void Build_invokes_the_generator_only_once() {
-      CachingHashBasedBuilder.Build(generatorMock.Object, new HashBasedCache(dir.Path), EmptyInput, Salt);
-      CachingHashBasedBuilder.Build(generatorMock.Object, new HashBasedCache(dir.Path), EmptyInput, Salt);
+      CachingHashBasedBuilder.Build(generatorMock.Object, new HashDirCache(dir.Path), EmptyInput, Salt);
+      CachingHashBasedBuilder.Build(generatorMock.Object, new HashDirCache(dir.Path), EmptyInput, Salt);
       generatorMock.Verify(self => self.Generate(It.IsAny<string>(), EmptyInput), Times.Once);
     }
 
     [Test]
     public void Build_reinvokes_the_generator_when_input_changes() {
       var someInput = ImmutableList.Create(dir.CreateFile("42", "a"));
-      CachingHashBasedBuilder.Build(generatorMock.Object, new HashBasedCache(dir.Path), EmptyInput, Salt);
-      CachingHashBasedBuilder.Build(generatorMock.Object, new HashBasedCache(dir.Path), someInput, Salt);
+      CachingHashBasedBuilder.Build(generatorMock.Object, new HashDirCache(dir.Path), EmptyInput, Salt);
+      CachingHashBasedBuilder.Build(generatorMock.Object, new HashDirCache(dir.Path), someInput, Salt);
       generatorMock.Verify(self => self.Generate(It.IsAny<string>(), It.IsAny<IImmutableList<string>>()), Times.Exactly(2));
     }
 
@@ -46,7 +46,7 @@ namespace Bud.Building {
       generatorMock.Setup(self => self.Generate(It.IsAny<string>(), EmptyInput))
                    .Callback<string, IImmutableList<string>>((outputDir, input) => CreateFooFile(outputDir));
       var cacheDir = CachingHashBasedBuilder.Build(generatorMock.Object,
-                                                  new HashBasedCache(dir.Path), EmptyInput, Salt);
+                                                  new HashDirCache(dir.Path), EmptyInput, Salt);
       FileAssert.AreEqual(CreateFooFile(dir.Path),
                           Path.Combine(cacheDir, "foo"));
     }

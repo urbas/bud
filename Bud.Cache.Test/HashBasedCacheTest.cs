@@ -10,7 +10,7 @@ namespace Bud.Cache.Test {
     [Test]
     public void Get_invokes_the_file_generator_when_nothing_in_cache() {
       using (var dir = new TmpDir()) {
-        var cache = new HashBasedCache(dir.Path);
+        var cache = new HashDirCache(dir.Path);
         var contentProducer = new Mock<Action<string>>();
         cache.Get(new byte[] {0x13}, contentProducer.Object);
         contentProducer.Verify(self => self(It.IsAny<string>()), Times.Once);
@@ -21,8 +21,8 @@ namespace Bud.Cache.Test {
     public void Get_does_not_invoke_the_file_generator_when_already_in_cache() {
       using (var dir = new TmpDir()) {
         var hash = new byte[] {0x13};
-        dir.CreateDir(HashBasedCache.ByteToHexString(hash));
-        var cache = new HashBasedCache(dir.Path);
+        dir.CreateDir(HashDirCache.ByteToHexString(hash));
+        var cache = new HashDirCache(dir.Path);
         var contentProducer = new Mock<Action<string>>();
         cache.Get(hash, contentProducer.Object);
         contentProducer.Verify(self => self(It.IsAny<string>()), Times.Never);
@@ -33,7 +33,7 @@ namespace Bud.Cache.Test {
     public void Get_invokes_producer_only_once() {
       using (var dir = new TmpDir()) {
         var hash = new byte[] {0x13};
-        var cache = new HashBasedCache(dir.Path);
+        var cache = new HashDirCache(dir.Path);
         var contentProducer = new Mock<Action<string>>();
         Assert.AreEqual(cache.Get(hash, contentProducer.Object),
                         cache.Get(hash, contentProducer.Object));
@@ -45,7 +45,7 @@ namespace Bud.Cache.Test {
     public void Get_does_not_create_cache_entry_if_producer_fails() {
       using (var dir = new TmpDir()) {
         var hash = new byte[] {0x13};
-        var cache = new HashBasedCache(dir.Path);
+        var cache = new HashDirCache(dir.Path);
         try {
           cache.Get(hash, s => {
             throw new Exception();
@@ -63,7 +63,7 @@ namespace Bud.Cache.Test {
     public void Get_does_not_leave_temporary_directories_behind_on_failure() {
       using (var dir = new TmpDir()) {
         var hash = new byte[] {0x13};
-        var cache = new HashBasedCache(dir.Path);
+        var cache = new HashDirCache(dir.Path);
         try {
           cache.Get(hash, s => {
             throw new Exception();
@@ -79,7 +79,7 @@ namespace Bud.Cache.Test {
     public void Get_keeps_first_directory_when_two_were_created_in_parallel() {
       using (var dir = new TmpDir()) {
         var hash = new byte[] {0x13};
-        var cache = new HashBasedCache(dir.Path);
+        var cache = new HashDirCache(dir.Path);
         var firstStart = new CountdownEvent(1);
         var secondStart = new CountdownEvent(1);
         var firstFinished = new CountdownEvent(1);
@@ -103,7 +103,7 @@ namespace Bud.Cache.Test {
         });
         secondFinished.Wait();
         FileAssert.AreEqual(dir.CreateFile("first", "expected_content"),
-                            dir.CreatePath(HashBasedCache.ByteToHexString(hash), "foo"));
+                            dir.CreatePath(HashDirCache.ByteToHexString(hash), "foo"));
       }
     }
   }
