@@ -11,8 +11,8 @@ Bud is a build tool.
 
 ## How does it work
 
-1.) Create a `Build.cs` file in the top folder of your project.
+1. Create a `Build.cs` file in the top folder of your project.
 
-2.) Run it with `Bud.RunScript.exe`.
+1. Run it with `Bud.RunScript.exe`.
 
 See [samples](Samples) for inspiration.
