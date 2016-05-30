@@ -180,7 +180,6 @@
     <Compile Include="Reactive\ObservableResources.cs" />
     <Compile Include="Reactive\WaitingObservables.cs" />
     <Compile Include="Util\Strings.cs" />
-    <Compile Include="..\Build.cs" />
     <Compile Include="V1\NuGetPublishing.cs" />
     <Compile Include="V1\NuGetReferences.cs" />
     <Compile Include="V1\Zipping.cs" />
