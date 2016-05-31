@@ -11,9 +11,9 @@ namespace Bud.ScriptToCsProj {
     public void Generate_full_csproj()
       => AreEqual(GetResourceContent("Bud.ScriptToCsProj.BudScript.csproj"),
                   ScriptCsProj.BudScriptCsProj(new[] {
-                    new Reference("Bud.Option", "Blah.dll"),
-                    new Reference("System"),
-                    new Reference("System.Core"),
+                    new CsProjReference("Bud.Option", "Blah.dll"),
+                    new CsProjReference("System"),
+                    new CsProjReference("System.Core"),
                   }, "/foo/bar"));
 
     public static string GetResourceContent(string embeddedResourceName) {

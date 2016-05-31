@@ -51,12 +51,14 @@ namespace Bud.Scripting {
       var frameworkAssemblies = new List<string>();
       var customAssemblies = new List<string>();
       foreach (var reference in references) {
-        var frameworkAssembly = WindowsResolver.ResolveFrameworkAssembly(reference, MaxVersion);
+        var frameworkAssembly = WindowsResolver.ResolveFrameworkAssembly(
+          reference.Name,
+          reference.Version.Map(Version.Parse).GetOrElse(MaxVersion));
         if (frameworkAssembly.HasValue) {
           frameworkAssemblies.Add(frameworkAssembly.Value);
           continue;
         }
-        var customAssembly = customAssemblyPaths.Get(reference);
+        var customAssembly = customAssemblyPaths.Get(reference.Name);
         if (customAssembly.HasValue) {
           customAssemblies.Add(customAssembly.Value);
           continue;

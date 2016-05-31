@@ -4,7 +4,7 @@ using Bud.CsProjTools;
 
 namespace Bud.ScriptToCsProj {
   public class ScriptCsProj {
-    public static string BudScriptCsProj(IEnumerable<Reference> references, string startWorkingDir)
+    public static string BudScriptCsProj(IEnumerable<CsProjReference> references, string startWorkingDir)
       => CsProj.Generate(
         CsProj.Import(@"$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props", @"Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"),
         CsProj.PropertyGroup(CsProj.Property("Configuration", "Debug", @" '$(Configuration)' == '' "),

@@ -1,6 +1,6 @@
 namespace Bud.ScriptToCsProj {
-  public struct Reference {
-    public Reference(string assemblyName, Option<string> path = default(Option<string>)) {
+  public struct CsProjReference {
+    public CsProjReference(string assemblyName, Option<string> path = default(Option<string>)) {
       Path = path;
       AssemblyName = assemblyName;
     }
