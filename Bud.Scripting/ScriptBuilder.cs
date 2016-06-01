@@ -47,22 +47,20 @@ namespace Bud.Scripting {
       var outputDir = Path.GetDirectoryName(outputScriptExe);
       var inputFilesList = inputFiles as IList<string> ?? inputFiles.ToList();
       var scriptContents = inputFilesList.Select(File.ReadAllText).ToList();
-      var references = ScriptReferences.Extract(scriptContents);
+      var references = ScriptMetadata.Extract(scriptContents);
       var frameworkAssemblies = new List<string>();
       var customAssemblies = new List<string>();
-      foreach (var reference in references) {
-        var frameworkAssembly = WindowsResolver.ResolveFrameworkAssembly(
-          reference.Name,
-          reference.Version.Map(Version.Parse).GetOrElse(MaxVersion));
-        if (frameworkAssembly.HasValue) {
-          frameworkAssemblies.Add(frameworkAssembly.Value);
-          continue;
-        }
-        var customAssembly = customAssemblyPaths.Get(reference.Name);
-        if (customAssembly.HasValue) {
-          customAssemblies.Add(customAssembly.Value);
-          continue;
-        }
+      foreach (var reference in references.AssemblyReferences) {
+          var frameworkAssembly = WindowsResolver.ResolveFrameworkAssembly(reference, MaxVersion);
+          if (frameworkAssembly.HasValue) {
+            frameworkAssemblies.Add(frameworkAssembly.Value);
+            continue;
+          }
+          var customAssembly = customAssemblyPaths.Get(reference);
+          if (customAssembly.HasValue) {
+            customAssemblies.Add(customAssembly.Value);
+            continue;
+          }
         throw new Exception($"Could not resolve the reference '{reference}'.");
       }
       var assemblies = frameworkAssemblies

@@ -1,4 +1,4 @@
-public class HelloWorld {
-  public static void Main(string[] args)
+class HelloWorld {
+  static void Main(string[] args)
     => System.Console.Write($"Hello, {string.Join(" ", args)}!");
 }

@@ -56,7 +56,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptBuilderTest.cs" />
-    <Compile Include="ScriptReferencesTest.cs" />
+    <Compile Include="ScriptMetadataTest.cs" />
     <Compile Include="ScriptRunnerTest.cs" />
     <EmbeddedResource Include="TestScripts\UsingLinqWithReference.cs" />
     <EmbeddedResource Include="TestScripts\UsingLinqWithoutReference.cs" />

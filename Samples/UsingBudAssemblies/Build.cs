@@ -2,8 +2,8 @@
 
 using Bud;
 
-public class HelloWorld {
-  public static void Main(string[] args) {
+class HelloWorld {
+  static void Main(string[] args) {
     System.Console.Write($"This is an option: {Option.Some(42)}!");
   }
 }
