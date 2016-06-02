@@ -16,6 +16,11 @@ namespace Bud.Scripting {
                   ScriptMetadata.Extract(@"//!reference Foo").AssemblyReferences);
 
     [Test]
+    public void Extract_deduplicates_assembly_references()
+      => AreEqual(new[] {"Foo"},
+                  ScriptMetadata.Extract(@"//!reference Foo", @"//!reference Foo").AssemblyReferences);
+
+    [Test]
     public void Extract_returns_no_references_if_reference_line_malformed()
       => IsEmpty(ScriptMetadata.Extract("// reference System.Linq").AssemblyReferences);
 

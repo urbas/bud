@@ -7,8 +7,17 @@ using static Bud.Option;
 
 namespace Bud.Scripting {
   public class ScriptMetadata {
-    public static ScriptMetadata Extract(params string[] scriptContents) 
-      => Extract((IEnumerable<string>)scriptContents);
+    public IImmutableSet<string> AssemblyReferences { get; }
+    public IReadOnlyDictionary<string, Option<string>> NuGetReferences { get; }
+
+    public ScriptMetadata(IImmutableSet<string> assemblyReferences,
+                          IReadOnlyDictionary<string, Option<string>> nuGetReferences) {
+      AssemblyReferences = assemblyReferences;
+      NuGetReferences = nuGetReferences;
+    }
+
+    public static ScriptMetadata Extract(params string[] scriptContents)
+      => Extract((IEnumerable<string>) scriptContents);
 
     public static ScriptMetadata Extract(IEnumerable<string> scriptContents) {
       var assemblyReferences = new List<string>();
@@ -57,14 +66,5 @@ namespace Bud.Scripting {
       }
       throw new Exception($"Malformed NuGet package reference: '{line}'. Should be of form: '//!nuget <name> [version]'");
     }
-
-
-    public ScriptMetadata(IImmutableSet<string> assemblyReferences, IReadOnlyDictionary<string, Option<string>> nuGetReferences) {
-      AssemblyReferences = assemblyReferences;
-      NuGetReferences = nuGetReferences;
-    }
-
-    public IImmutableSet<string> AssemblyReferences { get; }
-    public IReadOnlyDictionary<string, Option<string>> NuGetReferences { get; }
   }
 }
