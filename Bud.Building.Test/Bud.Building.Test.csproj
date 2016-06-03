@@ -70,6 +70,10 @@
       <Project>{713f14ed-baf2-4ce4-afb3-ecadac2b710b}</Project>
       <Name>Bud.Cache</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
+      <Project>{594DC304-3A8A-43FC-BE7D-71D8C603014A}</Project>
+      <Name>Bud.Option</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Bud.TmpDir\Bud.TmpDir.csproj">
       <Project>{b8efe565-1fda-48cb-a7f3-b3627b747727}</Project>
       <Name>Bud.TmpDir</Name>

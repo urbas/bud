@@ -1,5 +1,6 @@
 using System;
-using System.Collections.Immutable;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
@@ -36,7 +37,8 @@ namespace Bud.Building {
     public static void Build(FilesBuilder filesBuilder,
                              string hashFile,
                              byte[] salt,
-                             IImmutableList<string> input, string output) {
+                             IReadOnlyList<string> input,
+                             string output) {
       var digest = Md5Hasher.Digest(input, salt);
       if (!File.Exists(output)) {
         filesBuilder(input, output);
@@ -49,27 +51,27 @@ namespace Bud.Building {
       }
     }
 
-    public static void Build(FilesBuilder filesBuilder, IImmutableList<string> input, string output)
+    public static void Build(FilesBuilder filesBuilder, IReadOnlyList<string> input, string output)
       => Build(filesBuilder, output + ".input_hash", DefaultSalt, input, output);
 
     public static void Build(SingleFileBuilder fileBuilder, string hashFile, byte[] salt, string input, string output)
       => Build((inputFiles, outputFile) => fileBuilder(inputFiles.First(), outputFile),
                hashFile,
-               salt, ImmutableList.Create(input), output);
+               salt, new ReadOnlyCollection<string>(new [] { input }), output);
 
     public static void Build(SingleFileBuilder fileBuilder, string input, string output)
       => Build((inputFiles, outputFile) => fileBuilder(inputFiles.First(), outputFile),
-               ImmutableList.Create(input), output);
+               new ReadOnlyCollection<string>(new[] { input }), output);
   }
 
   internal class FuncFileGenerator {
-    public Action<string, IImmutableList<string>> FileGenerator { get; }
+    public Action<string, IReadOnlyList<string>> FileGenerator { get; }
 
-    public FuncFileGenerator(Action<string, IImmutableList<string>> fileGenerator) {
+    public FuncFileGenerator(Action<string, IReadOnlyList<string>> fileGenerator) {
       FileGenerator = fileGenerator;
     }
 
-    public void Generate(string outputFile, IImmutableList<string> inputFiles)
+    public void Generate(string outputFile, IReadOnlyList<string> inputFiles)
       => FileGenerator(outputFile, inputFiles);
   }
 }

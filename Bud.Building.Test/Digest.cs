@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -19,17 +19,13 @@ namespace Bud.Building {
     public static void CreateDigestsJsonFile(IEnumerable<string> inputFiles, string outputFile)
       => File.WriteAllText(outputFile, DigestsJson(inputFiles));
 
-    private static string DigestsJson(IEnumerable<string> inputFiles) {
-      var digests = inputFiles.Aggregate(ImmutableDictionary<string, Digest>.Empty,
-                                         AddFileDigest);
-      return JsonConvert.SerializeObject(digests);
-    }
+    public static Option<IReadOnlyDictionary<string, Digest>> LoadDigestsJsonFile(string digestsJsonFile)
+      => new ReadOnlyDictionary<string, Digest>(
+        JsonConvert.DeserializeObject<Dictionary<string, Digest>>(
+          File.ReadAllText(digestsJsonFile)));
 
-    private static ImmutableDictionary<string, Digest>
-      AddFileDigest(ImmutableDictionary<string, Digest> digests,
-                    string file)
-      => digests.Add(Path.GetFileName(file),
-                     new Digest(File.GetLastWriteTime(file), GetMd5Hash(file)));
+    private static string DigestsJson(IEnumerable<string> inputFiles)
+      => JsonConvert.SerializeObject(CreateDigests(inputFiles));
 
     private static string GetMd5Hash(string file) {
       using (var md5 = MD5.Create()) {
@@ -38,6 +34,19 @@ namespace Bud.Building {
           return BitConverter.ToString(computeHash).Replace("-", "").ToLower();
         }
       }
+    }
+
+    private static IReadOnlyDictionary<string, Digest> CreateDigests(IEnumerable<string> inputFiles) {
+      var digests = inputFiles.Aggregate(new Dictionary<string, Digest>(),
+                                         AddFileDigest);
+      return new ReadOnlyDictionary<string, Digest>(digests);
+    }
+
+    private static Dictionary<string, Digest> AddFileDigest(Dictionary<string, Digest> digests,
+                                                            string file) {
+      digests.Add(Path.GetFileName(file),
+                  new Digest(File.GetLastWriteTime(file), GetMd5Hash(file)));
+      return digests;
     }
   }
 }

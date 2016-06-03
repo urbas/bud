@@ -17,7 +17,7 @@ namespace Bud.Building {
     /// </remarks>
     public static void Build(FilesBuilder fileGenerator,
                              string output,
-                             IImmutableList<string> inputFiles) {
+                             IReadOnlyList<string> inputFiles) {
       inputFiles = inputFiles ?? ImmutableList<string>.Empty;
       if (!File.Exists(output) || AnyFileNewer(inputFiles, output)) {
         fileGenerator(inputFiles, output);
