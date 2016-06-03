@@ -7,6 +7,7 @@ using System.Linq;
 using Bud.Building;
 using Bud.FrameworkAssemblies;
 using Microsoft.CodeAnalysis;
+using Newtonsoft.Json;
 
 namespace Bud.Scripting {
   public class ScriptBuilder {
@@ -41,26 +42,32 @@ namespace Bud.Scripting {
       return buildScript;
     }
 
+    public static BuiltScript LoadBuiltScriptMetadata(string builtScriptPath)
+      => JsonConvert.DeserializeObject<BuiltScript>(File.ReadAllText($"{builtScriptPath}.metadata"));
+
     public static BuiltScript Build(IEnumerable<string> inputFiles,
-                                           IReadOnlyDictionary<string, string> customAssemblyPaths,
-                                           ICSharpScriptCompiler compiler,
-                                           string outputScriptExe) {
+                                    IReadOnlyDictionary<string, string> customAssemblyPaths,
+                                    ICSharpScriptCompiler compiler,
+                                    string outputScriptExe) {
       var outputDir = Path.GetDirectoryName(outputScriptExe);
       var inputFilesList = inputFiles as IList<string> ?? inputFiles.ToList();
       var scriptContents = inputFilesList.Select(File.ReadAllText).ToList();
       var references = ScriptMetadata.Extract(scriptContents);
       var resolvedReferences = ResolveReferences(customAssemblyPaths, references);
       var assemblies = resolvedReferences.FrameworkAssemblyReferences.Values
-                                  .Concat(resolvedReferences.AssemblyReferences.Values)
-                                  .Select(r => MetadataReference.CreateFromFile(r))
-                                  .Concat(new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)})
-                                  .ToImmutableList();
+                                         .Concat(resolvedReferences.AssemblyReferences.Values)
+                                         .Select(r => MetadataReference.CreateFromFile(r))
+                                         .Concat(new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)})
+                                         .ToImmutableList();
       var errors = compiler.Compile(inputFilesList, assemblies, outputScriptExe);
       if (errors.Any()) {
         throw new Exception($"Compilation error: {string.Join("\n", errors)}");
       }
       CopyAssemblies(resolvedReferences.AssemblyReferences.Values, outputDir);
-      return new BuiltScript(resolvedReferences, outputScriptExe);
+      var builtScript = new BuiltScript(resolvedReferences, outputScriptExe);
+      var builtScriptMetadata = JsonConvert.SerializeObject(builtScript);
+      File.WriteAllText($"{outputScriptExe}.metadata", builtScriptMetadata);
+      return builtScript;
     }
 
     private static ResolvedReferences ResolveReferences(IReadOnlyDictionary<string, string> customAssemblyPaths,

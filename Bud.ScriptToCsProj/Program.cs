@@ -6,12 +6,16 @@ using Bud.Scripting;
 namespace Bud.ScriptToCsProj {
   public class Program {
     public static void Main(string[] args) {
-//      var scriptContents = new[] {ScriptBuilder.DefaultScriptPath}
-//        .Select(File.ReadAllText);
-//      var buildScriptReferences = ScriptReferences
-//        .Extract(scriptContents)
-//        .Select(r => new CsProjReference(r.Name, BudAssemblyPaths.Get(r.Name)));
-//      Console.Write(ScriptCsProj.BudScriptCsProj(buildScriptReferences, Directory.GetCurrentDirectory()));
+      var executable = ScriptBuilder.Build(ScriptBuilder.DefaultScriptPath, new BudAssemblyPaths());
+      var builtScriptMetadata = ScriptBuilder.LoadBuiltScriptMetadata(executable);
+      var nonFrameworkReferences = builtScriptMetadata.ResolvedReferences
+                                                      .AssemblyReferences
+                                                      .Select(pair => new CsProjReference(pair.Key, pair.Value));
+      var frameworkReferences = builtScriptMetadata.ResolvedReferences
+                                                   .FrameworkAssemblyReferences
+                                                   .Select(pair => new CsProjReference(pair.Key));
+      Console.Write(ScriptCsProj.BudScriptCsProj(nonFrameworkReferences.Concat(frameworkReferences),
+                                                 Directory.GetCurrentDirectory()));
     }
   }
 }
