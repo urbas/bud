@@ -6,20 +6,30 @@ using System.IO;
 using static Bud.Option;
 
 namespace Bud.Scripting {
-  public class ScriptMetadata {
-    public IImmutableSet<string> AssemblyReferences { get; }
+  public class ScriptDirectives {
+    public IImmutableSet<string> References { get; }
     public IReadOnlyDictionary<string, Option<string>> NuGetReferences { get; }
 
-    public ScriptMetadata(IImmutableSet<string> assemblyReferences,
-                          IReadOnlyDictionary<string, Option<string>> nuGetReferences) {
-      AssemblyReferences = assemblyReferences;
+    public ScriptDirectives(IImmutableSet<string> references,
+                            IReadOnlyDictionary<string, Option<string>> nuGetReferences) {
+      References = references;
       NuGetReferences = nuGetReferences;
     }
 
-    public static ScriptMetadata Extract(params string[] scriptContents)
+    public static ScriptDirectives Extract(params string[] scriptContents)
       => Extract((IEnumerable<string>) scriptContents);
 
-    public static ScriptMetadata Extract(IEnumerable<string> scriptContents) {
+    /// <summary>
+    ///   Extracts directives from the contents of the scripts. Directives are of the following forms:
+    ///   - <c>//!reference [ASSEMBLY NAME]</c>
+    ///   - <c>//!nuget [NUGET PACKAGE ID] [VERSION]</c>
+    /// </summary>
+    /// <param name="scriptContents">textual contents of the script files.</param>
+    /// <returns>
+    ///   an instance of the <see cref="ScriptDirectives" /> class. This class contains
+    ///   all the directives found in the scripts.
+    /// </returns>
+    public static ScriptDirectives Extract(IEnumerable<string> scriptContents) {
       var assemblyReferences = new List<string>();
       var nugetReferences = new Dictionary<string, Option<string>>();
       foreach (var scriptContent in scriptContents) {
@@ -44,8 +54,8 @@ namespace Bud.Scripting {
         }
       }
 
-      return new ScriptMetadata(assemblyReferences.ToImmutableHashSet(),
-                                new ReadOnlyDictionary<string, Option<string>>(nugetReferences));
+      return new ScriptDirectives(assemblyReferences.ToImmutableHashSet(),
+                                  new ReadOnlyDictionary<string, Option<string>>(nugetReferences));
     }
 
     private static string ToAssemblyReference(string line) {

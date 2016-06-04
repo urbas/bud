@@ -50,7 +50,7 @@ namespace Bud.Scripting {
       var outputDir = Path.GetDirectoryName(outputScriptExe);
       var inputFilesList = inputFiles as IList<string> ?? inputFiles.ToList();
       var scriptContents = inputFilesList.Select(File.ReadAllText).ToList();
-      var references = ScriptMetadata.Extract(scriptContents);
+      var references = ScriptDirectives.Extract(scriptContents);
       var resolvedReferences = ResolveReferences(customAssemblyPaths, references);
       var assemblies = resolvedReferences.FrameworkAssemblyReferences.Values
                                          .Concat(resolvedReferences.AssemblyReferences.Values)
@@ -72,10 +72,10 @@ namespace Bud.Scripting {
       => $"{outputScriptExePath}.metadata.json";
 
     private static ResolvedScriptReferences ResolveReferences(IReadOnlyDictionary<string, string> customAssemblyPaths,
-                                                              ScriptMetadata references) {
+                                                              ScriptDirectives references) {
       var frameworkAssemblies = new Dictionary<string, string>();
       var customAssemblies = new Dictionary<string, string>();
-      foreach (var reference in references.AssemblyReferences) {
+      foreach (var reference in references.References) {
         var frameworkAssembly = WindowsResolver.ResolveFrameworkAssembly(reference, MaxVersion);
         if (frameworkAssembly.HasValue) {
           frameworkAssemblies.Add(reference, frameworkAssembly.Value);

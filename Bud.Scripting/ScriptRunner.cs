@@ -23,10 +23,8 @@ namespace Bud.Scripting {
     /// </param>
     public static int Run(string[] args,
                           Option<string> scriptPath = default(Option<string>),
-                          Option<string> workingDir = default(Option<string>)) {
-      var executablePath = Build(CoalesceScriptPath(scriptPath));
-      return BatchExec.Run(executablePath, string.Join(" ", args), workingDir);
-    }
+                          Option<string> workingDir = default(Option<string>))
+      => BatchExec.Run(Build(scriptPath), string.Join(" ", args), workingDir);
 
     /// <summary>
     ///   Loads the metadata of the script in the current working directory.
@@ -38,17 +36,16 @@ namespace Bud.Scripting {
     /// </param>
     /// <returns>the metadata.</returns>
     public static BuiltScriptMetadata LoadBuiltScriptMetadata(Option<string> scriptPath = default(Option<string>)) {
-      var outputScriptExePath = Build(CoalesceScriptPath(scriptPath));
-      var metadataContent = File.ReadAllText(ScriptBuilder.ScriptMetadataPath(outputScriptExePath));
-      return DeserializeObject<BuiltScriptMetadata>(metadataContent);
+      var scriptMetadataPath = ScriptBuilder.ScriptMetadataPath(Build(scriptPath));
+      return DeserializeObject<BuiltScriptMetadata>(File.ReadAllText(scriptMetadataPath));
     }
 
     /// <summary>
     ///   The default way of building <c>Build.cs</c> scripts.
     /// </summary>
     /// <returns>the path to the built executable. This executable can be run as is.</returns>
-    public static string Build(string scriptPath)
-      => ScriptBuilder.Build(scriptPath, new BudAssemblyPaths());
+    private static string Build(Option<string> scriptPath = default(Option<string>))
+      => ScriptBuilder.Build(CoalesceScriptPath(scriptPath), new BudAssemblyPaths());
 
     private static string CoalesceScriptPath(Option<string> scriptPath)
       => scriptPath.HasValue ? scriptPath.Value : DefaultScriptPath;
