@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 
 namespace Bud.Scripting {
-  public class ResolvedReferences {
-    public ResolvedReferences(IReadOnlyDictionary<string, string> assemblyReferences,
-                              IReadOnlyDictionary<string, string> frameworkAssemblyReferences) {
+  public class ResolvedScriptReferences {
+    public ResolvedScriptReferences(IReadOnlyDictionary<string, string> assemblyReferences,
+                                    IReadOnlyDictionary<string, string> frameworkAssemblyReferences) {
       AssemblyReferences = assemblyReferences;
       FrameworkAssemblyReferences = frameworkAssemblyReferences;
     }

@@ -56,8 +56,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BudAssemblyPaths.cs" />
-    <Compile Include="BuiltScript.cs" />
-    <Compile Include="ResolvedReferences.cs" />
+    <Compile Include="BuiltScriptMetadata.cs" />
+    <Compile Include="ResolvedScriptReferences.cs" />
     <Compile Include="IAssemblyPaths.cs" />
     <Compile Include="ICSharpScriptCompiler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

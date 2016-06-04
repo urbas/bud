@@ -37,7 +37,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="RunScriptProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -47,6 +47,10 @@
     <ProjectReference Include="..\Bud.Building\Bud.Building.csproj">
       <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
       <Name>Bud.Building</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
+      <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
+      <Name>Bud.Option</Name>
     </ProjectReference>
     <ProjectReference Include="..\Bud.Scripting\Bud.Scripting.csproj">
       <Project>{f1cc850c-4c10-4d2c-8267-0c7ef196cb38}</Project>

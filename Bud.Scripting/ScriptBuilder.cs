@@ -7,11 +7,12 @@ using System.Linq;
 using Bud.Building;
 using Bud.FrameworkAssemblies;
 using Microsoft.CodeAnalysis;
-using Newtonsoft.Json;
+using static Newtonsoft.Json.JsonConvert;
 
 namespace Bud.Scripting {
   public class ScriptBuilder {
     public static readonly Version MaxVersion = new Version(int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue);
+
     public IAssemblyPaths AssemblyPaths { get; }
     public ICSharpScriptCompiler Compiler { get; set; }
 
@@ -42,13 +43,10 @@ namespace Bud.Scripting {
       return buildScript;
     }
 
-    public static BuiltScript LoadBuiltScriptMetadata(string builtScriptPath)
-      => JsonConvert.DeserializeObject<BuiltScript>(File.ReadAllText($"{builtScriptPath}.metadata"));
-
-    public static BuiltScript Build(IEnumerable<string> inputFiles,
-                                    IReadOnlyDictionary<string, string> customAssemblyPaths,
-                                    ICSharpScriptCompiler compiler,
-                                    string outputScriptExe) {
+    public static BuiltScriptMetadata Build(IEnumerable<string> inputFiles,
+                                            IReadOnlyDictionary<string, string> customAssemblyPaths,
+                                            ICSharpScriptCompiler compiler,
+                                            string outputScriptExe) {
       var outputDir = Path.GetDirectoryName(outputScriptExe);
       var inputFilesList = inputFiles as IList<string> ?? inputFiles.ToList();
       var scriptContents = inputFilesList.Select(File.ReadAllText).ToList();
@@ -64,14 +62,17 @@ namespace Bud.Scripting {
         throw new Exception($"Compilation error: {string.Join("\n", errors)}");
       }
       CopyAssemblies(resolvedReferences.AssemblyReferences.Values, outputDir);
-      var builtScript = new BuiltScript(resolvedReferences, outputScriptExe);
-      var builtScriptMetadata = JsonConvert.SerializeObject(builtScript);
-      File.WriteAllText($"{outputScriptExe}.metadata", builtScriptMetadata);
+      var builtScript = new BuiltScriptMetadata(resolvedReferences, outputScriptExe);
+      var builtScriptMetadata = SerializeObject(builtScript);
+      File.WriteAllText(ScriptMetadataPath(outputScriptExe), builtScriptMetadata);
       return builtScript;
     }
 
-    private static ResolvedReferences ResolveReferences(IReadOnlyDictionary<string, string> customAssemblyPaths,
-                                                        ScriptMetadata references) {
+    public static string ScriptMetadataPath(string outputScriptExePath)
+      => $"{outputScriptExePath}.metadata.json";
+
+    private static ResolvedScriptReferences ResolveReferences(IReadOnlyDictionary<string, string> customAssemblyPaths,
+                                                              ScriptMetadata references) {
       var frameworkAssemblies = new Dictionary<string, string>();
       var customAssemblies = new Dictionary<string, string>();
       foreach (var reference in references.AssemblyReferences) {
@@ -87,12 +88,9 @@ namespace Bud.Scripting {
         }
         throw new Exception($"Could not resolve the reference '{reference}'.");
       }
-      return new ResolvedReferences(new ReadOnlyDictionary<string, string>(customAssemblies),
-                                    new ReadOnlyDictionary<string, string>(frameworkAssemblies));
+      return new ResolvedScriptReferences(new ReadOnlyDictionary<string, string>(customAssemblies),
+                                          new ReadOnlyDictionary<string, string>(frameworkAssemblies));
     }
-
-    public static string DefaultScriptPath
-      => Path.Combine(Directory.GetCurrentDirectory(), "Build.cs");
 
     private static void CopyAssemblies(IEnumerable<string> paths,
                                        string outputDir) {

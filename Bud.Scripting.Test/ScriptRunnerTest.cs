@@ -12,7 +12,7 @@ namespace Bud.Scripting {
         var fooExpected = dir.CreateFile("42 1337", "output-dir", "foo.expected");
         var script = dir.CreateFileFromResource("Bud.Scripting.TestScripts.CreateFooFile.cs",
                                                 "CreateFooFile.cs");
-        ScriptRunner.Run(script, new[] {"1337"}, outputDir);
+        ScriptRunner.Run(new[] {"1337"}, script, outputDir);
         FileAssert.AreEqual(fooExpected, Path.Combine(outputDir, "foo"));
       }
     }
@@ -22,7 +22,7 @@ namespace Bud.Scripting {
       using (var dir = new TmpDir()) {
         var script = dir.CreateFileFromResource("Bud.Scripting.TestScripts.UsingLinqWithoutReference.cs",
                                                 "UsingLinqWithoutReference.cs");
-        var exception = Assert.Throws<Exception>(() => ScriptRunner.Run(script, new[] {""}, dir.Path));
+        var exception = Assert.Throws<Exception>(() => ScriptRunner.Run(new[] {""}, script, dir.Path));
         Assert.That(exception.Message, Contains.Substring("Linq"));
       }
     }
@@ -33,7 +33,7 @@ namespace Bud.Scripting {
         var fooExpected = dir.CreateFile("FOO BAR", "foo.expected");
         var script = dir.CreateFileFromResource("Bud.Scripting.TestScripts.UsingLinqWithReference.cs",
                                                 "UsingLinqWithReference.cs");
-        ScriptRunner.Run(script, new[] {"foo", "bar"}, dir.Path);
+        ScriptRunner.Run(new[] {"foo", "bar"}, script, dir.Path);
         FileAssert.AreEqual(fooExpected, Path.Combine(dir.Path, "foo"));
       }
     }

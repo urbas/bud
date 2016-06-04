@@ -53,7 +53,7 @@ public class A {public static void Main(){}}", "Build.cs");
                                               new TestCSharpScriptCompiler(),
                                               Path.Combine(outputDir, "build-script.exe"));
 
-        Assert.That(builtScript.ResolvedReferences.AssemblyReferences,
+        Assert.That(builtScript.ResolvedScriptReferences.AssemblyReferences,
                     Is.EquivalentTo(ImmutableDictionary<string, string>.Empty.Add("A", assemblyA)));
       }
     }
@@ -70,7 +70,7 @@ public class A {public static void Main(){}}", "Build.cs");
                                               Path.Combine(outputDir, "build-script.exe"));
 
         var expectedAssemblyPath = WindowsResolver.ResolveFrameworkAssembly("System.Core", ScriptBuilder.MaxVersion).Value;
-        Assert.That(builtScript.ResolvedReferences.FrameworkAssemblyReferences,
+        Assert.That(builtScript.ResolvedScriptReferences.FrameworkAssemblyReferences,
                     Is.EquivalentTo(ImmutableDictionary<string, string>.Empty.Add("System.Core", expectedAssemblyPath)));
       }
     }
