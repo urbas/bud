@@ -7,8 +7,13 @@ using Bud.Building;
 
 namespace Bud.Make {
   public static class Make {
-    public static Rule Rule(string output, string input, Action<string, string> recipe)
-      => new Rule(output, input, recipe);
+    public static Rule Rule(string output, Action<string, string> recipe, string input)
+      => new Rule(output,
+                  (inputFiles, outputFile) => recipe(inputFiles[0], outputFile),
+                  new ReadOnlyCollection<string>(new[] {input}));
+
+    public static Rule Rule(string outputFile, Action<IReadOnlyList<string>, string> recipe, params string[] inputFiles)
+      => new Rule(outputFile, recipe, inputFiles);
 
     public static void Execute(string[] rulesToBuild, params Rule[] rules)
       => Execute(rulesToBuild, Directory.GetCurrentDirectory(), rules);
@@ -33,14 +38,19 @@ namespace Bud.Make {
       InvokeRecipe(workingDir, rulesDictionary, rule);
     }
 
-    private static void InvokeRecipe(string workingDir, IReadOnlyDictionary<string, Rule> rulesDictionary, Rule rule) {
-      var dependentRule = rulesDictionary.Get(rule.Input);
-      if (dependentRule.HasValue) {
-        InvokeRecipe(workingDir, rulesDictionary, dependentRule.Value);
+    private static void InvokeRecipe(string workingDir,
+                                     IReadOnlyDictionary<string, Rule> rulesDictionary,
+                                     Rule rule) {
+      foreach (var dependentRule in rule.Inputs.Gather(rulesDictionary.Get)) {
+        InvokeRecipe(workingDir, rulesDictionary, dependentRule);
       }
-      TimestampBasedBuilder.Build((inputFiles, outputFile) => rule.Recipe(inputFiles[0], outputFile),
-                                  new ReadOnlyCollection<string>(new[] {Path.Combine(workingDir, rule.Input)}),
+      TimestampBasedBuilder.Build((inputFiles, outputFile) => rule.Recipe(inputFiles, outputFile),
+                                  ToAbsolutePaths(workingDir, rule.Inputs),
                                   Path.Combine(workingDir, rule.Output));
     }
+
+    private static IReadOnlyList<string> ToAbsolutePaths(string workingDir, IEnumerable<string> relativePaths)
+      => new ReadOnlyCollection<string>(relativePaths.Select(input => Path.Combine(workingDir, input))
+                                                     .ToList());
   }
 }

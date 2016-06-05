@@ -1,14 +1,17 @@
 using System;
+using System.Collections.Generic;
 
 namespace Bud.Make {
   public class Rule {
-    public readonly Action<string, string> Recipe;
-    public readonly string Input;
+    public readonly Action<IReadOnlyList<string>, string> Recipe;
+    public readonly IReadOnlyList<string> Inputs;
     public readonly string Output;
 
-    public Rule(string output, string input, Action<string, string> recipe) {
+    public Rule(string output,
+                Action<IReadOnlyList<string>, string> recipe,
+                IReadOnlyList<string> inputs) {
       Recipe = recipe;
-      Input = input;
+      Inputs = inputs;
       Output = output;
     }
   }

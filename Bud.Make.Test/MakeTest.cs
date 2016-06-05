@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Moq;
 using NUnit.Framework;
 
@@ -11,7 +13,7 @@ namespace Bud.Make {
         dir.CreateFile("This is Sparta!", "foo.in");
         Make.Execute(new[] {"foo.out"},
                      dir.Path,
-                     Make.Rule("foo.out", "foo.in", RemoveSpaces));
+                     Make.Rule("foo.out", RemoveSpaces, "foo.in"));
         FileAssert.AreEqual(dir.CreateFile("ThisisSparta!", "expected_output"),
                             dir.CreatePath("foo.out"));
       }
@@ -26,7 +28,7 @@ namespace Bud.Make {
         File.SetLastWriteTimeUtc(inputFile, File.GetLastWriteTimeUtc(outputFile) - TimeSpan.FromSeconds(5));
         Make.Execute(new[] {"foo.out"},
                      dir.Path,
-                     Make.Rule("foo.out", "foo.in", recipeMock.Object));
+                     Make.Rule("foo.out", recipeMock.Object, "foo.in"));
         recipeMock.Verify(s => s(It.IsAny<string>(), It.IsAny<string>()),
                           Times.Never);
       }
@@ -41,15 +43,16 @@ namespace Bud.Make {
     }
 
     [Test]
-    public void Execute_invokes_dependent_recipe() {
+    public void Execute_invokes_dependent_recipes() {
       using (var dir = new TmpDir()) {
-        dir.CreateFile("This is Sparta!", "foo");
-        var expectedOutput = dir.CreateFile("THISISSPARTA!", "expected_output");
-        Make.Execute(new[] {"foo.nospace.upper"},
+        dir.CreateFile("foo bar", "foo");
+        var expectedOutput = dir.CreateFile("FOO BAR and foobar", "expected_output");
+        Make.Execute(new[] {"foo.joined"},
                      dir.Path,
-                     Make.Rule("foo.nospace.upper", "foo.nospace", Uppercase),
-                     Make.Rule("foo.nospace", "foo", RemoveSpaces));
-        FileAssert.AreEqual(expectedOutput, dir.CreatePath("foo.nospace.upper"));
+                     Make.Rule("foo.upper", Uppercase, "foo"),
+                     Make.Rule("foo.nospace", RemoveSpaces, "foo"),
+                     Make.Rule("foo.joined", JoinWithAnd, "foo.upper", "foo.nospace"));
+        FileAssert.AreEqual(expectedOutput, dir.CreatePath("foo.joined"));
       }
     }
 
@@ -58,7 +61,7 @@ namespace Bud.Make {
         var recipeMock = new Mock<Action<string, string>>();
         Make.Execute(new string[] {},
                      "/foo/bar",
-                     Make.Rule("foo.out", "foo.in", recipeMock.Object));
+                     Make.Rule("foo.out", recipeMock.Object, "foo.in"));
         recipeMock.Verify(s => s(It.IsAny<string>(), It.IsAny<string>()),
                           Times.Never);
     }
@@ -72,6 +75,12 @@ namespace Bud.Make {
     private static void Uppercase(string inputFile, string outputFile) {
       var inputFileContent = File.ReadAllText(inputFile);
       var outputFileContent = inputFileContent.ToUpperInvariant();
+      File.WriteAllText(outputFile, outputFileContent);
+    }
+
+    private static void JoinWithAnd(IReadOnlyList<string> inputFiles, string outputFile) {
+      var inputFilesContent = inputFiles.Select(File.ReadAllText);
+      var outputFileContent = string.Join(" and ", inputFilesContent);
       File.WriteAllText(outputFile, outputFileContent);
     }
   }
