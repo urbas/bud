@@ -35,6 +35,17 @@ namespace Bud.Make {
     }
 
     [Test]
+    public void Execute_throws_when_given_duplicate_rules() {
+      var exception = Assert.Throws<Exception>(() => {
+        Make.Execute(new[] {"foo"},
+                     "foo",
+                     Make.Rule("foo", RemoveSpaces, "bar"),
+                     Make.Rule("foo", RemoveSpaces, "moo"));
+      });
+      Assert.That(exception.Message, Does.Contain("'foo'"));
+    }
+
+    [Test]
     public void Execute_throws_when_rule_does_not_exist() {
       var exception = Assert.Throws<Exception>(() => {
         Make.Execute(new[] {"invalid.out"}, "/foo/bar");
@@ -57,13 +68,38 @@ namespace Bud.Make {
     }
 
     [Test]
-    public void Execute_does_nothing_when_no_rules_specified() {
-        var recipeMock = new Mock<Action<string, string>>();
-        Make.Execute(new string[] {},
+    public void Execute_does_not_invoke_dependent_rules_twice() {
+      var recipeMock = new Mock<Action<string, string>>();
+      Make.Execute(new[] {"foo.out3"},
+                   "/foo/bar",
+                   Make.Rule("foo.out1", recipeMock.Object, "foo.in"),
+                   Make.Rule("foo.out2", (string inFile, string outFile) => {}, "foo.out1"),
+                   Make.Rule("foo.out3", (inFiles, outFile) => {}, "foo.out1", "foo.out2"));
+      recipeMock.Verify(s => s(It.IsAny<string>(), It.IsAny<string>()),
+                        Times.Once);
+    }
+
+    [Test]
+    public void Execute_throws_when_there_is_a_cycle() {
+      var recipeMock = new Mock<Action<string, string>>();
+      var ex = Assert.Throws<Exception>(() => {
+        Make.Execute(new[] {"foo.out"},
                      "/foo/bar",
-                     Make.Rule("foo.out", recipeMock.Object, "foo.in"));
-        recipeMock.Verify(s => s(It.IsAny<string>(), It.IsAny<string>()),
-                          Times.Never);
+                     Make.Rule("foo.out", recipeMock.Object, "foo.in"),
+                     Make.Rule("foo.in", recipeMock.Object, "foo.out"));
+      });
+      Assert.That(ex.Message,
+                  Does.Contain("'foo.out <- foo.in <- foo.out'"));
+    }
+
+    [Test]
+    public void Execute_does_nothing_when_no_rules_specified() {
+      var recipeMock = new Mock<Action<string, string>>();
+      Make.Execute(new string[] {},
+                   "/foo/bar",
+                   Make.Rule("foo.out", recipeMock.Object, "foo.in"));
+      recipeMock.Verify(s => s(It.IsAny<string>(), It.IsAny<string>()),
+                        Times.Never);
     }
 
     private static void RemoveSpaces(string inputFile, string outputFile) {

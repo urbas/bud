@@ -29,24 +29,41 @@ namespace Bud.Make {
       if (rulesToBuild == null || rulesToBuild.Length == 0) {
         return;
       }
-      var rulesDictionary = rules.ToDictionary(r => r.Output, r => r);
+      var rulesDictionary = new Dictionary<string, Rule>();
+      foreach (var r in rules) {
+        if (rulesDictionary.ContainsKey(r.Output)) {
+          throw new Exception($"Found a duplicate rule '{r.Output}'.");
+        }
+        rulesDictionary.Add(r.Output, r);
+      }
       var ruleOptional = rulesDictionary.Get(rulesToBuild[0]);
       if (!ruleOptional.HasValue) {
         throw new Exception($"Could not find rule '{rulesToBuild[0]}'.");
       }
       var rule = ruleOptional.Value;
-      InvokeRecipe(workingDir, rulesDictionary, rule);
+      InvokeRecipe(workingDir, rulesDictionary, rule, new HashSet<string>(), new List<string>());
     }
 
     private static void InvokeRecipe(string workingDir,
                                      IReadOnlyDictionary<string, Rule> rulesDictionary,
-                                     Rule rule) {
+                                     Rule rule,
+                                     ISet<string> alreadyInvokedRules,
+                                     IList<string> currentlyExecutingRules) {
+      if (currentlyExecutingRules.Contains(rule.Output)) {
+        throw new Exception($"Detected a cycle in rule dependencies: '{string.Join(" <- ", currentlyExecutingRules)} <- {rule.Output}'.");
+      }
+      if (alreadyInvokedRules.Contains(rule.Output)) {
+        return;
+      }
+      currentlyExecutingRules.Add(rule.Output);
       foreach (var dependentRule in rule.Inputs.Gather(rulesDictionary.Get)) {
-        InvokeRecipe(workingDir, rulesDictionary, dependentRule);
+        InvokeRecipe(workingDir, rulesDictionary, dependentRule, alreadyInvokedRules, currentlyExecutingRules);
       }
       TimestampBasedBuilder.Build((inputFiles, outputFile) => rule.Recipe(inputFiles, outputFile),
                                   ToAbsolutePaths(workingDir, rule.Inputs),
                                   Path.Combine(workingDir, rule.Output));
+      alreadyInvokedRules.Add(rule.Output);
+      currentlyExecutingRules.RemoveAt(currentlyExecutingRules.Count - 1);
     }
 
     private static IReadOnlyList<string> ToAbsolutePaths(string workingDir, IEnumerable<string> relativePaths)
