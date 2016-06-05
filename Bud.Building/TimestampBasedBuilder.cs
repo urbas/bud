@@ -1,12 +1,9 @@
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
 namespace Bud.Building {
   public class TimestampBasedBuilder {
-    private static readonly IReadOnlyList<string> EmptyInputFiles = new ReadOnlyCollection<string>(new string[0]);
-
     /// <summary>
     ///   Builds a single file with the given list of inputs.
     /// </summary>
@@ -20,7 +17,7 @@ namespace Bud.Building {
     public static void Build(FilesBuilder fileGenerator,
                              string output,
                              IReadOnlyList<string> inputFiles) {
-      inputFiles = inputFiles ?? EmptyInputFiles;
+      inputFiles = inputFiles ?? BuildInput.EmptyInputFiles;
       if (!File.Exists(output) || AnyFileNewer(inputFiles, output)) {
         fileGenerator(inputFiles, output);
       }

@@ -39,6 +39,7 @@ namespace Bud.Building {
                              byte[] salt,
                              IReadOnlyList<string> input,
                              string output) {
+      input = input ?? BuildInput.EmptyInputFiles;
       var digest = Md5Hasher.Digest(input, salt);
       if (!File.Exists(output)) {
         filesBuilder(input, output);
