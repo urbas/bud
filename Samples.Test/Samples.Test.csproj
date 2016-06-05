@@ -90,6 +90,10 @@
       <Project>{a4d2b43f-f24a-480a-b743-ebe0186b0d21}</Project>
       <Name>Bud.FrameworkAssemblies</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Bud.Make\Bud.Make.csproj">
+      <Project>{3e9aefd6-385d-43a7-9ddb-5eef2643b6f7}</Project>
+      <Name>Bud.Make</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Bud.Option.Test\Bud.Option.Test.csproj">
       <Project>{cc20da6a-455a-431d-807c-9e5533dbf633}</Project>
       <Name>Bud.Option.Test</Name>

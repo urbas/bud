@@ -6,7 +6,7 @@ namespace Bud.Make {
     public readonly string Input;
     public readonly string Output;
 
-    public Rule(string input, string output, Action<string, string> recipe) {
+    public Rule(string output, string input, Action<string, string> recipe) {
       Recipe = recipe;
       Input = input;
       Output = output;
