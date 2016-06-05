@@ -41,12 +41,6 @@
     <Compile Include="SingleFileBuilder.cs" />
     <Compile Include="TimestampBasedBuilder.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Bud.Cache\Bud.Cache.csproj">
-      <Project>{713f14ed-baf2-4ce4-afb3-ecadac2b710b}</Project>
-      <Name>Bud.Cache</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
