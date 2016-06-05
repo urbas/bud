@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{05236F73-9AE4-4351-8378-29F96B6977C2}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{3E9AEFD6-385D-43A7-9DDB-5EEF2643B6F7}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bud.RunScript</RootNamespace>
-    <AssemblyName>Bud.RunScript</AssemblyName>
+    <RootNamespace>Bud.Make</RootNamespace>
+    <AssemblyName>Bud.Make</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -37,28 +34,14 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RunScriptProgram.cs" />
+    <Compile Include="Make.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
+    <Compile Include="Rule.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bud.Building\Bud.Building.csproj">
       <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
       <Name>Bud.Building</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.Make\Bud.Make.csproj">
-      <Project>{3e9aefd6-385d-43a7-9ddb-5eef2643b6f7}</Project>
-      <Name>Bud.Make</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
-      <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
-      <Name>Bud.Option</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.Scripting\Bud.Scripting.csproj">
-      <Project>{f1cc850c-4c10-4d2c-8267-0c7ef196cb38}</Project>
-      <Name>Bud.Scripting</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -12,7 +12,7 @@ namespace Bud.Building {
     [SetUp]
     public void SetUp() {
       outputGenerator = new Mock<FilesBuilder>();
-      outputGenerator.Setup(s => s(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
+      outputGenerator.Setup(s => s(It.IsAny<IReadOnlyList<string>>(), It.IsAny<string>()))
                      .Callback<IEnumerable<string>, string>(DigestGenerator.Generate);
       dir = new TmpDir();
     }

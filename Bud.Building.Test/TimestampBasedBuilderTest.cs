@@ -13,7 +13,7 @@ namespace Bud.Building {
     [SetUp]
     public void SetUp() {
       outputGenerator = new Mock<FilesBuilder>(MockBehavior.Strict);
-      outputGenerator.Setup(s => s(It.IsAny<IEnumerable<string>>(), It.IsAny<string>()))
+      outputGenerator.Setup(s => s(It.IsAny<IReadOnlyList<string>>(), It.IsAny<string>()))
                      .Callback<IEnumerable<string>, string>(DigestGenerator.Generate);
       dir = new TmpDir();
     }
@@ -24,14 +24,14 @@ namespace Bud.Building {
     [Test]
     public void Build_creates_the_output_file() {
       var output = dir.CreatePath("a.out");
-      TimestampBasedBuilder.Build(outputGenerator.Object, output, ImmutableList<string>.Empty);
+      TimestampBasedBuilder.Build(outputGenerator.Object, ImmutableList<string>.Empty, output);
       outputGenerator.Verify(self => self(ImmutableList<string>.Empty, output), Times.Once);
     }
 
     [Test]
     public void Build_does_not_invoke_the_worker_when_output_already_exists() {
       var output = dir.CreateEmptyFile("a.out");
-      TimestampBasedBuilder.Build(outputGenerator.Object, output, ImmutableList<string>.Empty);
+      TimestampBasedBuilder.Build(outputGenerator.Object, ImmutableList<string>.Empty, output);
     }
 
     [Test]
@@ -41,7 +41,7 @@ namespace Bud.Building {
       File.SetLastWriteTime(output, File.GetLastWriteTime(fileA) - TimeSpan.FromSeconds(1));
       var input = ImmutableList.Create(fileA);
 
-      TimestampBasedBuilder.Build(outputGenerator.Object, output, input);
+      TimestampBasedBuilder.Build(outputGenerator.Object, input, output);
 
       outputGenerator.Verify(self => self(input, output), Times.Once);
     }
@@ -52,7 +52,7 @@ namespace Bud.Building {
       var output = dir.CreateEmptyFile("a.out");
       File.SetLastWriteTime(fileA, File.GetLastWriteTime(output) - TimeSpan.FromSeconds(1));
       var inputFiles = ImmutableList.Create(fileA);
-      TimestampBasedBuilder.Build(outputGenerator.Object, output, inputFiles);
+      TimestampBasedBuilder.Build(outputGenerator.Object, inputFiles, output);
     }
   }
 }

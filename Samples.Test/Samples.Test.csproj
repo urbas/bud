@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="HelloWorldTest.cs" />
+    <Compile Include="MakeRuleTest.cs" />
     <Compile Include="PathsTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Paths.cs" />

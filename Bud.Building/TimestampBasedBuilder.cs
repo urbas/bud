@@ -8,15 +8,15 @@ namespace Bud.Building {
     ///   Builds a single file with the given list of inputs.
     /// </summary>
     /// <param name="fileGenerator">this function actually produces the output.</param>
-    /// <param name="output">the path of the expected output.</param>
     /// <param name="inputFiles">the files from which the <paramref name="fileGenerator" /> should generate the output.</param>
+    /// <param name="output">the path of the expected output.</param>
     /// <remarks>
     ///   The worker will not be invoked if the last-modified timestamp of the <paramref name="output" /> is newer
     ///   than the last-modified timestamp of any of the input files.
     /// </remarks>
     public static void Build(FilesBuilder fileGenerator,
-                             string output,
-                             IReadOnlyList<string> inputFiles) {
+                             IReadOnlyList<string> inputFiles,
+                             string output) {
       inputFiles = inputFiles ?? BuildInput.EmptyInputFiles;
       if (!File.Exists(output) || AnyFileNewer(inputFiles, output)) {
         fileGenerator(inputFiles, output);
