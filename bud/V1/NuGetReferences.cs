@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Security.Cryptography;
 using Bud.IO;
 using Bud.NuGet;
 using static Bud.V1.Basic;
@@ -82,7 +83,7 @@ namespace Bud.V1 {
         var buildDir = BuildDir[c];
         var resolvedAssembliesFile = Path.Combine(buildDir, "resolved_assemblies");
         Directory.CreateDirectory(buildDir);
-        var hash = PackageReference.GetHash(packageReferences);
+        var hash = GetHash(packageReferences);
         var resolvedAssemblies = HashBasedCaching.GetLinesOrCache(
           resolvedAssembliesFile,
           hash,
@@ -97,10 +98,27 @@ namespace Bud.V1 {
         return Enumerable.Empty<string>();
       }
       if (!PackageDownloader[c].DownloadPackages(packageReferences, packagesDir)) {
-        throw new Exception($"Could not download packages: {string.Join(", ", packageReferences)}");
+        throw new Exception($"Could not download packages: {String.Join(", ", packageReferences)}");
       }
       return AssemblyResolver[c]
         .FindAssemblies(packageReferences, packagesDir, BuildDir[c]);
+    }
+
+    public static string GetHash(IEnumerable<PackageReference> packageReferences) {
+      using (var memoryStream = new MemoryStream()) {
+        using (var writer = new StreamWriter(memoryStream)) {
+          PackageReference.WritePackagesConfigXml(packageReferences, writer);
+          writer.Flush();
+          memoryStream.Seek(0, SeekOrigin.Begin);
+          return Hash(memoryStream);
+        }
+      }
+    }
+
+    private static string Hash(Stream memoryStream) {
+      using (var digest = MD5.Create()) {
+        return BitConverter.ToString(digest.ComputeHash(memoryStream));
+      }
     }
   }
 }

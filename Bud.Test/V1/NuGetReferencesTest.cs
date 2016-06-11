@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reactive.Linq;
 using Bud.NuGet;
 using Moq;
+using NuGet.Frameworks;
+using NuGet.Versioning;
 using NUnit.Framework;
 using static Bud.V1.NuGetReferences;
 
@@ -104,6 +106,26 @@ namespace Bud.V1 {
                     Is.EqualTo(new[] {PackageConfigTestUtils.FooReference}));
       }
     }
+
+    [Test]
+    public void Digest_produces_the_same_string_for_the_same_references()
+      => Assert.AreEqual(GetHash(new[] { PackageA() }),
+                         GetHash(new[] { PackageA() }));
+
+    [Test]
+    public void Digest_produces_different_strings_for_the_different_references()
+      => Assert.AreNotEqual(GetHash(new[] { PackageA() }),
+                            GetHash(new[] { PackageB() }));
+
+    private static PackageReference PackageA()
+      => new PackageReference("A",
+                              NuGetVersion.Parse("1.2.3"),
+                              NuGetFramework.Parse("net40"));
+
+    private static PackageReference PackageB()
+      => new PackageReference("B",
+                              NuGetVersion.Parse("1.2.3"),
+                              NuGetFramework.Parse("net40"));
 
     private static Mock<NuGetPackageDownloader> MockDownloader(IEnumerable<PackageReference> packageReferences, TmpDir tmpDir) {
       var downloader = new Mock<NuGetPackageDownloader>(MockBehavior.Strict);

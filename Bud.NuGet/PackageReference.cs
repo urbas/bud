@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
 using NuGet.Frameworks;
 using NuGet.Versioning;
 
@@ -17,11 +15,10 @@ namespace Bud.NuGet {
       Framework = framework;
     }
 
-    protected bool Equals(PackageReference other) {
-      return Framework.Equals(other.Framework)
-             && string.Equals(Id, other.Id)
-             && Version.Equals(other.Version);
-    }
+    protected bool Equals(PackageReference other)
+      => Framework.Equals(other.Framework)
+         && string.Equals(Id, other.Id)
+         && Version.Equals(other.Version);
 
     public override bool Equals(object obj) {
       if (ReferenceEquals(null, obj)) {
@@ -42,23 +39,6 @@ namespace Bud.NuGet {
       }
     }
 
-    public static bool operator ==(PackageReference left, PackageReference right) => Equals(left, right);
-    public static bool operator !=(PackageReference left, PackageReference right) => !Equals(left, right);
-
-    public override string ToString()
-      => $"PackageReference({Id}, {Version}, {Framework})";
-
-    public static string GetHash(IEnumerable<PackageReference> packageReferences) {
-      using (var memoryStream = new MemoryStream()) {
-        using (var writer = new StreamWriter(memoryStream)) {
-          WritePackagesConfigXml(packageReferences, writer);
-          writer.Flush();
-          memoryStream.Seek(0, SeekOrigin.Begin);
-          return Hash(memoryStream);
-        }
-      }
-    }
-
     public static void WritePackagesConfigXml(IEnumerable<PackageReference> packageReferences,
                                               TextWriter writer) {
       writer.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>\n");
@@ -70,12 +50,6 @@ namespace Bud.NuGet {
                      $" targetFramework=\"{packageReference.Framework.GetShortFolderName()}\" />\n");
       }
       writer.Write("</packages>");
-    }
-
-    private static string Hash(Stream memoryStream) {
-      using (var digest = MD5.Create()) {
-        return BitConverter.ToString(digest.ComputeHash(memoryStream));
-      }
     }
   }
 }

@@ -124,7 +124,6 @@
     <Compile Include="NuGet\NuGetPushArgsBuilder.cs" />
     <Compile Include="NuGet\PackageDependency.cs" />
     <Compile Include="NuGet\NuGetPackageMetadata.cs" />
-    <Compile Include="NuGet\PackageReference.cs" />
     <Compile Include="NuGet\IAssemblyResolver.cs" />
     <Compile Include="NuGet\NuGetAssemblyResolver.cs" />
     <Compile Include="Reactive\ObservableOptions.cs" />
@@ -199,6 +198,10 @@
     <ProjectReference Include="..\Bud.Exec\Bud.Exec.csproj">
       <Project>{7647a7d1-bb14-4a70-9b0a-551b051cc125}</Project>
       <Name>Bud.Exec</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bud.NuGet\Bud.NuGet.csproj">
+      <Project>{e9529521-9d73-4dce-aa81-d1e08cbb53d4}</Project>
+      <Name>Bud.NuGet</Name>
     </ProjectReference>
     <ProjectReference Include="..\Bud.References\Bud.References.csproj">
       <Project>{a4d2b43f-f24a-480a-b743-ebe0186b0d21}</Project>
