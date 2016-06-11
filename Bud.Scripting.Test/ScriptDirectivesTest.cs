@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Immutable;
+using Bud.NuGet;
+using NuGet.Frameworks;
+using NuGet.Versioning;
 using NUnit.Framework;
 using static Bud.Option;
 using static NUnit.Framework.Assert;
@@ -41,18 +44,13 @@ var
               Is.EquivalentTo(new[] {"Foo", "Bar", "Zar","Moo"}));
 
     [Test]
-    public void Extract_returns_nuget_package_references()
-      => AreEqual(ImmutableDictionary<string, Option<string>>.Empty.Add("Foo", None<string>()),
-                  ScriptDirectives.Extract(@"//!nuget Foo").NuGetReferences);
+    public void Extract_throws_when_given_an_invalid_reference()
+      => Throws<Exception>(() => ScriptDirectives.Extract(@"//!reference Foo 1.2.3"));
 
     [Test]
     public void Extract_returns_versioned_nuget_package_references()
-      => AreEqual(ImmutableDictionary<string, Option<string>>.Empty.Add("Foo", Some("1.2.3")),
+      => AreEqual(new [] {new PackageReference("Foo", NuGetVersion.Parse("1.2.3"), NuGetFramework.AnyFramework)},
                   ScriptDirectives.Extract(@"//!nuget Foo 1.2.3").NuGetReferences);
-
-    [Test]
-    public void Extract_throws_when_given_an_invalid_reference()
-      => Throws<Exception>(() => ScriptDirectives.Extract(@"//!reference Foo 1.2.3"));
 
     [Test]
     public void Extract_throws_when_given_an_invalid_nuget_reference()

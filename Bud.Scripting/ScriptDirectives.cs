@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.IO;
-using static Bud.Option;
+using Bud.NuGet;
+using NuGet.Frameworks;
+using NuGet.Versioning;
 
 namespace Bud.Scripting {
   public class ScriptDirectives {
     public IImmutableSet<string> References { get; }
-    public IReadOnlyDictionary<string, Option<string>> NuGetReferences { get; }
+    public IReadOnlyList<PackageReference> NuGetReferences { get; }
 
     public ScriptDirectives(IImmutableSet<string> references,
-                            IReadOnlyDictionary<string, Option<string>> nuGetReferences) {
+                            IReadOnlyList<PackageReference> nuGetReferences) {
       References = references;
       NuGetReferences = nuGetReferences;
     }
@@ -31,7 +33,7 @@ namespace Bud.Scripting {
     /// </returns>
     public static ScriptDirectives Extract(IEnumerable<string> scriptContents) {
       var assemblyReferences = new List<string>();
-      var nugetReferences = new Dictionary<string, Option<string>>();
+      var nugetReferences = new List<PackageReference>();
       foreach (var scriptContent in scriptContents) {
         using (var stringReader = new StringReader(scriptContent)) {
           while (true) {
@@ -47,15 +49,14 @@ namespace Bud.Scripting {
               assemblyReferences.Add(ToAssemblyReference(line));
             }
             if (trimmed.StartsWith("//!nuget ")) {
-              var nuGetReference = ToNuGetReference(line);
-              nugetReferences[nuGetReference.Item1] = nuGetReference.Item2;
+              nugetReferences.Add(ToNuGetReference(line));
             }
           }
         }
       }
 
       return new ScriptDirectives(assemblyReferences.ToImmutableHashSet(),
-                                  new ReadOnlyDictionary<string, Option<string>>(nugetReferences));
+                                  new ReadOnlyCollection<PackageReference>(nugetReferences));
     }
 
     private static string ToAssemblyReference(string line) {
@@ -66,15 +67,12 @@ namespace Bud.Scripting {
       throw new Exception($"Malformed reference: '{line}'. Should be of form: '//!reference <name>'");
     }
 
-    private static Tuple<string, Option<string>> ToNuGetReference(string line) {
+    private static PackageReference ToNuGetReference(string line) {
       var components = line.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-      if (components.Length == 2) {
-        return Tuple.Create(components[1], None<string>());
-      }
       if (components.Length == 3) {
-        return Tuple.Create(components[1], Some(components[2]));
+        return new PackageReference(components[1], NuGetVersion.Parse(components[2]), NuGetFramework.AnyFramework);
       }
-      throw new Exception($"Malformed NuGet package reference: '{line}'. Should be of form: '//!nuget <name> [version]'");
+      throw new Exception($"Malformed NuGet package reference: '{line}'. Should be of form: '//!nuget <name> <version>'");
     }
   }
 }

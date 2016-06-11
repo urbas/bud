@@ -38,6 +38,14 @@
       <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.1.2.2\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NuGet.Frameworks, Version=3.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\NuGet.Frameworks.3.4.3\lib\net45\NuGet.Frameworks.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NuGet.Versioning, Version=3.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\NuGet.Versioning.3.4.3\lib\net45\NuGet.Versioning.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -67,6 +75,10 @@
     <ProjectReference Include="..\Bud.Building\Bud.Building.csproj">
       <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
       <Name>Bud.Building</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bud.NuGet\Bud.NuGet.csproj">
+      <Project>{E9529521-9D73-4DCE-AA81-D1E08CBB53D4}</Project>
+      <Name>Bud.NuGet</Name>
     </ProjectReference>
     <ProjectReference Include="..\Bud.References\Bud.References.csproj">
       <Project>{A4D2B43F-F24A-480A-B743-EBE0186B0D21}</Project>

@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Bud.Building;
+using Bud.NuGet;
 using Bud.References;
 using Microsoft.CodeAnalysis;
 using static Newtonsoft.Json.JsonConvert;
@@ -62,8 +63,17 @@ namespace Bud.Scripting {
       var outputDir = Path.GetDirectoryName(outputScriptExe);
       var inputFilesList = inputFiles as IList<string> ?? inputFiles.ToList();
       var scriptContents = inputFilesList.Select(File.ReadAllText).ToList();
-      var references = ScriptDirectives.Extract(scriptContents);
-      var resolvedReferences = ResolveReferences(referenceResolver, references);
+      var directives = ScriptDirectives.Extract(scriptContents);
+
+      var packagesConfigFile = Path.Combine(outputDir, "packages.config");
+      using (var packagesConfigFileStream = new FileStream(packagesConfigFile, FileMode.Create, FileAccess.Write)) {
+        using (var packageConfigFileWriter = new StreamWriter(packagesConfigFileStream)) {
+          PackageReference.WritePackagesConfigXml(directives.NuGetReferences,
+                                                  packageConfigFileWriter);
+        }
+      }
+
+      var resolvedReferences = ResolveReferences(referenceResolver, directives.References);
       var assemblies = resolvedReferences.FrameworkAssemblyReferences.Values
                                          .Concat(resolvedReferences.AssemblyReferences.Values)
                                          .Select(r => MetadataReference.CreateFromFile(r))
@@ -84,10 +94,10 @@ namespace Bud.Scripting {
       => $"{outputScriptExePath}.metadata.json";
 
     private static ResolvedScriptReferences ResolveReferences(IReferenceResolver referenceResolver,
-                                                              ScriptDirectives directives) {
+                                                              IEnumerable<string> references) {
       var frameworkAssemblies = new Dictionary<string, string>();
       var customAssemblies = new Dictionary<string, string>();
-      var resolvedReferences = referenceResolver.Resolve(directives.References);
+      var resolvedReferences = referenceResolver.Resolve(references);
 
       foreach (var reference in resolvedReferences) {
         if (reference.Value.HasValue) {
@@ -108,8 +118,7 @@ namespace Bud.Scripting {
     private static void CopyAssemblies(IEnumerable<string> paths,
                                        string outputDir) {
       foreach (var path in paths) {
-        var destFileName = Path.Combine(outputDir, Path.GetFileName(path));
-        HashBasedBuilder.Build(Copy, path, destFileName);
+        Copy(path, Path.Combine(outputDir, Path.GetFileName(path)));
       }
     }
 
