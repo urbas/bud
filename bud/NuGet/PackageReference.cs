@@ -19,7 +19,7 @@ namespace Bud.NuGet {
 
     protected bool Equals(PackageReference other) {
       return Framework.Equals(other.Framework)
-             && String.Equals(Id, other.Id)
+             && string.Equals(Id, other.Id)
              && Version.Equals(other.Version);
     }
 

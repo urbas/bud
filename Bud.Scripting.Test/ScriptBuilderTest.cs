@@ -90,6 +90,9 @@ public class A {public static void Main(){}}", "Build.cs");
   }
 
   public class TestCSharpScriptCompiler : ICSharpScriptCompiler {
-    public IImmutableList<Diagnostic> Compile(IEnumerable<string> inputFiles, IEnumerable<MetadataReference> references, string outputExe) => ImmutableList<Diagnostic>.Empty;
+    public IImmutableList<Diagnostic> Compile(IEnumerable<string> inputFiles,
+                                              IEnumerable<MetadataReference> references,
+                                              string outputExe)
+      => ImmutableList<Diagnostic>.Empty;
   }
 }
