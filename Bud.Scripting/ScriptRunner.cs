@@ -1,5 +1,4 @@
 using System.IO;
-using static Newtonsoft.Json.JsonConvert;
 
 namespace Bud.Scripting {
   public class ScriptRunner {
@@ -24,30 +23,6 @@ namespace Bud.Scripting {
     public static int Run(string[] args,
                           Option<string> scriptPath = default(Option<string>),
                           Option<string> workingDir = default(Option<string>))
-      => BatchExec.Run(Build(scriptPath), string.Join(" ", args), workingDir);
-
-    /// <summary>
-    ///   Loads the metadata of the script in the current working directory.
-    ///   This method will build the script first (as the metadata is available only for
-    ///   built scripts).
-    /// </summary>
-    /// <param name="scriptPath">
-    ///   the path of the script that will be built and whose metadata we seek.
-    /// </param>
-    /// <returns>the metadata.</returns>
-    public static BuiltScriptMetadata LoadBuiltScriptMetadata(Option<string> scriptPath = default(Option<string>)) {
-      var scriptMetadataPath = ScriptBuilder.ScriptMetadataPath(Build(scriptPath));
-      return DeserializeObject<BuiltScriptMetadata>(File.ReadAllText(scriptMetadataPath));
-    }
-
-    /// <summary>
-    ///   The default way of building <c>Build.cs</c> scripts.
-    /// </summary>
-    /// <returns>the path to the built executable. This executable can be run as is.</returns>
-    private static string Build(Option<string> scriptPath = default(Option<string>))
-      => ScriptBuilder.Build(CoalesceScriptPath(scriptPath), new BudReferenceResolver());
-
-    private static string CoalesceScriptPath(Option<string> scriptPath)
-      => scriptPath.HasValue ? scriptPath.Value : DefaultScriptPath;
+      => BatchExec.Run(ScriptBuilder.Build(scriptPath), string.Join(" ", args), workingDir);
   }
 }

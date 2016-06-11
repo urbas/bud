@@ -11,7 +11,7 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace Bud.Scripting {
   public class ScriptBuilder {
-    public static readonly Version MaxVersion = new Version(int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue);
+    public static readonly Version MaxVersion = new Version(Int32.MaxValue, Int32.MaxValue, Int32.MaxValue, Int32.MaxValue);
 
     public IReferenceResolver ReferenceResolver { get; }
     public ICSharpScriptCompiler Compiler { get; set; }
@@ -22,31 +22,43 @@ namespace Bud.Scripting {
       Compiler = compiler;
     }
 
+    /// <summary>
+    ///   Loads the metadata of the script in the current working directory.
+    ///   This method will build the script first (as the metadata is available only for
+    ///   built scripts).
+    /// </summary>
     /// <param name="scriptPath">
-    ///   the path of the C# script file to build.
+    ///   the path of the script that will be built and whose metadata we seek.
     /// </param>
-    /// <param name="referenceResolver">
-    ///   these references can be used in the build script in addition to framework references.
-    /// </param>
-    /// <returns>
-    ///   the path to the produced executable.
-    ///   The executable can be run as is (using any working directory).
-    /// </returns>
-    public static string Build(string scriptPath,
-                               IReferenceResolver referenceResolver) {
-      var compiler = new RoslynCSharpScriptCompiler();
-      FilesBuilder scriptBuilder = (inputFiles, outputFile) => Build(inputFiles, referenceResolver, compiler, outputFile);
-      var buildDir = Path.Combine(Path.GetDirectoryName(scriptPath), "build");
-      Directory.CreateDirectory(buildDir);
-      var buildScript = Path.Combine(buildDir, "build-script.exe");
-      HashBasedBuilder.Build(scriptBuilder, ImmutableList.Create(scriptPath), buildScript);
-      return buildScript;
+    /// <returns>the metadata.</returns>
+    public static BuiltScriptMetadata LoadBuiltScriptMetadata(Option<string> scriptPath = default(Option<string>)) {
+      var scriptMetadataPath = ScriptMetadataPath(Build(scriptPath));
+      return DeserializeObject<BuiltScriptMetadata>(File.ReadAllText(scriptMetadataPath));
     }
 
-    public static BuiltScriptMetadata Build(IEnumerable<string> inputFiles,
-                                            IReferenceResolver referenceResolver,
-                                            ICSharpScriptCompiler compiler,
-                                            string outputScriptExe) {
+    /// <summary>
+    ///   The default way of building <c>Build.cs</c> scripts.
+    /// </summary>
+    /// <param name="scriptPath">
+    ///   the path of the script to build. If omitted, <c>Build.cs</c>
+    ///   in the current working directory is used.
+    /// </param>
+    /// <returns>the path to the built executable. This executable can be run as is.</returns>
+    public static string Build(Option<string> scriptPath = default(Option<string>)) {
+      var actualScriptPath = scriptPath.HasValue ? scriptPath.Value : ScriptRunner.DefaultScriptPath;
+      var buildDir = CreateBuildDir(actualScriptPath);
+      return HashBasedBuilder.Build(Build,
+                                    ImmutableList.Create(actualScriptPath),
+                                    Path.Combine(buildDir, "build-script.exe"));
+    }
+
+    private static void Build(IReadOnlyList<string> inputFiles, string outputFile)
+      => Build(inputFiles, new BudReferenceResolver(), new RoslynCSharpScriptCompiler(), outputFile);
+
+    internal static BuiltScriptMetadata Build(IEnumerable<string> inputFiles,
+                                              IReferenceResolver referenceResolver,
+                                              ICSharpScriptCompiler compiler,
+                                              string outputScriptExe) {
       var outputDir = Path.GetDirectoryName(outputScriptExe);
       var inputFilesList = inputFiles as IList<string> ?? inputFiles.ToList();
       var scriptContents = inputFilesList.Select(File.ReadAllText).ToList();
@@ -59,7 +71,7 @@ namespace Bud.Scripting {
                                          .ToImmutableList();
       var errors = compiler.Compile(inputFilesList, assemblies, outputScriptExe);
       if (errors.Any()) {
-        throw new Exception($"Compilation error: {string.Join("\n", errors)}");
+        throw new Exception($"Compilation error: {String.Join("\n", errors)}");
       }
       CopyAssemblies(resolvedReferences.AssemblyReferences.Values, outputDir);
       var builtScript = new BuiltScriptMetadata(resolvedReferences, outputScriptExe);
@@ -103,5 +115,11 @@ namespace Bud.Scripting {
 
     private static void Copy(string inputFile, string output)
       => File.Copy(inputFile, output, true);
+
+    private static string CreateBuildDir(string scriptPath) {
+      var buildDir = Path.Combine(Path.GetDirectoryName(scriptPath), "build");
+      Directory.CreateDirectory(buildDir);
+      return buildDir;
+    }
   }
 }

@@ -29,12 +29,15 @@ namespace Bud.Building {
     /// </param>
     /// <param name="input">the files from which the <paramref name="filesBuilder" /> should generate the output.</param>
     /// <param name="output">the path of the expected output.</param>
+    /// <returns>
+    ///   the output file path.
+    /// </returns>
     /// <remarks>
     ///   Note that the order of input files is significant. Different order of input files will produce
     ///   a different hash. If your <paramref name="filesBuilder" /> is order-invariant, we suggest you
     ///   order the input before invoking this function.
     /// </remarks>
-    public static void Build(FilesBuilder filesBuilder,
+    public static string Build(FilesBuilder filesBuilder,
                              string hashFile,
                              byte[] salt,
                              IReadOnlyList<string> input,
@@ -50,17 +53,18 @@ namespace Bud.Building {
           File.WriteAllBytes(hashFile, digest);
         }
       }
+      return output;
     }
 
-    public static void Build(FilesBuilder filesBuilder, IReadOnlyList<string> input, string output)
+    public static string Build(FilesBuilder filesBuilder, IReadOnlyList<string> input, string output)
       => Build(filesBuilder, output + ".input_hash", DefaultSalt, input, output);
 
-    public static void Build(SingleFileBuilder fileBuilder, string hashFile, byte[] salt, string input, string output)
+    public static string Build(SingleFileBuilder fileBuilder, string hashFile, byte[] salt, string input, string output)
       => Build((inputFiles, outputFile) => fileBuilder(inputFiles.First(), outputFile),
                hashFile,
                salt, new ReadOnlyCollection<string>(new [] { input }), output);
 
-    public static void Build(SingleFileBuilder fileBuilder, string input, string output)
+    public static string Build(SingleFileBuilder fileBuilder, string input, string output)
       => Build((inputFiles, outputFile) => fileBuilder(inputFiles.First(), outputFile),
                new ReadOnlyCollection<string>(new[] { input }), output);
   }
