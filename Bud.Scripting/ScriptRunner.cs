@@ -45,7 +45,7 @@ namespace Bud.Scripting {
     /// </summary>
     /// <returns>the path to the built executable. This executable can be run as is.</returns>
     private static string Build(Option<string> scriptPath = default(Option<string>))
-      => ScriptBuilder.Build(CoalesceScriptPath(scriptPath), new BudAssemblyPaths());
+      => ScriptBuilder.Build(CoalesceScriptPath(scriptPath), new BudReferenceResolver());
 
     private static string CoalesceScriptPath(Option<string> scriptPath)
       => scriptPath.HasValue ? scriptPath.Value : DefaultScriptPath;

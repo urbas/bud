@@ -55,10 +55,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BudAssemblyPaths.cs" />
+    <Compile Include="BudReferenceResolver.cs" />
     <Compile Include="BuiltScriptMetadata.cs" />
     <Compile Include="ResolvedScriptReferences.cs" />
-    <Compile Include="IAssemblyPaths.cs" />
     <Compile Include="ICSharpScriptCompiler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoslynCSharpScriptCompiler.cs" />
@@ -79,9 +78,9 @@
       <Project>{7647a7d1-bb14-4a70-9b0a-551b051cc125}</Project>
       <Name>Bud.Exec</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.FrameworkAssemblies\Bud.FrameworkAssemblies.csproj">
+    <ProjectReference Include="..\Bud.References\Bud.References.csproj">
       <Project>{a4d2b43f-f24a-480a-b743-ebe0186b0d21}</Project>
-      <Name>Bud.FrameworkAssemblies</Name>
+      <Name>Bud.References</Name>
     </ProjectReference>
     <ProjectReference Include="..\Bud.Make\Bud.Make.csproj">
       <Project>{3e9aefd6-385d-43a7-9ddb-5eef2643b6f7}</Project>

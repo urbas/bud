@@ -118,7 +118,7 @@ namespace Bud.V1 {
       var baseDir = tmpDir.Path;
       var buildDir = Path.Combine(baseDir, "build", "A");
       var packagesCacheDir = Path.Combine(buildDir, "cache");
-      resolver.Setup(r => r.FindAssembly(packageReferences,
+      resolver.Setup(r => r.FindAssemblies(packageReferences,
                                          packagesCacheDir,
                                          buildDir))
               .Returns(resolvedAssemblies);

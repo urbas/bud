@@ -27,9 +27,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.Cache", "Bud.Cache\Bud.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.Cache.Test", "Bud.Cache.Test\Bud.Cache.Test.csproj", "{F212314A-CA0E-45D6-BFC7-134A43E5A96F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.FrameworkAssemblies", "Bud.FrameworkAssemblies\Bud.FrameworkAssemblies.csproj", "{A4D2B43F-F24A-480A-B743-EBE0186B0D21}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.References", "Bud.References\Bud.References.csproj", "{A4D2B43F-F24A-480A-B743-EBE0186B0D21}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.FrameworkAssemblies.Test", "Bud.FrameworkAssemblies.Test\Bud.FrameworkAssemblies.Test.csproj", "{CD0A7381-310B-421B-9B5B-2CBDB7BCE8D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.References.Test", "Bud.References.Test\Bud.References.Test.csproj", "{CD0A7381-310B-421B-9B5B-2CBDB7BCE8D3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CliTools", "CliTools", "{1B7C3817-387F-4D1A-B332-DB0802002240}"
 EndProject

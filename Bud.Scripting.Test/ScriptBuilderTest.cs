@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using Bud.FrameworkAssemblies;
+using System.Linq;
+using Bud.References;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
 
@@ -15,7 +16,7 @@ namespace Bud.Scripting {
 public class A {public static void Main(){}}", "Build.cs");
         var exception = Assert.Throws<Exception>(() => {
           ScriptBuilder.Build(ImmutableList.Create(script),
-                              ImmutableDictionary<string, string>.Empty,
+                              new TestReferenceResolver(),
                               new TestCSharpScriptCompiler(),
                               Path.Combine(dir.Path, "build-script.exe"));
         });
@@ -32,7 +33,7 @@ public class A {public static void Main(){}}", "Build.cs");
         var outputDir = dir.CreateDir("output");
 
         ScriptBuilder.Build(ImmutableList.Create(script),
-                            ImmutableDictionary<string, string>.Empty.Add("A", assemblyA),
+                            new TestReferenceResolver(ImmutableDictionary<string, string>.Empty.Add("A", assemblyA)),
                             new TestCSharpScriptCompiler(),
                             Path.Combine(outputDir, "build-script.exe"));
 
@@ -49,7 +50,7 @@ public class A {public static void Main(){}}", "Build.cs");
         var outputDir = dir.CreateDir("output");
 
         var builtScript = ScriptBuilder.Build(ImmutableList.Create(script),
-                                              ImmutableDictionary<string, string>.Empty.Add("A", assemblyA),
+                                              new TestReferenceResolver(ImmutableDictionary<string, string>.Empty.Add("A", assemblyA)),
                                               new TestCSharpScriptCompiler(),
                                               Path.Combine(outputDir, "build-script.exe"));
 
@@ -65,25 +66,27 @@ public class A {public static void Main(){}}", "Build.cs");
         var outputDir = dir.CreateDir("output");
 
         var builtScript = ScriptBuilder.Build(ImmutableList.Create(script),
-                                              ImmutableDictionary<string, string>.Empty,
+                                              new TestReferenceResolver(ImmutableDictionary<string, string>.Empty),
                                               new TestCSharpScriptCompiler(),
                                               Path.Combine(outputDir, "build-script.exe"));
 
-        var expectedAssemblyPath = WindowsResolver.ResolveFrameworkAssembly("System.Core", ScriptBuilder.MaxVersion).Value;
+        var expectedAssemblyPath = WindowsFrameworkReferenceResolver.ResolveFrameworkAssembly("System.Core", ScriptBuilder.MaxVersion).Value;
         Assert.That(builtScript.ResolvedScriptReferences.FrameworkAssemblyReferences,
                     Is.EquivalentTo(ImmutableDictionary<string, string>.Empty.Add("System.Core", expectedAssemblyPath)));
       }
     }
   }
 
-  public class TestAssemblyPaths : IAssemblyPaths {
-    private readonly IReadOnlyDictionary<string, string> references;
+  public class TestReferenceResolver : IReferenceResolver {
+    private readonly IReadOnlyDictionary<string, string> knownReferences;
 
-    public TestAssemblyPaths(IReadOnlyDictionary<string, string> references = null) {
-      this.references = references ?? ImmutableDictionary<string, string>.Empty;
+    public TestReferenceResolver(IReadOnlyDictionary<string, string> references = null) {
+      knownReferences = references ?? ImmutableDictionary<string, string>.Empty;
     }
 
-    public IReadOnlyDictionary<string, string> Get() => references;
+    public IDictionary<string, Option<string>> Resolve(IEnumerable<string> references)
+      => references.Aggregate(ImmutableDictionary<string, Option<string>>.Empty,
+                              (resolvedReferences, reference) => resolvedReferences.Add(reference, knownReferences.Get(reference)));
   }
 
   public class TestCSharpScriptCompiler : ICSharpScriptCompiler {

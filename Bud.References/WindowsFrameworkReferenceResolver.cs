@@ -4,22 +4,19 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Microsoft.Win32;
-using static System.Environment;
-using static System.IO.Path;
-using Version = System.Version;
 
-namespace Bud.FrameworkAssemblies {
-  public class WindowsResolver {
+namespace Bud.References {
+  public class WindowsFrameworkReferenceResolver {
     public static readonly string OldFrameworkPath
-      = Combine(GetFolderPath(SpecialFolder.Windows),
-                "Microsoft.NET", "Framework");
+      = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows),
+                     "Microsoft.NET", "Framework");
 
     public static readonly string Net3PlusFrameworkPath
-      = Combine(GetFolderPath(SpecialFolder.ProgramFilesX86),
-                "Reference Assemblies", "Microsoft", "Framework");
+      = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                     "Reference Assemblies", "Microsoft", "Framework");
 
     public static readonly string Net4PlusFrameworkPath
-      = Combine(Net3PlusFrameworkPath, ".NETFramework");
+      = Path.Combine(Net3PlusFrameworkPath, ".NETFramework");
 
     public static Option<string> ResolveFrameworkAssembly(string assemblyName, Version version) {
       if (version.Major == 0) {
@@ -28,15 +25,15 @@ namespace Bud.FrameworkAssemblies {
       var dllName = assemblyName + ".dll";
       var foundDll = FrameworkDirs
         .Where(frameworkDir => version >= frameworkDir.Version)
-        .Select(frameworkDir => Combine(frameworkDir.Dir, dllName))
+        .Select(frameworkDir => Path.Combine(frameworkDir.Dir, dllName))
         .FirstOrDefault(File.Exists);
       return foundDll ?? Option.None<string>();
     }
 
     public static bool IsFrameworkAssembly(string dll)
-      => FrameworkDirs.Any(f => File.Exists(Combine(f.Dir, dll)));
+      => FrameworkDirs.Any(f => File.Exists(Path.Combine(f.Dir, dll)));
 
-    public static ImmutableSortedSet<FrameworkDir> FrameworkDirs
+    internal static ImmutableSortedSet<FrameworkDir> FrameworkDirs
       => FrameworkDirsLazy.FrameworkDirsCache;
 
     private static class FrameworkDirsLazy {
@@ -46,18 +43,18 @@ namespace Bud.FrameworkAssemblies {
         var net4PlusDirs = Directory.EnumerateDirectories(Net4PlusFrameworkPath, "v*", SearchOption.TopDirectoryOnly);
         var list = new List<FrameworkDir>();
         foreach (var dir in net4PlusDirs) {
-          var facadesDir = Combine(dir, "Facades");
-          var frameworkVersion = Version.Parse(GetFileName(dir).Substring(1));
+          var facadesDir = Path.Combine(dir, "Facades");
+          var frameworkVersion = Version.Parse(Path.GetFileName(dir).Substring(1));
           if (Directory.Exists(facadesDir)) {
             list.Add(new FrameworkDir(frameworkVersion, facadesDir));
           }
           list.Add(new FrameworkDir(frameworkVersion, dir));
         }
-        list.Add(new FrameworkDir(new Version(3, 5), Combine(Net3PlusFrameworkPath, "v3.5")));
-        list.Add(new FrameworkDir(new Version(3, 5), Combine(OldFrameworkPath, "v3.5")));
-        list.Add(new FrameworkDir(new Version(3, 0), Combine(Net3PlusFrameworkPath, "v3.0")));
-        list.Add(new FrameworkDir(new Version(3, 0), Combine(OldFrameworkPath, "v3.0")));
-        list.Add(new FrameworkDir(new Version(2, 0), Combine(OldFrameworkPath, "v2.0.50727")));
+        list.Add(new FrameworkDir(new Version(3, 5), Path.Combine(Net3PlusFrameworkPath, "v3.5")));
+        list.Add(new FrameworkDir(new Version(3, 5), Path.Combine(OldFrameworkPath, "v3.5")));
+        list.Add(new FrameworkDir(new Version(3, 0), Path.Combine(Net3PlusFrameworkPath, "v3.0")));
+        list.Add(new FrameworkDir(new Version(3, 0), Path.Combine(OldFrameworkPath, "v3.0")));
+        list.Add(new FrameworkDir(new Version(2, 0), Path.Combine(OldFrameworkPath, "v2.0.50727")));
 
         AddAssemblyFoldersEx(list);
 
@@ -106,6 +103,16 @@ namespace Bud.FrameworkAssemblies {
           }
           return versionComparison;
         }
+      }
+    }
+
+    internal struct FrameworkDir {
+      public Version Version { get; }
+      public string Dir { get; }
+
+      public FrameworkDir(Version version, string dir) {
+        Version = version;
+        Dir = dir;
       }
     }
   }

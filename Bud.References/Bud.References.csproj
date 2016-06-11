@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CD0A7381-310B-421B-9B5B-2CBDB7BCE8D3}</ProjectGuid>
+    <ProjectGuid>{A4D2B43F-F24A-480A-B743-EBE0186B0D21}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bud.FrameworkAssemblies.Test</RootNamespace>
-    <AssemblyName>Bud.FrameworkAssemblies.Test</AssemblyName>
+    <RootNamespace>Bud.References</RootNamespace>
+    <AssemblyName>Bud.References</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,18 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NuGet.Frameworks, Version=3.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\NuGet.Frameworks.3.4.3\lib\net45\NuGet.Frameworks.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NuGet.Versioning, Version=3.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\NuGet.Versioning.3.4.3\lib\net45\NuGet.Versioning.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Collections.Immutable.1.1.37\lib\dotnet\System.Collections.Immutable.dll</HintPath>
@@ -50,14 +38,11 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IReferenceResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WindowsResolverTest.cs" />
+    <Compile Include="WindowsFrameworkReferenceResolver.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Bud.FrameworkAssemblies\Bud.FrameworkAssemblies.csproj">
-      <Project>{a4d2b43f-f24a-480a-b743-ebe0186b0d21}</Project>
-      <Name>Bud.FrameworkAssemblies</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
       <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
       <Name>Bud.Option</Name>

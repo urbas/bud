@@ -25,7 +25,7 @@ namespace Bud.NuGet {
     [Test]
     public void Resolve_a_list_of_assemblies_referenced_in_the_package() {
       var assemblies = new NuGetAssemblyResolver()
-        .FindAssembly(new[] {FooReference}, packagesDir, tmpDir.Path);
+        .FindAssemblies(new[] {FooReference}, packagesDir, tmpDir.Path);
 
       That(assemblies.Select(GetFullPath),
            Has.Member(GetFullPath(ReferencedDll(tmpDir))));
@@ -34,7 +34,7 @@ namespace Bud.NuGet {
     [Test]
     public void Resolve_returns_a_list_of_existing_assembly_dlls() {
       var assemblies = new NuGetAssemblyResolver()
-        .FindAssembly(new[] {FooReference}, packagesDir, tmpDir.Path);
+        .FindAssemblies(new[] {FooReference}, packagesDir, tmpDir.Path);
 
       That(assemblies, Has.All.Exist);
     }

@@ -54,6 +54,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BudReferenceResolverTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptBuilderTest.cs" />
     <Compile Include="ScriptDirectivesTest.cs" />
@@ -67,9 +68,9 @@
       <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
       <Name>Bud.Building</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.FrameworkAssemblies\Bud.FrameworkAssemblies.csproj">
+    <ProjectReference Include="..\Bud.References\Bud.References.csproj">
       <Project>{A4D2B43F-F24A-480A-B743-EBE0186B0D21}</Project>
-      <Name>Bud.FrameworkAssemblies</Name>
+      <Name>Bud.References</Name>
     </ProjectReference>
     <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
       <Project>{594DC304-3A8A-43FC-BE7D-71D8C603014A}</Project>

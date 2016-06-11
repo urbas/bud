@@ -1,6 +1,4 @@
 //!reference Bud.Make
-//!reference Bud.Option
-//!reference Bud.Building
 
 using System.IO;
 using Bud.Make;

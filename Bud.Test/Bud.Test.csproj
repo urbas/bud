@@ -157,9 +157,9 @@
     <Compile Include="V1\ZippingTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Bud.FrameworkAssemblies\Bud.FrameworkAssemblies.csproj">
+    <ProjectReference Include="..\Bud.References\Bud.References.csproj">
       <Project>{a4d2b43f-f24a-480a-b743-ebe0186b0d21}</Project>
-      <Name>Bud.FrameworkAssemblies</Name>
+      <Name>Bud.References</Name>
     </ProjectReference>
     <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
       <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>

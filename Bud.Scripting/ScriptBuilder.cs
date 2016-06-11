@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Bud.Building;
-using Bud.FrameworkAssemblies;
+using Bud.References;
 using Microsoft.CodeAnalysis;
 using static Newtonsoft.Json.JsonConvert;
 
@@ -13,19 +13,19 @@ namespace Bud.Scripting {
   public class ScriptBuilder {
     public static readonly Version MaxVersion = new Version(int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue);
 
-    public IAssemblyPaths AssemblyPaths { get; }
+    public IReferenceResolver ReferenceResolver { get; }
     public ICSharpScriptCompiler Compiler { get; set; }
 
-    public ScriptBuilder(IAssemblyPaths assemblyPaths,
+    public ScriptBuilder(IReferenceResolver referenceResolver,
                          ICSharpScriptCompiler compiler) {
-      AssemblyPaths = assemblyPaths;
+      ReferenceResolver = referenceResolver;
       Compiler = compiler;
     }
 
     /// <param name="scriptPath">
     ///   the path of the C# script file to build.
     /// </param>
-    /// <param name="assemblyPaths">
+    /// <param name="referenceResolver">
     ///   these references can be used in the build script in addition to framework references.
     /// </param>
     /// <returns>
@@ -33,9 +33,9 @@ namespace Bud.Scripting {
     ///   The executable can be run as is (using any working directory).
     /// </returns>
     public static string Build(string scriptPath,
-                               IAssemblyPaths assemblyPaths) {
+                               IReferenceResolver referenceResolver) {
       var compiler = new RoslynCSharpScriptCompiler();
-      FilesBuilder scriptBuilder = (inputFiles, outputFile) => Build(inputFiles, assemblyPaths.Get(), compiler, outputFile);
+      FilesBuilder scriptBuilder = (inputFiles, outputFile) => Build(inputFiles, referenceResolver, compiler, outputFile);
       var buildDir = Path.Combine(Path.GetDirectoryName(scriptPath), "build");
       Directory.CreateDirectory(buildDir);
       var buildScript = Path.Combine(buildDir, "build-script.exe");
@@ -44,14 +44,14 @@ namespace Bud.Scripting {
     }
 
     public static BuiltScriptMetadata Build(IEnumerable<string> inputFiles,
-                                            IReadOnlyDictionary<string, string> customAssemblyPaths,
+                                            IReferenceResolver referenceResolver,
                                             ICSharpScriptCompiler compiler,
                                             string outputScriptExe) {
       var outputDir = Path.GetDirectoryName(outputScriptExe);
       var inputFilesList = inputFiles as IList<string> ?? inputFiles.ToList();
       var scriptContents = inputFilesList.Select(File.ReadAllText).ToList();
       var references = ScriptDirectives.Extract(scriptContents);
-      var resolvedReferences = ResolveReferences(customAssemblyPaths, references);
+      var resolvedReferences = ResolveReferences(referenceResolver, references);
       var assemblies = resolvedReferences.FrameworkAssemblyReferences.Values
                                          .Concat(resolvedReferences.AssemblyReferences.Values)
                                          .Select(r => MetadataReference.CreateFromFile(r))
@@ -71,22 +71,23 @@ namespace Bud.Scripting {
     public static string ScriptMetadataPath(string outputScriptExePath)
       => $"{outputScriptExePath}.metadata.json";
 
-    private static ResolvedScriptReferences ResolveReferences(IReadOnlyDictionary<string, string> customAssemblyPaths,
-                                                              ScriptDirectives references) {
+    private static ResolvedScriptReferences ResolveReferences(IReferenceResolver referenceResolver,
+                                                              ScriptDirectives directives) {
       var frameworkAssemblies = new Dictionary<string, string>();
       var customAssemblies = new Dictionary<string, string>();
-      foreach (var reference in references.References) {
-        var frameworkAssembly = WindowsResolver.ResolveFrameworkAssembly(reference, MaxVersion);
-        if (frameworkAssembly.HasValue) {
-          frameworkAssemblies.Add(reference, frameworkAssembly.Value);
-          continue;
+      var resolvedReferences = referenceResolver.Resolve(directives.References);
+
+      foreach (var reference in resolvedReferences) {
+        if (reference.Value.HasValue) {
+          customAssemblies.Add(reference.Key, reference.Value.Value);
+        } else {
+          var frameworkAssembly = WindowsFrameworkReferenceResolver.ResolveFrameworkAssembly(reference.Key, MaxVersion);
+          if (frameworkAssembly.HasValue) {
+            frameworkAssemblies.Add(reference.Key, frameworkAssembly.Value);
+          } else {
+            throw new Exception($"Could not resolve the reference '{reference.Key}'.");
+          }
         }
-        var customAssembly = customAssemblyPaths.Get(reference);
-        if (customAssembly.HasValue) {
-          customAssemblies.Add(reference, customAssembly.Value);
-          continue;
-        }
-        throw new Exception($"Could not resolve the reference '{reference}'.");
       }
       return new ResolvedScriptReferences(new ReadOnlyDictionary<string, string>(customAssemblies),
                                           new ReadOnlyDictionary<string, string>(frameworkAssemblies));

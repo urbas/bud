@@ -100,7 +100,7 @@ namespace Bud.V1 {
         throw new Exception($"Could not download packages: {string.Join(", ", packageReferences)}");
       }
       return AssemblyResolver[c]
-        .FindAssembly(packageReferences, packagesDir, BuildDir[c]);
+        .FindAssemblies(packageReferences, packagesDir, BuildDir[c]);
     }
   }
 }

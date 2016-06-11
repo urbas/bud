@@ -3,20 +3,19 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Bud.Cli;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Repositories;
 using NuGet.Versioning;
 using static Bud.NuGet.FrameworkAssemblyReferencesAggregator;
-using static Bud.FrameworkAssemblies.WindowsResolver;
+using static Bud.References.WindowsFrameworkReferenceResolver;
 using static Bud.Option;
 
 namespace Bud.NuGet {
   public class NuGetAssemblyResolver : IAssemblyResolver {
-    public IEnumerable<string> FindAssembly(IEnumerable<PackageReference> packageReferences,
-                                            string packagesCacheDir,
-                                            string scratchDir) {
+    public IEnumerable<string> FindAssemblies(IEnumerable<PackageReference> packageReferences,
+                                              string packagesCacheDir,
+                                              string scratchDir) {
       var packageRepository = CreatePackageIndex(packagesCacheDir, scratchDir);
       var frameworkAssemblies = new List<FrameworkAssemblyReference>();
       var assemblies = new List<string>();
