@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using Bud.NuGet;
 using Bud.References;
 using Microsoft.CodeAnalysis;
 using NUnit.Framework;
@@ -25,6 +27,7 @@ public class A {public static void Main(){}}", "Build.cs");
         ScriptBuilder.Build(ImmutableList.Create(script),
                             new TestReferenceResolver(),
                             new TestCSharpScriptCompiler(),
+                            new TestNuGetReferenceResolver(),
                             Path.Combine(dir.Path, "build-script.exe"));
       });
       Assert.That(exception.Message,
@@ -40,10 +43,27 @@ public class A {public static void Main(){}}", "Build.cs");
       ScriptBuilder.Build(ImmutableList.Create(script),
                           new TestReferenceResolver(ImmutableDictionary<string, string>.Empty.Add("A", assemblyA)),
                           new TestCSharpScriptCompiler(),
+                          new TestNuGetReferenceResolver(),
                           Path.Combine(outputDir, "build-script.exe"));
 
       FileAssert.AreEqual(assemblyA,
                           Path.Combine(outputDir, "A.dll"));
+    }
+
+    [Test]
+    public void Build_copies_nuget_references_to_the_output_directory() {
+      var script = dir.CreateFile(@"//!nuget Foo 1.2.3", "Build.cs");
+      var expectedPackagesFile = dir.CreateFile("blah", "Foo.dll");
+      var outputDir = dir.CreateDir("output");
+
+      ScriptBuilder.Build(ImmutableList.Create(script),
+                          new TestReferenceResolver(ImmutableDictionary<string, string>.Empty),
+                          new TestCSharpScriptCompiler(),
+                          new TestNuGetReferenceResolver(new ResolvedReferences(new[] { new ResolvedAssembly("Foo", expectedPackagesFile)}, new FrameworkAssemblyReference[0])),
+                          Path.Combine(outputDir, "build-script.exe"));
+
+      FileAssert.AreEqual(expectedPackagesFile,
+                          Path.Combine(outputDir, "Foo.dll"));
     }
 
     [Test]
@@ -55,10 +75,11 @@ public class A {public static void Main(){}}", "Build.cs");
       var builtScript = ScriptBuilder.Build(ImmutableList.Create(script),
                                             new TestReferenceResolver(ImmutableDictionary<string, string>.Empty.Add("A", assemblyA)),
                                             new TestCSharpScriptCompiler(),
+                                            new TestNuGetReferenceResolver(),
                                             Path.Combine(outputDir, "build-script.exe"));
 
-      Assert.That(builtScript.ResolvedScriptReferences.AssemblyReferences,
-                  Is.EquivalentTo(ImmutableDictionary<string, string>.Empty.Add("A", assemblyA)));
+      Assert.That(builtScript.ResolvedScriptReferences.Assemblies,
+                  Is.EquivalentTo(ImmutableList.Create(new ResolvedAssembly("A", assemblyA))));
     }
 
     [Test]
@@ -69,31 +90,23 @@ public class A {public static void Main(){}}", "Build.cs");
       var builtScript = ScriptBuilder.Build(ImmutableList.Create(script),
                                             new TestReferenceResolver(ImmutableDictionary<string, string>.Empty),
                                             new TestCSharpScriptCompiler(),
+                                            new TestNuGetReferenceResolver(),
                                             Path.Combine(outputDir, "build-script.exe"));
 
-      var expectedAssemblyPath = WindowsFrameworkReferenceResolver.ResolveFrameworkAssembly("System.Core", ScriptBuilder.MaxVersion).Value;
-      Assert.That(builtScript.ResolvedScriptReferences.FrameworkAssemblyReferences,
-                  Is.EquivalentTo(ImmutableDictionary<string, string>.Empty.Add("System.Core", expectedAssemblyPath)));
+      Assert.That(builtScript.ResolvedScriptReferences.FrameworkAssemblies,
+                  Is.EquivalentTo(ImmutableList.Create(new FrameworkAssemblyReference("System.Core", FrameworkAssemblyReference.MaxVersion))));
+    }
+  }
+
+  public class TestNuGetReferenceResolver : INuGetReferenceResolver {
+    public ResolvedReferences ResolvedReferences { get; }
+
+    public TestNuGetReferenceResolver(ResolvedReferences resolvedReferences = null) {
+      ResolvedReferences = resolvedReferences ?? ResolvedReferences.Empty;
     }
 
-    [Test]
-    public void Build_produces_the_packages_config_file() {
-      var script = dir.CreateFile(@"//!nuget Foo 1.2.3", "Build.cs");
-      var expectedPackagesFile = dir.CreateFile(
-        "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" +
-        "<packages>\n" +
-        "  <package id=\"Foo\" version=\"1.2.3\" targetFramework=\"any\" />\n" +
-        "</packages>", "expected.packages.config");
-      var outputDir = dir.CreateDir("output");
-
-      ScriptBuilder.Build(ImmutableList.Create(script),
-                          new TestReferenceResolver(ImmutableDictionary<string, string>.Empty),
-                          new TestCSharpScriptCompiler(),
-                          Path.Combine(outputDir, "build-script.exe"));
-
-      FileAssert.AreEqual(expectedPackagesFile,
-                          Path.Combine(outputDir, "packages.config"));
-    }
+    public ResolvedReferences Resolve(IEnumerable<PackageReference> packageReferences, string outputDir)
+      => ResolvedReferences;
   }
 
   public class TestReferenceResolver : IReferenceResolver {

@@ -50,9 +50,9 @@ namespace Bud {
       process.OutputDataReceived += (s, a) => {};
       process.Start();
       process.BeginOutputReadLine();
-      process.StandardError.ReadToEnd();
+      var errorOutput = process.StandardError.ReadToEnd();
       process.WaitForExit();
-      AssertProcessSucceeded(executablePath, arguments, workingDir, process);
+      AssertProcessSucceeded(executablePath, arguments, workingDir, process, errorOutput);
       return process;
     }
 
@@ -68,25 +68,35 @@ namespace Bud {
     ///   working directory.
     /// </param>
     /// <returns>the captured output of the executed process.</returns>
-    /// <exception cref="Exception">thrown if the output exits with non-zero error code. The message
-    /// of the exception will contain the error output.</exception>
+    /// <exception cref="Exception">
+    ///   thrown if the output exits with non-zero error code. The message
+    ///   of the exception will contain the error output.
+    /// </exception>
     public static string
       GetOutputOrThrow(string executablePath,
                        Option<string> arguments = default(Option<string>),
                        Option<string> workingDir = default(Option<string>)) {
       var process = CreateProcess(executablePath, arguments, workingDir);
-      var stringWriter = new StringWriter();
-      process.ErrorDataReceived += (s, a) => {stringWriter.Write(a.Data);};
+      var errorOurput = new StringWriter();
+      process.ErrorDataReceived += (s, a) => {
+        errorOurput.Write(a.Data);
+      };
       process.Start();
       var output = process.StandardOutput.ReadToEnd();
       process.WaitForExit();
-      AssertProcessSucceeded(executablePath, arguments, workingDir, process);
+      AssertProcessSucceeded(executablePath, arguments, workingDir, process, errorOurput.ToString());
       return output;
     }
 
-    private static void AssertProcessSucceeded(string executablePath, Option<string> arguments, Option<string> workingDir, Process process) {
+    private static void AssertProcessSucceeded(string executablePath,
+                                               Option<string> arguments,
+                                               Option<string> workingDir,
+                                               Process process,
+                                               string errorOutput) {
       if (process.ExitCode != 0) {
-        throw new Exception($"Command '{executablePath}' with arguments '{arguments}' at working dir '{workingDir}' failed with error code {process.ExitCode}.");
+        throw new Exception($"Command '{executablePath}' with arguments '{arguments}' at working dir '{workingDir}'" +
+                            $" failed with error code {process.ExitCode}." +
+                            $" Error ourput: {errorOutput}");
       }
     }
 

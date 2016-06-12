@@ -8,7 +8,7 @@ namespace Bud.RunScript {
         var exitCode = ScriptRunner.Run(args);
         Environment.Exit(exitCode);
       } catch (Exception e) {
-        Console.Error.WriteLine("An error occurred while trying to run the script. Error message:\n\n    " + e.Message);
+        Console.Error.WriteLine($"An error occurred while trying to run the script. Error message:\n\n    {e}");
         Environment.Exit(1);
       }
     }

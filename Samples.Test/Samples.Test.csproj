@@ -44,6 +44,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UsingNuGetReferencesTest.cs" />
     <Compile Include="HelloWorldTest.cs" />
     <Compile Include="MakeRuleTest.cs" />
     <Compile Include="PathsTest.cs" />

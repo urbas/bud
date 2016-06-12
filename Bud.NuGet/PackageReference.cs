@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using NuGet.Frameworks;
@@ -17,7 +18,7 @@ namespace Bud.NuGet {
 
     protected bool Equals(PackageReference other)
       => Framework.Equals(other.Framework)
-         && string.Equals(Id, other.Id)
+         && String.Equals(Id, other.Id)
          && Version.Equals(other.Version);
 
     public override bool Equals(object obj) {
@@ -50,6 +51,16 @@ namespace Bud.NuGet {
                      $" targetFramework=\"{packageReference.Framework.GetShortFolderName()}\" />\n");
       }
       writer.Write("</packages>");
+    }
+
+    public static string WritePackagesConfigXml(IEnumerable<PackageReference> packageReferences, string packageConfigFile) {
+      using (var packagesConfigFileStream = new FileStream(packageConfigFile, FileMode.Create, FileAccess.Write)) {
+        using (var packageConfigFileWriter = new StreamWriter(packagesConfigFileStream)) {
+          WritePackagesConfigXml(packageReferences,
+                                                  packageConfigFileWriter);
+        }
+      }
+      return packageConfigFile;
     }
   }
 }

@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
+using Bud.References;
 using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Repositories;
 using NuGet.Versioning;
-using static Bud.NuGet.FrameworkAssemblyReferencesAggregator;
+using static Bud.References.AssemblyAggregator;
 using static Bud.References.WindowsFrameworkReferenceResolver;
 using static Bud.Option;
+using FrameworkAssemblyReference = Bud.References.FrameworkAssemblyReference;
 
 namespace Bud.NuGet {
   public class NuGetAssemblyResolver : IAssemblyResolver {
@@ -35,7 +37,7 @@ namespace Bud.NuGet {
                                    packageReference.Framework);
         }
       }
-      assemblies.AddRange(AggregateReferences(frameworkAssemblies)
+      assemblies.AddRange(AggregateByFrameworkVersion(frameworkAssemblies)
                             .Gather(FindFrameworkAssembly));
       return assemblies;
     }
@@ -119,7 +121,7 @@ namespace Bud.NuGet {
         .FindPackagesById(packageReference.Id)
         .FindBestMatch(new VersionRange(packageReference.Version), info => info?.Version);
 
-    private static Option<string> FindFrameworkAssembly(KeyValuePair<string, Version> reference)
-      => ResolveFrameworkAssembly(reference.Key, reference.Value);
+    private static Option<string> FindFrameworkAssembly(FrameworkAssemblyReference reference)
+      => ResolveFrameworkAssembly(reference.AssemblyName, reference.FrameworkVersion);
   }
 }

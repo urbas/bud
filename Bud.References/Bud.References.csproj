@@ -38,8 +38,12 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyAggregator.cs" />
+    <Compile Include="FrameworkAssemblyReference.cs" />
+    <Compile Include="ResolvedAssembly.cs" />
     <Compile Include="IReferenceResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResolvedReferences.cs" />
     <Compile Include="WindowsFrameworkReferenceResolver.cs" />
   </ItemGroup>
   <ItemGroup>

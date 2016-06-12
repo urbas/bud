@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using Bud.Scripting;
+using Bud.References;
 using NUnit.Framework;
 using static NUnit.Framework.Assert;
 
@@ -10,11 +10,11 @@ namespace Bud.ScriptToCsProj {
     [Test]
     public void Generate_full_csproj()
       => AreEqual(GetResourceContent("Bud.ScriptToCsProj.BudScript.csproj"),
-                  ScriptCsProj.BudScriptCsProj(new[] {
-                    new CsProjReference("Bud.Option", "Blah.dll"),
-                    new CsProjReference("System"),
-                    new CsProjReference("System.Core"),
-                  }, "/foo/bar"));
+                  ScriptCsProj.BudScriptCsProj(new[] {new ResolvedAssembly("Bud.Option", "Blah.dll")},
+                                               new[] {
+                                                 new FrameworkAssemblyReference("System", FrameworkAssemblyReference.MaxVersion),
+                                                 new FrameworkAssemblyReference("System.Core", FrameworkAssemblyReference.MaxVersion),
+                                               }, "/foo/bar"));
 
     public static string GetResourceContent(string embeddedResourceName) {
       var manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(embeddedResourceName);

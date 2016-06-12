@@ -126,7 +126,6 @@
     <Compile Include="IO\TaskTestUtils.cs" />
     <Compile Include="IO\TimestampedTest.cs" />
     <Compile Include="IO\ValueUpdaterTest.cs" />
-    <Compile Include="NuGet\FrameworkAssemblyReferenceVersionAggregatorTest.cs" />
     <Compile Include="NuGet\NuGetAssemblyResolverTest.cs" />
     <Compile Include="NuGet\NuGetPackageDownloaderTest.cs" />
     <Compile Include="NuGet\NuGetPackageReferencesReaderTest.cs" />

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Bud.CsProjTools;
+using Bud.References;
 using Bud.Scripting;
 
 namespace Bud.ScriptToCsProj {
@@ -17,16 +18,16 @@ namespace Bud.ScriptToCsProj {
     /// </param>
     public static void OutputScriptCsProj(BuiltScriptMetadata builtScriptMetadata) {
       var customReferences = builtScriptMetadata.ResolvedScriptReferences
-                                                .AssemblyReferences
-                                                .Select(pair => new CsProjReference(pair.Key, pair.Value));
+                                                .Assemblies;
       var frameworkReferences = builtScriptMetadata.ResolvedScriptReferences
-                                                   .FrameworkAssemblyReferences
-                                                   .Select(pair => new CsProjReference(pair.Key));
-      Console.Write(BudScriptCsProj(customReferences.Concat(frameworkReferences),
+                                                   .FrameworkAssemblies;
+      Console.Write(BudScriptCsProj(customReferences,
+        frameworkReferences,
                                     Directory.GetCurrentDirectory()));
     }
 
-    public static string BudScriptCsProj(IEnumerable<CsProjReference> references,
+    public static string BudScriptCsProj(IEnumerable<ResolvedAssembly> assemblies,
+                                         IEnumerable<FrameworkAssemblyReference> frameworkReferences,
                                          string startWorkingDir)
       => CsProj.Generate(
         CsProj.Import(@"$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props", @"Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"),
@@ -47,7 +48,8 @@ namespace Bud.ScriptToCsProj {
                              CsProj.Property("WarningLevel", "4")),
         CsProj.PropertyGroup(@"'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'",
                              CsProj.Property("StartWorkingDirectory", startWorkingDir)),
-        CsProj.ItemGroup(references.Select(r => CsProj.Reference(r.AssemblyName, r.Path)).ToArray()),
+        CsProj.ItemGroup(assemblies.Select(r => CsProj.Reference(r.AssemblyName, r.Path)).ToArray()),
+        CsProj.ItemGroup(frameworkReferences.Select(r => CsProj.Reference(r.AssemblyName)).ToArray()),
         CsProj.ItemGroup(CsProj.Item("Compile", "Build.cs")),
         CsProj.Import(@"$(MSBuildToolsPath)\Microsoft.CSharp.targets"));
   }

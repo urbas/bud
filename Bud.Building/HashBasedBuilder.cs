@@ -44,7 +44,7 @@ namespace Bud.Building {
                              string output) {
       input = input ?? BuildInput.EmptyInputFiles;
       var digest = Md5Hasher.Digest(input, salt);
-      if (!File.Exists(output)) {
+      if (!File.Exists(output) && !Directory.Exists(output)) {
         filesBuilder(input, output);
         File.WriteAllBytes(hashFile, digest);
       } else {

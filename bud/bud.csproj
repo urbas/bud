@@ -112,8 +112,6 @@
     <Compile Include="IO\ValueUpdater.cs" />
     <Compile Include="IO\FileWatcher.cs" />
     <Compile Include="IO\IValueStore.cs" />
-    <Compile Include="NuGet\FrameworkAssemblyReference.cs" />
-    <Compile Include="NuGet\FrameworkAssemblyReferencesAggregator.cs" />
     <Compile Include="NuGet\IPackager.cs" />
     <Compile Include="NuGet\IPublisher.cs" />
     <Compile Include="NuGet\NuGetExecutable.cs" />
