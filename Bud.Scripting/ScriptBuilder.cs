@@ -88,14 +88,14 @@ namespace Bud.Scripting {
       return builtScript;
     }
 
-    private static IEnumerable<string> FrameworkAssemblyPaths(IEnumerable<FrameworkAssemblyReference> frameworkAssemblyReferences) {
+    private static IEnumerable<string> FrameworkAssemblyPaths(IEnumerable<FrameworkAssembly> frameworkAssemblyReferences) {
       return frameworkAssemblyReferences
         .Select(frameworkAssemblyReference => {
-          var frameworkAssembly = WindowsFrameworkReferenceResolver.ResolveFrameworkAssembly(frameworkAssemblyReference.AssemblyName, frameworkAssemblyReference.FrameworkVersion);
+          var frameworkAssembly = WindowsFrameworkReferenceResolver.ResolveFrameworkAssembly(frameworkAssemblyReference.Name, frameworkAssemblyReference.FrameworkVersion);
           if (frameworkAssembly.HasValue) {
             return frameworkAssembly.Value;
           }
-          throw new Exception($"Could not resolve the reference '{frameworkAssemblyReference.AssemblyName}'.");
+          throw new Exception($"Could not resolve the reference '{frameworkAssemblyReference.Name}'.");
         });
     }
 
@@ -104,15 +104,15 @@ namespace Bud.Scripting {
 
     private static ResolvedReferences ResolveReferences(IReferenceResolver referenceResolver,
                                                         IEnumerable<string> references) {
-      var frameworkAssemblies = new List<FrameworkAssemblyReference>();
-      var customAssemblies = new List<ResolvedAssembly>();
+      var frameworkAssemblies = new List<FrameworkAssembly>();
+      var customAssemblies = new List<Assembly>();
       var resolvedReferences = referenceResolver.Resolve(references);
 
       foreach (var reference in resolvedReferences) {
         if (reference.Value.HasValue) {
-          customAssemblies.Add(new ResolvedAssembly(reference.Key, reference.Value.Value));
+          customAssemblies.Add(new Assembly(reference.Key, reference.Value.Value));
         } else {
-          frameworkAssemblies.Add(new FrameworkAssemblyReference(reference.Key, FrameworkAssemblyReference.MaxVersion));
+          frameworkAssemblies.Add(new FrameworkAssembly(reference.Key, FrameworkAssembly.MaxVersion));
         }
       }
       return new ResolvedReferences(customAssemblies, frameworkAssemblies);

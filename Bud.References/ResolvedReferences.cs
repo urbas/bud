@@ -4,14 +4,14 @@ using System.Collections.Immutable;
 namespace Bud.References {
   public class ResolvedReferences {
     public static readonly ResolvedReferences Empty
-      = new ResolvedReferences(ImmutableList<ResolvedAssembly>.Empty,
-                               ImmutableList<FrameworkAssemblyReference>.Empty);
+      = new ResolvedReferences(ImmutableList<Assembly>.Empty,
+                               ImmutableList<FrameworkAssembly>.Empty);
 
-    public IEnumerable<ResolvedAssembly> Assemblies { get; }
-    public IEnumerable<FrameworkAssemblyReference> FrameworkAssemblies { get; }
+    public IEnumerable<Assembly> Assemblies { get; }
+    public IEnumerable<FrameworkAssembly> FrameworkAssemblies { get; }
 
-    public ResolvedReferences(IEnumerable<ResolvedAssembly> assemblies,
-                              IEnumerable<FrameworkAssemblyReference> frameworkAssemblies) {
+    public ResolvedReferences(IEnumerable<Assembly> assemblies,
+                              IEnumerable<FrameworkAssembly> frameworkAssemblies) {
       Assemblies = assemblies;
       FrameworkAssemblies = frameworkAssemblies;
     }

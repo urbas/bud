@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using Bud.References;
 using NUnit.Framework;
 using static NUnit.Framework.Assert;
@@ -8,16 +7,16 @@ using static NUnit.Framework.Assert;
 namespace Bud.ScriptToCsProj {
   public class ScriptCsProjTest {
     [Test]
-    public void Generate_full_csproj()
+    public void BudScriptCsProj_procudes_expected_string()
       => AreEqual(GetResourceContent("Bud.ScriptToCsProj.BudScript.csproj"),
-                  ScriptCsProj.BudScriptCsProj(new[] {new ResolvedAssembly("Bud.Option", "Blah.dll")},
+                  ScriptCsProj.BudScriptCsProj(new[] {new Assembly("Bud.Option", "Blah.dll")},
                                                new[] {
-                                                 new FrameworkAssemblyReference("System", FrameworkAssemblyReference.MaxVersion),
-                                                 new FrameworkAssemblyReference("System.Core", FrameworkAssemblyReference.MaxVersion),
+                                                 new FrameworkAssembly("System", FrameworkAssembly.MaxVersion),
+                                                 new FrameworkAssembly("System.Core", FrameworkAssembly.MaxVersion),
                                                }, "/foo/bar"));
 
     public static string GetResourceContent(string embeddedResourceName) {
-      var manifestResourceStream = Assembly.GetExecutingAssembly().GetManifestResourceStream(embeddedResourceName);
+      var manifestResourceStream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream(embeddedResourceName);
       if (manifestResourceStream == null) {
         throw new Exception($"Could not find the embedded resource '{embeddedResourceName}'.");
       }

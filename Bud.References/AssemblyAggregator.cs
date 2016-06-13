@@ -11,14 +11,14 @@ namespace Bud.References {
     ///   with removed duplicates. If any duplicates are found in <paramref name="assemblies" />
     ///   then the one with the highest version is chosen.
     /// </returns>
-    public static IEnumerable<FrameworkAssemblyReference> AggregateByFrameworkVersion(
-      IEnumerable<FrameworkAssemblyReference> assemblies) {
-      var aggregatedAssemblies = new Dictionary<string, FrameworkAssemblyReference>();
+    public static IEnumerable<FrameworkAssembly> AggregateByFrameworkVersion(
+      IEnumerable<FrameworkAssembly> assemblies) {
+      var aggregatedAssemblies = new Dictionary<string, FrameworkAssembly>();
       foreach (var assemblyToVersion in assemblies) {
-        var existingAssembly = aggregatedAssemblies.Get(assemblyToVersion.AssemblyName);
+        var existingAssembly = aggregatedAssemblies.Get(assemblyToVersion.Name);
         if (!existingAssembly.HasValue ||
             assemblyToVersion.FrameworkVersion > existingAssembly.Value.FrameworkVersion) {
-          aggregatedAssemblies[assemblyToVersion.AssemblyName] = assemblyToVersion;
+          aggregatedAssemblies[assemblyToVersion.Name] = assemblyToVersion;
         }
       }
       return aggregatedAssemblies.Values;

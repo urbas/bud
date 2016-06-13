@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
-using System.Reflection;
 using Bud.Building;
 using Bud.References;
+using ReflectionAssembly = System.Reflection.Assembly;
 
 namespace Bud.Scripting {
   public class BudReferenceResolver : IReferenceResolver {
@@ -25,7 +25,7 @@ namespace Bud.Scripting {
     }
 
     private static void AddReference(string assemblyName,
-                                     Assembly assembly,
+                                     ReflectionAssembly assembly,
                                      IDictionary<string, Option<string>> resolvedReferences) {
       if (resolvedReferences.ContainsKey(assemblyName)) {
         return;
@@ -41,12 +41,8 @@ namespace Bud.Scripting {
       }
     }
 
-    private Option<Assembly> ResolveReference(AssemblyName assemblyName) {
-      return LazyReferencesInitializer.BudReferences.Get(assemblyName.Name);
-    }
-
     private static class LazyReferencesInitializer {
-      public static readonly IReadOnlyDictionary<string, Assembly> BudReferences = new[] {
+      public static readonly IReadOnlyDictionary<string, ReflectionAssembly> BudReferences = new[] {
         ToAssemblyNamePath(typeof(Option)),
         ToAssemblyNamePath(typeof(BatchExec)),
         ToAssemblyNamePath(typeof(Make.Make)),
@@ -54,10 +50,10 @@ namespace Bud.Scripting {
       }.ToImmutableDictionary();
     }
 
-    private static KeyValuePair<string, Assembly> ToAssemblyNamePath(Type typ) {
+    private static KeyValuePair<string, ReflectionAssembly> ToAssemblyNamePath(Type typ) {
       var assembly = typ.Assembly;
-      return new KeyValuePair<string, Assembly>(assembly.GetName().Name,
-                                                assembly);
+      return new KeyValuePair<string, ReflectionAssembly>(assembly.GetName().Name,
+                                                          assembly);
     }
   }
 }

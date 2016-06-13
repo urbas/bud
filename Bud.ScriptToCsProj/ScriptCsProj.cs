@@ -22,12 +22,12 @@ namespace Bud.ScriptToCsProj {
       var frameworkReferences = builtScriptMetadata.ResolvedScriptReferences
                                                    .FrameworkAssemblies;
       Console.Write(BudScriptCsProj(customReferences,
-        frameworkReferences,
+                                    frameworkReferences,
                                     Directory.GetCurrentDirectory()));
     }
 
-    public static string BudScriptCsProj(IEnumerable<ResolvedAssembly> assemblies,
-                                         IEnumerable<FrameworkAssemblyReference> frameworkReferences,
+    public static string BudScriptCsProj(IEnumerable<Assembly> assemblies,
+                                         IEnumerable<FrameworkAssembly> frameworkAssemblies,
                                          string startWorkingDir)
       => CsProj.Generate(
         CsProj.Import(@"$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props", @"Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"),
@@ -48,8 +48,8 @@ namespace Bud.ScriptToCsProj {
                              CsProj.Property("WarningLevel", "4")),
         CsProj.PropertyGroup(@"'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'",
                              CsProj.Property("StartWorkingDirectory", startWorkingDir)),
-        CsProj.ItemGroup(assemblies.Select(r => CsProj.Reference(r.AssemblyName, r.Path)).ToArray()),
-        CsProj.ItemGroup(frameworkReferences.Select(r => CsProj.Reference(r.AssemblyName)).ToArray()),
+        CsProj.ItemGroup(assemblies.Select(r => CsProj.Reference(r.Name, r.Path)).ToArray()),
+        CsProj.ItemGroup(frameworkAssemblies.Select(r => CsProj.Reference(r.Name)).ToArray()),
         CsProj.ItemGroup(CsProj.Item("Compile", "Build.cs")),
         CsProj.Import(@"$(MSBuildToolsPath)\Microsoft.CSharp.targets"));
   }

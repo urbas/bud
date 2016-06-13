@@ -39,7 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssemblyAggregator.cs" />
-    <Compile Include="FrameworkAssemblyReference.cs" />
+    <Compile Include="FrameworkAssembly.cs" />
     <Compile Include="ResolvedAssembly.cs" />
     <Compile Include="IReferenceResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

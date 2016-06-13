@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -59,7 +58,7 @@ public class A {public static void Main(){}}", "Build.cs");
       ScriptBuilder.Build(ImmutableList.Create(script),
                           new TestReferenceResolver(ImmutableDictionary<string, string>.Empty),
                           new TestCSharpScriptCompiler(),
-                          new TestNuGetReferenceResolver(new ResolvedReferences(new[] { new ResolvedAssembly("Foo", expectedPackagesFile)}, new FrameworkAssemblyReference[0])),
+                          new TestNuGetReferenceResolver(new ResolvedReferences(new[] {new Assembly("Foo", expectedPackagesFile)}, new FrameworkAssembly[0])),
                           Path.Combine(outputDir, "build-script.exe"));
 
       FileAssert.AreEqual(expectedPackagesFile,
@@ -79,7 +78,7 @@ public class A {public static void Main(){}}", "Build.cs");
                                             Path.Combine(outputDir, "build-script.exe"));
 
       Assert.That(builtScript.ResolvedScriptReferences.Assemblies,
-                  Is.EquivalentTo(ImmutableList.Create(new ResolvedAssembly("A", assemblyA))));
+                  Is.EquivalentTo(ImmutableList.Create(new Assembly("A", assemblyA))));
     }
 
     [Test]
@@ -94,7 +93,7 @@ public class A {public static void Main(){}}", "Build.cs");
                                             Path.Combine(outputDir, "build-script.exe"));
 
       Assert.That(builtScript.ResolvedScriptReferences.FrameworkAssemblies,
-                  Is.EquivalentTo(ImmutableList.Create(new FrameworkAssemblyReference("System.Core", FrameworkAssemblyReference.MaxVersion))));
+                  Is.EquivalentTo(ImmutableList.Create(new FrameworkAssembly("System.Core", FrameworkAssembly.MaxVersion))));
     }
   }
 
