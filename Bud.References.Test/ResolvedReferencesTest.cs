@@ -5,10 +5,10 @@ using static NUnit.Framework.Assert;
 
 namespace Bud.References {
   public class ResolvedReferencesTest {
-    private readonly ResolvedReferences refsA = new ResolvedReferences(new[] {Assembly.ToAssemblyFile("A.dll"),},
+    private readonly ResolvedReferences refsA = new ResolvedReferences(new[] {Assembly.FromPath("A.dll"),},
                                                                        new [] {new FrameworkAssembly("System", Version.Parse("4.6.0"))});
 
-    private readonly ResolvedReferences refsB = new ResolvedReferences(new[] {Assembly.ToAssemblyFile("B.dll"),},
+    private readonly ResolvedReferences refsB = new ResolvedReferences(new[] {Assembly.FromPath("B.dll"),},
                                                                        new[] { new FrameworkAssembly("System.Data", Version.Parse("4.6.0")) });
 
     [Test]

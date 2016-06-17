@@ -88,7 +88,7 @@ namespace Bud.NuGet {
       var referenceItemsList = referenceItems as IList<string> ?? referenceItems.ToList();
       if (referenceItemsList.Count > 0) {
         assemblies.AddRange(referenceItemsList.Select(pathInPackage => Path.Combine(packagesCacheDir, $"{packageId}.{packageVersion}", pathInPackage))
-                                              .Select(Assembly.ToAssemblyFile)
+                                              .Select(Assembly.FromPath)
                                               .ToList());
       } else {
         if (frameworkSpecificGroup != null) {

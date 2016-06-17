@@ -8,12 +8,11 @@ namespace Bud.References {
       Path = path;
     }
 
-    public static Assembly ToAssemblyFile(string path)
+    public static Assembly FromPath(string path)
       => new Assembly(System.IO.Path.GetFileNameWithoutExtension(path), path);
 
-    protected bool Equals(Assembly other) {
-      return string.Equals(Name, other.Name) && string.Equals(Path, other.Path);
-    }
+    protected bool Equals(Assembly other)
+      => string.Equals(Name, other.Name) && string.Equals(Path, other.Path);
 
     public override bool Equals(object obj) {
       if (ReferenceEquals(null, obj)) {
