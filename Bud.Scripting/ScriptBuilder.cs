@@ -59,7 +59,7 @@ namespace Bud.Scripting {
 
       return nuGetReferenceResolver
         .Resolve(directives.NuGetReferences, downloadedPackagesDir)
-        .Add(ResolveReferences(referenceResolver, directives.References));
+        .Add(referenceResolver.Resolve(directives.References));
     }
 
     private static void Compile(ICSharpScriptCompiler compiler,
@@ -70,22 +70,6 @@ namespace Bud.Scripting {
       if (errors.Any()) {
         throw new Exception($"Compilation error: {string.Join("\n", errors)}");
       }
-    }
-
-    private static ResolvedReferences ResolveReferences(IReferenceResolver referenceResolver,
-                                                        IEnumerable<string> references) {
-      var frameworkAssemblies = new List<FrameworkAssembly>();
-      var customAssemblies = new List<Assembly>();
-      var resolvedReferences = referenceResolver.Resolve(references);
-
-      foreach (var reference in resolvedReferences) {
-        if (reference.Value.HasValue) {
-          customAssemblies.Add(new Assembly(reference.Key, reference.Value.Value));
-        } else {
-          frameworkAssemblies.Add(new FrameworkAssembly(reference.Key, FrameworkAssembly.MaxVersion));
-        }
-      }
-      return new ResolvedReferences(customAssemblies, frameworkAssemblies);
     }
 
     private static void CopyAssemblies(IEnumerable<string> paths,

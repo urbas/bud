@@ -19,21 +19,6 @@ namespace Bud.Scripting {
     public void TearDown() => dir.Dispose();
 
     [Test]
-    public void Build_throws_when_unknown_reference_specified() {
-      var script = dir.CreateFile(@"//!reference INVALIDREFERENCE
-public class A {public static void Main(){}}", "Build.cs");
-      var exception = Assert.Throws<Exception>(() => {
-        ScriptBuilder.Build(ImmutableList.Create(script),
-                            new TestReferenceResolver(),
-                            new TestCSharpScriptCompiler(),
-                            new TestNuGetReferenceResolver(),
-                            Path.Combine(dir.Path, "build-script.exe"));
-      });
-      Assert.That(exception.Message,
-                  Does.Contain("INVALIDREFERENCE"));
-    }
-
-    [Test]
     public void Build_copies_referenced_nonframework_assemblies_to_the_output_directory() {
       var script = dir.CreateFile(@"//!reference A", "Build.cs");
       var assemblyA = dir.CreateFile("foo", "A.dll");
@@ -115,13 +100,20 @@ public class A {public static void Main(){}}", "Build.cs");
       knownReferences = references ?? ImmutableDictionary<string, string>.Empty;
     }
 
-    public IDictionary<string, Option<string>> Resolve(IEnumerable<string> references)
-      => references.Aggregate(ImmutableDictionary<string, Option<string>>.Empty,
-                              (resolvedReferences, reference) => resolvedReferences.Add(reference, knownReferences.Get(reference)));
+    ResolvedReferences IReferenceResolver.Resolve(IEnumerable<string> references) {
+      var assemblyPaths = references.Aggregate(ImmutableDictionary<string, Option<string>>.Empty,
+                                               (resolvedReferences, reference) => resolvedReferences.Add(reference, knownReferences.Get(reference)));
+      return new ResolvedReferences(assemblyPaths.Where(pair => pair.Value.HasValue)
+                                                 .Select(pair => new Assembly(pair.Key, pair.Value.Value)),
+                                    assemblyPaths.Where(pair => !pair.Value.HasValue)
+                                                 .Select(pair => new FrameworkAssembly(pair.Key, FrameworkAssembly.MaxVersion)));
+    }
   }
 
   public class TestCSharpScriptCompiler : ICSharpScriptCompiler {
-    public IImmutableList<Diagnostic> Compile(IEnumerable<string> inputFiles, ResolvedReferences references, string outputExe)
+    public IImmutableList<Diagnostic> Compile(IEnumerable<string> inputFiles,
+                                              ResolvedReferences references,
+                                              string outputExe)
       => ImmutableList<Diagnostic>.Empty;
   }
 }

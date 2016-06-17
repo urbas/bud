@@ -34,8 +34,8 @@
       <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Moq, Version=4.5.8.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <HintPath>..\packages\Moq.4.5.8\lib\net45\Moq.dll</HintPath>
+    <Reference Include="Moq, Version=4.5.9.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.5.9\lib\net45\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
@@ -48,11 +48,16 @@
   <ItemGroup>
     <Compile Include="MakeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RuleTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bud.Make\Bud.Make.csproj">
       <Project>{3E9AEFD6-385D-43A7-9DDB-5EEF2643B6F7}</Project>
       <Name>Bud.Make</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
+      <Project>{594DC304-3A8A-43FC-BE7D-71D8C603014A}</Project>
+      <Name>Bud.Option</Name>
     </ProjectReference>
     <ProjectReference Include="..\Bud.TmpDir\Bud.TmpDir.csproj">
       <Project>{B8EFE565-1FDA-48CB-A7F3-B3627B747727}</Project>

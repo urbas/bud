@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using Bud.Building;
 using Bud.References;
 using ReflectionAssembly = System.Reflection.Assembly;
@@ -12,36 +12,24 @@ namespace Bud.Scripting {
     public readonly ImmutableDictionary<string, Option<string>> NoReferences
       = ImmutableDictionary<string, Option<string>>.Empty;
 
-    public IDictionary<string, Option<string>> Resolve(IEnumerable<string> references) {
-      var resolvedReferences = new Dictionary<string, Option<string>>();
+    public ResolvedReferences Resolve(IEnumerable<string> references, IDictionary<string, string> assemblies, ISet<string> frameworkAssemblies) {
       foreach (var reference in references) {
-        var assembly = LazyReferencesInitializer.BudReferences.Get(reference);
-        if (assembly.HasValue) {
-          AddReference(reference, assembly.Value, resolvedReferences);
+        var assemblyOpt = LazyReferencesInitializer.BudReferences.Get(reference);
+        if (assemblyOpt.HasValue) {
+          if (assemblies.ContainsKey(reference)) {
+            continue;
+          }
+          var assembly = assemblyOpt.Value;
+          assemblies.Add(reference, assembly.Location);
+          Resolve(assembly.GetReferencedAssemblies().Select(reflectionAssembly => reflectionAssembly.Name), assemblies, frameworkAssemblies);
         } else if (File.Exists(reference)) {
-          resolvedReferences.Add(Path.GetFileNameWithoutExtension(reference), reference);
+          assemblies.Add(Path.GetFileNameWithoutExtension(reference), reference);
         } else {
-          resolvedReferences.Add(reference, Option.None<string>());
+          frameworkAssemblies.Add(reference);
         }
       }
-      return new ReadOnlyDictionary<string, Option<string>>(resolvedReferences);
-    }
-
-    private static void AddReference(string assemblyName,
-                                     ReflectionAssembly assembly,
-                                     IDictionary<string, Option<string>> resolvedReferences) {
-      if (resolvedReferences.ContainsKey(assemblyName)) {
-        return;
-      }
-      resolvedReferences.Add(assemblyName, assembly.Location);
-      foreach (var referencedAssembly in assembly.GetReferencedAssemblies()) {
-        var budAssembly = LazyReferencesInitializer.BudReferences.Get(referencedAssembly.Name);
-        if (budAssembly.HasValue) {
-          AddReference(referencedAssembly.Name, budAssembly.Value, resolvedReferences);
-        } else if (!resolvedReferences.ContainsKey(referencedAssembly.Name)) {
-          resolvedReferences.Add(referencedAssembly.Name, Option.None<string>());
-        }
-      }
+      return new ResolvedReferences(assemblies.Select(assemblyNamePath => new Assembly(assemblyNamePath.Key, assemblyNamePath.Value)),
+                                    frameworkAssemblies.Select(assemblyName => new FrameworkAssembly(assemblyName, FrameworkAssembly.MaxVersion)));
     }
 
     private static class LazyReferencesInitializer {
@@ -50,6 +38,7 @@ namespace Bud.Scripting {
         ToAssemblyNamePath(typeof(BatchExec)),
         ToAssemblyNamePath(typeof(Make.Make)),
         ToAssemblyNamePath(typeof(HashBasedBuilder)),
+        ToAssemblyNamePath(typeof(ImmutableList)),
       }.ToImmutableDictionary();
     }
 
@@ -58,5 +47,8 @@ namespace Bud.Scripting {
       return new KeyValuePair<string, ReflectionAssembly>(assembly.GetName().Name,
                                                           assembly);
     }
+
+    public ResolvedReferences Resolve(IEnumerable<string> references)
+      => Resolve(references, new Dictionary<string, string>(), new HashSet<string>());
   }
 }

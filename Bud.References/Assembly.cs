@@ -32,5 +32,7 @@ namespace Bud.References {
         return (Name.GetHashCode()*397) ^ Path.GetHashCode();
       }
     }
+
+    public override string ToString() => $"Assembly(Name: {Name}, Path: {Path})";
   }
 }

@@ -7,28 +7,26 @@ using Bud.Building;
 
 namespace Bud.Make {
   public static class Make {
-    public static Rule Rule(string output, Action<string, string> recipe, string input)
+    public static Rule Rule(string output,
+                            Action<string, string> recipe,
+                            string input)
       => new Rule(output,
                   (inputFiles, outputFile) => recipe(inputFiles[0], outputFile),
                   new ReadOnlyCollection<string>(new[] {input}));
 
-    public static Rule Rule(string outputFile, Action<IReadOnlyList<string>, string> recipe, params string[] inputFiles)
+    public static Rule Rule(string outputFile,
+                            Action<IReadOnlyList<string>, string> recipe,
+                            params string[] inputFiles)
       => new Rule(outputFile, recipe, inputFiles);
 
-    public static void Execute(string[] rulesToBuild, params Rule[] rules)
-      => Execute(rulesToBuild, Directory.GetCurrentDirectory(), rules);
-
-    public static void Execute(string[] rulesToBuild,
-                               string workingDir,
-                               params Rule[] rules)
-      => Execute(rulesToBuild, workingDir, (IEnumerable<Rule>) rules);
-
-    public static void Execute(string[] rulesToBuild,
-                               string workingDir,
-                               IEnumerable<Rule> rules) {
-      if (rulesToBuild == null || rulesToBuild.Length == 0) {
-        return;
-      }
+    /// <summary>
+    ///   Executes rule <paramref name="ruleToBuild" /> as defined in <paramref name="rules" />.
+    ///   This method executes the rules in a single thread synchronously.
+    /// </summary>
+    public static void Execute(Rules rules,
+                               string ruleToBuild,
+                               Option<string> workingDir = default(Option<string>)) {
+      var workingDirReal = workingDir.GetOrElse(Directory.GetCurrentDirectory);
       var rulesDictionary = new Dictionary<string, Rule>();
       foreach (var r in rules) {
         if (rulesDictionary.ContainsKey(r.Output)) {
@@ -36,12 +34,12 @@ namespace Bud.Make {
         }
         rulesDictionary.Add(r.Output, r);
       }
-      var ruleOptional = rulesDictionary.Get(rulesToBuild[0]);
+      var ruleOptional = rulesDictionary.Get(ruleToBuild);
       if (!ruleOptional.HasValue) {
-        throw new Exception($"Could not find rule '{rulesToBuild[0]}'.");
+        throw new Exception($"Could not find rule '{ruleToBuild}'.");
       }
       var rule = ruleOptional.Value;
-      InvokeRecipe(workingDir, rulesDictionary, rule, new HashSet<string>(), new List<string>());
+      InvokeRecipe(workingDirReal, rulesDictionary, rule, new HashSet<string>(), new List<string>());
     }
 
     private static void InvokeRecipe(string workingDir,
