@@ -7,6 +7,7 @@ using Bud.Building;
 using Bud.NuGet;
 using Bud.References;
 using Microsoft.CodeAnalysis;
+using Newtonsoft.Json;
 using static Newtonsoft.Json.JsonConvert;
 
 namespace Bud.Scripting {
@@ -17,12 +18,30 @@ namespace Bud.Scripting {
     ///   built scripts).
     /// </summary>
     /// <param name="scriptPath">
-    ///   the path of the script that will be built and whose metadata we seek.
+    ///   the path to the script executable. The "built script metadata" JSON file
+    ///   is placed next to the script executable.
     /// </param>
-    /// <returns>the metadata.</returns>
+    /// <returns>the metadata of the script.</returns>
     public static BuiltScriptMetadata LoadBuiltScriptMetadata(Option<string> scriptPath = default(Option<string>)) {
       var scriptMetadataPath = ScriptMetadataPath(Build(scriptPath));
       return DeserializeObject<BuiltScriptMetadata>(File.ReadAllText(scriptMetadataPath));
+    }
+
+    /// <summary>
+    ///   Stores a json file next to the given script executable.
+    /// </summary>
+    /// <param name="scriptPath">
+    ///   the path of the script that will be built and whose metadata we seek.
+    /// </param>
+    /// <param name="references">
+    ///   a list of non-framework assemblies and framework assemblies referenced by the script.
+    /// </param>
+    /// <returns></returns>
+    public static BuiltScriptMetadata SaveBuiltScriptMetadata(string scriptPath, ResolvedReferences references) {
+      var builtScriptMetadata = new BuiltScriptMetadata(references);
+      var builtScriptMetadataJson = SerializeObject(builtScriptMetadata, Formatting.Indented);
+      File.WriteAllText(ScriptMetadataPath(scriptPath), builtScriptMetadataJson);
+      return builtScriptMetadata;
     }
 
     /// <summary>
@@ -55,18 +74,38 @@ namespace Bud.Scripting {
                                               string outputScriptExe) {
       var outputDir = Path.GetDirectoryName(outputScriptExe);
       var inputFilesList = inputFiles as IList<string> ?? inputFiles.ToList();
+
+      var references = ResolveReferences(referenceResolver, nuGetReferenceResolver, inputFilesList, outputDir);
+      Compile(compiler, references, inputFilesList, outputScriptExe);
+      CopyAssemblies(references.Assemblies
+                               .Select(assemblyPath => assemblyPath.Path), outputDir);
+      return SaveBuiltScriptMetadata(outputScriptExe, references);
+    }
+
+    public static string ScriptMetadataPath(string outputScriptExePath)
+      => $"{outputScriptExePath}.metadata.json";
+
+    private static ResolvedReferences ResolveReferences(IReferenceResolver referenceResolver,
+                                                        INuGetReferenceResolver nuGetReferenceResolver,
+                                                        IEnumerable<string> inputFilesList,
+                                                        string downloadedPackagesDir) {
       var scriptContents = inputFilesList.Select(File.ReadAllText).ToList();
       var directives = ScriptDirectives.Extract(scriptContents);
 
-      var nugetReferences = nuGetReferenceResolver.Resolve(directives.NuGetReferences, outputDir);
-      var references = ResolveReferences(referenceResolver, directives.References);
+      var references = nuGetReferenceResolver
+        .Resolve(directives.NuGetReferences, downloadedPackagesDir)
+        .Add(ResolveReferences(referenceResolver, directives.References));
+      return references;
+    }
 
-      var frameworkAssemblyReferences = references.FrameworkAssemblies
-                                                  .Concat(nugetReferences.FrameworkAssemblies);
+    private static void Compile(ICSharpScriptCompiler compiler,
+                                ResolvedReferences references,
+                                IEnumerable<string> inputFilesList,
+                                string outputFile) {
+      var frameworkAssemblyReferences = references.FrameworkAssemblies;
       var frameworkAssemblyPaths = FrameworkAssemblyPaths(frameworkAssemblyReferences);
 
       var assemblyPaths = references.Assemblies
-                                    .Concat(nugetReferences.Assemblies)
                                     .Select(assemblyPath => assemblyPath.Path);
 
       var assemblies = frameworkAssemblyPaths
@@ -74,18 +113,10 @@ namespace Bud.Scripting {
         .Select(r => MetadataReference.CreateFromFile(r))
         .Concat(new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)})
         .ToImmutableList();
-      var errors = compiler.Compile(inputFilesList, assemblies, outputScriptExe);
+      var errors = compiler.Compile(inputFilesList, assemblies, outputFile);
       if (errors.Any()) {
         throw new Exception($"Compilation error: {string.Join("\n", errors)}");
       }
-
-      CopyAssemblies(references.Assemblies
-                               .Concat(nugetReferences.Assemblies)
-                               .Select(assemblyPath => assemblyPath.Path), outputDir);
-      var builtScript = new BuiltScriptMetadata(references, outputScriptExe);
-      var builtScriptMetadata = SerializeObject(builtScript);
-      File.WriteAllText(ScriptMetadataPath(outputScriptExe), builtScriptMetadata);
-      return builtScript;
     }
 
     private static IEnumerable<string> FrameworkAssemblyPaths(IEnumerable<FrameworkAssembly> frameworkAssemblyReferences) {
@@ -98,9 +129,6 @@ namespace Bud.Scripting {
           throw new Exception($"Could not resolve the reference '{frameworkAssemblyReference.Name}'.");
         });
     }
-
-    public static string ScriptMetadataPath(string outputScriptExePath)
-      => $"{outputScriptExePath}.metadata.json";
 
     private static ResolvedReferences ResolveReferences(IReferenceResolver referenceResolver,
                                                         IEnumerable<string> references) {

@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="AssemblyAggregatorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResolvedReferencesTest.cs" />
     <Compile Include="WindowsResolverTest.cs" />
   </ItemGroup>
   <ItemGroup>
