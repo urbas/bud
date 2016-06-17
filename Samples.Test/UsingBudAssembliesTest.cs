@@ -2,6 +2,7 @@ using Bud;
 using NUnit.Framework;
 
 namespace Samples {
+  [Category("IntegrationTest")]
   public class UsingBudAssembliesTest {
     [Test]
     public void Build_outputs_a_text_file() {

@@ -2,6 +2,7 @@
 using NUnit.Framework;
 
 namespace Samples {
+  [Category("IntegrationTest")]
   public class HelloWorldTest {
     [Test]
     public void Build_outputs_hello_world() {

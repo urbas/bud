@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Collections.ObjectModel;
+using System.IO;
 using Bud.Building;
 using Bud.References;
 using ReflectionAssembly = System.Reflection.Assembly;
@@ -17,6 +18,8 @@ namespace Bud.Scripting {
         var assembly = LazyReferencesInitializer.BudReferences.Get(reference);
         if (assembly.HasValue) {
           AddReference(reference, assembly.Value, resolvedReferences);
+        } else if (File.Exists(reference)) {
+          resolvedReferences.Add(Path.GetFileNameWithoutExtension(reference), reference);
         } else {
           resolvedReferences.Add(reference, Option.None<string>());
         }

@@ -2,6 +2,7 @@ using Bud;
 using NUnit.Framework;
 
 namespace Samples {
+  [Category("IntegrationTest")]
   public class MakeRuleTest {
     [Test]
     public void Script_produces_an_output_file() {

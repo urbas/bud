@@ -77,14 +77,14 @@ namespace Bud {
                        Option<string> arguments = default(Option<string>),
                        Option<string> workingDir = default(Option<string>)) {
       var process = CreateProcess(executablePath, arguments, workingDir);
-      var errorOurput = new StringWriter();
+      var errorOutput = new StringWriter();
       process.ErrorDataReceived += (s, a) => {
-        errorOurput.Write(a.Data);
+        errorOutput.Write(a.Data);
       };
       process.Start();
       var output = process.StandardOutput.ReadToEnd();
       process.WaitForExit();
-      AssertProcessSucceeded(executablePath, arguments, workingDir, process, errorOurput.ToString());
+      AssertProcessSucceeded(executablePath, arguments, workingDir, process, errorOutput.ToString());
       return output;
     }
 
@@ -96,7 +96,7 @@ namespace Bud {
       if (process.ExitCode != 0) {
         throw new Exception($"Command '{executablePath}' with arguments '{arguments}' at working dir '{workingDir}'" +
                             $" failed with error code {process.ExitCode}." +
-                            $" Error ourput: {errorOutput}");
+                            $" Error output: {errorOutput}");
       }
     }
 
