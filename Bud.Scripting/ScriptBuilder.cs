@@ -6,7 +6,6 @@ using System.Linq;
 using Bud.Building;
 using Bud.NuGet;
 using Bud.References;
-using Microsoft.CodeAnalysis;
 using Newtonsoft.Json;
 using static Newtonsoft.Json.JsonConvert;
 
@@ -92,42 +91,19 @@ namespace Bud.Scripting {
       var scriptContents = inputFilesList.Select(File.ReadAllText).ToList();
       var directives = ScriptDirectives.Extract(scriptContents);
 
-      var references = nuGetReferenceResolver
+      return nuGetReferenceResolver
         .Resolve(directives.NuGetReferences, downloadedPackagesDir)
         .Add(ResolveReferences(referenceResolver, directives.References));
-      return references;
     }
 
     private static void Compile(ICSharpScriptCompiler compiler,
                                 ResolvedReferences references,
                                 IEnumerable<string> inputFilesList,
                                 string outputFile) {
-      var frameworkAssemblyReferences = references.FrameworkAssemblies;
-      var frameworkAssemblyPaths = FrameworkAssemblyPaths(frameworkAssemblyReferences);
-
-      var assemblyPaths = references.Assemblies
-                                    .Select(assemblyPath => assemblyPath.Path);
-
-      var assemblies = frameworkAssemblyPaths
-        .Concat(assemblyPaths)
-        .Select(r => MetadataReference.CreateFromFile(r))
-        .Concat(new[] {MetadataReference.CreateFromFile(typeof(object).Assembly.Location)})
-        .ToImmutableList();
-      var errors = compiler.Compile(inputFilesList, assemblies, outputFile);
+      var errors = compiler.Compile(inputFilesList, references, outputFile);
       if (errors.Any()) {
         throw new Exception($"Compilation error: {string.Join("\n", errors)}");
       }
-    }
-
-    private static IEnumerable<string> FrameworkAssemblyPaths(IEnumerable<FrameworkAssembly> frameworkAssemblyReferences) {
-      return frameworkAssemblyReferences
-        .Select(frameworkAssemblyReference => {
-          var frameworkAssembly = WindowsFrameworkReferenceResolver.ResolveFrameworkAssembly(frameworkAssemblyReference.Name, frameworkAssemblyReference.FrameworkVersion);
-          if (frameworkAssembly.HasValue) {
-            return frameworkAssembly.Value;
-          }
-          throw new Exception($"Could not resolve the reference '{frameworkAssemblyReference.Name}'.");
-        });
     }
 
     private static ResolvedReferences ResolveReferences(IReferenceResolver referenceResolver,

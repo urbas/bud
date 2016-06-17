@@ -121,9 +121,7 @@ public class A {public static void Main(){}}", "Build.cs");
   }
 
   public class TestCSharpScriptCompiler : ICSharpScriptCompiler {
-    public IImmutableList<Diagnostic> Compile(IEnumerable<string> inputFiles,
-                                              IEnumerable<MetadataReference> references,
-                                              string outputExe)
+    public IImmutableList<Diagnostic> Compile(IEnumerable<string> inputFiles, ResolvedReferences references, string outputExe)
       => ImmutableList<Diagnostic>.Empty;
   }
 }
