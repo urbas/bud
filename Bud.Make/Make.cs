@@ -50,7 +50,7 @@ namespace Bud.Make {
                                      ISet<string> alreadyInvokedRules,
                                      IList<string> currentlyExecutingRules) {
       if (currentlyExecutingRules.Contains(rule.Output)) {
-        throw new Exception($"Detected a cycle in rule dependencies: '{string.Join(" <- ", currentlyExecutingRules)} <- {rule.Output}'.");
+        throw new Exception($"Detected a cycle in rule dependencies: '{rule.Output} -> {string.Join(" -> ", currentlyExecutingRules.Reverse())}'.");
       }
       if (alreadyInvokedRules.Contains(rule.Output)) {
         return;

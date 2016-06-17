@@ -83,13 +83,15 @@ namespace Bud.Make {
     public void Execute_throws_when_there_is_a_cycle() {
       var recipeMock = new Mock<Action<string, string>>();
       var ex = Assert.Throws<Exception>(() => {
-        Make.Execute(new[] {"foo.out"},
+        Make.Execute(new[] {"foo.out2"},
                      "/foo/bar",
-                     Make.Rule("foo.out", recipeMock.Object, "foo.in"),
-                     Make.Rule("foo.in", recipeMock.Object, "foo.out"));
+                     Make.Rule("foo.out1", recipeMock.Object, "foo.in1"),
+                     Make.Rule("foo.out2", recipeMock.Object, "foo.in2"),
+                     Make.Rule("foo.in1", recipeMock.Object, "foo.out2"),
+                     Make.Rule("foo.in2", recipeMock.Object, "foo.out1"));
       });
       Assert.That(ex.Message,
-                  Does.Contain("'foo.out <- foo.in <- foo.out'"));
+                  Does.Contain("'foo.out2 -> foo.in1 -> foo.out1 -> foo.in2 -> foo.out2'"));
     }
 
     [Test]
