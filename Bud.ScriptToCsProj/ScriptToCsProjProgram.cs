@@ -5,7 +5,9 @@ namespace Bud.ScriptToCsProj {
   public class ScriptToCsProjProgram {
     public static void Main(string[] args) {
       try {
-        ScriptCsProj.OutputScriptCsProj(ScriptBuilder.LoadBuiltScriptMetadata());
+        var scriptExePath = ScriptBuilder.Build();
+        var builtScriptMetadata = BuiltScriptMetadata.Load(scriptExePath);
+        ScriptCsProj.OutputScriptCsProj(builtScriptMetadata);
       } catch (Exception e) {
         Console.Error.WriteLine("Failed to create the csproj file. Error: ");
         Console.Error.WriteLine();

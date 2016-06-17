@@ -6,43 +6,9 @@ using System.Linq;
 using Bud.Building;
 using Bud.NuGet;
 using Bud.References;
-using Newtonsoft.Json;
-using static Newtonsoft.Json.JsonConvert;
 
 namespace Bud.Scripting {
   public class ScriptBuilder {
-    /// <summary>
-    ///   Loads the metadata of the script in the current working directory.
-    ///   This method will build the script first (as the metadata is available only for
-    ///   built scripts).
-    /// </summary>
-    /// <param name="scriptPath">
-    ///   the path to the script executable. The "built script metadata" JSON file
-    ///   is placed next to the script executable.
-    /// </param>
-    /// <returns>the metadata of the script.</returns>
-    public static BuiltScriptMetadata LoadBuiltScriptMetadata(Option<string> scriptPath = default(Option<string>)) {
-      var scriptMetadataPath = ScriptMetadataPath(Build(scriptPath));
-      return DeserializeObject<BuiltScriptMetadata>(File.ReadAllText(scriptMetadataPath));
-    }
-
-    /// <summary>
-    ///   Stores a json file next to the given script executable.
-    /// </summary>
-    /// <param name="scriptPath">
-    ///   the path of the script that will be built and whose metadata we seek.
-    /// </param>
-    /// <param name="references">
-    ///   a list of non-framework assemblies and framework assemblies referenced by the script.
-    /// </param>
-    /// <returns></returns>
-    public static BuiltScriptMetadata SaveBuiltScriptMetadata(string scriptPath, ResolvedReferences references) {
-      var builtScriptMetadata = new BuiltScriptMetadata(references);
-      var builtScriptMetadataJson = SerializeObject(builtScriptMetadata, Formatting.Indented);
-      File.WriteAllText(ScriptMetadataPath(scriptPath), builtScriptMetadataJson);
-      return builtScriptMetadata;
-    }
-
     /// <summary>
     ///   The default way of building <c>Build.cs</c> scripts.
     /// </summary>
@@ -78,7 +44,7 @@ namespace Bud.Scripting {
       Compile(compiler, references, inputFilesList, outputScriptExe);
       CopyAssemblies(references.Assemblies
                                .Select(assemblyPath => assemblyPath.Path), outputDir);
-      return SaveBuiltScriptMetadata(outputScriptExe, references);
+      return BuiltScriptMetadata.Save(outputScriptExe, references);
     }
 
     public static string ScriptMetadataPath(string outputScriptExePath)
