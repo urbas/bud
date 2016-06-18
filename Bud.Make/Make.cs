@@ -23,9 +23,7 @@ namespace Bud.Make {
     ///   Executes rule <paramref name="ruleToBuild" /> as defined in <paramref name="rules" />.
     ///   This method executes the rules in a single thread synchronously.
     /// </summary>
-    public static void Execute(Rules rules,
-                               string ruleToBuild,
-                               Option<string> workingDir = default(Option<string>)) {
+    public static void Execute(IEnumerable<Rule> rules, string ruleToBuild, Option<string> workingDir = default(Option<string>)) {
       var workingDirReal = workingDir.GetOrElse(Directory.GetCurrentDirectory);
       var rulesDictionary = new Dictionary<string, Rule>();
       foreach (var r in rules) {

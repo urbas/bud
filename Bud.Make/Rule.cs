@@ -20,8 +20,6 @@ namespace Bud.Make {
     public void Recipe(IReadOnlyList<string> inputFiles, string outputFile)
       => recipe(inputFiles, outputFile);
 
-    public Rules Add(Rule rule) => new Rules(ImmutableList.Create(this, rule));
-
     protected bool Equals(Rule other)
       => Inputs.SequenceEqual(other.Inputs) &&
          string.Equals(Output, other.Output);
@@ -41,9 +39,5 @@ namespace Bud.Make {
         return (Inputs.GetHashCode()*397) ^ Output.GetHashCode();
       }
     }
-
-    public static implicit operator Rules(Rule rule)
-      => new Rules(ImmutableList.Create<Rule>(rule));
-
   }
 }
