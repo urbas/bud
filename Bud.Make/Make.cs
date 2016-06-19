@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -12,12 +13,12 @@ namespace Bud.Make {
                             string input)
       => new Rule(output,
                   (inputFiles, outputFile) => recipe(inputFiles[0], outputFile),
-                  new ReadOnlyCollection<string>(new[] {input}));
+                  ImmutableList.Create(input));
 
     public static Rule Rule(string outputFile,
                             Action<IReadOnlyList<string>, string> recipe,
                             params string[] inputFiles)
-      => new Rule(outputFile, recipe, inputFiles);
+      => new Rule(outputFile, recipe, ImmutableList.CreateRange(inputFiles));
 
     /// <summary>
     ///   Executes rule <paramref name="ruleToBuild" /> as defined in <paramref name="rules" />.
@@ -55,15 +56,11 @@ namespace Bud.Make {
       foreach (var dependentRule in rule.Inputs.Gather(rulesDictionary.Get)) {
         InvokeRecipe(workingDir, rulesDictionary, dependentRule, alreadyInvokedRules, currentlyExecutingRules);
       }
-      TimestampBasedBuilder.Build((inputFiles, outputFile) => rule.Recipe(inputFiles, outputFile),
-                                  ToAbsolutePaths(workingDir, rule.Inputs),
+      TimestampBasedBuilder.Build(rule.Recipe,
+                                  rule.Inputs.Select(input => Path.Combine(workingDir, input)).ToImmutableList(),
                                   Path.Combine(workingDir, rule.Output));
       alreadyInvokedRules.Add(rule.Output);
       currentlyExecutingRules.RemoveAt(currentlyExecutingRules.Count - 1);
     }
-
-    private static IReadOnlyList<string> ToAbsolutePaths(string workingDir, IEnumerable<string> relativePaths)
-      => new ReadOnlyCollection<string>(relativePaths.Select(input => Path.Combine(workingDir, input))
-                                                     .ToList());
   }
 }

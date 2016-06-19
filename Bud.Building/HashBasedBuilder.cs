@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 
@@ -38,11 +38,11 @@ namespace Bud.Building {
     ///   order the input before invoking this function.
     /// </remarks>
     public static string Build(FilesBuilder filesBuilder,
-                             string hashFile,
-                             byte[] salt,
-                             IReadOnlyList<string> input,
-                             string output) {
-      input = input ?? BuildInput.EmptyInputFiles;
+                               string hashFile,
+                               byte[] salt,
+                               IImmutableList<string> input,
+                               string output) {
+      input = input ?? ImmutableList<string>.Empty;
       var digest = Md5Hasher.Digest(input, salt);
       if (!File.Exists(output) && !Directory.Exists(output)) {
         filesBuilder(input, output);
@@ -56,17 +56,22 @@ namespace Bud.Building {
       return output;
     }
 
-    public static string Build(FilesBuilder filesBuilder, IReadOnlyList<string> input, string output)
-      => Build(filesBuilder, output + ".input_hash", DefaultSalt, input, output);
+    public static string Build(FilesBuilder filesBuilder, IImmutableList<string> input, string output)
+      => Build(filesBuilder,
+               output + ".input_hash",
+               DefaultSalt,
+               input,
+               output);
 
     public static string Build(SingleFileBuilder fileBuilder, string hashFile, byte[] salt, string input, string output)
       => Build((inputFiles, outputFile) => fileBuilder(inputFiles.First(), outputFile),
                hashFile,
-               salt, new ReadOnlyCollection<string>(new [] { input }), output);
+               salt, ImmutableList.Create(input), output);
 
     public static string Build(SingleFileBuilder fileBuilder, string input, string output)
-      => Build((inputFiles, outputFile) => fileBuilder(inputFiles.First(), outputFile),
-               new ReadOnlyCollection<string>(new[] { input }), output);
+      => Build((inputFiles, outputFile) => fileBuilder(inputFiles[0], outputFile),
+               ImmutableList.Create(input),
+               output);
   }
 
   internal class FuncFileGenerator {

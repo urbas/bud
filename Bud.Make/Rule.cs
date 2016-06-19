@@ -1,23 +1,22 @@
 using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
 namespace Bud.Make {
   public class Rule {
-    private readonly Action<IReadOnlyList<string>, string> recipe;
-    public IReadOnlyList<string> Inputs { get; }
+    private readonly Action<IImmutableList<string>, string> recipe;
+    public IImmutableList<string> Inputs { get; }
     public string Output { get; }
 
     public Rule(string output,
-                Action<IReadOnlyList<string>, string> recipe,
-                IReadOnlyList<string> inputs) {
+                Action<IImmutableList<string>, string> recipe,
+                IImmutableList<string> inputs) {
       this.recipe = recipe;
       Inputs = inputs;
       Output = output;
     }
 
-    public void Recipe(IReadOnlyList<string> inputFiles, string outputFile)
+    public void Recipe(IImmutableList<string> inputFiles, string outputFile)
       => recipe(inputFiles, outputFile);
 
     protected bool Equals(Rule other)
