@@ -1,20 +1,19 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 
 namespace Bud.References {
   public class ResolvedReferences {
     public static readonly ResolvedReferences Empty
-      = new ResolvedReferences(ImmutableList<Assembly>.Empty,
-                               ImmutableList<FrameworkAssembly>.Empty);
+      = new ResolvedReferences(ImmutableArray<Assembly>.Empty,
+                               ImmutableArray<FrameworkAssembly>.Empty);
 
-    public IImmutableList<Assembly> Assemblies { get; }
-    public IImmutableList<FrameworkAssembly> FrameworkAssemblies { get; }
+    public ImmutableArray<Assembly> Assemblies { get; }
+    public ImmutableArray<FrameworkAssembly> FrameworkAssemblies { get; }
 
-    public ResolvedReferences(IEnumerable<Assembly> assemblies,
-                              IEnumerable<FrameworkAssembly> frameworkAssemblies) {
-      Assemblies = assemblies as IImmutableList<Assembly> ?? assemblies.ToImmutableList();
-      FrameworkAssemblies = frameworkAssemblies as IImmutableList<FrameworkAssembly> ?? frameworkAssemblies.ToImmutableList();
+    public ResolvedReferences(ImmutableArray<Assembly> assemblies,
+                              ImmutableArray<FrameworkAssembly> frameworkAssemblies) {
+      Assemblies = assemblies;
+      FrameworkAssemblies = frameworkAssemblies;
     }
 
     protected bool Equals(ResolvedReferences other)
@@ -33,8 +32,8 @@ namespace Bud.References {
     }
 
     public ResolvedReferences Add(ResolvedReferences resolvedReferences) {
-      return new ResolvedReferences(Assemblies.Concat(resolvedReferences.Assemblies).ToImmutableList(),
-                                    FrameworkAssemblies.Concat(resolvedReferences.FrameworkAssemblies).ToImmutableList());
+      return new ResolvedReferences(Assemblies.Concat(resolvedReferences.Assemblies).ToImmutableArray(),
+                                    FrameworkAssemblies.Concat(resolvedReferences.FrameworkAssemblies).ToImmutableArray());
     }
   }
 }

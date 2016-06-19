@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -40,9 +38,8 @@ namespace Bud.Building {
     public static string Build(FilesBuilder filesBuilder,
                                string hashFile,
                                byte[] salt,
-                               IImmutableList<string> input,
+                               ImmutableArray<string> input,
                                string output) {
-      input = input ?? ImmutableList<string>.Empty;
       var digest = Md5Hasher.Digest(input, salt);
       if (!File.Exists(output) && !Directory.Exists(output)) {
         filesBuilder(input, output);
@@ -56,7 +53,7 @@ namespace Bud.Building {
       return output;
     }
 
-    public static string Build(FilesBuilder filesBuilder, IImmutableList<string> input, string output)
+    public static string Build(FilesBuilder filesBuilder, ImmutableArray<string> input, string output)
       => Build(filesBuilder,
                output + ".input_hash",
                DefaultSalt,
@@ -66,22 +63,11 @@ namespace Bud.Building {
     public static string Build(SingleFileBuilder fileBuilder, string hashFile, byte[] salt, string input, string output)
       => Build((inputFiles, outputFile) => fileBuilder(inputFiles.First(), outputFile),
                hashFile,
-               salt, ImmutableList.Create(input), output);
+               salt, ImmutableArray.Create(input), output);
 
     public static string Build(SingleFileBuilder fileBuilder, string input, string output)
       => Build((inputFiles, outputFile) => fileBuilder(inputFiles[0], outputFile),
-               ImmutableList.Create(input),
+               ImmutableArray.Create(input),
                output);
-  }
-
-  internal class FuncFileGenerator {
-    public Action<string, IReadOnlyList<string>> FileGenerator { get; }
-
-    public FuncFileGenerator(Action<string, IReadOnlyList<string>> fileGenerator) {
-      FileGenerator = fileGenerator;
-    }
-
-    public void Generate(string outputFile, IReadOnlyList<string> inputFiles)
-      => FileGenerator(outputFile, inputFiles);
   }
 }

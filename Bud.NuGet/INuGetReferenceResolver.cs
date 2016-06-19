@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using Bud.References;
 
 namespace Bud.NuGet {
@@ -16,6 +16,7 @@ namespace Bud.NuGet {
     /// <returns>
     ///   a dictionary of reference ID's and assembly paths.
     /// </returns>
-    ResolvedReferences Resolve(IEnumerable<PackageReference> packageReferences, string outputDir);
+    ResolvedReferences Resolve(ImmutableArray<PackageReference> packageReferences,
+                               string outputDir);
   }
 }

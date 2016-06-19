@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -24,7 +23,7 @@ namespace Bud.Scripting {
       var assemblyA = dir.CreateFile("foo", "A.dll");
       var outputDir = dir.CreateDir("output");
 
-      ScriptBuilder.Build(ImmutableList.Create(script),
+      ScriptBuilder.Build(ImmutableArray.Create(script),
                           new TestReferenceResolver(ImmutableDictionary<string, string>.Empty.Add("A", assemblyA)),
                           new TestCSharpScriptCompiler(),
                           new TestNuGetReferenceResolver(),
@@ -40,10 +39,11 @@ namespace Bud.Scripting {
       var expectedPackagesFile = dir.CreateFile("blah", "Foo.dll");
       var outputDir = dir.CreateDir("output");
 
-      ScriptBuilder.Build(ImmutableList.Create(script),
+      ScriptBuilder.Build(ImmutableArray.Create(script),
                           new TestReferenceResolver(ImmutableDictionary<string, string>.Empty),
                           new TestCSharpScriptCompiler(),
-                          new TestNuGetReferenceResolver(new ResolvedReferences(new[] {new Assembly("Foo", expectedPackagesFile)}, new FrameworkAssembly[0])),
+                          new TestNuGetReferenceResolver(new ResolvedReferences(ImmutableArray.Create(new Assembly("Foo", expectedPackagesFile)),
+                                                                                ImmutableArray.Create(new FrameworkAssembly[0]))),
                           Path.Combine(outputDir, "build-script.exe"));
 
       FileAssert.AreEqual(expectedPackagesFile,
@@ -56,14 +56,14 @@ namespace Bud.Scripting {
       var assemblyA = dir.CreateFile("foo", "A.dll");
       var outputDir = dir.CreateDir("output");
 
-      var builtScript = ScriptBuilder.Build(ImmutableList.Create(script),
+      var builtScript = ScriptBuilder.Build(ImmutableArray.Create(script),
                                             new TestReferenceResolver(ImmutableDictionary<string, string>.Empty.Add("A", assemblyA)),
                                             new TestCSharpScriptCompiler(),
                                             new TestNuGetReferenceResolver(),
                                             Path.Combine(outputDir, "build-script.exe"));
 
       Assert.That(builtScript.ResolvedScriptReferences.Assemblies,
-                  Is.EquivalentTo(ImmutableList.Create(new Assembly("A", assemblyA))));
+                  Is.EquivalentTo(ImmutableArray.Create(new Assembly("A", assemblyA))));
     }
 
     [Test]
@@ -71,14 +71,14 @@ namespace Bud.Scripting {
       var script = dir.CreateFile(@"//!reference System.Core", "Build.cs");
       var outputDir = dir.CreateDir("output");
 
-      var builtScript = ScriptBuilder.Build(ImmutableList.Create(script),
+      var builtScript = ScriptBuilder.Build(ImmutableArray.Create(script),
                                             new TestReferenceResolver(ImmutableDictionary<string, string>.Empty),
                                             new TestCSharpScriptCompiler(),
                                             new TestNuGetReferenceResolver(),
                                             Path.Combine(outputDir, "build-script.exe"));
 
       Assert.That(builtScript.ResolvedScriptReferences.FrameworkAssemblies,
-                  Is.EquivalentTo(ImmutableList.Create(new FrameworkAssembly("System.Core", FrameworkAssembly.MaxVersion))));
+                  Is.EquivalentTo(ImmutableArray.Create(new FrameworkAssembly("System.Core", FrameworkAssembly.MaxVersion))));
     }
   }
 
@@ -89,7 +89,7 @@ namespace Bud.Scripting {
       ResolvedReferences = resolvedReferences ?? ResolvedReferences.Empty;
     }
 
-    public ResolvedReferences Resolve(IEnumerable<PackageReference> packageReferences, string outputDir)
+    public ResolvedReferences Resolve(ImmutableArray<PackageReference> packageReferences, string outputDir)
       => ResolvedReferences;
   }
 
@@ -104,16 +104,18 @@ namespace Bud.Scripting {
       var assemblyPaths = references.Aggregate(ImmutableDictionary<string, Option<string>>.Empty,
                                                (resolvedReferences, reference) => resolvedReferences.Add(reference, knownReferences.Get(reference)));
       return new ResolvedReferences(assemblyPaths.Where(pair => pair.Value.HasValue)
-                                                 .Select(pair => new Assembly(pair.Key, pair.Value.Value)),
+                                                 .Select(pair => new Assembly(pair.Key, pair.Value.Value))
+                                                 .ToImmutableArray(),
                                     assemblyPaths.Where(pair => !pair.Value.HasValue)
-                                                 .Select(pair => new FrameworkAssembly(pair.Key, FrameworkAssembly.MaxVersion)));
+                                                 .Select(pair => new FrameworkAssembly(pair.Key, FrameworkAssembly.MaxVersion))
+                                                 .ToImmutableArray());
     }
   }
 
   public class TestCSharpScriptCompiler : ICSharpScriptCompiler {
-    public IImmutableList<Diagnostic> Compile(IEnumerable<string> inputFiles,
+    public ImmutableArray<Diagnostic> Compile(ImmutableArray<string> inputFiles,
                                               ResolvedReferences references,
                                               string outputExe)
-      => ImmutableList<Diagnostic>.Empty;
+      => ImmutableArray<Diagnostic>.Empty;
   }
 }

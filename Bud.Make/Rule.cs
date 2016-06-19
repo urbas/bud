@@ -4,19 +4,19 @@ using System.Linq;
 
 namespace Bud.Make {
   public class Rule {
-    private readonly Action<IImmutableList<string>, string> recipe;
-    public IImmutableList<string> Inputs { get; }
+    private readonly Action<ImmutableArray<string>, string> recipe;
+    public ImmutableArray<string> Inputs { get; }
     public string Output { get; }
 
     public Rule(string output,
-                Action<IImmutableList<string>, string> recipe,
-                IImmutableList<string> inputs) {
+                Action<ImmutableArray<string>, string> recipe,
+                ImmutableArray<string> inputs) {
       this.recipe = recipe;
       Inputs = inputs;
       Output = output;
     }
 
-    public void Recipe(IImmutableList<string> inputFiles, string outputFile)
+    public void Recipe(ImmutableArray<string> inputFiles, string outputFile)
       => recipe(inputFiles, outputFile);
 
     protected bool Equals(Rule other)

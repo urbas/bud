@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -16,15 +15,14 @@ namespace Bud.Building {
     ///   than the last-modified timestamp of any of the input files.
     /// </remarks>
     public static void Build(FilesBuilder fileGenerator,
-                             IImmutableList<string> inputFiles,
+                             ImmutableArray<string> inputFiles,
                              string output) {
-      inputFiles = inputFiles ?? ImmutableList<string>.Empty;
       if (!File.Exists(output) || AnyFileNewer(inputFiles, output)) {
         fileGenerator(inputFiles, output);
       }
     }
 
-    private static bool AnyFileNewer(IEnumerable<string> files,
+    private static bool AnyFileNewer(ImmutableArray<string> files,
                                      string referenceFile) {
       var timestampOfReference = File.GetLastWriteTimeUtc(referenceFile);
       return files.Any(file => File.GetLastWriteTimeUtc(file) > timestampOfReference);

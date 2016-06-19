@@ -9,7 +9,7 @@ using Microsoft.CodeAnalysis.CSharp;
 
 namespace Bud.Scripting {
   public class RoslynCSharpScriptCompiler : ICSharpScriptCompiler {
-    public IImmutableList<Diagnostic> Compile(IEnumerable<string> inputFiles, ResolvedReferences references, string outputExe)
+    public ImmutableArray<Diagnostic> Compile(ImmutableArray<string> inputFiles, ResolvedReferences references, string outputExe)
       => CSharpCompilation.Create("Bud.Script",
                                   inputFiles.Select(ParseSyntaxTree),
                                   ToMetadataReferences(references),

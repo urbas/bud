@@ -6,13 +6,13 @@ using Newtonsoft.Json;
 
 namespace Bud.Benchmarks {
   public class Measurement {
-    public Measurement(string id, ImmutableList<ImmutableDictionary<string, object>> samples) {
+    public Measurement(string id, ImmutableArray<ImmutableDictionary<string, object>> samples) {
       Id = id;
       Samples = samples;
     }
 
     public string Id { get; }
-    public ImmutableList<ImmutableDictionary<string, object>> Samples { get; }
+    public ImmutableArray<ImmutableDictionary<string, object>> Samples { get; }
 
     public static Measurement MeasureAndLog(string measurementId,
                                             int sampleCount,
@@ -42,7 +42,7 @@ namespace Bud.Benchmarks {
                                       Action<int> postEachRun = null,
                                       Action preRun = null,
                                       Action postRun = null) {
-      var samples = ImmutableList<ImmutableDictionary<string, object>>.Empty;
+      var samples = ImmutableArray<ImmutableDictionary<string, object>>.Empty;
       preRun?.Invoke();
       for (int i = 1; i <= sampleCount; i++) {
         preEachRun?.Invoke(i);
@@ -55,7 +55,7 @@ namespace Bud.Benchmarks {
 
     protected bool Equals(Measurement other)
       => string.Equals(Id, other.Id) &&
-         other.Samples.Count == Samples.Count &&
+         other.Samples.Length == Samples.Length &&
          Samples.Zip(other.Samples, DictionaryUtils.DictionariesEqual)
                 .All(b => b);
 

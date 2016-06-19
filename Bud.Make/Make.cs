@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Bud.Building;
@@ -13,12 +12,12 @@ namespace Bud.Make {
                             string input)
       => new Rule(output,
                   (inputFiles, outputFile) => recipe(inputFiles[0], outputFile),
-                  ImmutableList.Create(input));
+                  ImmutableArray.Create(input));
 
     public static Rule Rule(string outputFile,
-                            Action<IReadOnlyList<string>, string> recipe,
+                            Action<ImmutableArray<string>, string> recipe,
                             params string[] inputFiles)
-      => new Rule(outputFile, recipe, ImmutableList.CreateRange(inputFiles));
+      => new Rule(outputFile, recipe, ImmutableArray.CreateRange(inputFiles));
 
     /// <summary>
     ///   Executes rule <paramref name="ruleToBuild" /> as defined in <paramref name="rules" />.
@@ -56,8 +55,11 @@ namespace Bud.Make {
       foreach (var dependentRule in rule.Inputs.Gather(rulesDictionary.Get)) {
         InvokeRecipe(workingDir, rulesDictionary, dependentRule, alreadyInvokedRules, currentlyExecutingRules);
       }
+      var inputAbsPaths = rule.Inputs
+                              .Select(input => Path.Combine(workingDir, input))
+                              .ToImmutableArray();
       TimestampBasedBuilder.Build(rule.Recipe,
-                                  rule.Inputs.Select(input => Path.Combine(workingDir, input)).ToImmutableList(),
+                                  inputAbsPaths,
                                   Path.Combine(workingDir, rule.Output));
       alreadyInvokedRules.Add(rule.Output);
       currentlyExecutingRules.RemoveAt(currentlyExecutingRules.Count - 1);

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.Collections.ObjectModel;
 using System.IO;
 using Bud.NuGet;
 using NuGet.Frameworks;
@@ -9,11 +8,11 @@ using NuGet.Versioning;
 
 namespace Bud.Scripting {
   public class ScriptDirectives {
-    public IImmutableSet<string> References { get; }
-    public IReadOnlyList<PackageReference> NuGetReferences { get; }
+    public ImmutableArray<string> References { get; }
+    public ImmutableArray<PackageReference> NuGetReferences { get; }
 
-    public ScriptDirectives(IImmutableSet<string> references,
-                            IReadOnlyList<PackageReference> nuGetReferences) {
+    public ScriptDirectives(ImmutableArray<string> references,
+                            ImmutableArray<PackageReference> nuGetReferences) {
       References = references;
       NuGetReferences = nuGetReferences;
     }
@@ -32,8 +31,8 @@ namespace Bud.Scripting {
     ///   all the directives found in the scripts.
     /// </returns>
     public static ScriptDirectives Extract(IEnumerable<string> scriptContents) {
-      var assemblyReferences = new List<string>();
-      var nugetReferences = new List<PackageReference>();
+      var assemblyReferences = new HashSet<string>();
+      var nugetReferences = ImmutableArray.CreateBuilder<PackageReference>();
       foreach (var scriptContent in scriptContents) {
         using (var stringReader = new StringReader(scriptContent)) {
           while (true) {
@@ -54,9 +53,8 @@ namespace Bud.Scripting {
           }
         }
       }
-
-      return new ScriptDirectives(assemblyReferences.ToImmutableHashSet(),
-                                  new ReadOnlyCollection<PackageReference>(nugetReferences));
+      return new ScriptDirectives(assemblyReferences.ToImmutableArray(),
+                                  nugetReferences.ToImmutable());
     }
 
     private static string ToAssemblyReference(string line) {

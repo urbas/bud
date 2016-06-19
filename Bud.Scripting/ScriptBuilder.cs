@@ -21,27 +21,26 @@ namespace Bud.Scripting {
       var actualScriptPath = scriptPath.HasValue ? scriptPath.Value : ScriptRunner.DefaultScriptPath;
       var buildDir = CreateBuildDir(actualScriptPath);
       return HashBasedBuilder.Build(Build,
-                                    ImmutableList.Create(actualScriptPath),
+                                    ImmutableArray.Create(actualScriptPath),
                                     Path.Combine(buildDir, "build-script.exe"));
     }
 
-    private static void Build(IReadOnlyList<string> inputFiles, string outputFile)
+    private static void Build(ImmutableArray<string> inputFiles, string outputFile)
       => Build(inputFiles,
                new BudReferenceResolver(),
                new RoslynCSharpScriptCompiler(),
                new NuGetReferenceResolver(),
                outputFile);
 
-    internal static BuiltScriptMetadata Build(IEnumerable<string> inputFiles,
+    internal static BuiltScriptMetadata Build(ImmutableArray<string> inputFiles,
                                               IReferenceResolver referenceResolver,
                                               ICSharpScriptCompiler compiler,
                                               INuGetReferenceResolver nuGetReferenceResolver,
                                               string outputScriptExe) {
       var outputDir = Path.GetDirectoryName(outputScriptExe);
-      var inputFilesList = inputFiles as IList<string> ?? inputFiles.ToList();
 
-      var references = ResolveReferences(referenceResolver, nuGetReferenceResolver, inputFilesList, outputDir);
-      Compile(compiler, references, inputFilesList, outputScriptExe);
+      var references = ResolveReferences(referenceResolver, nuGetReferenceResolver, inputFiles, outputDir);
+      Compile(compiler, references, inputFiles, outputScriptExe);
       CopyAssemblies(references.Assemblies
                                .Select(assemblyPath => assemblyPath.Path), outputDir);
       return BuiltScriptMetadata.Save(outputScriptExe, references);
@@ -64,7 +63,7 @@ namespace Bud.Scripting {
 
     private static void Compile(ICSharpScriptCompiler compiler,
                                 ResolvedReferences references,
-                                IEnumerable<string> inputFilesList,
+                                ImmutableArray<string> inputFilesList,
                                 string outputFile) {
       var errors = compiler.Compile(inputFilesList, references, outputFile);
       if (errors.Any()) {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
@@ -14,9 +15,10 @@ using static Bud.References.AssemblyAggregator;
 
 namespace Bud.NuGet {
   public class NuGetReferenceResolver : INuGetReferenceResolver {
-    public ResolvedReferences Resolve(IEnumerable<PackageReference> packageReferences, string outputDir) {
-      var packageReferencesList = packageReferences as IList<PackageReference> ?? packageReferences.ToList();
-      if (packageReferencesList.Count == 0) {
+    public ResolvedReferences Resolve(ImmutableArray<PackageReference> packageReferences,
+                                      string outputDir) {
+      var packageReferencesList = packageReferences;
+      if (packageReferencesList.IsEmpty) {
         return ResolvedReferences.Empty;
       }
       var packagesConfigFile = PackageReference.WritePackagesConfigXml(packageReferencesList, Path.Combine(outputDir, "packages.config"));
@@ -30,10 +32,9 @@ namespace Bud.NuGet {
       return JsonConvert.DeserializeObject<ResolvedReferences>(readAllText);
     }
 
-    private static void RestorePackages(string packagesConfigFile, string packagesDir) {
-      BatchExec.RunQuietlyThrow("nuget",
-                                $"restore {packagesConfigFile} -PackagesDirectory {packagesDir}");
-    }
+    private static void RestorePackages(string packagesConfigFile, string packagesDir)
+      => BatchExec.RunQuietlyThrow("nuget",
+                                   $"restore {packagesConfigFile} -PackagesDirectory {packagesDir}");
 
     private static void ResolveAssemblies(IEnumerable<PackageReference> packageReferences,
                                           string packagesDir,
@@ -65,8 +66,8 @@ namespace Bud.NuGet {
                                    nuspec.GetId(), nuspec.GetVersion(), packageReference.Framework);
         }
       }
-      return new ResolvedReferences(assemblies,
-                                    AggregateByFrameworkVersion(frameworkAssemblies).ToList());
+      return new ResolvedReferences(assemblies.ToImmutableArray(),
+                                    AggregateByFrameworkVersion(frameworkAssemblies).ToImmutableArray());
     }
 
     private static NuGetv3LocalRepository CreateNuGetV3Repo(string nugetV2RepoDir, string nugetV3RepoDir) {

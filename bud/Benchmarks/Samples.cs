@@ -10,9 +10,9 @@ namespace Bud.Benchmarks {
         .Add("UserTime", executionInfo.UserProcessorTime)
         .Add("SystemTime", executionInfo.PrivilegedProcessorTime);
 
-    public static ImmutableList<ImmutableDictionary<string, object>>
+    public static ImmutableArray<ImmutableDictionary<string, object>>
       SampleList(params ImmutableDictionary<string, object>[] samples)
-      => ImmutableList.CreateRange(samples);
+      => ImmutableArray.CreateRange(samples);
 
     public static ImmutableDictionary<string, object>
       DataPoint(string datapointName, object datapointValue)

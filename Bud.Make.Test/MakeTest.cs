@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Moq;
@@ -56,7 +57,7 @@ namespace Bud.Make {
         Execute(new[] {
           Rule("foo.upper", Uppercase, "foo"),
           Rule("foo.nospace", RemoveSpaces, "foo"),
-          Rule("foo.joined", JoinWithAnd, "foo.upper", "foo.nospace"),
+          Rule("foo.joined", WriteAndSeparatedFileContents, "foo.upper", "foo.nospace"),
         }, "foo.joined", dir.Path);
         FileAssert.AreEqual(expectedOutput, dir.CreatePath("foo.joined"));
       }
@@ -101,8 +102,8 @@ namespace Bud.Make {
       File.WriteAllText(outputFile, outputFileContent);
     }
 
-    private static void JoinWithAnd(IReadOnlyList<string> inputFiles, string outputFile) {
-      var inputFilesContent = inputFiles.Select(File.ReadAllText);
+    private static void WriteAndSeparatedFileContents(ImmutableArray<string> files, string outputFile) {
+      var inputFilesContent = files.Select(File.ReadAllText);
       var outputFileContent = string.Join(" and ", inputFilesContent);
       File.WriteAllText(outputFile, outputFileContent);
     }

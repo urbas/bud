@@ -12,7 +12,17 @@ namespace Bud.Scripting {
     public readonly ImmutableDictionary<string, Option<string>> NoReferences
       = ImmutableDictionary<string, Option<string>>.Empty;
 
-    public ResolvedReferences Resolve(IEnumerable<string> references, IDictionary<string, string> assemblies, ISet<string> frameworkAssemblies) {
+    public ResolvedReferences Resolve(IEnumerable<string> references) {
+      var assemblies = new Dictionary<string, string>();
+      var frameworkAssemblies = new HashSet<string>();
+      Resolve(references, assemblies, frameworkAssemblies);
+      return new ResolvedReferences(assemblies.Select(assemblyNamePath => new Assembly(assemblyNamePath.Key, assemblyNamePath.Value)).ToImmutableArray(),
+                                    frameworkAssemblies.Select(assemblyName => new FrameworkAssembly(assemblyName, FrameworkAssembly.MaxVersion)).ToImmutableArray());
+    }
+
+    public void Resolve(IEnumerable<string> references,
+                        IDictionary<string, string> assemblies,
+                        ISet<string> frameworkAssemblies) {
       foreach (var reference in references) {
         var assemblyOpt = LazyReferencesInitializer.BudReferences.Get(reference);
         if (assemblyOpt.HasValue) {
@@ -28,8 +38,6 @@ namespace Bud.Scripting {
           frameworkAssemblies.Add(reference);
         }
       }
-      return new ResolvedReferences(assemblies.Select(assemblyNamePath => new Assembly(assemblyNamePath.Key, assemblyNamePath.Value)),
-                                    frameworkAssemblies.Select(assemblyName => new FrameworkAssembly(assemblyName, FrameworkAssembly.MaxVersion)));
     }
 
     private static class LazyReferencesInitializer {
@@ -38,7 +46,7 @@ namespace Bud.Scripting {
         ToAssemblyNamePath(typeof(BatchExec)),
         ToAssemblyNamePath(typeof(Make.Make)),
         ToAssemblyNamePath(typeof(HashBasedBuilder)),
-        ToAssemblyNamePath(typeof(ImmutableList)),
+        ToAssemblyNamePath(typeof(ImmutableArray)),
       }.ToImmutableDictionary();
     }
 
@@ -47,8 +55,5 @@ namespace Bud.Scripting {
       return new KeyValuePair<string, ReflectionAssembly>(assembly.GetName().Name,
                                                           assembly);
     }
-
-    public ResolvedReferences Resolve(IEnumerable<string> references)
-      => Resolve(references, new Dictionary<string, string>(), new HashSet<string>());
   }
 }

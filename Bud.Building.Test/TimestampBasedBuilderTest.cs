@@ -13,7 +13,7 @@ namespace Bud.Building {
     [SetUp]
     public void SetUp() {
       outputGenerator = new Mock<FilesBuilder>(MockBehavior.Strict);
-      outputGenerator.Setup(s => s(It.IsAny<IImmutableList<string>>(), It.IsAny<string>()))
+      outputGenerator.Setup(s => s(It.IsAny<ImmutableArray<string>>(), It.IsAny<string>()))
                      .Callback<IEnumerable<string>, string>(DigestGenerator.Generate);
       dir = new TmpDir();
     }
@@ -24,14 +24,14 @@ namespace Bud.Building {
     [Test]
     public void Build_creates_the_output_file() {
       var output = dir.CreatePath("a.out");
-      TimestampBasedBuilder.Build(outputGenerator.Object, ImmutableList<string>.Empty, output);
-      outputGenerator.Verify(self => self(ImmutableList<string>.Empty, output), Times.Once);
+      TimestampBasedBuilder.Build(outputGenerator.Object, ImmutableArray<string>.Empty, output);
+      outputGenerator.Verify(self => self(ImmutableArray<string>.Empty, output), Times.Once);
     }
 
     [Test]
     public void Build_does_not_invoke_the_worker_when_output_already_exists() {
       var output = dir.CreateEmptyFile("a.out");
-      TimestampBasedBuilder.Build(outputGenerator.Object, ImmutableList<string>.Empty, output);
+      TimestampBasedBuilder.Build(outputGenerator.Object, ImmutableArray<string>.Empty, output);
     }
 
     [Test]
@@ -39,7 +39,7 @@ namespace Bud.Building {
       var output = dir.CreateEmptyFile("a.out");
       var fileA = dir.CreateFile("foo", "a");
       File.SetLastWriteTime(output, File.GetLastWriteTime(fileA) - TimeSpan.FromSeconds(1));
-      var input = ImmutableList.Create(fileA);
+      var input = ImmutableArray.Create(fileA);
 
       TimestampBasedBuilder.Build(outputGenerator.Object, input, output);
 
@@ -51,7 +51,7 @@ namespace Bud.Building {
       var fileA = dir.CreateFile("foo", "a");
       var output = dir.CreateEmptyFile("a.out");
       File.SetLastWriteTime(fileA, File.GetLastWriteTime(output) - TimeSpan.FromSeconds(1));
-      var inputFiles = ImmutableList.Create(fileA);
+      var inputFiles = ImmutableArray.Create(fileA);
       TimestampBasedBuilder.Build(outputGenerator.Object, inputFiles, output);
     }
   }
