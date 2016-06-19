@@ -51,9 +51,9 @@ namespace Bud.Scripting {
 
     private static ResolvedReferences ResolveReferences(IReferenceResolver referenceResolver,
                                                         INuGetReferenceResolver nuGetReferenceResolver,
-                                                        IEnumerable<string> inputFilesList,
+                                                        ImmutableArray<string> inputFilesList,
                                                         string downloadedPackagesDir) {
-      var scriptContents = inputFilesList.Select(File.ReadAllText).ToList();
+      var scriptContents = inputFilesList.Select(File.ReadAllText);
       var directives = ScriptDirectives.Extract(scriptContents);
 
       return nuGetReferenceResolver
