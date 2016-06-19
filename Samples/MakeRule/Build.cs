@@ -4,13 +4,8 @@ using System.IO;
 using Bud.Make;
 
 class Build {
-  static void Main(string[] args) {
-    var rules = new [] {
-      Make.Rule("foo.out", RemoveSpaces, "foo.in"),
-    };
-
-    Make.Execute(rules, "foo.out");
-  }
+  static void Main(string[] args)
+    => Make.Execute("foo.out", Make.Rule("foo.out", RemoveSpaces, "foo.in"));
 
   private static void RemoveSpaces(string inputFile, string outputFile) {
     var inputFileContent = File.ReadAllText(inputFile);

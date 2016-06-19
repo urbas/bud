@@ -23,8 +23,14 @@ namespace Bud.Make {
     ///   Executes rule <paramref name="ruleToBuild" /> as defined in <paramref name="rules" />.
     ///   This method executes the rules in a single thread synchronously.
     /// </summary>
-    public static void Execute(IEnumerable<Rule> rules, string ruleToBuild, Option<string> workingDir = default(Option<string>)) {
-      var workingDirReal = workingDir.GetOrElse(Directory.GetCurrentDirectory);
+    public static void Execute(string ruleToBuild, params Rule[] rules)
+      => Execute(ruleToBuild, Directory.GetCurrentDirectory(), rules);
+
+    /// <summary>
+    ///   Executes rule <paramref name="ruleToBuild" /> as defined in <paramref name="rules" />.
+    ///   This method executes the rules in a single thread synchronously.
+    /// </summary>
+    public static void Execute(string ruleToBuild, string workingDir, params Rule[] rules) {
       var rulesDictionary = new Dictionary<string, Rule>();
       foreach (var r in rules) {
         if (rulesDictionary.ContainsKey(r.Output)) {
@@ -37,7 +43,7 @@ namespace Bud.Make {
         throw new Exception($"Could not find rule '{ruleToBuild}'.");
       }
       var rule = ruleOptional.Value;
-      InvokeRecipe(workingDirReal, rulesDictionary, rule, new HashSet<string>(), new List<string>());
+      InvokeRecipe(workingDir, rulesDictionary, rule, new HashSet<string>(), new List<string>());
     }
 
     private static void InvokeRecipe(string workingDir,

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -14,7 +13,7 @@ namespace Bud.Make {
     public void Execute_invokes_the_recipe_when_output_file_not_present() {
       using (var dir = new TmpDir()) {
         dir.CreateFile("This is Sparta!", "foo.in");
-        Execute(new[] {Rule("foo.out", RemoveSpaces, "foo.in")}, "foo.out", dir.Path);
+        Execute("foo.out", dir.Path, Rule("foo.out", RemoveSpaces, "foo.in"));
         FileAssert.AreEqual(dir.CreateFile("ThisisSparta!", "expected_output"),
                             dir.CreatePath("foo.out"));
       }
@@ -27,7 +26,7 @@ namespace Bud.Make {
         var inputFile = dir.CreateEmptyFile("foo.in");
         var outputFile = dir.CreateEmptyFile("foo.out");
         File.SetLastWriteTimeUtc(inputFile, File.GetLastWriteTimeUtc(outputFile) - TimeSpan.FromSeconds(5));
-        Execute(new[] {Rule("foo.out", recipeMock.Object, "foo.in")}, "foo.out", dir.Path);
+        Execute("foo.out", dir.Path, Rule("foo.out", recipeMock.Object, "foo.in"));
         recipeMock.Verify(s => s(It.IsAny<string>(), It.IsAny<string>()),
                           Times.Never);
       }
@@ -36,7 +35,9 @@ namespace Bud.Make {
     [Test]
     public void Execute_throws_when_given_duplicate_rules() {
       var exception = Throws<Exception>(() => {
-        Execute(new[] {Rule("foo", RemoveSpaces, "bar"), Rule("foo", RemoveSpaces, "moo")}, "foo");
+        Execute("foo",
+                Rule("foo", RemoveSpaces, "bar"),
+                Rule("foo", RemoveSpaces, "moo"));
       });
       That(exception.Message, Does.Contain("'foo'"));
     }
@@ -44,7 +45,7 @@ namespace Bud.Make {
     [Test]
     public void Execute_throws_when_rule_does_not_exist() {
       var exception = Throws<Exception>(() => {
-        Execute(new[] {Rule("out", RemoveSpaces, "in")}, "invalid.out", "/foo/bar");
+        Execute("invalid.out", "/foo/bar", Rule("out", RemoveSpaces, "in"));
       });
       That(exception.Message, Does.Contain("'invalid.out'"));
     }
@@ -54,11 +55,11 @@ namespace Bud.Make {
       using (var dir = new TmpDir()) {
         dir.CreateFile("foo bar", "foo");
         var expectedOutput = dir.CreateFile("FOO BAR and foobar", "expected_output");
-        Execute(new[] {
-          Rule("foo.upper", Uppercase, "foo"),
-          Rule("foo.nospace", RemoveSpaces, "foo"),
-          Rule("foo.joined", WriteAndSeparatedFileContents, "foo.upper", "foo.nospace"),
-        }, "foo.joined", dir.Path);
+        Execute("foo.joined",
+                dir.Path,
+                Rule("foo.upper", Uppercase, "foo"),
+                Rule("foo.nospace", RemoveSpaces, "foo"),
+                Rule("foo.joined", WriteAndSeparatedFileContents, "foo.upper", "foo.nospace"));
         FileAssert.AreEqual(expectedOutput, dir.CreatePath("foo.joined"));
       }
     }
@@ -66,11 +67,11 @@ namespace Bud.Make {
     [Test]
     public void Execute_does_not_invoke_dependent_rules_twice() {
       var recipeMock = new Mock<Action<string, string>>();
-      Execute(new[] {
-        Rule("foo.out1", recipeMock.Object, "foo.in"),
-        Rule("foo.out2", (string inFile, string outFile) => {}, "foo.out1"),
-        Rule("foo.out3", (inFiles, outFile) => {}, "foo.out1", "foo.out2") ,
-      }, "foo.out3", "/foo/bar");
+      Execute("foo.out3",
+              "/foo/bar",
+              Rule("foo.out1", recipeMock.Object, "foo.in"),
+              Rule("foo.out2", (string inFile, string outFile) => {}, "foo.out1"),
+              Rule("foo.out3", (inFiles, outFile) => {}, "foo.out1", "foo.out2"));
       recipeMock.Verify(s => s(It.IsAny<string>(), It.IsAny<string>()),
                         Times.Once);
     }
@@ -79,12 +80,12 @@ namespace Bud.Make {
     public void Execute_throws_when_there_is_a_cycle() {
       var recipeMock = new Mock<Action<string, string>>();
       var ex = Throws<Exception>(() => {
-        Execute(new[] {
-          Rule("foo.out1", recipeMock.Object, "foo.in1"),
-          Rule("foo.out2", recipeMock.Object, "foo.in2"),
-          Rule("foo.in1", recipeMock.Object, "foo.out2"),
-          Rule("foo.in2", recipeMock.Object, "foo.out1"),
-        }, "foo.out2", "/foo/bar");
+        Execute("foo.out2",
+                "/foo/bar",
+                Rule("foo.out1", recipeMock.Object, "foo.in1"),
+                Rule("foo.out2", recipeMock.Object, "foo.in2"),
+                Rule("foo.in1", recipeMock.Object, "foo.out2"),
+                Rule("foo.in2", recipeMock.Object, "foo.out1"));
       });
       That(ex.Message,
            Does.Contain("'foo.out2 -> foo.in1 -> foo.out1 -> foo.in2 -> foo.out2'"));
