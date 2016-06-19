@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Immutable;
 using Bud.NuGet;
 using NuGet.Frameworks;
 using NuGet.Versioning;
 using NUnit.Framework;
-using static Bud.Option;
 using static NUnit.Framework.Assert;
 
 namespace Bud.Scripting {
@@ -17,11 +15,6 @@ namespace Bud.Scripting {
     public void Extract_returns_specified_assembly_references()
       => AreEqual(new[] {"Foo"},
                   ScriptDirectives.Extract(@"//!reference Foo").References);
-
-    [Test]
-    public void Extract_deduplicates_assembly_references()
-      => AreEqual(new[] {"Foo"},
-                  ScriptDirectives.Extract(@"//!reference Foo", @"//!reference Foo").References);
 
     [Test]
     public void Extract_returns_no_references_if_reference_line_malformed()
@@ -41,7 +34,7 @@ var
 
 // But not this one
 //!reference Goo").References,
-              Is.EquivalentTo(new[] {"Foo", "Bar", "Zar","Moo"}));
+              Is.EquivalentTo(new[] {"Foo", "Bar", "Zar", "Moo"}));
 
     [Test]
     public void Extract_throws_when_given_an_invalid_reference()
@@ -49,7 +42,7 @@ var
 
     [Test]
     public void Extract_returns_versioned_nuget_package_references()
-      => AreEqual(new [] {new PackageReference("Foo", NuGetVersion.Parse("1.2.3"), NuGetFramework.AnyFramework)},
+      => AreEqual(new[] {new PackageReference("Foo", NuGetVersion.Parse("1.2.3"), NuGetFramework.AnyFramework)},
                   ScriptDirectives.Extract(@"//!nuget Foo 1.2.3").NuGetReferences);
 
     [Test]

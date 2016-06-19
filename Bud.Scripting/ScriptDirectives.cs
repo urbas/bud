@@ -31,7 +31,7 @@ namespace Bud.Scripting {
     ///   all the directives found in the scripts.
     /// </returns>
     public static ScriptDirectives Extract(IEnumerable<string> scriptContents) {
-      var assemblyReferences = new HashSet<string>();
+      var assemblyReferences = ImmutableArray.CreateBuilder<string>();
       var nugetReferences = ImmutableArray.CreateBuilder<PackageReference>();
       foreach (var scriptContent in scriptContents) {
         using (var stringReader = new StringReader(scriptContent)) {
@@ -53,7 +53,7 @@ namespace Bud.Scripting {
           }
         }
       }
-      return new ScriptDirectives(assemblyReferences.ToImmutableArray(),
+      return new ScriptDirectives(assemblyReferences.ToImmutable(),
                                   nugetReferences.ToImmutable());
     }
 
