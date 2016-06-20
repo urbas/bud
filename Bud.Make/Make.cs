@@ -47,12 +47,13 @@ namespace Bud.Make {
     }
 
     private static void InvokeRecipe(string workingDir,
-                                     IReadOnlyDictionary<string, Rule> rulesDictionary,
+                                     IDictionary<string, Rule> rulesDictionary,
                                      Rule rule,
                                      ISet<string> alreadyInvokedRules,
                                      IList<string> currentlyExecutingRules) {
       if (currentlyExecutingRules.Contains(rule.Output)) {
-        throw new Exception($"Detected a cycle in rule dependencies: '{rule.Output} -> {string.Join(" -> ", currentlyExecutingRules.Reverse())}'.");
+        throw new Exception($"Detected a cycle in rule dependencies: " +
+                            $"'{rule.Output} -> {string.Join(" -> ", currentlyExecutingRules.Reverse())}'.");
       }
       if (alreadyInvokedRules.Contains(rule.Output)) {
         return;

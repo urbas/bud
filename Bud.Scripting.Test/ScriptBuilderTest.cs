@@ -94,9 +94,9 @@ namespace Bud.Scripting {
   }
 
   public class TestReferenceResolver : IReferenceResolver {
-    private readonly IReadOnlyDictionary<string, string> knownReferences;
+    private readonly ImmutableDictionary<string, string> knownReferences;
 
-    public TestReferenceResolver(IReadOnlyDictionary<string, string> references = null) {
+    public TestReferenceResolver(ImmutableDictionary<string, string> references = null) {
       knownReferences = references ?? ImmutableDictionary<string, string>.Empty;
     }
 

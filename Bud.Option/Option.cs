@@ -63,7 +63,7 @@ namespace Bud {
                                                                 Func<TSource, Option<TResult>> selector)
       => enumerable.Select(selector).Gather();
 
-    public static Option<TValue> Get<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dict,
+    public static Option<TValue> Get<TKey, TValue>(this IDictionary<TKey, TValue> dict,
                                                    TKey key) {
       TValue value;
       return dict.TryGetValue(key, out value) ? value : None<TValue>();

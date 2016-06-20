@@ -106,7 +106,7 @@ namespace Bud {
     [Test]
     public void Gather_filters_and_selects()
       => AreEqual(new[] {"1", "3"},
-                  new[] {1, 2, 3, 4}.Gather(number => number%2 == 1 ? Some(number.ToString()) : None<string>()));
+                  new[] {1, 2, 3, 4}.Gather(number => number % 2 == 1 ? Some(number.ToString()) : None<string>()));
 
     [Test]
     public void Flatten_returns_none_when_given_a_nested_none()
@@ -129,6 +129,6 @@ namespace Bud {
 
     [Test]
     public void Get_on_existing_key_in_dictionary_returns_Some()
-      => AreEqual(Some(1), new Dictionary<int, int> { {42, 1} }.Get(42));
+      => AreEqual(Some(1), new Dictionary<int, int> {{42, 1}}.Get(42));
   }
 }
