@@ -54,6 +54,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Bud.Building\Bud.Building.csproj">
+      <Project>{5A604E11-557A-429D-8237-2956CA928422}</Project>
+      <Name>Bud.Building</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Bud.Make\Bud.Make.csproj">
       <Project>{3E9AEFD6-385D-43A7-9DDB-5EEF2643B6F7}</Project>
       <Name>Bud.Make</Name>

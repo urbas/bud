@@ -1,23 +1,20 @@
-using System;
 using System.Collections.Immutable;
 using System.Linq;
+using Bud.Building;
 
 namespace Bud {
   public class Rule {
-    private readonly Action<ImmutableArray<string>, string> recipe;
     public ImmutableArray<string> Inputs { get; }
+    public FilesBuilder Recipe { get; }
     public string Output { get; }
 
     public Rule(string output,
-                Action<ImmutableArray<string>, string> recipe,
+                FilesBuilder recipe,
                 ImmutableArray<string> inputs) {
-      this.recipe = recipe;
+      Recipe = recipe;
       Inputs = inputs;
       Output = output;
     }
-
-    public void Recipe(ImmutableArray<string> inputFiles, string outputFile)
-      => recipe(inputFiles, outputFile);
 
     protected bool Equals(Rule other)
       => Inputs.SequenceEqual(other.Inputs) &&

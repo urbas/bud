@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using Bud.Building;
 using Moq;
 using NUnit.Framework;
 
@@ -20,7 +21,7 @@ namespace Bud {
     [Test]
     public void Execute_does_not_invoke_the_recipe_when_output_file_is_newer() {
       using (var dir = new TmpDir()) {
-        var recipeMock = new Mock<Action<string, string>>();
+        var recipeMock = new Mock<SingleFileBuilder>();
         var inputFile = dir.CreateEmptyFile("foo.in");
         var outputFile = dir.CreateEmptyFile("foo.out");
         File.SetLastWriteTimeUtc(inputFile, File.GetLastWriteTimeUtc(outputFile) - TimeSpan.FromSeconds(5));
@@ -64,7 +65,7 @@ namespace Bud {
 
     [Test]
     public void Execute_does_not_invoke_dependent_rules_twice() {
-      var recipeMock = new Mock<Action<string, string>>();
+      var recipeMock = new Mock<SingleFileBuilder>();
       Make.Execute("foo.out3",
                    "/foo/bar",
                    Make.Rule("foo.out1", recipeMock.Object, "foo.in"),
@@ -76,7 +77,7 @@ namespace Bud {
 
     [Test]
     public void Execute_throws_when_there_is_a_cycle() {
-      var recipeMock = new Mock<Action<string, string>>();
+      var recipeMock = new Mock<SingleFileBuilder>();
       var ex = Assert.Throws<Exception>(() => {
         Make.Execute("foo.out2",
                      "/foo/bar",

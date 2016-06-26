@@ -8,14 +8,14 @@ using Bud.Building;
 namespace Bud {
   public static class Make {
     public static Rule Rule(string output,
-                            Action<string, string> recipe,
+                            SingleFileBuilder recipe,
                             string input)
       => new Rule(output,
                   (inputFiles, outputFile) => recipe(inputFiles[0], outputFile),
                   ImmutableArray.Create(input));
 
     public static Rule Rule(string outputFile,
-                            Action<ImmutableArray<string>, string> recipe,
+                            FilesBuilder recipe,
                             params string[] inputFiles)
       => new Rule(outputFile, recipe, ImmutableArray.CreateRange(inputFiles));
 
