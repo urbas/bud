@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using Bud.Building;
 
-namespace Bud.Make {
+namespace Bud {
   public static class Make {
     public static Rule Rule(string output,
                             Action<string, string> recipe,

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Immutable;
 using System.Linq;
 
-namespace Bud.Make {
+namespace Bud {
   public class Rule {
     private readonly Action<ImmutableArray<string>, string> recipe;
     public ImmutableArray<string> Inputs { get; }
