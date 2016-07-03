@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.Option", "Bud.Option\Bu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.Option.Test", "Bud.Option.Test\Bud.Option.Test.csproj", "{CC20DA6A-455A-431D-807C-9E5533DBF633}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.RunScript", "Bud.RunScript\Bud.RunScript.csproj", "{05236F73-9AE4-4351-8378-29F96B6977C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.RunScript", "CliTools\Bud.RunScript\Bud.RunScript.csproj", "{05236F73-9AE4-4351-8378-29F96B6977C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.Cache", "Bud.Cache\Bud.Cache.csproj", "{713F14ED-BAF2-4CE4-AFB3-ECADAC2B710B}"
 EndProject
@@ -33,13 +33,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.References.Test", "Bud.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CliTools", "CliTools", "{1B7C3817-387F-4D1A-B332-DB0802002240}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.ScriptToCsProj", "Bud.ScriptToCsProj\Bud.ScriptToCsProj.csproj", "{D5DD5466-BBA7-4B4A-B8E6-74B4B643C1CC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.ScriptToCsProj", "CliTools\Bud.ScriptToCsProj\Bud.ScriptToCsProj.csproj", "{D5DD5466-BBA7-4B4A-B8E6-74B4B643C1CC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.CsProjTools", "Bud.CsProjTools\Bud.CsProjTools.csproj", "{C3AF8877-8FDE-4D6C-B5F8-51655E7FE63B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.CsProjTools.Test", "Bud.CsProjTools.Test\Bud.CsProjTools.Test.csproj", "{C0141677-538F-4352-BC87-417141927B59}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.ScriptToCsProj.Test", "Bud.ScriptToCsProj.Test\Bud.ScriptToCsProj.Test.csproj", "{7C9D58CA-20B0-4A55-844A-19BED08C8E0D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bud.ScriptToCsProj.Test", "CliTools\Bud.ScriptToCsProj.Test\Bud.ScriptToCsProj.Test.csproj", "{7C9D58CA-20B0-4A55-844A-19BED08C8E0D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Samples.Test", "Samples.Test\Samples.Test.csproj", "{DE00FDE6-D7A8-4073-88BA-63EFACB51522}"
 EndProject

@@ -104,7 +104,7 @@
       <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
       <Name>Bud.Option</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.RunScript\Bud.RunScript.csproj">
+    <ProjectReference Include="..\CliTools\Bud.RunScript\Bud.RunScript.csproj">
       <Project>{05236f73-9ae4-4351-8378-29f96b6977c2}</Project>
       <Name>Bud.RunScript</Name>
     </ProjectReference>
@@ -116,11 +116,11 @@
       <Project>{f1cc850c-4c10-4d2c-8267-0c7ef196cb38}</Project>
       <Name>Bud.Scripting</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.ScriptToCsProj.Test\Bud.ScriptToCsProj.Test.csproj">
+    <ProjectReference Include="..\CliTools\Bud.ScriptToCsProj.Test\Bud.ScriptToCsProj.Test.csproj">
       <Project>{7c9d58ca-20b0-4a55-844a-19bed08c8e0d}</Project>
       <Name>Bud.ScriptToCsProj.Test</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.ScriptToCsProj\Bud.ScriptToCsProj.csproj">
+    <ProjectReference Include="..\CliTools\Bud.ScriptToCsProj\Bud.ScriptToCsProj.csproj">
       <Project>{d5dd5466-bba7-4b4a-b8e6-74b4b643c1cc}</Project>
       <Name>Bud.ScriptToCsProj</Name>
     </ProjectReference>

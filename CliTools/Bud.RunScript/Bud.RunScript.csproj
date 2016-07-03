@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D5DD5466-BBA7-4B4A-B8E6-74B4B643C1CC}</ProjectGuid>
+    <ProjectGuid>{05236F73-9AE4-4351-8378-29F96B6977C2}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bud.ScriptToCsProj</RootNamespace>
-    <AssemblyName>Bud.ScriptToCsProj</AssemblyName>
+    <RootNamespace>Bud.RunScript</RootNamespace>
+    <AssemblyName>Bud.RunScript</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -33,63 +33,40 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.CodeAnalysis, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.1.2.2\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.1.2.2\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="RunScriptProgram.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Bud.Building\Bud.Building.csproj">
+      <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
+      <Name>Bud.Building</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Bud.Make\Bud.Make.csproj">
+      <Project>{3e9aefd6-385d-43a7-9ddb-5eef2643b6f7}</Project>
+      <Name>Bud.Make</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Bud.Option\Bud.Option.csproj">
+      <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
+      <Name>Bud.Option</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Bud.Scripting\Bud.Scripting.csproj">
+      <Project>{f1cc850c-4c10-4d2c-8267-0c7ef196cb38}</Project>
+      <Name>Bud.Scripting</Name>
+    </ProjectReference>
     <Reference Include="System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Collections.Immutable.1.1.37\lib\dotnet\System.Collections.Immutable.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Core" />
-    <Reference Include="System.Reflection.Metadata, Version=1.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reflection.Metadata.1.2.0\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ScriptToCsProjProgram.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ScriptCsProj.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Bud.Building\Bud.Building.csproj">
-      <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
-      <Name>Bud.Building</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.CsProjTools\Bud.CsProjTools.csproj">
-      <Project>{c3af8877-8fde-4d6c-b5f8-51655e7fe63b}</Project>
-      <Name>Bud.CsProjTools</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.Make\Bud.Make.csproj">
-      <Project>{3e9aefd6-385d-43a7-9ddb-5eef2643b6f7}</Project>
-      <Name>Bud.Make</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
-      <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
-      <Name>Bud.Option</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.References\Bud.References.csproj">
-      <Project>{a4d2b43f-f24a-480a-b743-ebe0186b0d21}</Project>
-      <Name>Bud.References</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.Scripting\Bud.Scripting.csproj">
-      <Project>{f1cc850c-4c10-4d2c-8267-0c7ef196cb38}</Project>
-      <Name>Bud.Scripting</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

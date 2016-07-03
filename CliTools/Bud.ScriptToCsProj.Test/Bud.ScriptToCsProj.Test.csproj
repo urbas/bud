@@ -58,19 +58,19 @@
     <Compile Include="ScriptCsProjTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Bud.CsProjTools\Bud.CsProjTools.csproj">
+    <ProjectReference Include="..\..\Bud.CsProjTools\Bud.CsProjTools.csproj">
       <Project>{c3af8877-8fde-4d6c-b5f8-51655e7fe63b}</Project>
       <Name>Bud.CsProjTools</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
+    <ProjectReference Include="..\..\Bud.Option\Bud.Option.csproj">
       <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
       <Name>Bud.Option</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.References\Bud.References.csproj">
+    <ProjectReference Include="..\..\Bud.References\Bud.References.csproj">
       <Project>{A4D2B43F-F24A-480A-B743-EBE0186B0D21}</Project>
       <Name>Bud.References</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Scripting\Bud.Scripting.csproj">
+    <ProjectReference Include="..\..\Bud.Scripting\Bud.Scripting.csproj">
       <Project>{F1CC850C-4C10-4D2C-8267-0C7EF196CB38}</Project>
       <Name>Bud.Scripting</Name>
     </ProjectReference>
