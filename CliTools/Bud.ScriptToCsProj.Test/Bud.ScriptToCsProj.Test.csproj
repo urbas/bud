@@ -31,25 +31,25 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CodeAnalysis, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.Common.1.2.2\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.CodeAnalysis.Common.1.2.2\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis.CSharp, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.CodeAnalysis.CSharp.1.2.2\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
+      <HintPath>..\..\packages\Microsoft.CodeAnalysis.CSharp.1.2.2\lib\net45\Microsoft.CodeAnalysis.CSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
-      <HintPath>..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
+      <HintPath>..\..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Collections.Immutable.1.1.37\lib\dotnet\System.Collections.Immutable.dll</HintPath>
+      <HintPath>..\..\packages\System.Collections.Immutable.1.1.37\lib\dotnet\System.Collections.Immutable.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Reflection.Metadata, Version=1.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Reflection.Metadata.1.2.0\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
+      <HintPath>..\..\packages\System.Reflection.Metadata.1.2.0\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>
@@ -58,19 +58,19 @@
     <Compile Include="ScriptCsProjTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Bud.CsProjTools\Bud.CsProjTools.csproj">
+    <ProjectReference Include="..\..\Libs\Bud.CsProjTools\Bud.CsProjTools.csproj">
       <Project>{c3af8877-8fde-4d6c-b5f8-51655e7fe63b}</Project>
       <Name>Bud.CsProjTools</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Bud.Option\Bud.Option.csproj">
+    <ProjectReference Include="..\..\Libs\Bud.Option\Bud.Option.csproj">
       <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
       <Name>Bud.Option</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Bud.References\Bud.References.csproj">
+    <ProjectReference Include="..\..\Libs\Bud.References\Bud.References.csproj">
       <Project>{A4D2B43F-F24A-480A-B743-EBE0186B0D21}</Project>
       <Name>Bud.References</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Bud.Scripting\Bud.Scripting.csproj">
+    <ProjectReference Include="..\..\Libs\Bud.Scripting\Bud.Scripting.csproj">
       <Project>{F1CC850C-4C10-4D2C-8267-0C7EF196CB38}</Project>
       <Name>Bud.Scripting</Name>
     </ProjectReference>
@@ -84,10 +84,6 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="BudScript.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

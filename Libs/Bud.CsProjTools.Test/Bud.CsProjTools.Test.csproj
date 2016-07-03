@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{05236F73-9AE4-4351-8378-29F96B6977C2}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{C0141677-538F-4352-BC87-417141927B59}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bud.RunScript</RootNamespace>
-    <AssemblyName>Bud.RunScript</AssemblyName>
+    <RootNamespace>Bud.CsProjTools</RootNamespace>
+    <AssemblyName>Bud.CsProjTools.Test</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,40 +30,40 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RunScriptProgram.cs" />
+    <Compile Include="CsProjTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Libs\Bud.Building\Bud.Building.csproj">
-      <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
-      <Name>Bud.Building</Name>
+    <EmbeddedResource Include="SampleCsProjs\PropertyGroup.csproj" />
+    <EmbeddedResource Include="SampleCsProjs\Empty.csproj" />
+    <EmbeddedResource Include="SampleCsProjs\MsBuildImports.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bud.CsProjTools\Bud.CsProjTools.csproj">
+      <Project>{C3AF8877-8FDE-4D6C-B5F8-51655E7FE63B}</Project>
+      <Name>Bud.CsProjTools</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Libs\Bud.Make\Bud.Make.csproj">
-      <Project>{3e9aefd6-385d-43a7-9ddb-5eef2643b6f7}</Project>
-      <Name>Bud.Make</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Libs\Bud.Option\Bud.Option.csproj">
-      <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
+    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
+      <Project>{594DC304-3A8A-43FC-BE7D-71D8C603014A}</Project>
       <Name>Bud.Option</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Libs\Bud.Scripting\Bud.Scripting.csproj">
-      <Project>{f1cc850c-4c10-4d2c-8267-0c7ef196cb38}</Project>
-      <Name>Bud.Scripting</Name>
-    </ProjectReference>
-    <Reference Include="System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Collections.Immutable.1.1.37\lib\dotnet\System.Collections.Immutable.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

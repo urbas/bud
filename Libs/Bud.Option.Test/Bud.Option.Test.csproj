@@ -4,17 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{05236F73-9AE4-4351-8378-29F96B6977C2}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{CC20DA6A-455A-431D-807C-9E5533DBF633}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bud.RunScript</RootNamespace>
-    <AssemblyName>Bud.RunScript</AssemblyName>
+    <RootNamespace>Bud</RootNamespace>
+    <AssemblyName>Bud.Option.Test</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -24,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -33,37 +30,30 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Castle.Core, Version=3.3.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Moq, Version=4.5.9.0, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Moq.4.5.9\lib\net45\Moq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="RunScriptProgram.cs" />
+    <Compile Include="OptionTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Libs\Bud.Building\Bud.Building.csproj">
-      <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
-      <Name>Bud.Building</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Libs\Bud.Make\Bud.Make.csproj">
-      <Project>{3e9aefd6-385d-43a7-9ddb-5eef2643b6f7}</Project>
-      <Name>Bud.Make</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Libs\Bud.Option\Bud.Option.csproj">
+    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
       <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
       <Name>Bud.Option</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Libs\Bud.Scripting\Bud.Scripting.csproj">
-      <Project>{f1cc850c-4c10-4d2c-8267-0c7ef196cb38}</Project>
-      <Name>Bud.Scripting</Name>
-    </ProjectReference>
-    <Reference Include="System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Collections.Immutable.1.1.37\lib\dotnet\System.Collections.Immutable.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -185,31 +185,27 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.Analyzers.dll" />
-    <Analyzer Include="..\packages\Microsoft.CodeAnalysis.Analyzers.1.1.0\analyzers\dotnet\cs\Microsoft.CodeAnalysis.CSharp.Analyzers.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Bud.Building\Bud.Building.csproj">
+    <ProjectReference Include="..\Libs\Bud.Building\Bud.Building.csproj">
       <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
       <Name>Bud.Building</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Exec\Bud.Exec.csproj">
+    <ProjectReference Include="..\Libs\Bud.Exec\Bud.Exec.csproj">
       <Project>{7647a7d1-bb14-4a70-9b0a-551b051cc125}</Project>
       <Name>Bud.Exec</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.FilesObservatory\Bud.FilesObservatory.csproj">
+    <ProjectReference Include="..\Libs\Bud.FilesObservatory\Bud.FilesObservatory.csproj">
       <Project>{0aaa33ea-e957-4e45-aac9-8021d2e82e80}</Project>
       <Name>Bud.FilesObservatory</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.NuGet\Bud.NuGet.csproj">
+    <ProjectReference Include="..\Libs\Bud.NuGet\Bud.NuGet.csproj">
       <Project>{e9529521-9d73-4dce-aa81-d1e08cbb53d4}</Project>
       <Name>Bud.NuGet</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.References\Bud.References.csproj">
+    <ProjectReference Include="..\Libs\Bud.References\Bud.References.csproj">
       <Project>{a4d2b43f-f24a-480a-b743-ebe0186b0d21}</Project>
       <Name>Bud.References</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
+    <ProjectReference Include="..\Libs\Bud.Option\Bud.Option.csproj">
       <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
       <Name>Bud.Option</Name>
     </ProjectReference>

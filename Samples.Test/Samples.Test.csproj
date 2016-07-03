@@ -56,51 +56,51 @@
     <Compile Include="UsingFrameworkAssembliesTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Bud.Building.Test\Bud.Building.Test.csproj">
+    <ProjectReference Include="..\Libs\Bud.Building.Test\Bud.Building.Test.csproj">
       <Project>{569d3dda-7694-4ab2-83a5-ec92eadd6002}</Project>
       <Name>Bud.Building.Test</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Building\Bud.Building.csproj">
+    <ProjectReference Include="..\Libs\Bud.Building\Bud.Building.csproj">
       <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
       <Name>Bud.Building</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Cache.Test\Bud.Cache.Test.csproj">
+    <ProjectReference Include="..\Libs\Bud.Cache.Test\Bud.Cache.Test.csproj">
       <Project>{f212314a-ca0e-45d6-bfc7-134a43e5a96f}</Project>
       <Name>Bud.Cache.Test</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Cache\Bud.Cache.csproj">
+    <ProjectReference Include="..\Libs\Bud.Cache\Bud.Cache.csproj">
       <Project>{713f14ed-baf2-4ce4-afb3-ecadac2b710b}</Project>
       <Name>Bud.Cache</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.CsProjTools.Test\Bud.CsProjTools.Test.csproj">
+    <ProjectReference Include="..\Libs\Bud.CsProjTools.Test\Bud.CsProjTools.Test.csproj">
       <Project>{c0141677-538f-4352-bc87-417141927b59}</Project>
       <Name>Bud.CsProjTools.Test</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.CsProjTools\Bud.CsProjTools.csproj">
+    <ProjectReference Include="..\Libs\Bud.CsProjTools\Bud.CsProjTools.csproj">
       <Project>{c3af8877-8fde-4d6c-b5f8-51655e7fe63b}</Project>
       <Name>Bud.CsProjTools</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Exec\Bud.Exec.csproj">
+    <ProjectReference Include="..\Libs\Bud.Exec\Bud.Exec.csproj">
       <Project>{7647a7d1-bb14-4a70-9b0a-551b051cc125}</Project>
       <Name>Bud.Exec</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.References.Test\Bud.References.Test.csproj">
+    <ProjectReference Include="..\Libs\Bud.References.Test\Bud.References.Test.csproj">
       <Project>{cd0a7381-310b-421b-9b5b-2cbdb7bce8d3}</Project>
       <Name>Bud.References.Test</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.References\Bud.References.csproj">
+    <ProjectReference Include="..\Libs\Bud.References\Bud.References.csproj">
       <Project>{a4d2b43f-f24a-480a-b743-ebe0186b0d21}</Project>
       <Name>Bud.References</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Make\Bud.Make.csproj">
+    <ProjectReference Include="..\Libs\Bud.Make\Bud.Make.csproj">
       <Project>{3e9aefd6-385d-43a7-9ddb-5eef2643b6f7}</Project>
       <Name>Bud.Make</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Option.Test\Bud.Option.Test.csproj">
+    <ProjectReference Include="..\Libs\Bud.Option.Test\Bud.Option.Test.csproj">
       <Project>{cc20da6a-455a-431d-807c-9e5533dbf633}</Project>
       <Name>Bud.Option.Test</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
+    <ProjectReference Include="..\Libs\Bud.Option\Bud.Option.csproj">
       <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
       <Name>Bud.Option</Name>
     </ProjectReference>
@@ -108,11 +108,11 @@
       <Project>{05236f73-9ae4-4351-8378-29f96b6977c2}</Project>
       <Name>Bud.RunScript</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Scripting.Test\Bud.Scripting.Test.csproj">
+    <ProjectReference Include="..\Libs\Bud.Scripting.Test\Bud.Scripting.Test.csproj">
       <Project>{9a731d93-1960-4847-8259-64ba42d6026a}</Project>
       <Name>Bud.Scripting.Test</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Scripting\Bud.Scripting.csproj">
+    <ProjectReference Include="..\Libs\Bud.Scripting\Bud.Scripting.csproj">
       <Project>{f1cc850c-4c10-4d2c-8267-0c7ef196cb38}</Project>
       <Name>Bud.Scripting</Name>
     </ProjectReference>
@@ -124,15 +124,15 @@
       <Project>{d5dd5466-bba7-4b4a-b8e6-74b4b643c1cc}</Project>
       <Name>Bud.ScriptToCsProj</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Test\Bud.Test.csproj">
+    <ProjectReference Include="..\Libs\Bud.Test\Bud.Test.csproj">
       <Project>{e5e245ed-633e-4589-90c2-a69eedd96b72}</Project>
       <Name>Bud.Test</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.TmpDir.Test\Bud.TmpDir.Test.csproj">
+    <ProjectReference Include="..\Libs\Bud.TmpDir.Test\Bud.TmpDir.Test.csproj">
       <Project>{5144abf8-c9ac-4034-8459-0bbb964ac712}</Project>
       <Name>Bud.TmpDir.Test</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.TmpDir\Bud.TmpDir.csproj">
+    <ProjectReference Include="..\Libs\Bud.TmpDir\Bud.TmpDir.csproj">
       <Project>{b8efe565-1fda-48cb-a7f3-b3627b747727}</Project>
       <Name>Bud.TmpDir</Name>
     </ProjectReference>
