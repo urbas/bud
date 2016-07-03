@@ -121,9 +121,7 @@
     <Compile Include="IO\FileUtilsTest.cs" />
     <Compile Include="IO\FileWatcherTest.cs" />
     <Compile Include="IO\HashBasedCachingTest.cs" />
-    <Compile Include="IO\LocalFilesObservatoryTest.cs" />
     <Compile Include="IO\PathUtilsTest.cs" />
-    <Compile Include="IO\TaskTestUtils.cs" />
     <Compile Include="IO\TimestampedTest.cs" />
     <Compile Include="IO\ValueUpdaterTest.cs" />
     <Compile Include="NuGet\NuGetAssemblyResolverTest.cs" />
@@ -155,6 +153,10 @@
     <Compile Include="V1\ZippingTest.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Bud.FilesObservatory\Bud.FilesObservatory.csproj">
+      <Project>{0aaa33ea-e957-4e45-aac9-8021d2e82e80}</Project>
+      <Name>Bud.FilesObservatory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Bud.NuGet\Bud.NuGet.csproj">
       <Project>{e9529521-9d73-4dce-aa81-d1e08cbb53d4}</Project>
       <Name>Bud.NuGet</Name>

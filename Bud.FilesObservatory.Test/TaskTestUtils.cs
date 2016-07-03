@@ -1,7 +1,7 @@
 using System;
 using System.Threading;
 
-namespace Bud.IO {
+namespace Bud {
   public static class TaskTestUtils {
     public static T InvokeAndWait<T>(Func<CountdownEvent, T> invokee,
                                      int waitCountdown = 1) {

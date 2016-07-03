@@ -197,6 +197,10 @@
       <Project>{7647a7d1-bb14-4a70-9b0a-551b051cc125}</Project>
       <Name>Bud.Exec</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Bud.FilesObservatory\Bud.FilesObservatory.csproj">
+      <Project>{0aaa33ea-e957-4e45-aac9-8021d2e82e80}</Project>
+      <Name>Bud.FilesObservatory</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Bud.NuGet\Bud.NuGet.csproj">
       <Project>{e9529521-9d73-4dce-aa81-d1e08cbb53d4}</Project>
       <Name>Bud.NuGet</Name>

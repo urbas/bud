@@ -7,9 +7,9 @@ using System.Reactive.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
-using static Bud.IO.LocalFilesObservatory;
+using static Bud.FilesObservatory;
 
-namespace Bud.IO {
+namespace Bud {
   [Category("AppVeyorIgnore")]
   public class LocalFilesObservatoryTest {
     [Test]
@@ -206,8 +206,7 @@ namespace Bud.IO {
                                    fileFilter: "*.txt",
                                    includeSubdirectories: true,
                                    subscribedCallback: () => waitCountdown.Signal(),
-                                   disposedCallback: () => disposingBarrier.Signal())
-            .Take(1)
+                                   disposedCallback: () => disposingBarrier.Signal()).Take(1)
             .Wait();
         }),
         waitCountdown: 1);
@@ -221,8 +220,7 @@ namespace Bud.IO {
                                   fileFilter: "*.txt",
                                   includeSubdirectories: true,
                                   subscribedCallback: () => waitCountdown.Signal(),
-                                  disposedCallback: disposedCallback)
-                  .Take(expectedChangesCount)
+                                  disposedCallback: disposedCallback).Take(expectedChangesCount)
                   .ToEnumerable().ToList()),
         waitCountdown: 1);
 
@@ -233,8 +231,7 @@ namespace Bud.IO {
       => TaskTestUtils.InvokeAndWait(waitCountdown => Task.Run(() => {
         var observerA = ObserveFileSystem(dirA, "*", true, () => waitCountdown.Signal(), () => disposalBarrier.Signal());
         var observerB = ObserveFileSystem(dirB, "*", true, () => waitCountdown.Signal(), () => disposalBarrier.Signal());
-        return observerA.Merge(observerB)
-                        .ObserveOn(new EventLoopScheduler())
+        return observerA.Merge(observerB).ObserveOn(new EventLoopScheduler())
                         .Take(expectedChangesCount)
                         .ToEnumerable().ToList();
       }), waitCountdown: 2);
