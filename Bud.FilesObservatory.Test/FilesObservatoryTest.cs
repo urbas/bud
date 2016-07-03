@@ -11,7 +11,7 @@ using static Bud.FilesObservatory;
 
 namespace Bud {
   [Category("AppVeyorIgnore")]
-  public class LocalFilesObservatoryTest {
+  public class FilesObservatoryTest {
     [Test]
     public async Task Adding_a_file_should_result_in_a_push_notification() {
       using (var dir = new TmpDir()) {

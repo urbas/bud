@@ -22,14 +22,18 @@ namespace Bud.Reactive {
                    .Gather();
     }
 
-    public static IObservable<IImmutableList<T>> CollectUntilCalm<T>(this IObservable<T> observable,
+    public static IObservable<ImmutableArray<T>> CollectUntilCalm<T>(this IObservable<T> observable,
                                                                      TimeSpan calmingPeriod,
                                                                      IScheduler scheduler) {
       var shared = observable.Publish().RefCount();
       return shared.Window(CalmingWindows(shared, calmingPeriod, scheduler))
-                   .SelectMany(o => o.Aggregate(ImmutableList<T>.Empty,
-                                                (collectedSoFar, nextElement) => collectedSoFar.Add(nextElement)))
-                   .Where(list => !list.IsEmpty);
+                   .SelectMany(o => o.Aggregate(ImmutableArray.CreateBuilder<T>(),
+                                                (collectedSoFar, nextElement) => {
+                                                  collectedSoFar.Add(nextElement);
+                                                  return collectedSoFar;
+                                                }))
+                   .Where(list => list.Count > 0)
+                   .Select(builder => builder.ToImmutable());
     }
 
     public static IObservable<T> CalmAfterFirst<T>(this IObservable<T> observableToThrottle,
@@ -40,7 +44,9 @@ namespace Bud.Reactive {
                         .Concat(sharedInput.Skip(1).SkipUntilCalm(calmingPeriod, scheduler));
     }
 
-    private static IObservable<Unit> CalmingWindows<T>(IObservable<T> observable, TimeSpan calmingPeriod, IScheduler scheduler)
+    private static IObservable<Unit> CalmingWindows<T>(IObservable<T> observable,
+                                                       TimeSpan calmingPeriod,
+                                                       IScheduler scheduler)
       => Observable.Create<Unit>(observer => {
         var timerDisposable = new MultipleAssignmentDisposable();
         var calmingWindows = new Subject<Unit>();
