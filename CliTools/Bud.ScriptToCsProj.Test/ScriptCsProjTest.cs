@@ -22,7 +22,7 @@ namespace Bud.ScriptToCsProj {
       }
       using (var expectedContent = manifestResourceStream) {
         using (var streamReader = new StreamReader(expectedContent)) {
-          return streamReader.ReadToEnd();
+          return streamReader.ReadToEnd().Replace("\r\n", "\n");
         }
       }
     }
