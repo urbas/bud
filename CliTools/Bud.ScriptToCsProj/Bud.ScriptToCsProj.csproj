@@ -33,6 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bud.Option, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Bud.Option.1.0.0-rc1\lib\net46\Bud.Option.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeAnalysis, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.CodeAnalysis.Common.1.2.2\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
       <Private>True</Private>
@@ -73,10 +77,6 @@
     <ProjectReference Include="..\..\Libs\Bud.Make\Bud.Make.csproj">
       <Project>{3e9aefd6-385d-43a7-9ddb-5eef2643b6f7}</Project>
       <Name>Bud.Make</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Libs\Bud.Option\Bud.Option.csproj">
-      <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
-      <Name>Bud.Option</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\Libs\Bud.References\Bud.References.csproj">
       <Project>{a4d2b43f-f24a-480a-b743-ebe0186b0d21}</Project>

@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bud.Option, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bud.Option.1.0.0-rc1\lib\net46\Bud.Option.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -95,14 +99,6 @@
     <ProjectReference Include="..\Libs\Bud.Make\Bud.Make.csproj">
       <Project>{3e9aefd6-385d-43a7-9ddb-5eef2643b6f7}</Project>
       <Name>Bud.Make</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Libs\Bud.Option.Test\Bud.Option.Test.csproj">
-      <Project>{cc20da6a-455a-431d-807c-9e5533dbf633}</Project>
-      <Name>Bud.Option.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Libs\Bud.Option\Bud.Option.csproj">
-      <Project>{594dc304-3a8a-43fc-be7d-71d8c603014a}</Project>
-      <Name>Bud.Option</Name>
     </ProjectReference>
     <ProjectReference Include="..\CliTools\Bud.RunScript\Bud.RunScript.csproj">
       <Project>{05236f73-9ae4-4351-8378-29f96b6977c2}</Project>

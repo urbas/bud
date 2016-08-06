@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bud.Option, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Bud.Option.1.0.0-rc1\lib\net46\Bud.Option.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -59,10 +63,6 @@
     <ProjectReference Include="..\Bud.CsProjTools\Bud.CsProjTools.csproj">
       <Project>{C3AF8877-8FDE-4D6C-B5F8-51655E7FE63B}</Project>
       <Name>Bud.CsProjTools</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
-      <Project>{594DC304-3A8A-43FC-BE7D-71D8C603014A}</Project>
-      <Name>Bud.Option</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

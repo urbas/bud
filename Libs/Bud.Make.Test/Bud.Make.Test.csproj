@@ -62,10 +62,6 @@
       <Project>{3E9AEFD6-385D-43A7-9DDB-5EEF2643B6F7}</Project>
       <Name>Bud.Make</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Option\Bud.Option.csproj">
-      <Project>{594DC304-3A8A-43FC-BE7D-71D8C603014A}</Project>
-      <Name>Bud.Option</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Bud.TmpDir\Bud.TmpDir.csproj">
       <Project>{B8EFE565-1FDA-48CB-A7F3-B3627B747727}</Project>
       <Name>Bud.TmpDir</Name>
