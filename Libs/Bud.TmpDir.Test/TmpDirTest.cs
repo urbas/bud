@@ -7,7 +7,14 @@ namespace Bud {
     [Test]
     public void Creates_the_directory() {
       using (var dir = new TmpDir()) {
-        Assert.That(dir.Path, Does.Exist);
+        DirectoryAssert.Exists(dir.Path);
+      }
+    }
+
+    [Test]
+    public void Path_is_absolute() {
+      using (var dir = new TmpDir()) {
+        Assert.That(Path.IsPathRooted(dir.Path));
       }
     }
 
