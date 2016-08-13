@@ -31,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Bud.TmpDir, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Bud.TmpDir.1.0.0-rc1\lib\net46\Bud.TmpDir.dll</HintPath>
+      <HintPath>..\..\packages\Bud.TmpDir.1.0.0\lib\net46\Bud.TmpDir.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
