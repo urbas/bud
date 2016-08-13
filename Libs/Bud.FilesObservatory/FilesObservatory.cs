@@ -33,7 +33,7 @@ namespace Bud {
     ///   <para>
     ///     Important: this observable will publish its elements on the file system watcher's thread.
     ///     Please make sure you use
-    ///     <see cref="Observable.ObserveOn{TSource}(System.IObservable{TSource},System.Reactive.Concurrency.IScheduler)" />
+    ///     <see cref="Observable.ObserveOn{TSource}(IObservable{TSource},System.Reactive.Concurrency.IScheduler)" />
     ///     and observe on an appropriate scheduler.
     ///   </para>
     ///   <para>
