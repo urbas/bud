@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bud.TmpDir, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Bud.TmpDir.1.0.0-rc1\lib\net46\Bud.TmpDir.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\..\packages\NUnit.3.2.1\lib\net45\nunit.framework.dll</HintPath>
       <Private>True</Private>
@@ -66,10 +70,6 @@
     <ProjectReference Include="..\Bud.FilesObservatory\Bud.FilesObservatory.csproj">
       <Project>{0aaa33ea-e957-4e45-aac9-8021d2e82e80}</Project>
       <Name>Bud.FilesObservatory</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.TmpDir\Bud.TmpDir.csproj">
-      <Project>{b8efe565-1fda-48cb-a7f3-b3627b747727}</Project>
-      <Name>Bud.TmpDir</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

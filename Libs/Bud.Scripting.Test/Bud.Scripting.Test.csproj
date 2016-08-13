@@ -31,7 +31,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Bud.Option, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Bud.Option.1.0.0-rc1\lib\net46\Bud.Option.dll</HintPath>
+      <HintPath>..\..\packages\Bud.Option.1.0.0\lib\net46\Bud.Option.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Bud.TmpDir, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Bud.TmpDir.1.0.0-rc1\lib\net46\Bud.TmpDir.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -92,10 +96,6 @@
     <ProjectReference Include="..\Bud.Scripting\Bud.Scripting.csproj">
       <Project>{f1cc850c-4c10-4d2c-8267-0c7ef196cb38}</Project>
       <Name>Bud.Scripting</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.TmpDir\Bud.TmpDir.csproj">
-      <Project>{b8efe565-1fda-48cb-a7f3-b3627b747727}</Project>
-      <Name>Bud.TmpDir</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

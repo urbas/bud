@@ -31,7 +31,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Bud.Option, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Bud.Option.1.0.0-rc1\lib\net46\Bud.Option.dll</HintPath>
+      <HintPath>..\packages\Bud.Option.1.0.0\lib\net46\Bud.Option.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Bud.TmpDir, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bud.TmpDir.1.0.0-rc1\lib\net46\Bud.TmpDir.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=3.2.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
@@ -123,14 +127,6 @@
     <ProjectReference Include="..\Libs\Bud.Test\Bud.Test.csproj">
       <Project>{e5e245ed-633e-4589-90c2-a69eedd96b72}</Project>
       <Name>Bud.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Libs\Bud.TmpDir.Test\Bud.TmpDir.Test.csproj">
-      <Project>{5144abf8-c9ac-4034-8459-0bbb964ac712}</Project>
-      <Name>Bud.TmpDir.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Libs\Bud.TmpDir\Bud.TmpDir.csproj">
-      <Project>{b8efe565-1fda-48cb-a7f3-b3627b747727}</Project>
-      <Name>Bud.TmpDir</Name>
     </ProjectReference>
     <ProjectReference Include="..\bud\bud.csproj">
       <Project>{5d2c752c-65d5-4148-918a-ab11f8344e68}</Project>

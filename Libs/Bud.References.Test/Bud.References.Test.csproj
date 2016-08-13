@@ -31,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Bud.Option, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Bud.Option.1.0.0-rc1\lib\net46\Bud.Option.dll</HintPath>
+      <HintPath>..\..\packages\Bud.Option.1.0.0\lib\net46\Bud.Option.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NuGet.Frameworks, Version=3.4.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
