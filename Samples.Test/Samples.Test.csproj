@@ -76,14 +76,6 @@
       <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
       <Name>Bud.Building</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Libs\Bud.Cache.Test\Bud.Cache.Test.csproj">
-      <Project>{f212314a-ca0e-45d6-bfc7-134a43e5a96f}</Project>
-      <Name>Bud.Cache.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Libs\Bud.Cache\Bud.Cache.csproj">
-      <Project>{713f14ed-baf2-4ce4-afb3-ecadac2b710b}</Project>
-      <Name>Bud.Cache</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Libs\Bud.CsProjTools.Test\Bud.CsProjTools.Test.csproj">
       <Project>{c0141677-538f-4352-bc87-417141927b59}</Project>
       <Name>Bud.CsProjTools.Test</Name>

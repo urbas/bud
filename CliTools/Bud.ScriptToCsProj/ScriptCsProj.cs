@@ -16,21 +16,17 @@ namespace Bud.ScriptToCsProj {
     ///   metadata of the script for which to generate the
     ///   csproj file.
     /// </param>
-    public static void OutputScriptCsProj(BuiltScriptMetadata builtScriptMetadata) {
-      var customReferences = builtScriptMetadata.ResolvedScriptReferences
-                                                .Assemblies;
-      var frameworkReferences = builtScriptMetadata.ResolvedScriptReferences
-                                                   .FrameworkAssemblies;
-      Console.Write(BudScriptCsProj(customReferences,
-                                    frameworkReferences,
-                                    Directory.GetCurrentDirectory()));
-    }
+    public static void OutputScriptCsProj(BuiltScriptMetadata builtScriptMetadata)
+      => Console.Write(BudScriptCsProj(builtScriptMetadata.ResolvedScriptReferences.Assemblies,
+                                       builtScriptMetadata.ResolvedScriptReferences.FrameworkAssemblies,
+                                       Directory.GetCurrentDirectory()));
 
     public static string BudScriptCsProj(IEnumerable<Assembly> assemblies,
                                          IEnumerable<FrameworkAssembly> frameworkAssemblies,
                                          string startWorkingDir)
       => CsProj.Generate(
-        CsProj.Import(@"$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props", @"Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"),
+        CsProj.Import(@"$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props",
+                      @"Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"),
         CsProj.PropertyGroup(CsProj.Property("Configuration", "Debug", @" '$(Configuration)' == '' "),
                              CsProj.Property("Platform", "AnyCPU", @" '$(Platform)' == '' "),
                              CsProj.Property("OutputType", "Exe"),

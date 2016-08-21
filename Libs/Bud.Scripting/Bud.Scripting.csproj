@@ -85,10 +85,6 @@
       <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
       <Name>Bud.Building</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Cache\Bud.Cache.csproj">
-      <Project>{713F14ED-BAF2-4CE4-AFB3-ECADAC2B710B}</Project>
-      <Name>Bud.Cache</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Bud.NuGet\Bud.NuGet.csproj">
       <Project>{E9529521-9D73-4DCE-AA81-D1E08CBB53D4}</Project>
       <Name>Bud.NuGet</Name>

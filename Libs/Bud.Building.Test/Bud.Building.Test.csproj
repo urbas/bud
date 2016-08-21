@@ -74,10 +74,6 @@
       <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
       <Name>Bud.Building</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bud.Cache\Bud.Cache.csproj">
-      <Project>{713f14ed-baf2-4ce4-afb3-ecadac2b710b}</Project>
-      <Name>Bud.Cache</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
