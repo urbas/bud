@@ -8,7 +8,7 @@ namespace Samples {
     public void Build_outputs_some_json() {
       using (var dir = SampleDir.TmpCopy("UsingNuGetReferences")) {
         Assert.AreEqual(@"[42,""answer""]",
-                        BatchExec.GetOutputOrThrow(Paths.RunScript, "", dir.Path).Trim());
+                        Exec.CheckOutput(Paths.RunScript, "", dir.Path).Trim());
       }
     }
   }

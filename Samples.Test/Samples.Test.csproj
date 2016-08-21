@@ -30,8 +30,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bud.Option, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Bud.Option.1.0.0\lib\net46\Bud.Option.dll</HintPath>
+    <Reference Include="Bud.Exec, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bud.Exec.1.0.0-rc1\lib\net46\Bud.Exec.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Bud.Option, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bud.Option.1.0.1\lib\net46\Bud.Option.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Bud.TmpDir, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -87,10 +91,6 @@
     <ProjectReference Include="..\Libs\Bud.CsProjTools\Bud.CsProjTools.csproj">
       <Project>{c3af8877-8fde-4d6c-b5f8-51655e7fe63b}</Project>
       <Name>Bud.CsProjTools</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Libs\Bud.Exec\Bud.Exec.csproj">
-      <Project>{7647a7d1-bb14-4a70-9b0a-551b051cc125}</Project>
-      <Name>Bud.Exec</Name>
     </ProjectReference>
     <ProjectReference Include="..\Libs\Bud.References.Test\Bud.References.Test.csproj">
       <Project>{cd0a7381-310b-421b-9b5b-2cbdb7bce8d3}</Project>

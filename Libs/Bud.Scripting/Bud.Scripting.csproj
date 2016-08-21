@@ -32,8 +32,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Bud.Option, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Bud.Option.1.0.0\lib\net46\Bud.Option.dll</HintPath>
+    <Reference Include="Bud.Exec, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Bud.Exec.1.0.0-rc1\lib\net46\Bud.Exec.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Bud.Option, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Bud.Option.1.0.1\lib\net46\Bud.Option.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -84,10 +88,6 @@
     <ProjectReference Include="..\Bud.Cache\Bud.Cache.csproj">
       <Project>{713F14ED-BAF2-4CE4-AFB3-ECADAC2B710B}</Project>
       <Name>Bud.Cache</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Bud.Exec\Bud.Exec.csproj">
-      <Project>{7647a7d1-bb14-4a70-9b0a-551b051cc125}</Project>
-      <Name>Bud.Exec</Name>
     </ProjectReference>
     <ProjectReference Include="..\Bud.NuGet\Bud.NuGet.csproj">
       <Project>{E9529521-9D73-4DCE-AA81-D1E08CBB53D4}</Project>

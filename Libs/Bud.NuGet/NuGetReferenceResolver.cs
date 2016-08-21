@@ -33,8 +33,7 @@ namespace Bud.NuGet {
     }
 
     private static void RestorePackages(string packagesConfigFile, string packagesDir)
-      => BatchExec.RunQuietlyThrow("nuget",
-                                   $"restore {packagesConfigFile} -PackagesDirectory {packagesDir}");
+      => Exec.CheckCall("nuget", $"restore {packagesConfigFile} -PackagesDirectory {packagesDir}");
 
     private static void ResolveAssemblies(IEnumerable<PackageReference> packageReferences,
                                           string packagesDir,
@@ -71,7 +70,7 @@ namespace Bud.NuGet {
     }
 
     private static NuGetv3LocalRepository CreateNuGetV3Repo(string nugetV2RepoDir, string nugetV3RepoDir) {
-      BatchExec.RunQuietlyThrow("nuget", $"init {nugetV2RepoDir} {nugetV3RepoDir}");
+      Exec.CheckCall("nuget", $"init {nugetV2RepoDir} {nugetV3RepoDir}");
       return new NuGetv3LocalRepository(nugetV3RepoDir, true);
     }
 

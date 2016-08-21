@@ -33,12 +33,16 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bud.Exec, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bud.Exec.1.0.0-rc1\lib\net46\Bud.Exec.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Bud.FilesObservatory, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Bud.FilesObservatory.1.0.0-rc1\lib\net46\Bud.FilesObservatory.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Bud.Option, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Bud.Option.1.0.0\lib\net46\Bud.Option.dll</HintPath>
+    <Reference Include="Bud.Option, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Bud.Option.1.0.1\lib\net46\Bud.Option.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CodeAnalysis, Version=1.2.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -193,10 +197,6 @@
     <ProjectReference Include="..\Libs\Bud.Building\Bud.Building.csproj">
       <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
       <Name>Bud.Building</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Libs\Bud.Exec\Bud.Exec.csproj">
-      <Project>{7647a7d1-bb14-4a70-9b0a-551b051cc125}</Project>
-      <Name>Bud.Exec</Name>
     </ProjectReference>
     <ProjectReference Include="..\Libs\Bud.NuGet\Bud.NuGet.csproj">
       <Project>{e9529521-9d73-4dce-aa81-d1e08cbb53d4}</Project>

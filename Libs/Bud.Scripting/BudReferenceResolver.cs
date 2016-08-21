@@ -43,7 +43,7 @@ namespace Bud.Scripting {
     private static class LazyReferencesInitializer {
       public static readonly ImmutableDictionary<string, ReflectionAssembly> BudReferences = new[] {
         ToAssemblyNamePath(typeof(Option)),
-        ToAssemblyNamePath(typeof(BatchExec)),
+        ToAssemblyNamePath(typeof(Exec)),
         ToAssemblyNamePath(typeof(Make)),
         ToAssemblyNamePath(typeof(HashBasedBuilder)),
         ToAssemblyNamePath(typeof(ImmutableArray)),

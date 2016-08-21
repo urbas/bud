@@ -8,7 +8,7 @@ namespace Samples {
     public void Build_outputs_a_text_file() {
       using (var dir = SampleDir.TmpCopy("UsingBudAssemblies")) {
         Assert.AreEqual("This is an option: Some<System.Int32>(42)!",
-                        BatchExec.GetOutputOrThrow(Paths.RunScript, workingDir: dir.Path).Trim());
+                        Exec.CheckOutput(Paths.RunScript, cwd: dir.Path).Trim());
       }
     }
   }
