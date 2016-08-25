@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
-using Bud.Cli;
 using Bud.IO;
 using Bud.NuGet;
 using static Bud.V1.Basic;
@@ -78,7 +77,7 @@ namespace Bud.V1 {
       Console.WriteLine($"Starting to push to chocolatey ...");
       // TODO: use nuget instead. Read the ApiKey from somewhere.
       //      var success = NuGetExecutable.Instance.Run($"push {distPackage} -source https://chocolatey.org/ -NonInteractive");
-      var success = Exec.Run("cpush", distPackage) == 0;
+      var success = Exec.Run("cpush", distPackage).ExitCode == 0;
       Console.WriteLine($"Push to chocolatey success: {success}");
       // TODO: Return the actual URL
       return "FOO BAR!";

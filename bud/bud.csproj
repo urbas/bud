@@ -34,11 +34,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Bud.Exec, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Bud.Exec.1.0.0-rc1\lib\net46\Bud.Exec.dll</HintPath>
+      <HintPath>..\packages\Bud.Exec.1.0.0-rc2\lib\net46\Bud.Exec.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Bud.FilesObservatory, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Bud.FilesObservatory.1.0.0-rc1\lib\net46\Bud.FilesObservatory.dll</HintPath>
+      <HintPath>..\packages\Bud.FilesObservatory.1.0.0\lib\net46\Bud.FilesObservatory.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Bud.Option, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
