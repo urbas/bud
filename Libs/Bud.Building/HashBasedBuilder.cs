@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace Bud.Building {
     ///   this function actually produces the output.
     ///   The first parameter to the function is the input file and the second parameter is the output file.
     /// </param>
+    /// <param name="input">the files from which the <paramref name="filesBuilder" /> should generate the output.</param>
+    /// <param name="output">the path of the expected output.</param>
     /// <param name="hashFile">
     ///   this file contains the has of all <paramref name="input" />
     ///   file combined. This file is updated each time <paramref name="output" /> is generated. If this
@@ -25,8 +28,6 @@ namespace Bud.Building {
     ///   use of this salt is as the hash of the generator. For example, the salt could be
     ///   the version of the generator and the parameters of the generator.
     /// </param>
-    /// <param name="input">the files from which the <paramref name="filesBuilder" /> should generate the output.</param>
-    /// <param name="output">the path of the expected output.</param>
     /// <returns>
     ///   the output file path.
     /// </returns>
@@ -35,11 +36,9 @@ namespace Bud.Building {
     ///   a different hash. If your <paramref name="filesBuilder" /> is order-invariant, we suggest you
     ///   order the input before invoking this function.
     /// </remarks>
-    public static string Build(FilesBuilder filesBuilder,
-                               string hashFile,
-                               byte[] salt,
-                               ImmutableArray<string> input,
-                               string output) {
+    public static string Build(FilesBuilder filesBuilder, ImmutableArray<string> input, string output, string hashFile = null, byte[] salt = null) {
+      hashFile = hashFile ?? $"{output}.input_hash";
+      salt = salt ?? DefaultSalt;
       var digest = Hasher.HashFiles(input, salt);
       if (Exists(output) && IsUpToDate(hashFile, digest)) {
           return output;
@@ -49,22 +48,14 @@ namespace Bud.Building {
       return output;
     }
 
-    public static string Build(FilesBuilder filesBuilder, ImmutableArray<string> input, string output)
-      => Build(filesBuilder, $"{output}.input_hash", DefaultSalt, input, output);
-
-    public static string Build(SingleFileBuilder fileBuilder, string hashFile, byte[] salt, string input, string output)
-      => Build((inputFiles, outputFile) => fileBuilder(inputFiles.First(), outputFile),
-               hashFile,
-               salt,
-               ImmutableArray.Create(input), 
-               output);
-
-    public static string Build(SingleFileBuilder fileBuilder, string input, string output)
+    public static string Build(SingleFileBuilder fileBuilder, string input, string output, string hashFile = null, byte[] salt = null)
       => Build((inputFiles, outputFile) => fileBuilder(inputFiles[0], outputFile),
-               ImmutableArray.Create(input),
-               output);
+               ImmutableArray.Create(input), 
+               output,
+               hashFile, 
+               salt);
 
-    private static bool IsUpToDate(string hashFile, byte[] digest)
+    private static bool IsUpToDate(string hashFile, IEnumerable<byte> digest)
       => File.Exists(hashFile) && File.ReadAllBytes(hashFile).SequenceEqual(digest);
 
     private static bool Exists(string output) => File.Exists(output) || Directory.Exists(output);

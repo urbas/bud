@@ -22,11 +22,11 @@ namespace Bud.Scripting {
 
     /// <summary>
     ///   Extracts directives from the contents of the scripts. Directives are of the following forms:
-    ///   - <c>//!reference [ASSEMBLY NAME]</c>
+    ///   - <c>//!reference [ASSEMBLY NAME | ASSEMBLY PATH]</c>
     ///   - <c>//!nuget [NUGET PACKAGE ID] [VERSION]</c>
     /// </summary>
     /// <param name="scriptContents">textual contents of the script files.</param>
-    /// <returns>
+    /// <returns>L
     ///   an instance of the <see cref="ScriptDirectives" /> class. This class contains
     ///   all the directives found in the scripts.
     /// </returns>
@@ -53,8 +53,7 @@ namespace Bud.Scripting {
           }
         }
       }
-      return new ScriptDirectives(assemblyReferences.ToImmutable(),
-                                  nugetReferences.ToImmutable());
+      return new ScriptDirectives(assemblyReferences.ToImmutable(), nugetReferences.ToImmutable());
     }
 
     private static string ToAssemblyReference(string line) {
@@ -70,7 +69,8 @@ namespace Bud.Scripting {
       if (components.Length == 3) {
         return new PackageReference(components[1], NuGetVersion.Parse(components[2]), NuGetFramework.AnyFramework);
       }
-      throw new Exception($"Malformed NuGet package reference: '{line}'. Should be of form: '//!nuget <name> <version>'");
+      throw new Exception($"Malformed NuGet package reference: '{line}'. " +
+                          $"Should be of form: '//!nuget <name> <version>'");
     }
   }
 }
