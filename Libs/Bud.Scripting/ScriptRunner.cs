@@ -23,6 +23,6 @@ namespace Bud.Scripting {
     public static int Run(string[] args,
                           Option<string> scriptPath = default(Option<string>),
                           Option<string> workingDir = default(Option<string>))
-      => Exec.Run(ScriptBuilder.Build(scriptPath), string.Join(" ", args), workingDir).ExitCode;
+      => Exec.Run(ScriptBuilder.Build(scriptPath), Exec.Args(args), workingDir).ExitCode;
   }
 }

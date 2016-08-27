@@ -62,7 +62,7 @@ namespace Bud.Scripting {
       if (components.Length == 2) {
         return components[1];
       }
-      throw new Exception($"Malformed reference: '{line}'. Should be of form: '//!reference <name>'");
+      throw new Exception($"Malformed reference: '{line}'. Should be of form: '//!reference <name or path>'");
     }
 
     private static PackageReference ToNuGetReference(string line) {

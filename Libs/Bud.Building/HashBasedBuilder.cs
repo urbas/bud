@@ -40,7 +40,7 @@ namespace Bud.Building {
                                byte[] salt,
                                ImmutableArray<string> input,
                                string output) {
-      var digest = Md5Hasher.Digest(input, salt);
+      var digest = Hasher.HashFiles(input, salt);
       if (Exists(output) && IsUpToDate(hashFile, digest)) {
           return output;
       }

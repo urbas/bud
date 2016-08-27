@@ -10,7 +10,19 @@ using Bud.References;
 namespace Bud.Scripting {
   public class ScriptBuilder {
     /// <summary>
+    /// The name of the compiled build script executable.
+    /// </summary>
+    public const string BuildScriptExeFileName = "build-script.exe";
+
+    /// <summary>
+    /// The name of the directorywhere the compiled build script will be placed.
+    /// </summary>
+    private const string ScriptBuildDirName = "build";
+
+    /// <summary>
     ///   The default way of building <c>Build.cs</c> scripts.
+    ///   This method places all the output in the <see cref="ScriptBuildDirName"/> directory.
+    ///   This directory will be placed next to the input file.
     /// </summary>
     /// <param name="scriptPath">
     ///   the path of the script to build. If omitted, <c>Build.cs</c>
@@ -22,7 +34,7 @@ namespace Bud.Scripting {
       var buildDir = CreateBuildDir(actualScriptPath);
       return HashBasedBuilder.Build(Build,
                                     ImmutableArray.Create(actualScriptPath),
-                                    Path.Combine(buildDir, "build-script.exe"));
+                                    Path.Combine(buildDir, BuildScriptExeFileName));
     }
 
     private static void Build(ImmutableArray<string> inputFiles, string outputFile)
@@ -82,7 +94,7 @@ namespace Bud.Scripting {
       => File.Copy(inputFile, output, true);
 
     private static string CreateBuildDir(string scriptPath) {
-      var buildDir = Path.Combine(Path.GetDirectoryName(scriptPath), "build");
+      var buildDir = Path.Combine(Path.GetDirectoryName(scriptPath), ScriptBuildDirName);
       Directory.CreateDirectory(buildDir);
       return buildDir;
     }
