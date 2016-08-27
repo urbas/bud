@@ -42,7 +42,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyAggregator.cs" />
+    <Compile Include="AssemblyCollections.cs" />
     <Compile Include="FrameworkAssembly.cs" />
     <Compile Include="Assembly.cs" />
     <Compile Include="IReferenceResolver.cs" />

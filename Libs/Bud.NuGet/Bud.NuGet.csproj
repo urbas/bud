@@ -87,7 +87,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="INuGetReferenceResolver.cs" />
-    <Compile Include="NuGeRef.cs" />
     <Compile Include="NuGetReferenceResolver.cs" />
     <Compile Include="PackageReference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

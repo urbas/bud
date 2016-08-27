@@ -41,33 +41,32 @@ namespace Bud.Building {
                                ImmutableArray<string> input,
                                string output) {
       var digest = Md5Hasher.Digest(input, salt);
-      if (!File.Exists(output) && !Directory.Exists(output)) {
-        filesBuilder(input, output);
-        File.WriteAllBytes(hashFile, digest);
-      } else {
-        if (!File.Exists(hashFile) || !File.ReadAllBytes(hashFile).SequenceEqual(digest)) {
-          filesBuilder(input, output);
-          File.WriteAllBytes(hashFile, digest);
-        }
+      if (Exists(output) && IsUpToDate(hashFile, digest)) {
+          return output;
       }
+      filesBuilder(input, output);
+      File.WriteAllBytes(hashFile, digest);
       return output;
     }
 
     public static string Build(FilesBuilder filesBuilder, ImmutableArray<string> input, string output)
-      => Build(filesBuilder,
-               output + ".input_hash",
-               DefaultSalt,
-               input,
-               output);
+      => Build(filesBuilder, $"{output}.input_hash", DefaultSalt, input, output);
 
     public static string Build(SingleFileBuilder fileBuilder, string hashFile, byte[] salt, string input, string output)
       => Build((inputFiles, outputFile) => fileBuilder(inputFiles.First(), outputFile),
                hashFile,
-               salt, ImmutableArray.Create(input), output);
+               salt,
+               ImmutableArray.Create(input), 
+               output);
 
     public static string Build(SingleFileBuilder fileBuilder, string input, string output)
       => Build((inputFiles, outputFile) => fileBuilder(inputFiles[0], outputFile),
                ImmutableArray.Create(input),
                output);
+
+    private static bool IsUpToDate(string hashFile, byte[] digest)
+      => File.Exists(hashFile) && File.ReadAllBytes(hashFile).SequenceEqual(digest);
+
+    private static bool Exists(string output) => File.Exists(output) || Directory.Exists(output);
   }
 }

@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
 namespace Bud.References {
-  public class AssemblyAggregator {
+  public class AssemblyCollections {
     /// <param name="assemblies">
     ///   a list of assemblies. Each assembly is associated with a framework version.
     ///   This list may contain duplicate assemblies with different framework versions.
@@ -11,8 +11,7 @@ namespace Bud.References {
     ///   with removed duplicates. If any duplicates are found in <paramref name="assemblies" />
     ///   then the one with the highest version is chosen.
     /// </returns>
-    public static IEnumerable<FrameworkAssembly> AggregateByFrameworkVersion(
-      IEnumerable<FrameworkAssembly> assemblies) {
+    public static IEnumerable<FrameworkAssembly> DeduplicateAssemblies(IEnumerable<FrameworkAssembly> assemblies) {
       var aggregatedAssemblies = new Dictionary<string, FrameworkAssembly>();
       foreach (var assemblyToVersion in assemblies) {
         var existingAssembly = aggregatedAssemblies.Get(assemblyToVersion.Name);

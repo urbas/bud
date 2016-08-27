@@ -8,6 +8,5 @@ namespace Bud.Building {
   /// </summary>
   /// <param name="inputFiles">input file paths.</param>
   /// <param name="outputFile">the path to the output file this builder must produce.</param>
-  public delegate void FilesBuilder(ImmutableArray<string> inputFiles,
-                                    string outputFile);
+  public delegate void FilesBuilder(ImmutableArray<string> inputFiles, string outputFile);
 }

@@ -8,7 +8,7 @@ using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Repositories;
 using NuGet.Versioning;
-using static Bud.References.AssemblyAggregator;
+using static Bud.References.AssemblyCollections;
 using static Bud.References.WindowsFrameworkReferenceResolver;
 using static Bud.Option;
 
@@ -36,8 +36,7 @@ namespace Bud.NuGet {
                                    packageReference.Framework);
         }
       }
-      assemblies.AddRange(AggregateByFrameworkVersion(frameworkAssemblies)
-                            .Gather(FindFrameworkAssembly));
+      assemblies.AddRange(DeduplicateAssemblies(frameworkAssemblies).Gather(FindFrameworkAssembly));
       return assemblies;
     }
 
@@ -77,23 +76,22 @@ namespace Bud.NuGet {
                                    frameworkSpecificGroup.TargetFramework.Version);
     }
 
-    private static ICollection<string>
-      FindAssemblies(PackageReaderBase nupkg,
-                     string packagesDir,
-                     NuGetFramework targetFramework,
-                     string packageId,
-                     NuGetVersion packageVersion) {
+    private static ICollection<string> FindAssemblies(PackageReaderBase nupkg,
+                                                      string packagesDir,
+                                                      NuGetFramework targetFramework,
+                                                      string packageId,
+                                                      NuGetVersion packageVersion) {
       var referenceItems = nupkg.GetReferenceItems()
                                 .GetNearest(targetFramework)?
                                 .Items ?? Enumerable.Empty<string>();
-      return referenceItems.Select(pathInPackage => PathInFileSystem(packagesDir, pathInPackage, packageId, packageVersion))
+      return referenceItems.Select(pathInPackage => GetPath(packagesDir, pathInPackage, packageId, packageVersion))
                            .ToList();
     }
 
-    private static string PathInFileSystem(string packagesDir,
-                                           string pathInPackage,
-                                           string packageId,
-                                           NuGetVersion packageVersion)
+    private static string GetPath(string packagesDir,
+                                  string pathInPackage,
+                                  string packageId,
+                                  NuGetVersion packageVersion)
       => Path.Combine(packagesDir, $"{packageId}.{packageVersion}", pathInPackage);
 
     private static IEnumerable<FrameworkAssembly>
@@ -108,10 +106,8 @@ namespace Bud.NuGet {
                   .Select(assemblyName => ToFrameworkAssemblyReference(assemblyName, frameworkVersion));
     }
 
-    private static FrameworkAssembly ToFrameworkAssemblyReference(string assemblyName, Version frameworkVersion) {
-      return new FrameworkAssembly(assemblyName,
-                                   frameworkVersion);
-    }
+    private static FrameworkAssembly ToFrameworkAssemblyReference(string assemblyName, Version frameworkVersion)
+      => new FrameworkAssembly(assemblyName, frameworkVersion);
 
     private static LocalPackageInfo
       FindBestMatch(NuGetv3LocalRepository packageRepository,

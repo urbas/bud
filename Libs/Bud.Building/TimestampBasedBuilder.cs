@@ -14,16 +14,13 @@ namespace Bud.Building {
     ///   The worker will not be invoked if the last-modified timestamp of the <paramref name="output" /> is newer
     ///   than the last-modified timestamp of any of the input files.
     /// </remarks>
-    public static void Build(FilesBuilder fileGenerator,
-                             ImmutableArray<string> inputFiles,
-                             string output) {
+    public static void Build(FilesBuilder fileGenerator, ImmutableArray<string> inputFiles, string output) {
       if (!File.Exists(output) || AnyFileNewer(inputFiles, output)) {
         fileGenerator(inputFiles, output);
       }
     }
 
-    private static bool AnyFileNewer(ImmutableArray<string> files,
-                                     string referenceFile) {
+    private static bool AnyFileNewer(ImmutableArray<string> files, string referenceFile) {
       var timestampOfReference = File.GetLastWriteTimeUtc(referenceFile);
       return files.Any(file => File.GetLastWriteTimeUtc(file) > timestampOfReference);
     }
