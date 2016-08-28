@@ -16,7 +16,7 @@ namespace Bud.Building {
     /// </param>
     /// <param name="hashAlgorithm">
     ///   the hashing alrogithm with which to generate the hash.
-    ///   This parameter is optiona. <see cref="SHA256" /> is used by default.
+    ///   This parameter is optional. <see cref="SHA256" /> is used by default.
     /// </param>
     /// <returns>the hash of the digested contents of the files.</returns>
     public static byte[] HashFiles(IEnumerable<string> files, byte[] salt = null, HashAlgorithm hashAlgorithm = null) {

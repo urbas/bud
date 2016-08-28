@@ -14,6 +14,10 @@ namespace Bud.Reactive {
     public void Gather_selects_and_filters_observed_values()
       => Assert.AreEqual(new[] {"1", "3"},
                          new[] {1, 2, 3, 4}.ToObservable()
-                                           .Gather(number => number%2 == 1 ? Some(number.ToString()) : None<string>()).ToList().Wait());
+                                           .Gather(IfOddToString)
+                                           .ToList().Wait());
+
+    private static Option<string> IfOddToString(int number)
+      => number%2 == 1 ? number.ToString() : None<string>();
   }
 }

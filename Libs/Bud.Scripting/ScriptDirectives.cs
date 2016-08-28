@@ -34,26 +34,31 @@ namespace Bud.Scripting {
       var assemblyReferences = ImmutableArray.CreateBuilder<string>();
       var nugetReferences = ImmutableArray.CreateBuilder<PackageReference>();
       foreach (var scriptContent in scriptContents) {
-        using (var stringReader = new StringReader(scriptContent)) {
-          while (true) {
-            var line = stringReader.ReadLine();
-            if (line == null) {
-              break;
-            }
-            var trimmed = line.Trim();
-            if (!string.IsNullOrEmpty(trimmed) && !trimmed.StartsWith("//")) {
-              break;
-            }
-            if (trimmed.StartsWith("//!reference ")) {
-              assemblyReferences.Add(ToAssemblyReference(line));
-            }
-            if (trimmed.StartsWith("//!nuget ")) {
-              nugetReferences.Add(ToNuGetReference(line));
-            }
+        Extract(scriptContent, assemblyReferences, nugetReferences);
+      }
+      return new ScriptDirectives(assemblyReferences.ToImmutable(), nugetReferences.ToImmutable());
+    }
+
+    private static void Extract(string scriptContent,
+                                ICollection<string> assemblyReferences,
+                                ICollection<PackageReference> nugetReferences) {
+      using (var stringReader = new StringReader(scriptContent)) {
+        while (true) {
+          var line = stringReader.ReadLine();
+          if (line == null) {
+            break;
+          }
+          var trimmed = line.Trim();
+          if (!string.IsNullOrEmpty(trimmed) && !trimmed.StartsWith("//")) {
+            break;
+          }
+          if (trimmed.StartsWith("//!reference ")) {
+            assemblyReferences.Add(ToAssemblyReference(line));
+          } else if (trimmed.StartsWith("//!nuget ")) {
+            nugetReferences.Add(ToNuGetReference(line));
           }
         }
       }
-      return new ScriptDirectives(assemblyReferences.ToImmutable(), nugetReferences.ToImmutable());
     }
 
     private static string ToAssemblyReference(string line) {
