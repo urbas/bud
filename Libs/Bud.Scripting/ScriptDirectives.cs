@@ -26,7 +26,7 @@ namespace Bud.Scripting {
     ///   - <c>//!nuget [NUGET PACKAGE ID] [VERSION]</c>
     /// </summary>
     /// <param name="scriptContents">textual contents of the script files.</param>
-    /// <returns>L
+    /// <returns>
     ///   an instance of the <see cref="ScriptDirectives" /> class. This class contains
     ///   all the directives found in the scripts.
     /// </returns>
