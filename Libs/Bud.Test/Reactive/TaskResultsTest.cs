@@ -16,8 +16,7 @@ namespace Bud.Reactive {
 
     [Test]
     public void Await_returns_unit_when_the_task_is_void()
-      => AreEqual(Some<object>(Unit.Default),
-                  Await(Run(new Mock<Action>().Object)));
+      => AreEqual(Some<object>(Unit.Default), Await(Run(new Mock<Action>().Object)));
 
     [Test]
     public void Await_invoked_the_action_in_a_void_task() {
@@ -29,8 +28,7 @@ namespace Bud.Reactive {
 
     [Test]
     public void Await_returns_the_result_when_the_task_is_typed()
-      => AreEqual(Some<object>(42),
-                  Await(FromResult(42)));
+      => AreEqual(Some<object>(42), Await(FromResult(42)));
 
     [Test]
     public void IsTaskWithResult_returns_false_when_given_null()

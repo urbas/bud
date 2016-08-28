@@ -9,23 +9,101 @@ using static Bud.Option;
 
 namespace Bud.Reactive {
   public static class WaitingObservables {
-    public static IObservable<T> SkipUntilCalm<T>(this IObservable<T> observable,
-                                                  TimeSpan calmingPeriod)
-      => SkipUntilCalm(observable, calmingPeriod, DefaultScheduler.Instance);
-
+    /// <summary>
+    ///   Transforms the given <paramref name="observable" /> into a new observable. The new observable
+    ///   waits until some time (given by the <paramref name="calmingPeriod" /> parameter) has passed from the
+    ///   last-produced element in the original obervable. This last element will then end up in the
+    ///   new observable. After this, the new observable waits for a new element from the original observable
+    ///   and repeats the procedure.
+    /// </summary>
+    /// <typeparam name="T">
+    ///   the type of elements in the returned and given <paramref name="observable" />.
+    /// </typeparam>
+    /// <param name="observable">the observable from which to construct a calmed observable.</param>
+    /// <param name="calmingPeriod">
+    ///   the amount of time to wait from the last-produced element in
+    ///   the given <paramref name="observable" />.
+    /// </param>
+    /// <param name="scheduler">
+    ///   The scheduler that will be used to determine calming windows. This parameter
+    ///   is optional, by default <see cref="DefaultScheduler.Instance" /> is used.
+    /// </param>
+    /// <returns>
+    ///   a new observable that produces only those elements from the given <paramref name="observable" />
+    ///   after which there were no elements for the amount of time given by the <paramref name="calmingPeriod" />
+    ///   parameter.
+    /// </returns>
     public static IObservable<T> SkipUntilCalm<T>(this IObservable<T> observable,
                                                   TimeSpan calmingPeriod,
-                                                  IScheduler scheduler) {
+                                                  IScheduler scheduler = null) {
       var shared = observable.Publish().RefCount();
+      scheduler = scheduler ?? DefaultScheduler.Instance;
       return shared.Window(CalmingWindows(shared, calmingPeriod, scheduler))
                    .SelectMany(o => o.Aggregate(None<T>(), (element, nextElement) => Some(nextElement)))
                    .Gather();
     }
 
+    /// <summary>
+    ///   This method is similar to <see cref="SkipUntilCalm{T}" /> with one difference:
+    ///   the observable returned by this method immeditately returns the first element that comes from the
+    ///   given <paramref name="observable" />. Only after that it starts behaving the same as <see cref="SkipUntilCalm{T}" />.
+    /// </summary>
+    /// <typeparam name="T">
+    ///   the type of elements in the returned and given <paramref name="observable" />.
+    /// </typeparam>
+    /// <param name="observable">the observable from which to construct a calmed observable.</param>
+    /// <param name="calmingPeriod">
+    ///   the amount of time to wait from the last-produced element in
+    ///   the given <paramref name="observable" />.
+    /// </param>
+    /// <param name="scheduler">
+    ///   The scheduler that will be used to determine calming windows. This parameter
+    ///   is optional, by default <see cref="DefaultScheduler.Instance" /> is used.
+    /// </param>
+    /// <returns>
+    ///   a new observable that produces the first element from the given <paramref name="observable" /> and afterwards
+    ///   those elements from the given <paramref name="observable" /> after which there were no elements for the amount
+    ///   of time given by the <paramref name="calmingPeriod" /> parameter.
+    /// </returns>
+    public static IObservable<T> CalmAfterFirst<T>(this IObservable<T> observable,
+                                                   TimeSpan calmingPeriod,
+                                                   IScheduler scheduler = null) {
+      var sharedInput = observable.Publish().RefCount();
+      return sharedInput.Take(1)
+                        .Concat(sharedInput.Skip(1).SkipUntilCalm(calmingPeriod, scheduler));
+    }
+
+    /// <summary>
+    ///   Transforms the given <paramref name="observable" /> into a new observable. The new observable
+    ///   collects all elements produced by the given observable until it hits an element, after which
+    ///   some time (given by the <paramref name="calmingPeriod" /> parameter) has passed without any
+    ///   newly produced elements. At this point, the new observable will produce an element that is a
+    ///   collection of all the elements collected so far from the original observable.
+    ///   After this, the new observable waits for a new element from the original observable
+    ///   and repeats the procedure.
+    /// </summary>
+    /// <typeparam name="T">
+    ///   the type of elements in the returned and given <paramref name="observable" />.
+    /// </typeparam>
+    /// <param name="observable">the observable from which to construct a calmed observable.</param>
+    /// <param name="calmingPeriod">
+    ///   the amount of time to wait from the last-produced element in
+    ///   the given <paramref name="observable" />.
+    /// </param>
+    /// <param name="scheduler">
+    ///   The scheduler that will be used to determine calming windows. This parameter
+    ///   is optional, by default <see cref="DefaultScheduler.Instance" /> is used.
+    /// </param>
+    /// <returns>
+    ///   a new observable that produces a collection of elements collected from the given <paramref name="observable" />
+    ///   during the time that it wated for the first such element after which there were no elements for the
+    ///   duration given by the <paramref name="calmingPeriod" /> parameter.
+    /// </returns>
     public static IObservable<ImmutableArray<T>> CollectUntilCalm<T>(this IObservable<T> observable,
                                                                      TimeSpan calmingPeriod,
-                                                                     IScheduler scheduler) {
+                                                                     IScheduler scheduler = null) {
       var shared = observable.Publish().RefCount();
+      scheduler = scheduler ?? DefaultScheduler.Instance;
       return shared.Window(CalmingWindows(shared, calmingPeriod, scheduler))
                    .SelectMany(o => o.Aggregate(ImmutableArray.CreateBuilder<T>(),
                                                 (collectedSoFar, nextElement) => {
@@ -34,14 +112,6 @@ namespace Bud.Reactive {
                                                 }))
                    .Where(list => list.Count > 0)
                    .Select(builder => builder.ToImmutable());
-    }
-
-    public static IObservable<T> CalmAfterFirst<T>(this IObservable<T> observableToThrottle,
-                                                   TimeSpan calmingPeriod,
-                                                   IScheduler scheduler) {
-      var sharedInput = observableToThrottle.Publish().RefCount();
-      return sharedInput.Take(1)
-                        .Concat(sharedInput.Skip(1).SkipUntilCalm(calmingPeriod, scheduler));
     }
 
     private static IObservable<Unit> CalmingWindows<T>(IObservable<T> observable,
