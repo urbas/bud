@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -114,28 +115,30 @@ namespace Bud.Reactive {
                    .Select(builder => builder.ToImmutable());
     }
 
+    [SuppressMessage("ReSharper", "ArgumentsStyleAnonymousFunction")]
     private static IObservable<Unit> CalmingWindows<T>(IObservable<T> observable,
                                                        TimeSpan calmingPeriod,
                                                        IScheduler scheduler)
       => Observable.Create<Unit>(observer => {
-        var timerDisposable = new MultipleAssignmentDisposable();
+        var calmingTimer = new MultipleAssignmentDisposable();
         var calmingWindows = new Subject<Unit>();
-        IDisposable localTimerDisposable = null;
-        var calmerSubscription = observable
-          .Subscribe(next => {
-            localTimerDisposable?.Dispose();
-            localTimerDisposable = scheduler
-              .Schedule(calmingPeriod, () => calmingWindows.OnNext(Unit.Default));
-            timerDisposable.Disposable = localTimerDisposable;
-          }, exception => {
-            timerDisposable.Dispose();
+        var calmerSubscription = observable.Subscribe(
+          onNext: next => {
+            calmingTimer.Disposable?.Dispose();
+            calmingTimer.Disposable = scheduler.Schedule(
+              calmingPeriod,
+              () => calmingWindows.OnNext(Unit.Default));
+          },
+          onError: exception => {
+            calmingTimer.Dispose();
             calmingWindows.OnError(exception);
-          }, () => {
-            timerDisposable.Dispose();
+          },
+          onCompleted: () => {
+            calmingTimer.Dispose();
             calmingWindows.OnCompleted();
           });
         return new CompositeDisposable {
-          timerDisposable,
+          calmingTimer,
           calmerSubscription,
           calmingWindows.Subscribe(observer),
           calmingWindows

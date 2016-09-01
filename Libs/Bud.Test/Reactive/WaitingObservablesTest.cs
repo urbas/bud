@@ -1,5 +1,4 @@
 using System;
-using System.Reactive.Linq;
 using Microsoft.Reactive.Testing;
 using NUnit.Framework;
 using static System.Reactive.Linq.Observable;
@@ -67,6 +66,29 @@ namespace Bud.Reactive {
       IsTrue(observable.MoveNext());
       AreEqual(2, observable.Current);
       IsFalse(observable.MoveNext());
+    }
+
+    [Test]
+    public void SkipUntilCalm_stops_producing_elements_on_exception() {
+      var observable = Return("foo", scheduler)
+        .Concat(Return("bar", scheduler).Delay(FromTicks(200), scheduler))
+        .Concat(Throw<string>(new Exception("foobar"), scheduler))
+        .SkipUntilCalm(FromTicks(150), scheduler)
+        .GetEnumerator();
+
+      // |-o--------------------o-----------------o--------o-|
+      //   ^                    ^                 ^        ^
+      //   foo                  calmed            bar      exception
+      //   t = 1                t = 151           t = 203  t = 204
+
+      scheduler.AdvanceTo(151);
+      observable.MoveNext();
+      AreEqual("foo", observable.Current);
+
+      scheduler.AdvanceTo(204);
+      var exception = Throws<Exception>(() => observable.MoveNext());
+      AreEqual("foobar", exception.Message);
+      IsNull(observable.Current);
     }
 
     [Test]
