@@ -9,7 +9,7 @@ using System.Reactive.Subjects;
 using static Bud.Option;
 
 namespace Bud.Reactive {
-  public static class WaitingObservables {
+  public static class ObservableCalming {
     /// <summary>
     ///   Transforms the given <paramref name="observable" /> into a new observable. The new observable
     ///   waits until some time (given by the <paramref name="calmingPeriod" /> parameter) has passed from the

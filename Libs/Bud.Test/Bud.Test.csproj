@@ -148,7 +148,7 @@
     <Compile Include="Reactive\ObservableResourcesTest.cs" />
     <Compile Include="Reactive\ObservableResultsTest.cs" />
     <Compile Include="Reactive\TaskResultsTest.cs" />
-    <Compile Include="Reactive\WaitingObservablesTest.cs" />
+    <Compile Include="Reactive\ObservableCalmingTest.cs" />
     <Compile Include="Util\StringsTest.cs" />
     <Compile Include="Util\ZipTestUtils.cs" />
     <Compile Include="V1\BasicTest.cs" />

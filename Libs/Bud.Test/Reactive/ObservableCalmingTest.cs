@@ -6,7 +6,7 @@ using static System.TimeSpan;
 using static NUnit.Framework.Assert;
 
 namespace Bud.Reactive {
-  public class WaitingObservablesTest {
+  public class ObservableCalmingTest {
     private TestScheduler scheduler;
     private IObservable<long> tenTickInterval;
 

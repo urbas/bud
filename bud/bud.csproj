@@ -184,7 +184,7 @@
     <Compile Include="Configuration\ModifyConf.cs" />
     <Compile Include="Configuration\ConfUndefinedException.cs" />
     <Compile Include="Reactive\ObservableResources.cs" />
-    <Compile Include="Reactive\WaitingObservables.cs" />
+    <Compile Include="Reactive\ObservableCalming.cs" />
     <Compile Include="Util\Strings.cs" />
     <Compile Include="V1\NuGetPublishing.cs" />
     <Compile Include="V1\NuGetReferences.cs" />
