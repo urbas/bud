@@ -17,13 +17,13 @@ namespace Bud.Reactive {
     }
 
     [Test]
-    public void SkipUntilCalm_produces_empty_observables_from_empty_observables()
-      => IsEmpty(Empty<int>().SkipUntilCalm(FromMilliseconds(100)).ToEnumerable());
+    public void Calmed_produces_empty_observables_from_empty_observables()
+      => IsEmpty(Empty<int>().Calmed(FromMilliseconds(100)).ToEnumerable());
 
     [Test]
-    public void SkipUntilCalm_produces_the_last_element_when_observable_finishes_before_calming_period() {
+    public void Calmed_produces_the_last_element_when_observable_finishes_before_calming_period() {
       var observable = tenTickInterval.Take(5)
-                                      .SkipUntilCalm(FromTicks(100), scheduler)
+                                      .Calmed(FromTicks(100), scheduler)
                                       .GetEnumerator();
       scheduler.AdvanceBy(9001);
       IsTrue(observable.MoveNext());
@@ -31,9 +31,9 @@ namespace Bud.Reactive {
     }
 
     [Test]
-    public void SkipUntilCalm_produces_the_last_element_when_observable_produces_faster_than_calming_period() {
+    public void Calmed_produces_the_last_element_when_observable_produces_faster_than_calming_period() {
       var observable = tenTickInterval.Take(15)
-                                      .SkipUntilCalm(FromTicks(50), scheduler)
+                                      .Calmed(FromTicks(50), scheduler)
                                       .GetEnumerator();
       scheduler.AdvanceBy(9001);
       IsTrue(observable.MoveNext());
@@ -41,8 +41,8 @@ namespace Bud.Reactive {
     }
 
     [Test]
-    public void SkipUntilCalm_skips_some_elements() {
-      var observable = ThreeBursts().SkipUntilCalm(FromTicks(20), scheduler).GetEnumerator();
+    public void Calmed_skips_some_elements() {
+      var observable = ThreeBursts().Calmed(FromTicks(20), scheduler).GetEnumerator();
       scheduler.AdvanceBy(9001);
       IsTrue(observable.MoveNext());
       AreEqual(2, observable.Current);
@@ -54,8 +54,8 @@ namespace Bud.Reactive {
     }
 
     [Test]
-    public void SkipUntilCalm_skips_nothing_when_production_interval_is_shorter_than_calming_period() {
-      var observable = tenTickInterval.SkipUntilCalm(FromTicks(1), scheduler)
+    public void Calmed_skips_nothing_when_production_interval_is_shorter_than_calming_period() {
+      var observable = tenTickInterval.Calmed(FromTicks(1), scheduler)
                                       .Take(3)
                                       .GetEnumerator();
       scheduler.AdvanceBy(9001);
@@ -69,11 +69,11 @@ namespace Bud.Reactive {
     }
 
     [Test]
-    public void SkipUntilCalm_stops_producing_elements_on_exception() {
+    public void Calmed_stops_producing_elements_on_exception() {
       var observable = Return("foo", scheduler)
         .Concat(Return("bar", scheduler).Delay(FromTicks(200), scheduler))
         .Concat(Throw<string>(new Exception("foobar"), scheduler))
-        .SkipUntilCalm(FromTicks(150), scheduler)
+        .Calmed(FromTicks(150), scheduler)
         .GetEnumerator();
 
       // |-o--------------------o-----------------o--------o-|
@@ -92,20 +92,20 @@ namespace Bud.Reactive {
     }
 
     [Test]
-    public void CalmAfterFirst_returns_empty()
-      => IsEmpty(Empty<int>().CalmAfterFirst(FromTicks(100), scheduler).ToEnumerable());
+    public void FirstThenCalmed_returns_empty()
+      => IsEmpty(Empty<int>().FirstThenCalmed(FromTicks(100), scheduler).ToEnumerable());
 
     [Test]
-    public void CalmAfterFirst_produces_the_first_observation_when_next_happens_within_calming_period() {
-      var enumerator = tenTickInterval.Take(5).CalmAfterFirst(FromTicks(100), scheduler).GetEnumerator();
+    public void FirstThenCalmed_produces_the_first_observation_when_next_happens_within_calming_period() {
+      var enumerator = tenTickInterval.Take(5).FirstThenCalmed(FromTicks(100), scheduler).GetEnumerator();
       scheduler.AdvanceBy(50);
       IsTrue(enumerator.MoveNext());
       AreEqual(0, enumerator.Current);
     }
 
     [Test]
-    public void CalmAfterFirst_produces_the_second_observation_when_after_calming_period() {
-      var observable = ThreeBursts().CalmAfterFirst(FromTicks(20), scheduler).GetEnumerator();
+    public void FirstThenCalmed_produces_the_second_observation_when_after_calming_period() {
+      var observable = ThreeBursts().FirstThenCalmed(FromTicks(20), scheduler).GetEnumerator();
       scheduler.AdvanceBy(9001);
       IsTrue(observable.MoveNext());
       AreEqual(0, observable.Current);
@@ -119,8 +119,8 @@ namespace Bud.Reactive {
     }
 
     [Test]
-    public void CollectUntilCalm_collects_single_elements_when_calming_period_too_short() {
-      var observable = ThreeBursts().CollectUntilCalm(FromTicks(1), scheduler).GetEnumerator();
+    public void CalmedBatches_collects_single_elements_when_calming_period_too_short() {
+      var observable = ThreeBursts().CalmedBatches(FromTicks(1), scheduler).GetEnumerator();
       scheduler.AdvanceBy(9001);
       IsTrue(observable.MoveNext());
       AreEqual(new [] {0}, observable.Current);
@@ -138,8 +138,8 @@ namespace Bud.Reactive {
     }
 
     [Test]
-    public void CollectUntilCalm_collects_groups() {
-      var observable = ThreeBursts().CollectUntilCalm(FromTicks(50), scheduler).GetEnumerator();
+    public void CalmedBatches_collects_groups() {
+      var observable = ThreeBursts().CalmedBatches(FromTicks(50), scheduler).GetEnumerator();
       scheduler.AdvanceBy(9001);
       IsTrue(observable.MoveNext());
       AreEqual(new [] {0, 1, 2}, observable.Current);

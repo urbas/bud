@@ -34,9 +34,9 @@ namespace Bud.Reactive {
     ///   after which there were no elements for the amount of time given by the <paramref name="calmingPeriod" />
     ///   parameter.
     /// </returns>
-    public static IObservable<T> SkipUntilCalm<T>(this IObservable<T> observable,
-                                                  TimeSpan calmingPeriod,
-                                                  IScheduler scheduler = null) {
+    public static IObservable<T> Calmed<T>(this IObservable<T> observable,
+                                           TimeSpan calmingPeriod,
+                                           IScheduler scheduler = null) {
       var shared = observable.Publish().RefCount();
       scheduler = scheduler ?? DefaultScheduler.Instance;
       return shared.Window(CalmingWindows(shared, calmingPeriod, scheduler))
@@ -45,9 +45,9 @@ namespace Bud.Reactive {
     }
 
     /// <summary>
-    ///   This method is similar to <see cref="SkipUntilCalm{T}" /> with one difference:
+    ///   This method is similar to <see cref="Calmed{T}" /> with one difference:
     ///   the observable returned by this method immeditately returns the first element that comes from the
-    ///   given <paramref name="observable" />. Only after that it starts behaving the same as <see cref="SkipUntilCalm{T}" />.
+    ///   given <paramref name="observable" />. Only after that it starts behaving the same as <see cref="Calmed{T}" />.
     /// </summary>
     /// <typeparam name="T">
     ///   the type of elements in the returned and given <paramref name="observable" />.
@@ -66,12 +66,12 @@ namespace Bud.Reactive {
     ///   those elements from the given <paramref name="observable" /> after which there were no elements for the amount
     ///   of time given by the <paramref name="calmingPeriod" /> parameter.
     /// </returns>
-    public static IObservable<T> CalmAfterFirst<T>(this IObservable<T> observable,
-                                                   TimeSpan calmingPeriod,
-                                                   IScheduler scheduler = null) {
+    public static IObservable<T> FirstThenCalmed<T>(this IObservable<T> observable,
+                                                    TimeSpan calmingPeriod,
+                                                    IScheduler scheduler = null) {
       var sharedInput = observable.Publish().RefCount();
       return sharedInput.Take(1)
-                        .Concat(sharedInput.Skip(1).SkipUntilCalm(calmingPeriod, scheduler));
+                        .Concat(sharedInput.Skip(1).Calmed(calmingPeriod, scheduler));
     }
 
     /// <summary>
@@ -100,9 +100,9 @@ namespace Bud.Reactive {
     ///   during the time that it wated for the first such element after which there were no elements for the
     ///   duration given by the <paramref name="calmingPeriod" /> parameter.
     /// </returns>
-    public static IObservable<ImmutableArray<T>> CollectUntilCalm<T>(this IObservable<T> observable,
-                                                                     TimeSpan calmingPeriod,
-                                                                     IScheduler scheduler = null) {
+    public static IObservable<ImmutableArray<T>> CalmedBatches<T>(this IObservable<T> observable,
+                                                                  TimeSpan calmingPeriod,
+                                                                  IScheduler scheduler = null) {
       var shared = observable.Publish().RefCount();
       scheduler = scheduler ?? DefaultScheduler.Instance;
       return shared.Window(CalmingWindows(shared, calmingPeriod, scheduler))
