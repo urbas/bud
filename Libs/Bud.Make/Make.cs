@@ -23,14 +23,14 @@ namespace Bud {
     ///   Executes rule <paramref name="ruleToBuild" /> as defined in <paramref name="rules" />.
     ///   This method executes the rules in a single thread synchronously.
     /// </summary>
-    public static void Execute(string ruleToBuild, params Rule[] rules)
-      => Execute(ruleToBuild, Directory.GetCurrentDirectory(), rules);
+    public static void DoMake(string ruleToBuild, params Rule[] rules)
+      => DoMake(ruleToBuild, Directory.GetCurrentDirectory(), rules);
 
     /// <summary>
     ///   Executes rule <paramref name="ruleToBuild" /> as defined in <paramref name="rules" />.
     ///   This method executes the rules in a single thread synchronously.
     /// </summary>
-    public static void Execute(string ruleToBuild, string workingDir, params Rule[] rules) {
+    public static void DoMake(string ruleToBuild, string workingDir, params Rule[] rules) {
       var rulesDictionary = new Dictionary<string, Rule>();
       foreach (var r in rules) {
         if (rulesDictionary.ContainsKey(r.Output)) {

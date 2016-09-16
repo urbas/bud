@@ -20,10 +20,10 @@ namespace Bud.Building {
     /// </param>
     /// <returns>the hash of the digested contents of the files.</returns>
     public static byte[] HashFiles(IEnumerable<string> files, byte[] salt = null, HashAlgorithm hashAlgorithm = null) {
-      var digest = Init(salt ?? Array.Empty<byte>(), hashAlgorithm ?? SHA256.Create());
+      var digest = Init(hashAlgorithm ?? SHA256.Create(), salt ?? Array.Empty<byte>());
       var buffer = CreateBuffer();
       foreach (var file in files) {
-        AddFile(file, buffer, digest);
+        AddFile(digest, file, buffer);
       }
       return Finish(digest, buffer);
     }
@@ -33,13 +33,13 @@ namespace Bud.Building {
       return digest.Hash;
     }
 
-    private static HashAlgorithm Init(byte[] salt, HashAlgorithm hashingAlgorithm) {
+    private static HashAlgorithm Init(HashAlgorithm hashingAlgorithm, byte[] salt) {
       hashingAlgorithm.Initialize();
       hashingAlgorithm.TransformBlock(salt, 0, salt.Length, salt, 0);
       return hashingAlgorithm;
     }
 
-    private static void AddFile(string file, byte[] buffer, ICryptoTransform digest) {
+    private static void AddFile(ICryptoTransform digest, string file, byte[] buffer) {
       using (var fileStream = File.OpenRead(file)) {
         int readBytes;
         do {

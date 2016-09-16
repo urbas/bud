@@ -12,7 +12,7 @@ namespace Bud {
     public void Execute_invokes_the_recipe_when_output_file_not_present() {
       using (var dir = new TmpDir()) {
         dir.CreateFile("This is Sparta!", "foo.in");
-        Make.Execute("foo.out", dir.Path, Make.Rule("foo.out", RemoveSpaces, "foo.in"));
+        Make.DoMake("foo.out", dir.Path, Make.Rule("foo.out", RemoveSpaces, "foo.in"));
         FileAssert.AreEqual(dir.CreateFile("ThisisSparta!", "expected_output"),
                             dir.CreatePath("foo.out"));
       }
@@ -25,7 +25,7 @@ namespace Bud {
         var inputFile = dir.CreateEmptyFile("foo.in");
         var outputFile = dir.CreateEmptyFile("foo.out");
         File.SetLastWriteTimeUtc(inputFile, File.GetLastWriteTimeUtc(outputFile) - TimeSpan.FromSeconds(5));
-        Make.Execute("foo.out", dir.Path, Make.Rule("foo.out", recipeMock.Object, "foo.in"));
+        Make.DoMake("foo.out", dir.Path, Make.Rule("foo.out", recipeMock.Object, "foo.in"));
         recipeMock.Verify(s => s(It.IsAny<string>(), It.IsAny<string>()),
                           Times.Never);
       }
@@ -34,9 +34,9 @@ namespace Bud {
     [Test]
     public void Execute_throws_when_given_duplicate_rules() {
       var exception = Assert.Throws<Exception>(() => {
-        Make.Execute("foo",
-                     Make.Rule("foo", RemoveSpaces, "bar"),
-                     Make.Rule("foo", RemoveSpaces, "moo"));
+        Make.DoMake("foo",
+                    Make.Rule("foo", RemoveSpaces, "bar"),
+                    Make.Rule("foo", RemoveSpaces, "moo"));
       });
       Assert.That(exception.Message, Does.Contain("'foo'"));
     }
@@ -44,7 +44,7 @@ namespace Bud {
     [Test]
     public void Execute_throws_when_rule_does_not_exist() {
       var exception = Assert.Throws<Exception>(() => {
-        Make.Execute("invalid.out", "/foo/bar", Make.Rule("out", RemoveSpaces, "in"));
+        Make.DoMake("invalid.out", "/foo/bar", Make.Rule("out", RemoveSpaces, "in"));
       });
       Assert.That(exception.Message, Does.Contain("'invalid.out'"));
     }
@@ -54,11 +54,11 @@ namespace Bud {
       using (var dir = new TmpDir()) {
         dir.CreateFile("foo bar", "foo");
         var expectedOutput = dir.CreateFile("FOO BAR and foobar", "expected_output");
-        Make.Execute("foo.joined",
-                     dir.Path,
-                     Make.Rule("foo.upper", Uppercase, "foo"),
-                     Make.Rule("foo.nospace", RemoveSpaces, "foo"),
-                     Make.Rule("foo.joined", WriteAndSeparatedFileContents, "foo.upper", "foo.nospace"));
+        Make.DoMake("foo.joined",
+                    dir.Path,
+                    Make.Rule("foo.upper", Uppercase, "foo"),
+                    Make.Rule("foo.nospace", RemoveSpaces, "foo"),
+                    Make.Rule("foo.joined", WriteAndSeparatedFileContents, "foo.upper", "foo.nospace"));
         FileAssert.AreEqual(expectedOutput, dir.CreatePath("foo.joined"));
       }
     }
@@ -66,11 +66,11 @@ namespace Bud {
     [Test]
     public void Execute_does_not_invoke_dependent_rules_twice() {
       var recipeMock = new Mock<SingleFileBuilder>();
-      Make.Execute("foo.out3",
-                   "/foo/bar",
-                   Make.Rule("foo.out1", recipeMock.Object, "foo.in"),
-                   Make.Rule("foo.out2", (string inFile, string outFile) => {}, "foo.out1"),
-                   Make.Rule("foo.out3", (inFiles, outFile) => {}, "foo.out1", "foo.out2"));
+      Make.DoMake("foo.out3",
+                  "/foo/bar",
+                  Make.Rule("foo.out1", recipeMock.Object, "foo.in"),
+                  Make.Rule("foo.out2", (string inFile, string outFile) => {}, "foo.out1"),
+                  Make.Rule("foo.out3", (inFiles, outFile) => {}, "foo.out1", "foo.out2"));
       recipeMock.Verify(s => s(It.IsAny<string>(), It.IsAny<string>()),
                         Times.Once);
     }
@@ -79,12 +79,12 @@ namespace Bud {
     public void Execute_throws_when_there_is_a_cycle() {
       var recipeMock = new Mock<SingleFileBuilder>();
       var ex = Assert.Throws<Exception>(() => {
-        Make.Execute("foo.out2",
-                     "/foo/bar",
-                     Make.Rule("foo.out1", recipeMock.Object, "foo.in1"),
-                     Make.Rule("foo.out2", recipeMock.Object, "foo.in2"),
-                     Make.Rule("foo.in1", recipeMock.Object, "foo.out2"),
-                     Make.Rule("foo.in2", recipeMock.Object, "foo.out1"));
+        Make.DoMake("foo.out2",
+                    "/foo/bar",
+                    Make.Rule("foo.out1", recipeMock.Object, "foo.in1"),
+                    Make.Rule("foo.out2", recipeMock.Object, "foo.in2"),
+                    Make.Rule("foo.in1", recipeMock.Object, "foo.out2"),
+                    Make.Rule("foo.in2", recipeMock.Object, "foo.out1"));
       });
       Assert.That(ex.Message,
                   Does.Contain("'foo.out2 -> foo.in1 -> foo.out1 -> foo.in2 -> foo.out2'"));

@@ -133,7 +133,6 @@
     <Compile Include="NuGet\NuGetPackageMetadata.cs" />
     <Compile Include="NuGet\IAssemblyResolver.cs" />
     <Compile Include="NuGet\NuGetAssemblyResolver.cs" />
-    <Compile Include="Reactive\ObservableOptions.cs" />
     <Compile Include="Reactive\ObservableResults.cs" />
     <Compile Include="Reactive\TaskResults.cs" />
     <Compile Include="V1\Basic.cs" />
@@ -184,7 +183,6 @@
     <Compile Include="Configuration\ModifyConf.cs" />
     <Compile Include="Configuration\ConfUndefinedException.cs" />
     <Compile Include="Reactive\ObservableResources.cs" />
-    <Compile Include="Reactive\ObservableCalming.cs" />
     <Compile Include="Util\Strings.cs" />
     <Compile Include="V1\NuGetPublishing.cs" />
     <Compile Include="V1\NuGetReferences.cs" />
