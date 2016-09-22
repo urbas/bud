@@ -4,10 +4,13 @@ using System.Reflection;
 namespace Samples {
   public static class Paths {
     public static string RunScript
-      => Path.Combine(TestAssemblyDir, "Bud.RunScript.exe");
+      => Path.Combine(SolutionRootDir, "CliTools", "Bud.RunScript", "bin", "Debug", "Bud.RunScript.exe");
+
+    public static string SolutionRootDir
+      => Path.Combine(TestAssemblyDir, "..", "..", "..");
 
     public static string SamplesDir
-      => Path.Combine(TestAssemblyDir, "..", "..", "..", "Samples");
+      => Path.Combine(SolutionRootDir, "Samples");
 
     public static string Sample(string sampleName)
       => Path.Combine(SamplesDir, sampleName);
