@@ -31,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Bud.Make, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Bud.Make.1.0.0-rc1\lib\net46\Bud.Make.dll</HintPath>
+      <HintPath>..\..\packages\Bud.Make.1.0.0-rc2\lib\net46\Bud.Make.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Bud.Option, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">

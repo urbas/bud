@@ -1,7 +1,7 @@
 //!reference Bud.Make
 
 using System.IO;
-using static Bud.Make;
+using static Bud.Make.Rules;
 
 class Build {
   static void Main(string[] args)
