@@ -179,7 +179,6 @@
   <ItemGroup>
     <EmbeddedResource Include="NuGet\SinglePackageTest\packages.config" />
     <EmbeddedResource Include="NuGet\Foo.Bar.1.2.3.nupkg" />
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
