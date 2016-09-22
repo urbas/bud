@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bud.Make, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Bud.Make.1.0.0-rc1\lib\net46\Bud.Make.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Bud.Option, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Bud.Option.1.0.1\lib\net46\Bud.Option.dll</HintPath>
       <Private>True</Private>
@@ -59,8 +63,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\System.Collections.Immutable.1.1.37\lib\dotnet\System.Collections.Immutable.dll</HintPath>
+    <Reference Include="System.Collections.Immutable, Version=1.2.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Collections.Immutable.1.2.0\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
@@ -81,10 +85,6 @@
     <EmbeddedResource Include="TestScripts\CreateFooFile.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Bud.Building\Bud.Building.csproj">
-      <Project>{5a604e11-557a-429d-8237-2956ca928422}</Project>
-      <Name>Bud.Building</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Bud.NuGet\Bud.NuGet.csproj">
       <Project>{E9529521-9D73-4DCE-AA81-D1E08CBB53D4}</Project>
       <Name>Bud.NuGet</Name>
@@ -99,6 +99,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

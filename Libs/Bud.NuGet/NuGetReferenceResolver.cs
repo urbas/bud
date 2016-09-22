@@ -4,7 +4,7 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Bud.Building;
+using Bud.Make;
 using Bud.References;
 using Newtonsoft.Json;
 using NuGet.Frameworks;
@@ -24,16 +24,16 @@ namespace Bud.NuGet {
       var packagesConfigFile = PackageReference.WritePackagesConfigXml(packageReferencesList, Path.Combine(outputDir, "packages.config"));
       var nugetV2RepoDir = Path.Combine(outputDir, "packages");
       var nugetV3RepoDir = Path.Combine(outputDir, "pacakges-v3");
-      HashBasedBuilder.Build(RestorePackages, packagesConfigFile, nugetV2RepoDir);
+      HashBasedBuilder.Build(RestorePackages, ImmutableArray.Create(packagesConfigFile), nugetV2RepoDir);
       var assemblyPathsJsonFile = HashBasedBuilder.Build((inputfile, outputfile) => ResolveAssemblies(packageReferencesList, nugetV2RepoDir, nugetV3RepoDir, outputfile),
-                                                         packagesConfigFile,
+                                                         ImmutableArray.Create(packagesConfigFile),
                                                          Path.Combine(outputDir, "nuget_assemblies.json"));
       var readAllText = File.ReadAllText(assemblyPathsJsonFile);
       return JsonConvert.DeserializeObject<ResolvedReferences>(readAllText);
     }
 
-    private static void RestorePackages(string packagesConfigFile, string packagesDir)
-      => Exec.CheckCall("nuget", $"restore {packagesConfigFile} -PackagesDirectory {packagesDir}");
+    private static void RestorePackages(ImmutableArray<string> packagesConfigFiles, string packagesDir)
+      => Exec.CheckCall("nuget", $"restore {packagesConfigFiles[0]} -PackagesDirectory {packagesDir}");
 
     private static void ResolveAssemblies(IEnumerable<PackageReference> packageReferences,
                                           string packagesDir,

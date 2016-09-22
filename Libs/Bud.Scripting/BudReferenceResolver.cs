@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using Bud.Building;
+using Bud.Make;
 using Bud.References;
 using ReflectionAssembly = System.Reflection.Assembly;
 
@@ -44,7 +44,7 @@ namespace Bud.Scripting {
       public static readonly ImmutableDictionary<string, ReflectionAssembly> BudReferences = new[] {
         ToAssemblyNamePath(typeof(Option)),
         ToAssemblyNamePath(typeof(Exec)),
-        ToAssemblyNamePath(typeof(Make)),
+        ToAssemblyNamePath(typeof(Rules)),
         ToAssemblyNamePath(typeof(HashBasedBuilder)),
         ToAssemblyNamePath(typeof(ImmutableArray)),
       }.ToImmutableDictionary();
