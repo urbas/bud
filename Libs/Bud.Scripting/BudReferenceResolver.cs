@@ -44,6 +44,9 @@ namespace Bud.Scripting {
       public static readonly ImmutableDictionary<string, ReflectionAssembly> BudReferences = new[] {
         ToAssemblyNamePath(typeof(Option)),
         ToAssemblyNamePath(typeof(Exec)),
+        ToAssemblyNamePath(typeof(TmpDir)),
+        ToAssemblyNamePath(typeof(FilesObservatory)),
+        ToAssemblyNamePath(typeof(TaskGraph)),
         ToAssemblyNamePath(typeof(Rules)),
         ToAssemblyNamePath(typeof(HashBasedBuilder)),
         ToAssemblyNamePath(typeof(ImmutableArray)),
