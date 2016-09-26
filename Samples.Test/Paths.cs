@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace Samples {
   public static class Paths {
+    /// <summary>
+    ///   The location of the Bud.RunScript executable.
+    /// </summary>
     public static string RunScript
       => Path.Combine(SolutionRootDir, "CliTools", "Bud.RunScript", "bin", "Debug", "Bud.RunScript.exe");
 

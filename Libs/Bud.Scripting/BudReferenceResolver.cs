@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
 using Bud.Make;
 using Bud.References;
 using ReflectionAssembly = System.Reflection.Assembly;
@@ -50,6 +52,9 @@ namespace Bud.Scripting {
         ToAssemblyNamePath(typeof(Rules)),
         ToAssemblyNamePath(typeof(HashBasedBuilder)),
         ToAssemblyNamePath(typeof(ImmutableArray)),
+        ToAssemblyNamePath(typeof(Observable)),
+        ToAssemblyNamePath(typeof(Unit)),
+        ToAssemblyNamePath(typeof(IEventSource<>)),
       }.ToImmutableDictionary();
     }
 

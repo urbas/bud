@@ -10,18 +10,18 @@ using Bud.References;
 namespace Bud.Scripting {
   public class ScriptBuilder {
     /// <summary>
-    /// The name of the compiled build script executable.
+    ///   The name of the compiled build script executable.
     /// </summary>
     public const string BuildScriptExeFileName = "build-script.exe";
 
     /// <summary>
-    /// The name of the directorywhere the compiled build script will be placed.
+    ///   The name of the directorywhere the compiled build script will be placed.
     /// </summary>
     private const string ScriptBuildDirName = "build";
 
     /// <summary>
     ///   The default way of building <c>Build.cs</c> scripts.
-    ///   This method places all the output in the <see cref="ScriptBuildDirName"/> directory.
+    ///   This method places all the output in the <see cref="ScriptBuildDirName" /> directory.
     ///   This directory will be placed next to the input file.
     /// </summary>
     /// <param name="scriptPath">
@@ -37,6 +37,9 @@ namespace Bud.Scripting {
                                     Path.Combine(buildDir, BuildScriptExeFileName));
     }
 
+    public static string ScriptMetadataPath(string outputScriptExePath)
+      => $"{outputScriptExePath}.metadata.json";
+
     private static void Build(ImmutableArray<string> inputFiles, string outputFile)
       => Build(inputFiles,
                new BudReferenceResolver(),
@@ -50,27 +53,12 @@ namespace Bud.Scripting {
                                               INuGetReferenceResolver nuGetReferenceResolver,
                                               string outputScriptExe) {
       var outputDir = Path.GetDirectoryName(outputScriptExe);
-
-      var references = ResolveReferences(referenceResolver, nuGetReferenceResolver, inputFiles, outputDir);
+      var scriptDirectives = ScriptDirectives.Extract(inputFiles.Select(File.ReadAllText));
+      var references = nuGetReferenceResolver.Resolve(scriptDirectives.NuGetReferences, outputDir)
+                                             .Add(referenceResolver.Resolve(scriptDirectives.References));
       Compile(compiler, references, inputFiles, outputScriptExe);
-      CopyAssemblies(references.Assemblies
-                               .Select(assemblyPath => assemblyPath.Path), outputDir);
+      CopyAssemblies(references.Assemblies.Select(assemblyPath => assemblyPath.Path), outputDir);
       return BuiltScriptMetadata.Save(outputScriptExe, references);
-    }
-
-    public static string ScriptMetadataPath(string outputScriptExePath)
-      => $"{outputScriptExePath}.metadata.json";
-
-    private static ResolvedReferences ResolveReferences(IReferenceResolver referenceResolver,
-                                                        INuGetReferenceResolver nuGetReferenceResolver,
-                                                        ImmutableArray<string> inputFilesList,
-                                                        string downloadedPackagesDir) {
-      var scriptContents = inputFilesList.Select(File.ReadAllText);
-      var directives = ScriptDirectives.Extract(scriptContents);
-
-      return nuGetReferenceResolver
-        .Resolve(directives.NuGetReferences, downloadedPackagesDir)
-        .Add(referenceResolver.Resolve(directives.References));
     }
 
     private static void Compile(ICSharpScriptCompiler compiler,
@@ -83,15 +71,11 @@ namespace Bud.Scripting {
       }
     }
 
-    private static void CopyAssemblies(IEnumerable<string> paths,
-                                       string outputDir) {
+    private static void CopyAssemblies(IEnumerable<string> paths, string outputDir) {
       foreach (var path in paths) {
-        Copy(path, Path.Combine(outputDir, Path.GetFileName(path)));
+        File.Copy(path, Path.Combine(outputDir, Path.GetFileName(path)), true);
       }
     }
-
-    private static void Copy(string inputFile, string output)
-      => File.Copy(inputFile, output, true);
 
     private static string CreateBuildDir(string scriptPath) {
       var buildDir = Path.Combine(Path.GetDirectoryName(scriptPath), ScriptBuildDirName);
