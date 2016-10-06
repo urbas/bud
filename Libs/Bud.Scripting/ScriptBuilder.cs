@@ -56,8 +56,11 @@ namespace Bud.Scripting {
       var scriptDirectives = ScriptDirectives.Extract(inputFiles.Select(File.ReadAllText));
       var references = nuGetReferenceResolver.Resolve(scriptDirectives.NuGetReferences, outputDir)
                                              .Add(referenceResolver.Resolve(scriptDirectives.References));
-      Compile(compiler, references, inputFiles, outputScriptExe);
-      CopyAssemblies(references.Assemblies.Select(assemblyPath => assemblyPath.Path), outputDir);
+
+      var taskGraph = TaskGraph.ToTaskGraph(
+        () => Compile(compiler, references, inputFiles, outputScriptExe),
+        () => CopyAssemblies(references.Assemblies.Select(assemblyPath => assemblyPath.Path), outputDir));
+      taskGraph.Run();
       return BuiltScriptMetadata.Save(outputScriptExe, references);
     }
 

@@ -49,7 +49,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Bud.TaskGraph, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Bud.TaskGraph.1.0.0\lib\net46\Bud.TaskGraph.dll</HintPath>
+      <HintPath>..\..\packages\Bud.TaskGraph.1.1.0\lib\net46\Bud.TaskGraph.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Bud.TmpDir, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">

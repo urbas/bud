@@ -22,8 +22,10 @@ namespace Bud.Scripting {
       using (var dir = new TmpDir()) {
         var script = dir.CreateFileFromResource("Bud.Scripting.TestScripts.UsingLinqWithoutReference.cs",
                                                 "UsingLinqWithoutReference.cs");
-        var exception = Assert.Throws<Exception>(() => ScriptRunner.Run(new[] {""}, script, dir.Path));
-        Assert.That(exception.Message, Contains.Substring("Linq"));
+        var exception = Assert.Throws<AggregateException>(() => ScriptRunner.Run(new[] {""}, script, dir.Path));
+        Assert.That(exception.InnerExceptions[0].Message,
+                    Contains.Substring("error CS0234: The type or namespace name 'Linq' does not exist " +
+                                       "in the namespace 'System'"));
       }
     }
 
