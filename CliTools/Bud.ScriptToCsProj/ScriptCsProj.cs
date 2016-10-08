@@ -38,7 +38,7 @@ namespace Bud.ScriptToCsProj {
                              CsProj.Property("DebugSymbols", "true"),
                              CsProj.Property("DebugType", "full"),
                              CsProj.Property("Optimize", "false"),
-                             CsProj.Property("OutputPath", @"build\"),
+                             CsProj.Property("OutputPath", $@"{ScriptBuilder.ScriptBuildDirName}\"),
                              CsProj.Property("DefineConstants", @"DEBUG;TRACE"),
                              CsProj.Property("ErrorReport", @"prompt"),
                              CsProj.Property("WarningLevel", "4")),

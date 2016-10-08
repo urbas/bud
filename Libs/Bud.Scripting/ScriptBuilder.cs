@@ -17,7 +17,7 @@ namespace Bud.Scripting {
     /// <summary>
     ///   The name of the directorywhere the compiled build script will be placed.
     /// </summary>
-    private const string ScriptBuildDirName = "build";
+    public const string ScriptBuildDirName = ".bud";
 
     /// <summary>
     ///   The default way of building <c>Build.cs</c> scripts.
