@@ -9,10 +9,20 @@ __Table of contents__
 
 Bud is a build tool.
 
-## How does it work
+## Quick start
 
 1. Create a `Build.cs` file in the top folder of your project.
 
 1. Run it with `Bud.RunScript.exe`.
 
-See [samples](Samples) for inspiration.
+See [samples](Samples) for examples on what Bud can do for you.
+
+__TODO__: Needs easy installation instructions.
+
+__TODO__: The tool to run the script should be called `bud.exe` (`bud` on Unix).
+
+## Core principles
+
+1. Bud's build scripts are just C# code.
+
+1. In addition, Bud provides some easy to use libraries with which you can write clean and powerful build scripts.
