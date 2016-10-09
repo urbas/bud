@@ -182,14 +182,6 @@
       <Project>{d5dd5466-bba7-4b4a-b8e6-74b4b643c1cc}</Project>
       <Name>Bud.ScriptToCsProj</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Libs\Bud.Test\Bud.Test.csproj">
-      <Project>{e5e245ed-633e-4589-90c2-a69eedd96b72}</Project>
-      <Name>Bud.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\bud\bud.csproj">
-      <Project>{5d2c752c-65d5-4148-918a-ab11f8344e68}</Project>
-      <Name>bud</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
