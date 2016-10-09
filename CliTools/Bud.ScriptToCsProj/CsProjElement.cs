@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Bud.CsProjTools {
+namespace Bud.ScriptToCsProj {
   public class CsProjElement {
     public string Name { get; }
     public Option<string> Content { get; }

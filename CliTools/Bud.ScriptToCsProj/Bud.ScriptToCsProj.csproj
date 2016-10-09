@@ -121,6 +121,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CsProj.cs" />
+    <Compile Include="CsProjElement.cs" />
     <Compile Include="ScriptToCsProjProgram.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptCsProj.cs" />
@@ -130,10 +132,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Libs\Bud.CsProjTools\Bud.CsProjTools.csproj">
-      <Project>{c3af8877-8fde-4d6c-b5f8-51655e7fe63b}</Project>
-      <Name>Bud.CsProjTools</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Libs\Bud.References\Bud.References.csproj">
       <Project>{a4d2b43f-f24a-480a-b743-ebe0186b0d21}</Project>
       <Name>Bud.References</Name>

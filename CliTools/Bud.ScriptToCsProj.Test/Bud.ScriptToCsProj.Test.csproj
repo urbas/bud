@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bud.Option, Version=1.0.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Bud.Option.1.0.1\lib\net46\Bud.Option.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeAnalysis, Version=1.3.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.CodeAnalysis.Common.1.3.2\lib\net45\Microsoft.CodeAnalysis.dll</HintPath>
       <Private>True</Private>
@@ -118,14 +122,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CsProjTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScriptCsProjTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Libs\Bud.CsProjTools\Bud.CsProjTools.csproj">
-      <Project>{c3af8877-8fde-4d6c-b5f8-51655e7fe63b}</Project>
-      <Name>Bud.CsProjTools</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\Libs\Bud.References\Bud.References.csproj">
       <Project>{A4D2B43F-F24A-480A-B743-EBE0186B0D21}</Project>
       <Name>Bud.References</Name>
@@ -145,6 +146,15 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="BudScript.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SampleCsProjs\Empty.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SampleCsProjs\MsBuildImports.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="SampleCsProjs\PropertyGroup.csproj" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

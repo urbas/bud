@@ -2,23 +2,22 @@
 using System.IO;
 using System.Reflection;
 using NUnit.Framework;
-using static NUnit.Framework.Assert;
 
-namespace Bud.CsProjTools {
+namespace Bud.ScriptToCsProj {
   public class CsProjTest {
     [Test]
     public void Generate_produces_an_empty_csproj_file()
-      => AreEqual(GetResourceContent("Bud.CsProjTools.SampleCsProjs.Empty.csproj"),
+      => Assert.AreEqual(GetResourceContent("Bud.ScriptToCsProj.SampleCsProjs.Empty.csproj"),
                   CsProj.Generate());
 
     [Test]
     public void Generate_imports()
-      => AreEqual(GetResourceContent("Bud.CsProjTools.SampleCsProjs.MsBuildImports.csproj"),
+      => Assert.AreEqual(GetResourceContent("Bud.ScriptToCsProj.SampleCsProjs.MsBuildImports.csproj"),
                   CsProj.Generate(CsProj.Import("blah", "bleh")));
 
     [Test]
     public void Generate_property_group()
-      => AreEqual(GetResourceContent("Bud.CsProjTools.SampleCsProjs.PropertyGroup.csproj"),
+      => Assert.AreEqual(GetResourceContent("Bud.ScriptToCsProj.SampleCsProjs.PropertyGroup.csproj"),
                   CsProj.Generate(
                     CsProj.PropertyGroup("ya",
                                          CsProj.Property("ConfigurationName", "42"),

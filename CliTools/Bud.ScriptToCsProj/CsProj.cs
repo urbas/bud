@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Bud.CsProjTools {
+namespace Bud.ScriptToCsProj {
   public static class CsProj {
     public const string Indentation = "  ";
     public static readonly IEnumerable<Tuple<string, string>> NoAttributes = Enumerable.Empty<Tuple<string, string>>();

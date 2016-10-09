@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Bud.CsProjTools;
 using Bud.References;
 using Bud.Scripting;
 

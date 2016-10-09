@@ -146,14 +146,6 @@
     <Compile Include="UsingFrameworkAssembliesTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Libs\Bud.CsProjTools.Test\Bud.CsProjTools.Test.csproj">
-      <Project>{c0141677-538f-4352-bc87-417141927b59}</Project>
-      <Name>Bud.CsProjTools.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Libs\Bud.CsProjTools\Bud.CsProjTools.csproj">
-      <Project>{c3af8877-8fde-4d6c-b5f8-51655e7fe63b}</Project>
-      <Name>Bud.CsProjTools</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Libs\Bud.References.Test\Bud.References.Test.csproj">
       <Project>{cd0a7381-310b-421b-9b5b-2cbdb7bce8d3}</Project>
       <Name>Bud.References.Test</Name>
