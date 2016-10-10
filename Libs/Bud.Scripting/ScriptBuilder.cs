@@ -10,6 +10,12 @@ using Bud.References;
 namespace Bud.Scripting {
   public class ScriptBuilder {
     /// <summary>
+    ///   The default script name is <c>Build.cs</c> and is looked up in the current working directory.
+    /// </summary>
+    public static string DefaultScriptPath
+      => Path.Combine(Directory.GetCurrentDirectory(), "Build.cs");
+
+    /// <summary>
     ///   The name of the compiled build script executable.
     /// </summary>
     public const string BuildScriptExeFileName = "build-script.exe";
@@ -30,7 +36,7 @@ namespace Bud.Scripting {
     /// </param>
     /// <returns>the path to the built executable. This executable can be run as is.</returns>
     public static string Build(Option<string> scriptPath = default(Option<string>)) {
-      var actualScriptPath = scriptPath.HasValue ? scriptPath.Value : ScriptRunner.DefaultScriptPath;
+      var actualScriptPath = scriptPath.HasValue ? scriptPath.Value : DefaultScriptPath;
       var buildDir = CreateBuildDir(actualScriptPath);
       return HashBasedBuilder.Build(Build,
                                     ImmutableArray.Create(actualScriptPath),
@@ -70,7 +76,7 @@ namespace Bud.Scripting {
                                 string outputFile) {
       var errors = compiler.Compile(inputFilesList, references, outputFile);
       if (errors.Any()) {
-        throw new Exception($"Compilation error: {string.Join("\n", errors)}");
+        throw new Exception($"Compilation error: {String.Join("\n", errors)}");
       }
     }
 

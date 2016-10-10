@@ -11,7 +11,6 @@ using NuGet.Frameworks;
 using NuGet.Packaging;
 using NuGet.Repositories;
 using NuGet.Versioning;
-using static Bud.References.AssemblyCollections;
 
 namespace Bud.NuGet {
   public class NuGetReferenceResolver : INuGetReferenceResolver {
@@ -66,7 +65,7 @@ namespace Bud.NuGet {
         }
       }
       return new ResolvedReferences(assemblies.ToImmutableArray(),
-                                    DeduplicateAssemblies(frameworkAssemblies).ToImmutableArray());
+                                    FrameworkAssembly.TakeHighestVersions(frameworkAssemblies).ToImmutableArray());
     }
 
     private static NuGetv3LocalRepository CreateNuGetV3Repo(string nugetV2RepoDir, string nugetV3RepoDir) {
