@@ -1,5 +1,3 @@
-using System.IO;
-
 namespace Bud.Scripting {
   public class ScriptRunner {
     /// <summary>

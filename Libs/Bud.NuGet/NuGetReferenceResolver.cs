@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
@@ -20,15 +19,16 @@ namespace Bud.NuGet {
       if (packageReferencesList.IsEmpty) {
         return ResolvedReferences.Empty;
       }
-      var packagesConfigFile = PackageReference.WritePackagesConfigXml(packageReferencesList, Path.Combine(outputDir, "packages.config"));
+      var packagesConfigFile = PackageReference.WritePackagesConfigXml(packageReferencesList,
+                                                                       Path.Combine(outputDir, "packages.config"));
       var nugetV2RepoDir = Path.Combine(outputDir, "packages");
       var nugetV3RepoDir = Path.Combine(outputDir, "pacakges-v3");
       HashBasedBuilder.Build(RestorePackages, ImmutableArray.Create(packagesConfigFile), nugetV2RepoDir);
       var assemblyPathsJsonFile = HashBasedBuilder.Build((inputfile, outputfile) => ResolveAssemblies(packageReferencesList, nugetV2RepoDir, nugetV3RepoDir, outputfile),
                                                          ImmutableArray.Create(packagesConfigFile),
                                                          Path.Combine(outputDir, "nuget_assemblies.json"));
-      var readAllText = File.ReadAllText(assemblyPathsJsonFile);
-      return JsonConvert.DeserializeObject<ResolvedReferences>(readAllText);
+      var assemblyPathsJson = File.ReadAllText(assemblyPathsJsonFile);
+      return JsonConvert.DeserializeObject<ResolvedReferences>(assemblyPathsJson);
     }
 
     private static void RestorePackages(ImmutableArray<string> packagesConfigFiles, string packagesDir)
@@ -37,11 +37,11 @@ namespace Bud.NuGet {
     private static void ResolveAssemblies(IEnumerable<PackageReference> packageReferences,
                                           string packagesDir,
                                           string indexDir,
-                                          string outputNuGetReferencesJsonFile) {
+                                          string assemblyPathsJsonFile) {
       var nugetRepo = CreateNuGetV3Repo(packagesDir, indexDir);
       var resolvedReferences = FindAssemblies(packageReferences, packagesDir, nugetRepo);
-      var assembliesListJson = JsonConvert.SerializeObject(resolvedReferences, Formatting.Indented);
-      File.WriteAllText(outputNuGetReferencesJsonFile, assembliesListJson);
+      var assemblyPathsJson = JsonConvert.SerializeObject(resolvedReferences, Formatting.Indented);
+      File.WriteAllText(assemblyPathsJsonFile, assemblyPathsJson);
     }
 
 
@@ -105,12 +105,8 @@ namespace Bud.NuGet {
       }
       var frameworkVersion = group.TargetFramework.Version;
       return group.Items
-                  .Select(assemblyName => ToFrameworkAssembly(assemblyName, frameworkVersion));
+                  .Select(assemblyName => new FrameworkAssembly(assemblyName, frameworkVersion));
     }
-
-    private static FrameworkAssembly ToFrameworkAssembly(string assemblyName,
-                                                         Version frameworkVersion)
-      => new FrameworkAssembly(assemblyName, frameworkVersion);
 
     private static LocalPackageInfo FindBestMatch(NuGetv3LocalRepository packageRepository,
                                                   PackageReference packageReference)
