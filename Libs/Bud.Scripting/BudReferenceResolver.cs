@@ -11,9 +11,6 @@ using ReflectionAssembly = System.Reflection.Assembly;
 
 namespace Bud.Scripting {
   public class BudReferenceResolver : IReferenceResolver {
-    public readonly ImmutableDictionary<string, Option<string>> NoReferences
-      = ImmutableDictionary<string, Option<string>>.Empty;
-
     public ResolvedReferences Resolve(IEnumerable<string> references) {
       var assemblies = new Dictionary<string, string>();
       var frameworkAssemblies = new HashSet<string>();

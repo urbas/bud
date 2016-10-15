@@ -33,7 +33,7 @@ namespace Bud.Scripting {
       foreach (var scriptContent in scriptContents) {
         Extract(scriptContent, assemblyReferences, nugetReferences);
       }
-      return new ScriptDirectives(assemblyReferences.MoveToImmutable(), nugetReferences.MoveToImmutable());
+      return new ScriptDirectives(assemblyReferences.ToImmutable(), nugetReferences.ToImmutable());
     }
 
     /// <summary>

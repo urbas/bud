@@ -64,7 +64,7 @@ namespace Bud.NuGet {
                                    nuspec.GetId(), nuspec.GetVersion(), packageReference.Framework);
         }
       }
-      return new ResolvedReferences(assemblies.MoveToImmutable(),
+      return new ResolvedReferences(assemblies.ToImmutable(),
                                     FrameworkAssembly.TakeHighestVersions(frameworkAssemblies).ToImmutableArray());
     }
 

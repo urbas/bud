@@ -33,8 +33,7 @@ namespace Bud.References {
     public static bool IsFrameworkAssembly(string dll)
       => FrameworkDirs.Any(f => File.Exists(Path.Combine(f.Dir, dll)));
 
-    internal static ImmutableSortedSet<FrameworkDir> FrameworkDirs
-      => FrameworkDirsLazy.FrameworkDirsCache;
+    internal static ImmutableSortedSet<FrameworkDir> FrameworkDirs => FrameworkDirsLazy.FrameworkDirsCache;
 
     private static class FrameworkDirsLazy {
       public static readonly ImmutableSortedSet<FrameworkDir> FrameworkDirsCache = GetFrameworkDirs();
