@@ -49,7 +49,7 @@ namespace Bud.NuGet {
                                                     string packagesCacheDir,
                                                     NuGetv3LocalRepository localRepository) {
       var frameworkAssemblies = new List<FrameworkAssembly>();
-      var assemblies = new List<Assembly>();
+      var assemblies = ImmutableArray.CreateBuilder<Assembly>();
       foreach (var packageReference in packageReferences) {
         var packageInfo = FindBestMatch(localRepository, packageReference);
         var nuspec = new NuspecReader(XDocument.Load(packageInfo.ManifestPath));
@@ -64,7 +64,7 @@ namespace Bud.NuGet {
                                    nuspec.GetId(), nuspec.GetVersion(), packageReference.Framework);
         }
       }
-      return new ResolvedReferences(assemblies.ToImmutableArray(),
+      return new ResolvedReferences(assemblies.MoveToImmutable(),
                                     FrameworkAssembly.TakeHighestVersions(frameworkAssemblies).ToImmutableArray());
     }
 
@@ -73,7 +73,7 @@ namespace Bud.NuGet {
       return new NuGetv3LocalRepository(nugetV3RepoDir, true);
     }
 
-    private static void AddAssembliesFromPackage(List<Assembly> assemblies,
+    private static void AddAssembliesFromPackage(ImmutableArray<Assembly>.Builder assemblies,
                                                  string packagesCacheDir,
                                                  Stream fileStream,
                                                  ICollection<FrameworkAssembly> frameworkAssemblies,

@@ -17,9 +17,6 @@ namespace Bud.Scripting {
       NuGetReferences = nuGetReferences;
     }
 
-    public static ScriptDirectives Extract(params string[] scriptContents)
-      => Extract((IEnumerable<string>) scriptContents);
-
     /// <summary>
     ///   Extracts directives from the contents of the scripts. Directives are of the following forms:
     ///   - <c>//!reference [ASSEMBLY NAME | ASSEMBLY PATH]</c>
@@ -36,8 +33,14 @@ namespace Bud.Scripting {
       foreach (var scriptContent in scriptContents) {
         Extract(scriptContent, assemblyReferences, nugetReferences);
       }
-      return new ScriptDirectives(assemblyReferences.ToImmutable(), nugetReferences.ToImmutable());
+      return new ScriptDirectives(assemblyReferences.MoveToImmutable(), nugetReferences.MoveToImmutable());
     }
+
+    /// <summary>
+    ///   Overload of <see cref="Extract(IEnumerable{string})"/>.
+    /// </summary>
+    public static ScriptDirectives Extract(params string[] scriptContents)
+      => Extract((IEnumerable<string>) scriptContents);
 
     private static void Extract(string scriptContent,
                                 ICollection<string> assemblyReferences,

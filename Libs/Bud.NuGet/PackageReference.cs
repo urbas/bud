@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using NuGet.Frameworks;
@@ -18,7 +17,7 @@ namespace Bud.NuGet {
 
     protected bool Equals(PackageReference other)
       => Framework.Equals(other.Framework)
-         && String.Equals(Id, other.Id)
+         && string.Equals(Id, other.Id)
          && Version.Equals(other.Version);
 
     public override bool Equals(object obj) {
@@ -53,11 +52,12 @@ namespace Bud.NuGet {
       writer.Write("</packages>");
     }
 
-    public static string WritePackagesConfigXml(IEnumerable<PackageReference> packageReferences, string packageConfigFile) {
+    public static string WritePackagesConfigXml(IEnumerable<PackageReference> packageReferences,
+                                                string packageConfigFile) {
       using (var packagesConfigFileStream = new FileStream(packageConfigFile, FileMode.Create, FileAccess.Write)) {
         using (var packageConfigFileWriter = new StreamWriter(packagesConfigFileStream)) {
           WritePackagesConfigXml(packageReferences,
-                                                  packageConfigFileWriter);
+                                 packageConfigFileWriter);
         }
       }
       return packageConfigFile;
