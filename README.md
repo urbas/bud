@@ -21,6 +21,8 @@ __TODO__: Needs easy installation instructions.
 
 __TODO__: The tool to run the script should be called `bud.exe` (`bud` on Unix).
 
+__TODO__: Integrate with [Bud.Building](https://github.com/urbas/Bud.Building).
+
 ## Core principles
 
 1. Bud's build scripts are just C# code.
